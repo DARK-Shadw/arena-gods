@@ -86,6 +86,7 @@ export const ANIM_LIBRARY: LibClipSpec[] = [
   // ------------------------------------------------------------ get-ups (start posture measured: prone / supine / side)
   ...['Getting_Up', 'Getting_Up_2', 'Getting_Up_3', 'Getting_Up_4', 'Stand_Up_2', 'Stand_Up_3'].map((n) => e('core', 'getup', HR + n, { mirror: true })),
   e('core', 'getup', HF2R + 'Kip_Up', { mirror: true, tags: ['acrobatic'] }),
+  e('core', 'getup', HF2R + 'Standing_Up_2', { mirror: true }),
   e('core', 'getup', HR + 'Zombie_Stand_Up', { mirror: true, tags: ['creature', 'slow'] }),
 
   // ------------------------------------------------------------ deaths
@@ -100,13 +101,13 @@ export const ANIM_LIBRARY: LibClipSpec[] = [
   e('core', 'death', 'Creature/mutant dying', { id: 'Mutant_Dying', tags: ['creature'], mirror: true }),
 
   // ------------------------------------------------------------ dodges (direction measured from root travel)
-  ...['Jump_Backward', 'Jump_Backward_2', 'Long_Left_Side_Step', 'Long_Right_Side_Step', 'Medium_Left_Side_Step', 'Medium_Right_Side_Step', 'Short_Left_Side_Step', 'Short_Right_Side_Step', 'Dodging_Back', 'Ducking_2'].map((n) => e('core', 'dodge', DO + n)),
+  ...['Jump_Backward', 'Jump_Backward_2', 'Long_Left_Side_Step', 'Long_Right_Side_Step', 'Medium_Left_Side_Step', 'Medium_Right_Side_Step', 'Short_Left_Side_Step', 'Short_Right_Side_Step', 'Dodging_Back', 'Ducking_2'].map((n) => e('core', 'dodge', DO + n, { mirror: true })),
   ...['Backflip_2', 'Front_Flip', 'Stylish_Flip', 'Aerial_Evade', 'Corkscrew_Evade'].map((n) => e('core', 'dodge', DO + n, { tags: ['acrobatic'] })),
   ...['Dive_Roll', 'Sprinting_Forward_Roll', 'Stand_To_Roll', 'Roll_Left_2'].map((n) => e('core', 'dodge', DO + n, { tags: ['roll'] })),
   ...['Queshada_1', 'Queshada_2', 'Macaco_Side'].map((n) => e('core', 'dodge', DO + n, { tags: ['capoeira'] })),
-  e('core', 'dodge', 'ProLongbow/standing dodge backward', { id: 'Bow_Dodge_Back' }),
-  e('core', 'dodge', 'ProLongbow/standing dodge left', { id: 'Bow_Dodge_Left' }),
-  e('core', 'dodge', 'ProLongbow/standing dodge right', { id: 'Bow_Dodge_Right' }),
+  e('core', 'dodge', 'ProLongbow/standing dodge backward', { id: 'Bow_Dodge_Back', mirror: true }),
+  e('core', 'dodge', 'ProLongbow/standing dodge left', { id: 'Bow_Dodge_Left', mirror: true }),
+  e('core', 'dodge', 'ProLongbow/standing dodge right', { id: 'Bow_Dodge_Right', mirror: true }),
 
   // ------------------------------------------------------------ entrances (arena-aware beats, lazily loaded)
   ...['Banging_Fist', 'Bash', 'Climbing_To_Top', 'Emerging', 'Fall_B_Land_To_Standing_Idle', 'Falling_To_Landing', 'Floating', 'Freehang_Climb', 'Jump_Down', 'Jumping_Down', 'Jumping_Down_2', 'Jumping_Down_6', 'Jumping_Over_Into_Combat', 'Vault_Over_Box', 'Kicking_Out', 'Smash', 'Pulling_Lever', 'Opening_Door_Inwards', 'Swagger_Walk', 'Strut_Walking', 'Standing_Taunt_Battlecry', 'Being_Cocky', 'Focus', 'Kneeling_Down', 'Stand_Up_3', 'Quick_Informal_Bow'].map((n) => e('entrance', 'entrance', EN + n)),

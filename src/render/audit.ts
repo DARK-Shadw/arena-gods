@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { simulate } from '../sim/match';
 import { getFighter } from '../sim/fighters';
 import { FighterView } from './fighterView';
+import { initLib } from './animLib';
 import { loadCharacter } from './character';
 import type { MatchRecord } from '../sim/types';
 
@@ -42,7 +43,7 @@ export async function runAudit(scene: THREE.Scene, pairs: [string, string][], se
   let deathsWithoutHit = 0;
   let matches = 0;
   for (const [a, b] of pairs) {
-    const assets = await Promise.all([loadCharacter(a), loadCharacter(b)]);
+    const [assets] = await Promise.all([Promise.all([loadCharacter(a), loadCharacter(b)]), initLib('core')]);
     for (let s = 1; s <= seeds; s++) {
       const seed = s * 7919 + a.length * 31 + b.length;
       const rec: MatchRecord = simulate(a, b, seed);

@@ -29,6 +29,7 @@ function lerpFighter(a: FighterFrame, b: FighterFrame, t: number): FighterFrame 
     // phase progress interpolates only within the same phase
     phaseT: a.phase === b.phase && a.state === b.state ? a.phaseT + (b.phaseT - a.phaseT) * t : near.phaseT,
     stateT: a.state === b.state ? a.stateT + (b.stateT - a.stateT) * t : near.stateT,
+    clipT: a.clip === b.clip && a.state === b.state ? a.clipT + (b.clipT - a.clipT) * t : near.clipT,
   };
 }
 

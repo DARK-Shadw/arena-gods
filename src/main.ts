@@ -28,6 +28,8 @@ import { UI, type MenuChoice } from './ui/ui';
 import { buildEntrance, buildFaceoff, type CineCtx, type CineLine } from './cinematic/entrance';
 import type { Timeline } from './cinematic/timeline';
 import { runAudit } from './render/audit';
+import { runAnimAudit } from './render/animAudit';
+import { initLib } from './render/animLib';
 
 type AppState = 'menu' | 'loading' | 'intro' | 'faceoff' | 'fight' | 'post';
 
@@ -70,6 +72,8 @@ class App {
   private startToken = 0;
   sound!: SoundDirector;
   dialogue!: DialogueManager;
+  /** pending ?t= jump (sim seconds), consumed when the fight starts */
+  private jumpT = 0;
   /** true while skipping cutscenes: suppresses their voice cues */
   private skipping = false;
   private lastToastT = -99;
@@ -108,13 +112,15 @@ class App {
       a: q.get('a') ?? 'gorak',
       b: q.get('b') ?? 'vex',
       seed: Number(q.get('seed') ?? Math.floor(Math.random() * 1e6)),
-      skipIntro: q.get('skip') === '1',
+      skipIntro: q.get('skip') === '1' || Number(q.get('t') ?? 0) > 0,
       arena: {
         theme: (q.get('theme') as ThemeId | 'random' | null) ?? 'random',
         layout: (q.get('layout') as LayoutId | 'random' | null) ?? 'random',
         seed: Number(q.get('aseed') ?? Math.floor(Math.random() * 1e6)),
       },
     };
+    // ?t=SECONDS jumps straight to that fight time (bug reports: ?a=&b=&seed=&theme=&layout=&aseed=&t=)
+    this.jumpT = Number(q.get('t') ?? 0);
     this.ensureArena(this.resolveArena(this.choice));
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('keydown', (e) => this.key(e));
@@ -196,7 +202,7 @@ class App {
     this.ui.splashText('<small>THE GATES OPEN…</small>', 'victory');
     let assets;
     try {
-      assets = await Promise.all([loadCharacter(c.a), loadCharacter(c.b)]);
+      [assets] = await Promise.all([Promise.all([loadCharacter(c.a), loadCharacter(c.b)]), initLib('core')]);
     } catch (e) {
       console.error(e);
       this.ui.splashText('<small>failed to load fighter models (see console)</small>', 'victory');
@@ -306,6 +312,12 @@ class App {
     this.sound = new SoundDirector([this.choice.a, this.choice.b]);
     this.sound.voiceBusy = () => this.dialogue.busy;
     audio.setMusic(true, 'fight');
+    if (this.jumpT > 0) {
+      const t = this.jumpT;
+      this.jumpT = 0;
+      this.debugSeekFight(t);
+      this.paused = new URLSearchParams(location.search).get('pause') === '1';
+    }
   }
 
   restoreLighting() {
@@ -523,7 +535,7 @@ class App {
     const simDt = realDt * scale;
     const evs = pb.advance(simDt);
     const fr = pb.frameAt(pb.t);
-    for (let i = 0; i < 2; i++) this.views[i].updateFromFrame(fr.f[i], Math.max(simDt, 1e-4), fr.f[1 - i]);
+    for (let i = 0; i < 2; i++) this.views[i].updateFromFrame(fr.f[i], Math.max(simDt, 1e-4), fr.f[1 - i], realDt);
     this.arena.applyFrame(
       fr,
       simDt,
@@ -753,6 +765,13 @@ class App {
           if (!b || !a) break;
           const p = b.chestWorld().lerp(a.chestWorld(), 0.25);
           const heavy = !!e.data?.heavy;
+          {
+            // procedural flinch on the victim (real-time springs: keeps moving through hit-stop)
+            const sp = a.strikePointsWorld(String(e.data?.move ?? ''));
+            const high = sp.length > 0 && sp[0].y > b.chestWorld().y + 0.22;
+            const ult = e.data?.kind === 'ultimate';
+            b.onHit(a.position, (ult ? 2.2 : heavy ? 1.6 : 0.85) * Math.min(1.3, 0.8 + a.def.stats.weight * 0.2), high ? 'head' : 'body');
+          }
           const fx = String(e.data?.fx ?? '');
           const color = fx === 'fire' || fx === 'pyre' || fx === 'nova' ? '#ff8a30' : fx === 'shadow' ? '#c79bff' : fx === 'holy' ? '#ffe08a' : '#fff1c8';
           this.vfx.sparks(p, heavy ? 40 : 14, color, heavy ? 9 : 6);
@@ -772,6 +791,7 @@ class App {
         case 'block': {
           if (!a || !b) break;
           a.onBlocked();
+          a.onHit(b.position, 0.45, 'body');
           const p = a.chestWorld().lerp(b.chestWorld(), 0.3);
           this.vfx.sparks(p, 16, '#ffd59a', 5);
           this.vfx.flash(p, '#ffe2b0', 0.5, 3);
@@ -780,6 +800,7 @@ class App {
         case 'parry': {
           if (!a || !b) break;
           const p = a.chestWorld().lerp(b.chestWorld(), 0.35);
+          b.onHit(a.position, 1.0, 'body');
           this.vfx.sparks(p, 50, '#cfe6ff', 9);
           this.vfx.flash(p, '#d8ecff', 1.6, 16);
           this.aberration = 0.8;
@@ -1010,6 +1031,10 @@ class App {
   /** Phantom-hit audit (see render/audit.ts). */
   audit(pairs: [string, string][], seeds = 2) {
     return runAudit(this.scene, pairs, seeds);
+  }
+  /** Animation quality audit (see render/animAudit.ts). */
+  animAudit(pairs: [string, string][], seeds = 2, opts: { blend?: 'inertial' | 'xfade'; feet?: boolean } = {}) {
+    return runAnimAudit(this.scene, pairs, seeds, opts);
   }
   /** Test hook: free camera at a pose (renders one frame). */
   debugView(p: [number, number, number], look: [number, number, number], fov = 50) {

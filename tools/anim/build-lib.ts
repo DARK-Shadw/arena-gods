@@ -427,11 +427,27 @@ function measure(spec: LibClipSpec, S: Sampled) {
         ai = i;
       }
     }
+    // big travelling reactions: the body is thrown AWAY from the blow
+    const tx = S.hips[(n - 1) * 3] - S.hips[0],
+      tz = S.hips[(n - 1) * 3 + 2] - S.hips[2];
+    if (spec.role !== 'hit' && Math.hypot(tx, tz) > 0.8) from = Math.abs(tz) >= Math.abs(tx) * 0.8 ? (tz < 0 ? 'F' : 'B') : tx < 0 ? 'L' : 'R';
     m.from = from;
     m.exc = +best.toFixed(2);
     m.sev = best < 0.2 ? 1 : best < 0.42 ? 2 : 3;
     m.height = chestAtBest > 1e-3 && best / chestAtBest > 1.7 ? 'head' : 'body';
     m.impactT = +(ai / FPS).toFixed(2);
+  }
+  {
+    // when the travel is (85%) done - dodges / launches are time-warped onto the sim's displacement window
+    const D = Math.hypot(S.hips[(n - 1) * 3] - S.hips[0], S.hips[(n - 1) * 3 + 2] - S.hips[2]);
+    let tt = 0;
+    if (D > 0.2)
+      for (let i = 0; i < n; i++)
+        if (Math.hypot(S.hips[i * 3] - S.hips[0], S.hips[i * 3 + 2] - S.hips[2]) >= 0.85 * D) {
+          tt = i / FPS;
+          break;
+        }
+    m.travelT = +tt.toFixed(2);
   }
   if (spec.role === 'dodge') {
     const [dx, dz] = m.travel as number[];
@@ -556,7 +572,7 @@ if (!ONLY) {
 export interface AnimClipData {
   role: string; tags: string[]; dur: number; posture: [string, string]; hMin: number; lift: number; apexT: number; groundT: number;
   startFace: string; endFace: string; travel: [number, number]; trim: [number, number, number]; mirror: boolean;
-  from?: 'F' | 'B' | 'L' | 'R'; exc?: number; sev?: number; height?: 'head' | 'body'; impactT?: number; dir?: 'F' | 'B' | 'L' | 'R';
+  from?: 'F' | 'B' | 'L' | 'R'; exc?: number; sev?: number; height?: 'head' | 'body'; impactT?: number; dir?: 'F' | 'B' | 'L' | 'R'; travelT: number;
 }
 export const ANIM: Record<string, AnimClipData> = {
 ${simRows}

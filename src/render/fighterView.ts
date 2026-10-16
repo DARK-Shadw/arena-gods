@@ -7,9 +7,10 @@ import * as THREE from 'three';
 import { APPEARANCE, type Appearance } from '../data/appearance';
 import type { FighterDef, FighterFrame, MoveDef } from '../sim/types';
 import { getFighter } from '../sim/fighters';
-import { AnimController, buildSharedClip, instantiate, loadSharedClips, type CharAsset, type ClipMeta } from './character';
+import { AnimController, buildSharedClip, instantiate, loadSharedClips, type AnimCat, type AnimRequest, type CharAsset, type ClipMeta } from './character';
 import { LIFT_DUR, THROW_CLIP, THROW_DUR } from '../sim/world';
 import { Telegraph, Trail } from './vfx';
+import { buildLibClip } from './animLib';
 
 /** Cutscene / manual animation input. */
 export interface AnimInput {
@@ -57,6 +58,12 @@ export class FighterView {
   private tmpA = new THREE.Vector3();
   private tmpB = new THREE.Vector3();
   weaponGlow = 0;
+  /** resolves when runtime-loaded clips (shared props, animation library) are attached */
+  ready: Promise<void>;
+  /** variant picks per pool (metrics: repetition / entropy) */
+  usage: Record<string, string[]> = {};
+  /** optional per-event hook (audits replay events through it) */
+  onEvent?: (e: import('../sim/types').SimEvent, rec: import('../sim/types').MatchRecord) => void;
   /** Height in metres (for camera framing). */
   height: number;
 
@@ -89,7 +96,7 @@ export class FighterView {
     }
     this.anim = new AnimController(this.model, asset.clips, meta);
     // shared prop clip (Throw_Object): pick-up, carry hold pose, throw
-    loadSharedClips()
+    this.ready = loadSharedClips()
       .then((d) => {
         const clip = buildSharedClip(d, 'throw_object', this.model, meta);
         if (!clip) return;
@@ -161,6 +168,30 @@ export class FighterView {
     return pts;
   }
 
+  /**
+   * Procedural flinch (spring additive, real-time): from = world position the
+   * blow comes from; strength ~0.5 light .. 2.5 huge.
+   */
+  onHit(from: THREE.Vector3, strength: number, height: 'head' | 'body' = 'body') {
+    const push = this.root.position.clone().sub(from).setY(0);
+    // world -> character space (+Z forward, +X left)
+    push.applyAxisAngle(new THREE.Vector3(0, 1, 0), -this.root.rotation.y);
+    this.anim.flinch.impulse(push, strength, height);
+  }
+
+  /** Make sure a shared-library clip is attached to this fighter's controller; returns its name or '' */
+  libName(id: string): string {
+    if (!id) return '';
+    const name = 'lib:' + id;
+    if (this.anim.has(name)) return name;
+    const clip = buildLibClip(id, this.model, this.anim.meta.hipsY);
+    if (!clip) return '';
+    this.anim.addClip(clip, clip.duration);
+    return name;
+  }
+  private lastClip = '';
+  private flightTilt = 0;
+
   /** Called by the app for block events (plays a block-impact reaction). */
   onBlocked() {
     this.blockHitT = 0;
@@ -187,8 +218,8 @@ export class FighterView {
   }
 
   /** Drive from a sim frame. dt is sim-time elapsed (slow-mo aware). */
-  updateFromFrame(fr: FighterFrame, dt: number, opp?: FighterFrame) {
-    this.root.position.set(fr.x, 0, fr.z);
+  updateFromFrame(fr: FighterFrame, dt: number, opp?: FighterFrame, realDt = dt) {
+    this.root.position.set(fr.x, fr.state === 'launched' || fr.state === 'dead' ? fr.y : 0, fr.z);
     this.root.rotation.y = fr.facing;
     if (dt > 0) this.vel.set(fr.x - this.last.x, 0, fr.z - this.last.z).divideScalar(dt);
     this.last.set(fr.x, 0, fr.z);
@@ -211,60 +242,91 @@ export class FighterView {
     }
     this.lastState = fr.state;
     this.blockHitT += dt;
+    // sim-chosen library variant for this state (hit reaction, fall, get-up, death, dodge, launch)
+    const lib = fr.clip ? this.libName(fr.clip) : '';
+    if (fr.clip && fr.clip !== this.lastClip) {
+      const pool = fr.state === 'stagger' ? 'hit' : fr.state === 'launched' ? 'launch' : fr.state === 'dead' ? 'death' : fr.state;
+      (this.usage[pool] ??= []).push(fr.clip);
+    }
+    this.lastClip = fr.clip;
+    // launched: the sim owns the arc; the body flails a little mid-air (cosmetic springs) and settles before landing
+    const air = fr.state === 'launched' || (fr.state === 'dead' && fr.y > 0.02);
+    this.anim.flinch.flail = air ? Math.max(0, Math.min(1, fr.y / 0.6)) : 0;
 
-    let req: { name?: string; time?: number; auto?: boolean; fadeIn?: number } = {};
+    let req: Omit<AnimRequest, 'fwd' | 'side'> = {};
     const A = this.anim;
     switch (fr.state) {
       case 'attack': {
         const meta = move ? A.meta.clips[move.id] : undefined;
         if (move && meta) {
           const w = this.warpAttack(meta, move, fr.phase, fr.phaseT);
-          req = w.fadeOut ? {} : { name: move.id, time: w.time, fadeIn: fr.attackId !== this.lastAttackId ? 14 : 30 };
+          req = w.fadeOut ? {} : { name: move.id, time: w.time, fadeIn: fr.attackId !== this.lastAttackId ? 14 : 30, cat: 'attack', restart: fr.attackId !== this.lastAttackId };
         }
         break;
       }
       case 'block':
-        req = this.blockHitT < 0.45 ? { name: 'blockHit', time: this.blockHitT * 1.2 } : { name: 'block', auto: true, fadeIn: 14 };
+        req = this.blockHitT < 0.45 ? { name: 'blockHit', time: this.blockHitT * 1.2, cat: 'hit' } : { name: 'block', auto: true, fadeIn: 14, cat: 'block' };
         break;
       case 'dodge':
-        req = { name: this.dodgeClip, time: Math.min(1, fr.stateT / 0.5) * A.dur(this.dodgeClip) * 0.85, fadeIn: 20 };
+        req = lib
+          ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'dodge', restart: entering }
+          : { name: this.dodgeClip, time: Math.min(1, fr.stateT / 0.5) * A.dur(this.dodgeClip) * 0.85, fadeIn: 20, cat: 'dodge' };
         break;
       case 'stagger':
-        req = { name: this.hitClip, time: 0.05 + fr.stateT * 1.15, fadeIn: 20 };
+        req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'hit', restart: entering } : { name: this.hitClip, time: 0.05 + fr.stateT * 1.15, fadeIn: 20, cat: 'hit', restart: entering };
+        break;
+      case 'launched':
+        req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'launch' } : { name: 'fall', auto: true, cat: 'launch' };
         break;
       case 'winded':
-        req = { name: 'winded', auto: true, fadeIn: 6 };
+        req = { name: 'winded', auto: true, fadeIn: 6, cat: 'other' };
         break;
       case 'knockdown':
-        req = { name: 'death', time: Math.min(1, fr.stateT / 0.65) * A.dur('death') * 0.55, fadeIn: 18 };
+        req = lib
+          ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'knockdown' }
+          : { name: 'death', time: Math.min(1, fr.stateT / 0.65) * A.dur('death') * 0.55, fadeIn: 18, cat: 'knockdown' };
         break;
       case 'getup':
-        req = { name: 'getup', time: fr.phaseT * A.dur('getup'), fadeIn: 7 };
+        req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'getup' } : { name: 'getup', time: fr.phaseT * A.dur('getup'), fadeIn: 7, cat: 'getup' };
         break;
       case 'dead':
-        req = { name: 'death', time: Math.min(A.dur('death') - 0.05, A.dur('death') * 0.4 + fr.stateT * 0.9), fadeIn: 18 };
+        req = lib
+          ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: air ? 'launch' : 'death' }
+          : { name: 'death', time: Math.min(A.dur('death') - 0.05, A.dur('death') * 0.4 + fr.stateT * 0.9), fadeIn: 18, cat: 'death' };
         break;
       case 'taunt':
-        req = { name: 'taunt', time: Math.min(A.dur('taunt') - 0.05, fr.stateT * 1.3), fadeIn: 8 };
+        req = { name: 'taunt', time: Math.min(A.dur('taunt') - 0.05, fr.stateT * 1.3), fadeIn: 8, cat: 'taunt' };
         break;
       case 'roar':
-        req = { name: 'roar', time: Math.min(A.dur('roar') - 0.05, 0.2 + fr.stateT * 1.2), fadeIn: 10 };
+        req = { name: 'roar', time: Math.min(A.dur('roar') - 0.05, 0.2 + fr.stateT * 1.2), fadeIn: 10, cat: 'taunt' };
         break;
       case 'lift':
-        req = { name: 'throw_object', time: THROW_CLIP.liftFrom + Math.min(1, fr.stateT / LIFT_DUR) * (THROW_CLIP.liftTo - THROW_CLIP.liftFrom), fadeIn: 14 };
+        req = { name: 'throw_object', time: THROW_CLIP.liftFrom + Math.min(1, fr.stateT / LIFT_DUR) * (THROW_CLIP.liftTo - THROW_CLIP.liftFrom), fadeIn: 14, cat: 'carry' };
         break;
       case 'throw':
-        req = { name: 'throw_object', time: THROW_CLIP.throwFrom + Math.min(1, fr.stateT / THROW_DUR) * (THROW_CLIP.throwTo - THROW_CLIP.throwFrom), fadeIn: 30 };
+        req = { name: 'throw_object', time: THROW_CLIP.throwFrom + Math.min(1, fr.stateT / THROW_DUR) * (THROW_CLIP.throwTo - THROW_CLIP.throwFrom), fadeIn: 30, cat: 'carry' };
         break;
       case 'victory': {
         const d = A.dur('taunt');
-        req = { name: 'taunt', time: fr.stateT % d, fadeIn: 5 };
+        req = { name: 'taunt', time: fr.stateT % d, fadeIn: 5, cat: 'taunt' };
         break;
       }
     }
     this.lastAttackId = fr.attackId;
     A.overlayTarget = fr.carry >= 0 && (fr.state === 'idle' || fr.state === 'block') ? 1 : 0;
-    A.update(dt, { ...req, fwd: fr.state === 'idle' || fr.state === 'block' ? fwd : 0, side: fr.state === 'idle' || fr.state === 'block' ? side : 0 });
+    // airborne: tip the whole body back along the flight (cosmetic; peaks mid-air, level again at landing)
+    if (air && fr.y > 0.01) {
+      const hv = Math.hypot(this.vel.x, this.vel.z);
+      if (hv > 0.5) {
+        const travel = new THREE.Vector3(this.vel.x, 0, this.vel.z).normalize();
+        const fwdW = new THREE.Vector3(Math.sin(fr.facing), 0, Math.cos(fr.facing));
+        const back = travel.dot(fwdW) < 0 ? 1 : -1; // flying backwards -> tip back
+        const k = Math.min(1, fr.y / 1.2);
+        this.flightTilt += (back * 0.75 * k - this.flightTilt) * Math.min(1, realDt * 8);
+      }
+    } else this.flightTilt *= Math.exp(-realDt * 10);
+    this.model.rotation.x = -this.flightTilt;
+    A.update(dt, { ...req, fwd: fr.state === 'idle' || fr.state === 'block' ? fwd : 0, side: fr.state === 'idle' || fr.state === 'block' ? side : 0 }, realDt);
     this.root.updateMatrixWorld(true);
 
     // weapon/limb trail during active frames
@@ -313,7 +375,7 @@ export class FighterView {
     this.last.copy(pos);
     const A = this.anim;
     const t = inp.stateT ?? 0;
-    let req: { name?: string; time?: number; auto?: boolean; fadeIn?: number } = {};
+    let req: Omit<AnimRequest, 'fwd' | 'side'> = {};
     let fwd = 0;
     switch (inp.state) {
       case 'idle':

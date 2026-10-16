@@ -590,7 +590,7 @@ export class World {
     const h = this.L.hazards[i];
     const s = this.haz[i];
     const t = m.t;
-    const inside = (f: FighterState, pad = 0) => f.state !== 'dead' && hypot(f.x - h.x, f.z - h.z) < h.r + pad;
+    const inside = (f: FighterState, pad = 0) => f.state !== 'dead' && f.state !== 'launched' && hypot(f.x - h.x, f.z - h.z) < h.r + pad;
     switch (h.kind) {
       case 'lava':
       case 'firepit': {

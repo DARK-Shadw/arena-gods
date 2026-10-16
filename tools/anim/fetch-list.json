@@ -139,21 +139,47 @@
     "Being_Electrocuted": "lightning-spell victim",
     "Kip_Up": "acrobatic get-up (Vex, Kachujin)",
     "Corkscrew_Kip_Up": "acrobatic get-up 2",
-    "Waking": "slow get-up"
+    "Waking": "slow get-up",
+    "Standing_Up_2": "get-up from a sprawled fall (1.7 s) - widens the get-up pool (M2)",
+    "Standing_Up_3": "get-up from lying on the stomach (prone get-ups were the thinnest pool, M2)",
+    "Inverted_Double_Kick_To_Kip_Up": "acrobatic kip-up variant (agile fighters, M2)"
   },
   "deaths": {
-    "Dying": "death variant", "Dying_3": "death variant", "Dying_5": "death variant", "Dying_8": "death variant",
-    "Knocked_Out": "KO collapse", "Knocked_Unconscious": "KO collapse 2", "Turn_To_Knocked_Unconscious": "spin-out KO",
-    "Crouch_Death": "kneeling death (execution end)", "Walking_To_Dying": "stumbling death"
+    "Dying": "death variant",
+    "Dying_3": "death variant",
+    "Dying_5": "death variant",
+    "Dying_8": "death variant",
+    "Knocked_Out": "KO collapse",
+    "Knocked_Unconscious": "KO collapse 2",
+    "Turn_To_Knocked_Unconscious": "spin-out KO",
+    "Crouch_Death": "kneeling death (execution end)",
+    "Walking_To_Dying": "stumbling death"
   },
   "social": {
-    "Insult": "taunt", "Shake_Fist": "taunt", "Fist_Pump": "victory", "Angry": "rage idle", "Hard_Head_Nod": "talk accent",
-    "Head_Nod_Yes": "talk accent", "Annoyed_Head_Shake": "talk accent", "Cocky_Head_Turn": "talk accent", "Dismissing_Gesture": "talk accent",
-    "Look_Away_Gesture": "talk accent", "Rallying": "rally the crowd", "Standing_Arguing": "long argue loop (face-off)", "Sad_Idle": "defeat idle", "Kneeling": "kneel hold"
+    "Insult": "taunt",
+    "Shake_Fist": "taunt",
+    "Fist_Pump": "victory",
+    "Angry": "rage idle",
+    "Hard_Head_Nod": "talk accent",
+    "Head_Nod_Yes": "talk accent",
+    "Annoyed_Head_Shake": "talk accent",
+    "Cocky_Head_Turn": "talk accent",
+    "Dismissing_Gesture": "talk accent",
+    "Look_Away_Gesture": "talk accent",
+    "Rallying": "rally the crowd",
+    "Standing_Arguing": "long argue loop (face-off)",
+    "Sad_Idle": "defeat idle",
+    "Kneeling": "kneel hold"
   },
   "environment": {
-    "Pushing": "push a pillar / statue (topple setup)", "Push_Start": "push start", "Push_Stop": "push stop",
-    "Pull_Heavy_Object": "drag a prop", "Holding_Idle": "carry pose (two-handed hold)", "Holding_Walk": "carry walk",
-    "Carrying": "fireman carry (victory parade with defeated foe?)", "Picking_Up_Object": "pick up variant", "Putting_Down": "set prop down"
+    "Pushing": "push a pillar / statue (topple setup)",
+    "Push_Start": "push start",
+    "Push_Stop": "push stop",
+    "Pull_Heavy_Object": "drag a prop",
+    "Holding_Idle": "carry pose (two-handed hold)",
+    "Holding_Walk": "carry walk",
+    "Carrying": "fireman carry (victory parade with defeated foe?)",
+    "Picking_Up_Object": "pick up variant",
+    "Putting_Down": "set prop down"
   }
 }

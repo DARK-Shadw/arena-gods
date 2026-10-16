@@ -20,6 +20,7 @@
  * greed after a landed hit, panic rolls at low HP, stubborn personalities
  * adapting slowly. Everything uses the match's seeded RNG - deterministic.
  */
+import { LAUNCH, launchForce } from './launch';
 import { atan2, cos, hypot, pow, sin } from './dmath';
 import type { Rng } from './rng';
 import { PS_REST, THROW_RELEASE, segPointDist } from './world';
@@ -170,7 +171,7 @@ function maxReach(o: FighterState): number {
 function safeToLift(m: Match, f: FighterState, o: FighterState, q: { gap: number; los: boolean; oppRanged: boolean; prop: number }): boolean {
   const p = m.world.props[q.prop];
   const d = hypot(p.x - f.x, p.z - f.z);
-  if (o.state === 'knockdown' && o.stateDur - o.stateT > 0.5 && d < 3.5) return true;
+  if ((o.state === 'knockdown' || o.state === 'launched') && o.stateDur - o.stateT > 0.5 && d < 3.5) return true;
   if (oppBusy(m, o) && q.gap > 2.5) return true;
   if (q.oppRanged) return !q.los && q.gap > 3;
   // brutes who love throwing things take the risk sooner
@@ -179,7 +180,7 @@ function safeToLift(m: Match, f: FighterState, o: FighterState, q: { gap: number
 
 /** opponent tied up for a moment (safe-ish to bend over for a prop) */
 function oppBusy(m: Match, o: FighterState): boolean {
-  if (o.state === 'stagger' || o.state === 'knockdown' || o.state === 'getup' || o.state === 'winded' || o.state === 'taunt' || o.state === 'lift') return true;
+  if (o.state === 'stagger' || (o.state === 'knockdown' || o.state === 'launched') || o.state === 'getup' || o.state === 'winded' || o.state === 'taunt' || o.state === 'lift') return true;
   return o.state === 'attack' && !!o.move && m.attackPhase(o) === 2 && o.stateDur - o.stateT > 0.4;
 }
 
@@ -187,7 +188,7 @@ function oppBusy(m: Match, o: FighterState): boolean {
 function openWindow(m: Match, o: FighterState): number {
   if (o.state === 'stagger' || o.state === 'taunt' || o.state === 'winded') return Math.max(0, o.stateDur - o.stateT);
   if (o.state === 'getup') return Math.max(0, o.stateDur - o.stateT - 0.3);
-  if (o.state === 'knockdown') return o.stateDur - o.stateT < 0.5 ? 0.25 : 0;
+  if ((o.state === 'knockdown' || o.state === 'launched')) return o.stateDur - o.stateT < 0.5 ? 0.25 : 0;
   if (o.state === 'attack' && o.move && m.attackPhase(o) === 2) return o.move.windup + o.move.active + o.move.recovery - o.stateT;
   if (o.state === 'roar') return 0;
   // bending over to pick something up / winding up a throw: free hit
@@ -219,7 +220,7 @@ function caution(f: FighterState): number {
 
 export function wantsCombo(m: Match, f: FighterState, o: FighterState, next: MoveDef): boolean {
   if (f.stamina < next.stamina * 0.6) return false;
-  if (o.state === 'knockdown' || o.state === 'dead' || m.isInvulnerable(o)) return false;
+  if ((o.state === 'knockdown' || o.state === 'launched') || o.state === 'dead' || m.isInvulnerable(o)) return false;
   if (gapOf(f, o) > reachOf(f, next) + 0.2) return false;
   // after a block, only continue with a guard-breaker (or out of greed)
   const greedy = m.t < f.ai.greedUntil;
@@ -626,7 +627,7 @@ function scoreGoals(m: Match, f: FighterState, o: FighterState, q: Percept): Rec
     // arena play: grab something to throw (melee vs a kiter / opponent hiding / brutes showing off)
     grab:
       AI_TUNING.arenaTactics && q.prop >= 0 && !q.oppPressing && safeToLift(m, f, o, q)
-        ? (q.ranged ? 0.35 : 1) * (1.2 + q.doc.usesProps * 1.6 + (o.state === 'knockdown' ? 0.8 : 0) + (q.oppRanged && !q.ranged ? 1.0 : 0) + (!q.los ? 0.4 : 0) + (m.world.props[q.prop].explosive ? 0.4 : 0) + onTheWay(f, o, m.world.props[q.prop]) * 0.6) * pow(0.8, f.ai.pickups)
+        ? (q.ranged ? 0.35 : 1) * (1.2 + q.doc.usesProps * 1.6 + ((o.state === 'knockdown' || o.state === 'launched') ? 0.8 : 0) + (q.oppRanged && !q.ranged ? 1.0 : 0) + (!q.los ? 0.4 : 0) + (m.world.props[q.prop].explosive ? 0.4 : 0) + onTheWay(f, o, m.world.props[q.prop]) * 0.6) * pow(0.8, f.ai.pickups)
         : 0,
     // bring the cover down: topple it onto them, or smash the cover a shooter hides behind
     smash: !AI_TUNING.arenaTactics ? 0 : (q.topple >= 0 ? 0.8 + q.doc.envCunning * 1.6 : 0) + (q.blocker >= 0 && q.oppRanged && !q.ranged && q.gap < 7 ? 0.3 + q.doc.envCunning * 0.6 : 0) + (q.blocker >= 0 && q.ranged ? 0.2 + q.doc.envCunning * 0.5 : 0),
@@ -709,7 +710,7 @@ function think(m: Match, f: FighterState, o: FighterState) {
     if (ult && moveUsable(m, f, o, ult, q.gap)) {
       let want = 0.2 + (q.my < 0.3 ? 0.5 : 0) + (q.open > ult.windup * 0.7 ? 0.6 : 0) + P.aggression * 0.15 + (ai.goal === 'finish' || ai.goal === 'gambit' ? 0.4 : 0);
       if (P.pride > 0.6 && q.their > 0.4 && q.my > 0.4) want *= 0.3;
-      if (o.state === 'knockdown' && o.stateDur - o.stateT > 0.5) want = 0;
+      if ((o.state === 'knockdown' || o.state === 'launched') && o.stateDur - o.stateT > 0.5) want = 0;
       if (m.rng.chance(want) && m.startAttack(f, ult)) {
         remember(f, ult);
         return;
@@ -771,7 +772,7 @@ function attackChance(m: Match, f: FighterState, o: FighterState, q: Percept): n
       break;
   }
   if (o.state === 'block') p *= 0.5 + f.def.personality.adaptability * 0.5;
-  if (o.state === 'knockdown' && q.open === 0) p = 0;
+  if ((o.state === 'knockdown' || o.state === 'launched') && q.open === 0) p = 0;
   if (f.stamina < 25) p -= 0.2;
   return clamp(p, 0, 1);
 }
@@ -825,6 +826,10 @@ function chooseMove(m: Match, f: FighterState, o: FighterState, q: Percept): Mov
     if (goal !== 'punish' && mv.recovery > 0.6 && o.def.stats.speed > 4) u *= 0.75;
     // something nasty behind them (hazard / wall / cover): big knockback sends them into it
     if (AI_TUNING.arenaTactics && q.backHazard > 0 && (mv.knockback >= 4 || mv.knockdown)) u += q.backHazard * (0.6 + q.doc.envCunning * 1.2);
+    // LAUNCH exploitation: a knockdown blow strong enough to send an off-balance opponent flying,
+    // ideally into a hazard / wall / cover behind them
+    if (AI_TUNING.arenaTactics && mv.knockdown && m.launches < LAUNCH.maxPerMatch && launchForce(f, o, mv, m.attackPhase(o)) >= LAUNCH.minForce)
+      u += 0.25 + P.pride * 0.25 + (q.backHazard > 0 ? 0.5 + q.doc.envCunning : 0);
     if (f.stamina - mv.stamina < 12 && !mv.furyCost) u *= 0.6;
     cands.push(mv);
     w.push(Math.max(0.02, u * (0.85 + m.rng.next() * 0.3)));

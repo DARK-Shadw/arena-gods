@@ -117,7 +117,8 @@ export type FState =
   | 'lift'
   | 'throw'
   | 'dead'
-  | 'victory';
+  | 'victory'
+  | 'launched';
 
 export type EventType =
   | 'match_start'
@@ -134,6 +135,8 @@ export type EventType =
   | 'stagger'
   | 'knockdown'
   | 'getup'
+  | 'launch'
+  | 'launch_land'
   | 'wall_slam'
   | 'pillar_slam'
   | 'prop_break'
@@ -228,6 +231,9 @@ export interface FighterFrame {
   carry: number;
   /** facing a world target (cover / prop / barrel) rather than the opponent */
   aimOn: boolean;
+  /** sim-chosen library clip for the current state ('' = own clip set) and its clip time */
+  clip: string;
+  clipT: number;
 }
 
 export interface Frame {
