@@ -1,6 +1,6 @@
 # Animation catalog
 
-Every animation clip we own: 594 clips (360 Mixamo_HF, 234 original packs).
+Every animation clip we own: 753 clips (360 Mixamo_HF, 159 Mixamo_HF2 (fetched this round), 234 original packs).
 The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by `tools/anim/catalog.ts`. The machine-readable version is `docs/animation-catalog.json`, which also carries start and end poses, contacts and per-effector peaks.
 
 **Columns:**
@@ -15,31 +15,31 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | category | clips | in game |
 |---|---|---|
 | error | 1 | 0 |
-| attack | 64 | 19 |
+| attack | 77 | 19 |
 | block | 15 | 4 |
 | cast | 25 | 12 |
-| combo | 20 | 3 |
+| combo | 21 | 3 |
 | cover | 6 | 0 |
-| death | 32 | 6 |
+| death | 41 | 6 |
 | dodge | 38 | 3 |
-| emote | 24 | 5 |
-| equip | 12 | 2 |
-| finisher | 18 | 0 |
-| getup | 10 | 0 |
-| grapple | 14 | 0 |
-| hit-react | 83 | 12 |
-| idle | 36 | 11 |
-| jump-fall | 20 | 3 |
-| kick | 20 | 4 |
-| knockdown | 12 | 0 |
-| locomotion | 67 | 28 |
+| emote | 35 | 5 |
+| equip | 16 | 2 |
+| finisher | 27 | 0 |
+| getup | 13 | 0 |
+| grapple | 22 | 0 |
+| hit-react | 90 | 12 |
+| idle | 51 | 11 |
+| jump-fall | 34 | 3 |
+| kick | 29 | 4 |
+| knockdown | 16 | 0 |
+| locomotion | 83 | 28 |
 | misc | 1 | 1 |
 | parry | 2 | 2 |
-| talk | 18 | 0 |
-| throw-prop | 7 | 0 |
-| transition | 5 | 2 |
-| turn | 25 | 0 |
-| victory-defeat | 19 | 0 |
+| talk | 26 | 0 |
+| throw-prop | 23 | 0 |
+| transition | 8 | 2 |
+| turn | 28 | 0 |
+| victory-defeat | 25 | 0 |
 
 ## error (1)
 
@@ -47,7 +47,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 |---|---|---|---|---|---|---|---|---|
 | ProMeleeAxe/standing melee attack horizontal.fbx | error: THREE.FBXLoader: Unknown property type  |||||||| 
 
-## attack (64)
+## attack (77)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -100,6 +100,19 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/weapons_extra/Standing_Torch_Melee_Attack_04 | 1h-torch/club | 3.833 | dz 1.74 dx 0 | stand>stand (via crouch) | LeftHand @1.133 |  |  |  |
 | HF/weapons_extra/Standing_Torch_Melee_Attack_05 | 1h-torch/club | 3.2 | dz 1.73 dx 0 | stand>stand (via crouch) | LeftHand @1.667 |  |  |  |
 | HF/weapons_extra/Standing_Torch_Melee_Attack_Stab | 1h-torch/club | 2.433 | dz 0 dx 0 | stand>stand (via crouch) | LeftHand @0.833 |  | M |  |
+| HF2/martial/Back_Flip_To_Uppercut | unarmed | 5.833 | dz 0.48 dx 0 | stand>stand (via crouch) | LeftHand @1.4 |  |  |  |
+| HF2/martial/Elbow_Punch | unarmed | 1.733 | dz 0 dx 0 | stand>stand (via crouch) | RightHand @0.533 |  |  |  |
+| HF2/martial/Illegal_Elbow_Punch | unarmed | 2.267 | dz 0.01 dx 0 | stand>stand (via crouch) | RightHand @0.6 |  |  |  |
+| HF2/martial/Knee_Jab | unarmed | 6 | dz 0 dx 0 | stand>stand (via crouch) | RightHand @1.333 |  | M |  |
+| HF2/martial/Surprise_Uppercut | unarmed | 3.5 | dz 1.12 dx -0.04 yaw -57 | stand>stand (via crouch) | RightHand @1.133 |  |  |  |
+| HF2/martial/Uppercut | unarmed | 1.333 | · | stand>stand (via crouch) | LeftHand @0.467 |  | M |  |
+| HF2/weapons/Heavy_Weapon_Swing | 2h-club | 5.2 | dz 0 dx 0 | stand>stand | RightHand @2.567 |  | M |  |
+| HF2/weapons/Run_And_Swing | 1h-sword | 2.433 | dz 5.6 dx 0 | stand>stand (via crouch) | RightFoot @1.2 |  |  |  |
+| HF2/weapons/Slash_Advance | 1h-sword | 2.5 | dz 0 dx 0 | stand>stand (via crouch) | LeftHand @0.767 |  | M |  |
+| HF2/weapons/Sword_And_Shield_Attack_2 | sword-shield | 2.333 | dz 3.48 dx 0.01 yaw -45 | stand>crouch (via kneel) | LeftHand @1.233 |  |  |  |
+| HF2/weapons/Sword_And_Shield_Slash_2 | sword-shield | 3.533 | dz 2.35 dx 0.01 yaw -362 | stand>stand (via kneel) | RightFoot @1.867 |  |  |  |
+| HF2/weapons/Thrust_Slash | spear/2h | 3 | dz 0 dx 0 | crouch>crouch | RightHand @0.733 |  | M |  |
+| HF2/weapons/Upward_Thrust | spear/2h | 2.333 | dz -0.01 dx 0 | crouch>crouch | RightHand @0.733 |  | M |  |
 | ProLongbow/standing melee punch | bow | 1 | · | stand>stand | LeftHand @0.333 |  | M | erika.jab, hollowjack.gourd_punch +1 |
 | ProMeleeAxe/standing melee attack 360 high | 1h-axe | 3.167 | dz 0 dx 0 yaw -360 | stand>stand (via crouch) | RightHand @1.067 |  | M | gorak.skullsplitter, maw.devour +1 |
 | ProMeleeAxe/standing melee attack 360 low | 1h-axe | 2.5 | dz 0 dx 0 yaw -360 | stand>stand (via crouch) | RightHand @0.933 |  | M | gorak.cleave, fenrik.tail_sweep +2 |
@@ -166,7 +179,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProSwordandShield/sword and shield casting (2) | sword-shield | 1.033 | · | crouch>stand | LeftHand @0.167 |  | M | aldric.ward_pulse |
 | ProSwordandShield/sword and shield casting | sword-shield | 2.967 | · | stand>stand (via kneel) | RightHand @1.633 |  | M | aldric.roar |
 
-## combo (20)
+## combo (21)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -187,6 +200,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/weapons_extra/One_Hand_Club_Combo | 1h-club | 3.633 | dz 1.39 dx 0 | stand>stand (via crouch) | RightHand @2.167 |  | M |  |
 | HF/weapons_extra/One_Hand_Sword_Combo | 1h-sword | 4.533 | dz 1.12 dx 0 | crouch>crouch | RightHand @3 |  | M |  |
 | HF/weapons_extra/Two_Hand_Sword_Combo | 2h-greatsword | 3.267 | dz 1.81 dx 0 | stand>stand | LeftHand @2.2 |  |  |  |
+| HF2/weapons/Two_Hand_Club_Combo | 2h-club | 5.433 | dz 1.47 dx 0 | stand>stand (via crouch) | LeftHand @1.467 |  |  |  |
 | ProMeleeAxe/standing melee combo attack ver. 1 | 1h-axe | 4.667 | dz 1.5 dx 0 | crouch>crouch | LeftHand @2.133 |  |  | gorak.reavers_fury, vex.thousand_cuts |
 | ProMeleeAxe/standing melee combo attack ver. 2 | 1h-axe | 4.2 | dz 0 dx 0 | stand>stand (via crouch) | LeftHand @2.5 |  | M | gorak.headsman, fenrik.savage_string |
 | ProMeleeAxe/standing melee combo attack ver. 3 | 1h-axe | 2.733 | dz 0 dx 0 | stand>stand (via crouch) | RightHand @1.033 |  | M | fenrik.feral_frenzy, hollowjack.harvest_combo |
@@ -202,7 +216,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ActionAdventure/stand to cover (2) | unarmed | 1.267 | dz 1.19 dx -0.01 yaw -132 | stand>crouch (via kneel) |  |  |  |  |
 | ActionAdventure/stand to cover | unarmed | 1.133 | dz 1.15 dx -0.01 yaw -110 | stand>stand (via crouch) |  |  |  |  |
 
-## death (32)
+## death (41)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -230,6 +244,15 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/deaths/Zombie_Dying | zombie | 3.333 | dz 1.19 dx -0.17 yaw 142 | stand>ground | ends on ground |  |  |  |
 | HF/weapons_extra/Two_Handed_Sword_Death_2 | 2h-greatsword | 2.6 | dz 1.24 dx -0.07 yaw -102 | stand>ground | ends on ground |  | M |  |
 | HF/weapons_extra/Two_Handed_Sword_Death | 2h-greatsword | 2.4 | dz -0.82 dx -0.01 yaw 132 | stand>ground | ends on ground |  | M |  |
+| HF2/deaths/Crouch_Death | unarmed | 2.367 | dz -0.98 dx -0.09 yaw -41 | kneel>ground | ends on ground |  | M |  |
+| HF2/deaths/Dying_3 | unarmed | 4.667 | dz 2.17 dx -0.06 yaw -164 | stand>ground | ends on ground |  |  |  |
+| HF2/deaths/Dying_5 | unarmed | 4.333 | dz 1.38 dx -0.53 yaw -99 | stand>ground | ends on ground |  |  |  |
+| HF2/deaths/Dying_8 | unarmed | 6.833 | · | ground>ground | ends on ground |  |  |  |
+| HF2/deaths/Dying | unarmed | 4.4 | dz 0.04 dx -0.34 yaw 28 | stand>ground | ends on ground |  | M |  |
+| HF2/deaths/Knocked_Out | unarmed | 4.933 | dz -1.07 dx -0.94 | stand>ground | ends on ground |  | M |  |
+| HF2/deaths/Knocked_Unconscious | unarmed | 4.567 | · | kneel>kneel | ends kneel |  | M |  |
+| HF2/deaths/Turn_To_Knocked_Unconscious | unarmed | 4.6 | dz 4.02 dx 0.15 yaw -197 | stand>ground | ends on ground |  |  |  |
+| HF2/deaths/Walking_To_Dying | unarmed | 3.067 | dz 1.61 dx -0.21 yaw 125 | stand>ground | ends on ground |  |  |  |
 | ProLongbow/standing death backward 01 | bow | 3.1 | dz -1.06 dx 0.19 | stand>ground | ends on ground |  |  | erika.death |
 | ProLongbow/standing death forward 01 | bow | 3.167 | dz 1.28 dx -0.2 yaw 107 | stand>ground | ends on ground |  |  |  |
 | ProMagic/Standing React Death Backward | caster | 3.633 | dz -0.85 dx -0.13 | stand>ground | ends on ground |  | M | ozrel.death |
@@ -282,7 +305,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProLongbow/standing dodge left | bow | 0.967 | dz 0 dx 1.79 | stand>stand |  |  |  | gorak.dodgeLeft, aldric.dodgeLeft +6 |
 | ProLongbow/standing dodge right | bow | 0.967 | dz 0 dx -1.84 | stand>stand (via crouch) |  |  |  | gorak.dodgeRight, aldric.dodgeRight +6 |
 
-## emote (24)
+## emote (35)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -307,14 +330,29 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/talk_gesture/Yelling_While_Standing_2 | unarmed | 4.033 | dz 0 dx 0 | crouch>crouch |  |  |  |  |
 | HF/talk_gesture/Yelling_While_Standing | unarmed | 5.5 | dz 0 dx 0 | crouch>crouch |  |  |  |  |
 | HF/talk_gesture/Yelling | unarmed | 7.833 | · | stand>stand |  |  |  |  |
+| HF2/entrance/Being_Cocky | unarmed | 2.9 | · | stand>stand |  |  |  |  |
+| HF2/entrance/Focus | unarmed | 5.5 | dz 0.2 dx -0.03 | stand>stand |  |  | M |  |
+| HF2/entrance/Standing_Taunt_Battlecry | unarmed | 2.833 | · | crouch>crouch |  |  | M |  |
+| HF2/paired/Shaking_Hands_1 ⇄ aggressor | unarmed | 4.367 | dz 0 dx 0 | stand>stand |  |  | M |  |
+| HF2/paired/Shaking_Hands_2 ⇄ victim | unarmed | 4.367 | dz 0 dx 0 | stand>stand |  |  | M |  |
+| HF2/paired/Spat_In_Face ⇄ aggressor | unarmed | 2.533 | dz 0.33 dx 0.08 yaw 161 | stand>stand (via crouch) |  |  |  |  |
+| HF2/paired/Spit_Reaction ⇄ victim | unarmed | 4.267 | dz -0.04 dx 0.04 | stand>stand |  |  | M |  |
+| HF2/social/Angry | unarmed | 19.167 | dz 0 dx 0 | stand>stand |  |  |  |  |
+| HF2/social/Insult | unarmed | 2.667 | · | stand>stand |  |  | M |  |
+| HF2/social/Rallying | unarmed | 6.2 | dz -1.13 dx 0 | stand>stand |  |  |  |  |
+| HF2/weapons/Sword_And_Shield_Power_Up | sword-shield | 2.367 | · | crouch>crouch |  |  | M |  |
 | ProMeleeAxe/standing taunt battlecry | 1h-axe | 2.833 | · | crouch>crouch |  |  | M | gorak.roar |
 | ProMeleeAxe/standing taunt chest thump | 1h-axe | 2.833 | · | crouch>stand |  |  | M | gorak.taunt, hollowjack.taunt |
 | ProSwordandShield/sword and shield power up | sword-shield | 2.367 | · | crouch>crouch |  |  | M | aldric.taunt |
 
-## equip (12)
+## equip (16)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
+| HF2/weapons/Draw_A_Great_Sword_1 | 2h-greatsword | 0.5 | · | stand>stand |  |  | M |  |
+| HF2/weapons/Sheath_A_Great_Sword_1 | 2h-greatsword | 0.733 | dz 0.25 dx 0.09 | stand>stand |  |  | M |  |
+| HF2/weapons/Sheathing_Sword | 1h-sword | 1.667 | · | stand>stand |  |  | M |  |
+| HF2/weapons/Withdrawing_Sword | 1h-sword | 1.5 | · | stand>stand |  |  | M |  |
 | ProLongbow/standing aim overdraw | bow | 3.767 | · | stand>stand |  |  | M | erika.pinning_shot |
 | ProLongbow/standing disarm bow | bow | 1.1 | · | stand>stand |  |  | M |  |
 | ProLongbow/standing draw arrow | bow | 1.033 | · | stand>stand |  |  | M | erika.roar, erika.quick_draw +1 |
@@ -328,7 +366,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProSwordandShield/sheath sword 1 | sword-shield | 1.267 | · | crouch>stand |  |  | M |  |
 | ProSwordandShield/sheath sword 2 | sword-shield | 0.833 | · | stand>stand |  |  | M |  |
 
-## finisher (18)
+## finisher (27)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -350,8 +388,17 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/finishers/Stomp | unarmed | 1.867 | dz 0 dx 0 | stand>stand (via crouch) | LeftHand @0.767 |  | M |  |
 | HF/finishers/Stomping | unarmed | 1.8 | · | stand>stand (via crouch) | RightFoot @0.633 |  | M |  |
 | HF/finishers/Zombie_Neck_Bite | zombie | 4.167 | dz 0 dx 0 | stand>stand (via crouch) | LeftHand @3.433 |  |  |  |
+| HF2/paired/Being_Strangled ⇄ victim | unarmed | 17.6 | dz 1.15 dx 0.15 yaw -233 | stand>ground | LeftHand @7.4 |  |  |  |
+| HF2/paired/Holding_Down | unarmed | 1.9 | dz 0.16 dx -0.23 | kneel>kneel | RightHand @1.1 |  | M |  |
+| HF2/paired/Release_Hostage_-_Hostage ⇄ victim | unarmed | 3.067 | dz 1.33 dx -0.09 | stand>stand | RightHand @0.5 |  |  |  |
+| HF2/paired/Release_Hostage_-_Villain ⇄ aggressor | unarmed | 3.067 | dz -0.52 dx 0.24 | stand>stand | LeftHand @0.6 |  |  |  |
+| HF2/paired/Restrain | unarmed | 7.567 | dz 0 dx 0 | stand>stand | RightHand @0.633 |  |  |  |
+| HF2/paired/Strangling ⇄ aggressor | unarmed | 17.567 | dz 1.9 dx 0 | stand>stand (via crouch) | RightHand @7 |  |  |  |
+| HF2/paired/Taken_Hostage_-_Victim ⇄ victim | unarmed | 2.167 | dz 0.19 dx 0.01 | stand>stand | LeftHand @0.9 |  |  |  |
+| HF2/paired/Taken_Hostage_-_Villain ⇄ aggressor | unarmed | 2.167 | dz 0.69 dx 0 | stand>stand | LeftHand @0.7 |  |  |  |
+| HF2/paired/Vampiric_Bite ⇄ aggressor | unarmed | 3.033 | dz 0 dx 0 | stand>stand (via crouch) | RightHand @0.733 |  | M |  |
 
-## getup (10)
+## getup (13)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -365,8 +412,11 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/hit_reactions/Zombie_Stand_Up_2 | zombie | 5.8 | dz 0.18 dx -0.09 yaw -122 | ground>crouch |  |  |  |  |
 | HF/hit_reactions/Zombie_Stand_Up_3 | zombie | 6 | dz -1.17 dx 0.2 yaw 97 | ground>crouch |  |  |  |  |
 | HF/hit_reactions/Zombie_Stand_Up | zombie | 3.1 | dz 0.05 dx 0.09 yaw 70 | ground>crouch |  |  |  |  |
+| HF2/reactions/Corkscrew_Kip_Up | unarmed | 2.767 | dz 7.71 dx -0.03 | crouch>crouch (via ground) |  |  |  |  |
+| HF2/reactions/Kip_Up | unarmed | 2.033 | dz -0.02 dx 0.11 yaw -201 | ground>crouch |  |  |  |  |
+| HF2/reactions/Waking | unarmed | 1.833 | · | ground>ground |  |  |  |  |
 
-## grapple (14)
+## grapple (22)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -384,8 +434,16 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/grabs_throws/Soccer_Trip | unarmed | 1.6 | dz 3.91 dx -1.15 yaw -74 | stand>ground | LeftHand @0.433 |  |  |  |
 | HF/grabs_throws/Superhuman_Choke_Lift | unarmed | 6.367 | dz 0 dx 0 | stand>stand | RightHand @3.967 |  | M |  |
 | HF/grabs_throws/Zombie_Headbutt | zombie | 2.6 | · | stand>stand (via crouch) | LeftHand @1.333 |  |  |  |
+| HF2/paired/Double_Leg_Takedown_-_Victim_2 ⇄ victim | unarmed | 3.5 | dz -1.16 dx -0.15 yaw -93 | stand>ground | LeftHand @1.467 |  |  |  |
+| HF2/paired/Double_Leg_Takedown_-_Victim ⇄ victim | unarmed | 7.233 | dz -1.34 dx 0.25 yaw -112 | stand>ground | RightHand @1.433 |  |  |  |
+| HF2/paired/Fist_Fight_A ⇄ aggressor | unarmed | 4.667 | dz -0.8 dx 0.41 yaw -31 | stand>crouch | LeftHand @2.8 |  |  |  |
+| HF2/paired/Fist_Fight_B ⇄ victim | unarmed | 4.667 | dz -0.79 dx 0.72 yaw -53 | stand>crouch | LeftHand @2.9 |  |  |  |
+| HF2/paired/Getting_Bit ⇄ victim | unarmed | 4.067 | dz -1.82 dx -1.34 yaw 65 | stand>stand | RightHand @1.533 |  |  |  |
+| HF2/paired/Hold_Off_Assailant | unarmed | 4.767 | · | kneel>kneel | LeftHand @2.333 |  | M |  |
+| HF2/paired/Kick_To_The_Groin_3 ⇄ victim | unarmed | 3.467 | dz 1.18 dx -0.03 yaw -67 | stand>ground | LeftFoot @0.467 |  |  |  |
+| HF2/paired/Kick_To_The_Groin ⇄ victim | unarmed | 2.9 | · | stand>stand (via crouch) | LeftHand @0.267 |  |  |  |
 
-## hit-react (83)
+## hit-react (90)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -456,6 +514,13 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/weapons_extra/Great_Sword_Impact_4 | 2h-greatsword | 0.667 | · | kneel>kneel |  |  |  |  |
 | HF/weapons_extra/Great_Sword_Impact_5 | 2h-greatsword | 1.2 | · | stand>stand (via crouch) |  |  |  |  |
 | HF/weapons_extra/Great_Sword_Impact | 2h-greatsword | 0.967 | · | kneel>kneel |  |  |  |  |
+| HF2/reactions/Being_Electrocuted | unarmed | 8.067 | dz 1.22 dx -0.55 yaw 155 | stand>ground |  |  |  |  |
+| HF2/reactions/Getting_Smashed | unarmed | 2.267 | dz 0.28 dx 0.8 | stand>kneel (via ground) |  |  |  |  |
+| HF2/reactions/Shoved_Reaction_With_Spin | unarmed | 4.533 | dz 2.1 dx 0.45 yaw -198 | stand>stand |  |  |  |  |
+| HF2/reactions/Struck_In_Head | unarmed | 5.967 | · | kneel>kneel |  |  | M |  |
+| HF2/reactions/Stumble_Backwards | unarmed | 3.333 | dz -1.83 dx 0.01 yaw 28 | stand>ground |  |  |  |  |
+| HF2/reactions/Taking_Punch | unarmed | 5.667 | · | stand>stand (via crouch) |  |  | M |  |
+| HF2/reactions/Teeter | unarmed | 1.833 | · | stand>stand |  |  |  |  |
 | ProLongbow/standing react small from front | bow | 1.267 | · | stand>stand |  |  |  | erika.blockHit, erika.hitFront +1 |
 | ProLongbow/standing react small from headshot | bow | 0.967 | · | stand>stand |  |  |  | erika.hitLeft, erika.hitBack |
 | ProMagic/Standing React Large From Back | caster | 1.667 | dz 1.56 dx 0 | stand>stand (via crouch) |  |  |  |  |
@@ -473,7 +538,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProSwordandShield/sword and shield impact (3) | sword-shield | 0.7 | · | crouch>crouch |  |  | M | aldric.blockHit, aldric.hitRight |
 | ProSwordandShield/sword and shield impact | sword-shield | 0.767 | · | crouch>crouch |  |  | M | aldric.hitFront, aldric.hitBack |
 
-## idle (36)
+## idle (51)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -492,6 +557,21 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/weapons_extra/Great_Sword_Idle_4 | 2h-greatsword | 3.7 | · | stand>stand |  | L |  |  |
 | HF/weapons_extra/Great_Sword_Idle_5 | 2h-greatsword | 7.567 | dz 0 dx 0 | stand>stand |  | L |  |  |
 | HF/weapons_extra/Great_Sword_Idle | 2h-greatsword | 2 | · | stand>stand |  | L |  |  |
+| HF2/idles_style/Bouncing_Fight_Idle | unarmed | 2.967 | · | stand>stand |  | L | M |  |
+| HF2/idles_style/Breathing_Idle | unarmed | 9.933 | dz 0 dx 0 | stand>stand |  | L | M |  |
+| HF2/idles_style/Fighting_Idle | unarmed | 3.3 | dz -0.02 dx 0 | stand>stand |  | L |  |  |
+| HF2/idles_style/Knife_Idle | dagger/blade | 4.467 | · | stand>stand (via crouch) |  | L |  |  |
+| HF2/idles_style/Ninja_Idle_3 | unarmed | 4.933 | · | crouch>crouch (via kneel) |  | L |  |  |
+| HF2/idles_style/Ninja_Idle | unarmed | 9.167 | dz 0 dx 0 | crouch>crouch |  | L | M |  |
+| HF2/idles_style/Offensive_Idle | unarmed | 10.567 | dz 0 dx 0 | stand>stand |  | L |  |  |
+| HF2/idles_style/Orc_Idle_2 | unarmed | 7.367 | · | stand>stand |  | L |  |  |
+| HF2/idles_style/Orc_Idle | unarmed | 6.667 | · | stand>stand |  | L | M |  |
+| HF2/idles_style/Warrior_Idle | unarmed | 11.467 | · | stand>stand |  | L |  |  |
+| HF2/idles_style/Zombie_Idle | zombie | 4.233 | · | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Dizzy_Idle | unarmed | 4.267 | · | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Injured_Hurting_Idle | unarmed | 6.033 | dz 0 dx 0 | stand>stand (via crouch) |  | L | M |  |
+| HF2/locomotion_style/Injured_Idle | unarmed | 9.333 | dz 0 dx 0 | stand>stand |  | L | M |  |
+| HF2/locomotion_style/Injured_Stumble_Idle | unarmed | 5.067 | dz 0 dx 0 | stand>stand (via crouch) |  | L |  |  |
 | ProLongbow/standing idle 01 | bow | 5.1 | · | stand>stand |  | L |  | erika.idle |
 | ProLongbow/standing idle 02 looking | bow | 3.2 | · | stand>stand |  | L |  |  |
 | ProLongbow/standing idle 03 examine | bow | 5.1 | · | stand>stand |  | L | M | erika.taunt |
@@ -514,7 +594,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProSwordandShield/sword and shield idle (4) | sword-shield | 2.533 | · | crouch>crouch |  | L |  |  |
 | ProSwordandShield/sword and shield idle | sword-shield | 3.667 | · | crouch>crouch |  | L |  | aldric.idle |
 
-## jump-fall (20)
+## jump-fall (34)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -526,6 +606,20 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | Creature/mutant jumping | creature | 3.167 | · | stand>stand (via kneel) |  |  |  |  |
 | HF/weapons_extra/Great_Sword_Jump_2 | 2h-greatsword | 0.633 | dz 1.59 dx 0 | stand>stand |  |  |  |  |
 | HF/weapons_extra/Great_Sword_Jump | 2h-greatsword | 0.9 | · | stand>stand |  |  |  |  |
+| HF2/entrance/Climbing_To_Top | unarmed | 4 | dz 1.31 dx -0.04 | stand>stand |  |  |  |  |
+| HF2/entrance/Emerging | unarmed | 2.3 | dz 3 dx 1.01 yaw -155 | stand>crouch |  |  |  |  |
+| HF2/entrance/Fall_B_Land_To_Standing_Idle | unarmed | 1.567 | dz 1.84 dx 0 yaw -22 | stand>stand (via crouch) |  |  |  |  |
+| HF2/entrance/Falling_To_Landing | unarmed | 1.067 | · | stand>stand (via crouch) |  |  |  |  |
+| HF2/entrance/Floating | unarmed | 3.6 | · | stand>stand |  |  |  |  |
+| HF2/entrance/Flying | unarmed | 2.633 | dz 19.86 dx 0 | stand>stand |  |  |  |  |
+| HF2/entrance/Freehang_Climb | unarmed | 3.867 | dz 0.61 dx 0.16 yaw -45 | stand>stand |  |  |  |  |
+| HF2/entrance/Jump_Down | unarmed | 0.667 | · | stand>stand (via crouch) |  |  |  |  |
+| HF2/entrance/Jumping_Down_2 | unarmed | 2.833 | dz 1.65 dx 0.06 | stand>stand (via crouch) |  |  |  |  |
+| HF2/entrance/Jumping_Down_6 | unarmed | 2.633 | dz 1.83 dx -0.01 | stand>kneel |  |  |  |  |
+| HF2/entrance/Jumping_Down_9 | unarmed | 6 | dz 1.52 dx -0.37 yaw 70 | stand>stand (via kneel) |  |  |  |  |
+| HF2/entrance/Jumping_Down | unarmed | 2.667 | dz 1.94 dx 0.01 | stand>crouch (via kneel) |  |  |  |  |
+| HF2/entrance/Jumping_Over_Into_Combat | unarmed | 4.167 | dz 4.04 dx 0.53 yaw -64 | stand>crouch |  |  |  |  |
+| HF2/entrance/Vault_Over_Box | unarmed | 3.533 | dz 2.99 dx -0.81 yaw 368 | stand>kneel |  |  |  |  |
 | ProLongbow/fall a land to run forward | bow | 0.933 | dz 1.69 dx 0.08 yaw 37 | stand>stand (via crouch) |  |  |  |  |
 | ProLongbow/fall a land to standing idle 01 | bow | 0.7 | · | stand>stand (via crouch) |  |  | M |  |
 | ProLongbow/fall a loop | bow | 1.067 | · | stand>stand |  |  |  |  |
@@ -539,7 +633,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProSwordandShield/sword and shield jump (2) | sword-shield | 0.967 | · | crouch>crouch |  |  |  |  |
 | ProSwordandShield/sword and shield jump | sword-shield | 0.833 | dz 2.44 dx 0 | stand>stand |  |  |  |  |
 
-## kick (20)
+## kick (29)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -559,12 +653,21 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/brawler_kicks/Scissor_Kick | unarmed | 2.767 | dz -0.23 dx 0.19 yaw 191 | stand>stand (via ground) | LeftHand @1 |  |  |  |
 | HF/brawler_kicks/Side_Kick | unarmed | 2 | dz 0 dx 0 | crouch>crouch | RightFoot @0.633 |  | M |  |
 | HF/brawler_kicks/Spin_Flip_Kick | unarmed | 3.7 | dz 2.33 dx 1.3 yaw -337 | stand>crouch (via ground) | RightHand @1.467 |  |  |  |
+| HF2/martial/Armada | unarmed | 1.633 | dz 1.28 dx 1.27 yaw 345 | crouch>crouch | LeftFoot @1.333 |  | M |  |
+| HF2/martial/Flip_Kick | unarmed | 2.8 | dz 4.4 dx 0.03 yaw 346 | stand>crouch (via kneel) | RightHand @2.6 |  |  |  |
+| HF2/martial/Kicking_3 | unarmed | 2.2 | · | stand>stand | LeftHand @0.433 |  |  |  |
+| HF2/martial/Kicking_7 | unarmed | 2.267 | dz -1.61 dx 0 | stand>stand (via crouch) | LeftHand @0.767 |  |  |  |
+| HF2/martial/Leg_Sweep_3 | unarmed | 2.867 | dz 0 dx 0 yaw -360 | crouch>crouch | RightFoot @1.333 |  | M |  |
+| HF2/martial/Leg_Sweep | unarmed | 2.333 | dz 0 dx 0 yaw -360 | crouch>crouch | LeftHand @0.6 |  | M |  |
+| HF2/martial/Martelo_2 | unarmed | 1.3 | dz 0.01 dx 0.01 | crouch>crouch | LeftFoot @0.4 |  | M |  |
+| HF2/martial/Meia_Lua_De_Compasso | unarmed | 1.733 | dz 0.73 dx -1.77 yaw -375 | crouch>crouch | LeftHand @0.867 |  | M |  |
+| HF2/martial/Roll_Kicking | unarmed | 2.267 | dz -0.47 dx 0.1 yaw 214 | stand>kneel (via ground) | RightFoot @0.767 |  |  |  |
 | ProLongbow/standing melee kick | bow | 1.433 | dz 0 dx 0 | stand>stand (via crouch) | RightFoot @0.533 |  | M | erika.kick |
 | ProMeleeAxe/standing melee attack kick ver. 1 | 1h-axe | 1.867 | dz 0 dx 0 | crouch>crouch | RightFoot @0.567 |  | M | gorak.boot, erika.ankle_sweep +3 |
 | ProMeleeAxe/standing melee attack kick ver. 2 | 1h-axe | 1.4 | dz 0.02 dx 0 | crouch>stand | RightFoot @0.6 |  | M | gorak.stomp_kick, vex.spinning_heel +2 |
 | ProSwordandShield/sword and shield kick | sword-shield | 1.2 | dz 0 dx 0 | crouch>crouch | RightFoot @0.4 |  | M | aldric.shield_kick |
 
-## knockdown (12)
+## knockdown (16)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -580,8 +683,12 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/hit_reactions/Shoulder_Hit_And_Fall | unarmed | 3.1 | dz -1.49 dx -0.19 yaw 215 | stand>ground | ends on ground |  |  |  |
 | HF/hit_reactions/Stunned | unarmed | 2.133 | dz -1.01 dx -0.2 yaw 194 | stand>ground | ends on ground |  |  |  |
 | HF/hit_reactions/Sweep_Fall | unarmed | 2.5 | dz -0.65 dx -0.15 yaw 181 | stand>ground | ends on ground |  |  |  |
+| HF2/reactions/Edge_Slip | unarmed | 2.467 | dz -0.24 dx 0.03 | stand>stand | ends stand |  | M |  |
+| HF2/reactions/Hit_By_Car | unarmed | 4.833 | dz 0.23 dx -1.6 yaw -36 | stand>ground | ends on ground |  |  |  |
+| HF2/reactions/Tripping | unarmed | 2.767 | dz 3.12 dx -0.08 yaw 137 | stand>ground | ends on ground |  |  |  |
+| HF2/reactions/Wall_Crash | unarmed | 2.467 | dz 1.89 dx 0.6 yaw -63 | stand>ground | ends on ground |  |  |  |
 
-## locomotion (67)
+## locomotion (83)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -605,6 +712,22 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/weapons_extra/Great_Sword_Strafe | 2h-greatsword | 1.167 | dz 0.01 dx -1.36 | stand>stand |  | L |  |  |
 | HF/weapons_extra/Great_Sword_Walk_2 | 2h-greatsword | 1.3 | dz -1.26 dx 0 | stand>stand |  | L |  |  |
 | HF/weapons_extra/Great_Sword_Walk | 2h-greatsword | 1.367 | dz 1.45 dx 0 | stand>stand |  | L |  |  |
+| HF2/entrance/Female_Tough_Walk | unarmed | 2.633 | dz 2.91 dx 0 | stand>stand |  | L |  |  |
+| HF2/entrance/Strut_Walking | unarmed | 1.433 | dz 1.31 dx 0 | stand>stand |  | L |  |  |
+| HF2/entrance/Swagger_Walk | unarmed | 2.8 | dz 2.48 dx 0 | stand>stand |  | L |  |  |
+| HF2/entrance/Walk_In_Circle | unarmed | 17.367 | dz 0 dx 0 yaw 360 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Drunk_Walk | unarmed | 3 | dz 2.49 dx 0 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Dwarf_Walk | unarmed | 1.167 | dz 1.68 dx 0 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Injured_Run | unarmed | 0.633 | dz 1.47 dx 0 | stand>stand (via crouch) |  | L |  |  |
+| HF2/locomotion_style/Injured_Walk | unarmed | 1.633 | dz 1.97 dx 0 | stand>stand (via crouch) |  | L |  |  |
+| HF2/locomotion_style/Old_Man_Walk | unarmed | 1.267 | dz 0.48 dx 0 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Orc_Walk_2 | unarmed | 1.133 | dz 1.55 dx -0.01 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Orc_Walk | unarmed | 1.2 | dz 1.6 dx 0 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Running_Tired | unarmed | 7 | dz 2.06 dx 0.19 yaw -78 | stand>stand (via crouch) |  |  |  |  |
+| HF2/locomotion_style/Scary_Clown_Walk | unarmed | 0.967 | dz 1.23 dx 0 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Sneak_Walk | unarmed | 0.9 | dz 2.19 dx 0 | crouch>crouch |  | L |  |  |
+| HF2/locomotion_style/Walker_Walk | unarmed | 3.7 | dz 0.49 dx 0 | stand>stand |  | L |  |  |
+| HF2/locomotion_style/Zombie_Walk | zombie | 4.033 | dz 1.31 dx 0 | stand>stand (via crouch) |  | L |  |  |
 | ProLongbow/standing aim walk back | bow | 1.467 | dz -1.33 dx 0 | stand>stand |  | L |  |  |
 | ProLongbow/standing aim walk forward | bow | 1.2 | dz 1.33 dx 0 | stand>stand |  | L |  |  |
 | ProLongbow/standing aim walk left | bow | 1.2 | dz 0 dx 1.72 | stand>stand (via crouch) |  | L |  |  |
@@ -666,7 +789,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProMagic/Standing Block React Large | caster | 1.333 | · | crouch>crouch |  |  |  | ozrel.blockHit, vex.blockHit |
 | ProMeleeAxe/standing block react large | 1h-axe | 1.333 | · | crouch>crouch |  |  | M | gorak.blockHit, fenrik.blockHit +2 |
 
-## talk (18)
+## talk (26)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -688,8 +811,16 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/talk_gesture/Talking_7 | unarmed | 3.933 | · | stand>stand |  |  | M |  |
 | HF/talk_gesture/Talking | unarmed | 5.167 | · | stand>stand |  |  | M |  |
 | HF/talk_gesture/Taunt_Gesture | unarmed | 1.967 | · | stand>stand |  |  | M |  |
+| HF2/social/Annoyed_Head_Shake | unarmed | 2.567 | · | stand>stand |  |  | M |  |
+| HF2/social/Cocky_Head_Turn | unarmed | 2.533 | · | stand>stand |  |  |  |  |
+| HF2/social/Dismissing_Gesture | unarmed | 2.233 | · | stand>stand |  |  | M |  |
+| HF2/social/Hard_Head_Nod | unarmed | 1.633 | · | stand>stand |  |  | M |  |
+| HF2/social/Head_Nod_Yes | unarmed | 2.6 | · | stand>stand |  |  |  |  |
+| HF2/social/Look_Away_Gesture | unarmed | 2.333 | · | stand>stand |  |  | M |  |
+| HF2/social/Shake_Fist | unarmed | 2.433 | · | stand>stand |  |  | M |  |
+| HF2/social/Standing_Arguing | unarmed | 20.8 | dz 0 dx 0 | stand>stand |  |  | M |  |
 
-## throw-prop (7)
+## throw-prop (23)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -700,18 +831,37 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/grabs_throws/Throw_Object | unarmed | 4.867 | dz 0 dx 0 | stand>stand (via crouch) | release @2.4 |  | M |  |
 | HF/grabs_throws/Throw | unarmed | 2.2 | · | stand>stand | release @0.9 |  | M |  |
 | HF/grabs_throws/Throwing | unarmed | 5.567 | dz 0.8 dx 0.05 yaw -21 | stand>stand (via crouch) | release @1.633 |  | M |  |
+| HF2/entrance/Banging_Fist | unarmed | 2.633 | · | crouch>crouch | release @0.867 |  | M |  |
+| HF2/entrance/Bash | unarmed | 4 | · | stand>stand | release @1.433 |  | M |  |
+| HF2/entrance/Kicking_Out | unarmed | 1.6 | · | ground>ground | release @0.433 |  | M |  |
+| HF2/entrance/Open_Door_Outwards | unarmed | 4.1 | dz 2.08 dx 0.01 | stand>stand | release @3.867 |  |  |  |
+| HF2/entrance/Opening_Door_Inwards | unarmed | 6.367 | dz 1.68 dx 0 | stand>stand | release @4.933 |  |  |  |
+| HF2/entrance/Pulling_Lever | unarmed | 6.267 | · | stand>stand | release @1.067 |  | M |  |
+| HF2/entrance/Smash | unarmed | 3 | · | crouch>crouch | release @1 |  | M |  |
+| HF2/environment/Carrying | unarmed | 10 | · | stand>stand | release @7.267 |  |  |  |
+| HF2/environment/Holding_Idle | unarmed | 6 | · | stand>stand | release @2.833 |  | M |  |
+| HF2/environment/Holding_Walk | unarmed | 1.367 | dz 1.62 dx 0 | stand>stand | release @0.133 |  |  |  |
+| HF2/environment/Picking_Up_Object | unarmed | 3.433 | · | stand>stand | release @0.367 |  | M |  |
+| HF2/environment/Pull_Heavy_Object | unarmed | 1.1 | dz -0.27 dx 0 | crouch>crouch | release @1.033 |  |  |  |
+| HF2/environment/Push_Start | unarmed | 4.733 | dz 1.32 dx -0.05 yaw 55 | stand>crouch | release @0.433 |  |  |  |
+| HF2/environment/Push_Stop | unarmed | 2.6 | dz 0.76 dx 0.05 yaw -54 | crouch>stand | release @2.067 |  |  |  |
+| HF2/environment/Pushing | unarmed | 3.967 | dz 0.36 dx -0.06 | kneel>stand | release @2.033 |  |  |  |
+| HF2/environment/Putting_Down | unarmed | 10.333 | · | stand>stand | release @4.367 |  | M |  |
 
-## transition (5)
+## transition (8)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
 | ActionAdventure/run to stop | unarmed | 0.9 | dz 0.79 dx 0 yaw -45 | stand>stand (via crouch) |  |  |  |  |
+| HF2/locomotion_style/Run_To_Stop | unarmed | 1.8 | dz 2.57 dx 0.01 | stand>stand (via crouch) |  |  |  |  |
+| HF2/locomotion_style/Start_Walking | unarmed | 2.933 | dz 1.9 dx -0.03 | stand>stand |  |  |  |  |
+| HF2/locomotion_style/Stop_Walking | unarmed | 2.667 | dz 1.52 dx -0.01 | stand>stand |  |  |  |  |
 | ProLongbow/standing run forward stop | bow | 0.9 | dz 0.44 dx 0.1 yaw -36 | stand>stand (via crouch) |  |  | M |  |
 | ProMagic/Crouch To Standing Idle | caster | 1 | · | kneel>stand |  |  | M | ozrel.getup, erika.getup +1 |
 | ProMagic/Standing Idle To Crouch | caster | 1 | · | stand>kneel |  |  |  |  |
 | ProMeleeAxe/crouch to standing idle | 1h-axe | 0.633 | · | crouch>crouch |  |  |  | gorak.getup, aldric.getup +3 |
 
-## turn (25)
+## turn (28)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -726,6 +876,9 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/weapons_extra/Great_Sword_180_Turn | 2h-greatsword | 0.8 | dz 0.01 dx -0.03 yaw -188 | stand>stand (via crouch) |  |  | M |  |
 | HF/weapons_extra/Great_Sword_Turn_2 | 2h-greatsword | 0.833 | dz 0.09 dx -0.12 yaw 86 | stand>stand |  |  | M |  |
 | HF/weapons_extra/Great_Sword_Turn | 2h-greatsword | 0.733 | dz 0.19 dx 0.01 yaw -98 | stand>stand |  |  |  |  |
+| HF2/locomotion_style/Quick_180_Turn | unarmed | 1.3 | · | stand>stand |  |  |  |  |
+| HF2/locomotion_style/Standing_Turn_Left_90 | unarmed | 1.867 | · | stand>stand |  |  |  |  |
+| HF2/locomotion_style/Standing_Turn_Right_90 | unarmed | 1.633 | dz 0 dx 0 yaw -90 | crouch>crouch |  |  |  |  |
 | ProLongbow/standing turn 90 left | bow | 1.267 | dz -0.01 dx -0.01 yaw 88 | stand>stand |  |  |  |  |
 | ProLongbow/standing turn 90 right | bow | 1.1 | · | stand>stand |  |  |  |  |
 | ProMagic/Crouch Turn Left 90 | caster | 1.833 | · | kneel>kneel |  |  |  |  |
@@ -741,7 +894,7 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | ProSwordandShield/sword and shield turn (2) | sword-shield | 0.933 | dz 0 dx -0.01 yaw 99 | crouch>crouch |  |  |  |  |
 | ProSwordandShield/sword and shield turn | sword-shield | 0.933 | dz 0.01 dx 0 yaw -99 | crouch>crouch |  |  |  |  |
 
-## victory-defeat (19)
+## victory-defeat (25)
 
 | clip | stance | dur | root | posture | strike / contact | L | M | used |
 |---|---|---|---|---|---|---|---|---|
@@ -764,3 +917,25 @@ The data is measured from the FBX files by `tools/anim/analyze.ts` and tagged by
 | HF/talk_gesture/Victory_Idle_3 | unarmed | 1.867 | · | stand>stand (via crouch) |  |  | M |  |
 | HF/talk_gesture/Victory_Idle | unarmed | 1.8 | · | stand>stand (via crouch) |  |  | M |  |
 | HF/talk_gesture/Victory | unarmed | 8.533 | · | stand>stand |  |  |  |  |
+| HF2/entrance/Kneeling_Down | unarmed | 2.767 | · | stand>kneel |  |  | M |  |
+| HF2/entrance/Quick_Informal_Bow | unarmed | 2.733 | · | stand>stand |  |  |  |  |
+| HF2/entrance/Stand_Up_3 | unarmed | 2.333 | dz -0.37 dx 0.08 | ground>stand |  |  |  |  |
+| HF2/social/Fist_Pump | unarmed | 3.5 | dz 0 dx 0 | crouch>crouch |  |  | M |  |
+| HF2/social/Kneeling | unarmed | 4.667 | · | kneel>kneel |  |  |  |  |
+| HF2/social/Sad_Idle | unarmed | 4 | · | stand>stand |  |  |  |  |
+
+## Gap analysis vs the dataset (2,317 clips)
+
+What the owned packs lacked, and how it was closed. The 159 clips fetched into `Mixamo_HF2/` are listed with reasons in `tools/anim/fetch-list.json`.
+
+| Gap in owned packs | Closed by (HF2) | Still missing |
+|---|---|---|
+| Victim halves of paired clips (takedown, strangle, hostage, bite) | paired/* (21) | No groin-kick *kicker* exists in the dataset (contact-warp a front kick); Flying_Shoulder_Throw has no synced victim |
+| Ledge drops, vaults, climbs, emerges, gate interaction (Gorak / Vex fixes) | entrance/* (31) | No true flying-descent-to-land; use Floating + Jumping_Down from a validated perch |
+| Character gaits, injured / tired / dizzy sets, starts / stops / pivots | locomotion_style/* (22), idles_style/* (11) | Strafe sets for most styles (fall back to the stance's strafes) |
+| Launchers, sweeps, clinch knees and elbows, capoeira | martial/* (15) | - |
+| Spear, 2h club, draw / sheathe | weapons/* (13) | Dedicated dual-dagger and staff movesets (use Dual_Weapon_Combo and caster clips) |
+| Wall slam, launch, edge teeter / slip, electrocution, kip-ups | reactions/* (14) | Directional knockdowns from left / right (mirror) |
+| More deaths, KO collapses | deaths/* (9) | Possible later: more Dying_* / Standing_Death_* |
+| Talk accents, crowd rally, defeat kneel | social/* (14) | Lip-sync (no jaw bones or blendshapes on the rigs) |
+| Push / pull / carry poses | environment/* (9) | - |

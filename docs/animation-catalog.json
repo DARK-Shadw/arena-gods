@@ -2061,6 +2061,546 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/martial/Back_Flip_To_Uppercut.fbx",
+   "name": "Back_Flip_To_Uppercut",
+   "pack": "Mixamo_HF2",
+   "desc": "Back Flip To Uppercut Combo",
+   "cat": "attack",
+   "stance": "unarmed",
+   "dur": 5.833,
+   "frames30": 176,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0.48,
+    "dist": 0.48,
+    "path": 5.2,
+    "yMin": 0.59,
+    "yMax": 1.05,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0.47,
+   "contact": {
+    "strike": 1.4,
+    "eff": "LeftHand",
+    "reachMax": 1.44
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftHand strike @1.4s)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Elbow_Punch.fbx",
+   "name": "Elbow_Punch",
+   "pack": "Mixamo_HF2",
+   "desc": "Illegal Elbow Rear Arm With Forward Step",
+   "cat": "attack",
+   "stance": "unarmed",
+   "dur": 1.733,
+   "frames30": 53,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.39,
+    "yMin": 0.73,
+    "yMax": 0.91,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.533,
+    "eff": "RightHand",
+    "reachMax": 0.89
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightHand strike @0.533s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Illegal_Elbow_Punch.fbx",
+   "name": "Illegal_Elbow_Punch",
+   "pack": "Mixamo_HF2",
+   "desc": "Illegal Elbow To The Head",
+   "cat": "attack",
+   "stance": "unarmed",
+   "dur": 2.267,
+   "frames30": 68,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.004,
+   "root": {
+    "dx": 0,
+    "dz": 0.01,
+    "dist": 0.01,
+    "path": 0.72,
+    "yMin": 0.79,
+    "yMax": 0.83,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.6,
+    "eff": "RightHand",
+    "reachMax": 0.45
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightHand strike @0.6s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Knee_Jab.fbx",
+   "name": "Knee_Jab",
+   "pack": "Mixamo_HF2",
+   "desc": "Swing Club And Triple Knee Kicks",
+   "cat": "attack",
+   "stance": "unarmed",
+   "dur": 6,
+   "frames30": 181,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 2.2,
+    "yMin": 0.81,
+    "yMax": 0.98,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.333,
+    "eff": "RightHand",
+    "reachMax": 0.78
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightHand strike @1.333s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Surprise_Uppercut.fbx",
+   "name": "Surprise_Uppercut",
+   "pack": "Mixamo_HF2",
+   "desc": "Attacker Chase Down Give Surprise Uppercut",
+   "cat": "attack",
+   "stance": "unarmed",
+   "dur": 3.5,
+   "frames30": 106,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.242,
+   "root": {
+    "dx": -0.04,
+    "dz": 1.12,
+    "dist": 1.12,
+    "path": 2.39,
+    "yMin": 0.72,
+    "yMax": 0.95,
+    "yaw": -57
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.133,
+    "eff": "RightHand",
+    "reachMax": 2.15
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightHand strike @1.133s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Uppercut.fbx",
+   "name": "Uppercut",
+   "pack": "Mixamo_HF2",
+   "desc": "Standing Left Uppercut Punch",
+   "cat": "attack",
+   "stance": "unarmed",
+   "dur": 1.333,
+   "frames30": 41,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.29,
+    "yMin": 0.79,
+    "yMax": 0.94,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.467,
+    "eff": "LeftHand",
+    "reachMax": 0.5
+   },
+   "handedness": "left-hand",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftHand strike @0.467s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Heavy_Weapon_Swing.fbx",
+   "name": "Heavy_Weapon_Swing",
+   "pack": "Mixamo_HF2",
+   "desc": "Two Handed Heavy Weapon Swing",
+   "cat": "attack",
+   "stance": "2h-club",
+   "dur": 5.2,
+   "frames30": 156,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.007,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.54,
+    "yMin": 0.84,
+    "yMax": 0.9,
+    "yaw": 1
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 2.567,
+    "eff": "RightHand",
+    "reachMax": 0.55
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "Warrok",
+    "maw (weapon variant)",
+    "Goblin"
+   ],
+   "uses": [
+    "2h-club moveset (RightHand strike @2.567s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Run_And_Swing.fbx",
+   "name": "Run_And_Swing",
+   "pack": "Mixamo_HF2",
+   "desc": "Run To Swing To Run",
+   "cat": "attack",
+   "stance": "1h-sword",
+   "dur": 2.433,
+   "frames30": 74,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 5.6,
+    "dist": 5.6,
+    "path": 5.61,
+    "yMin": 0.73,
+    "yMax": 1.86,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 1.27,
+   "contact": {
+    "strike": 1.2,
+    "eff": "RightFoot",
+    "reachMax": 5.73
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "aldric (shield off)",
+    "Kachujin",
+    "Pirate"
+   ],
+   "uses": [
+    "1h-sword moveset (RightFoot strike @1.2s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Slash_Advance.fbx",
+   "name": "Slash_Advance",
+   "pack": "Mixamo_HF2",
+   "desc": "Slashing Forward With A Bayonet",
+   "cat": "attack",
+   "stance": "1h-sword",
+   "dur": 2.5,
+   "frames30": 76,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.35,
+    "yMin": 0.62,
+    "yMax": 0.84,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.767,
+    "eff": "LeftHand",
+    "reachMax": 0.88
+   },
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "aldric (shield off)",
+    "Kachujin",
+    "Pirate"
+   ],
+   "uses": [
+    "1h-sword moveset (LeftHand strike @0.767s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Sword_And_Shield_Attack_2.fbx",
+   "name": "Sword_And_Shield_Attack_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Sword And Shield Jump Attack",
+   "cat": "attack",
+   "stance": "sword-shield",
+   "dur": 2.333,
+   "frames30": 70,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.255,
+   "root": {
+    "dx": 0.01,
+    "dz": 3.48,
+    "dist": 3.48,
+    "path": 3.71,
+    "yMin": 0.34,
+    "yMax": 1.72,
+    "yaw": -45
+   },
+   "inPlace": false,
+   "posture": "stand>crouch (via kneel)",
+   "airborne": 0.57,
+   "contact": {
+    "strike": 1.233,
+    "eff": "LeftHand",
+    "reachMax": 3.99
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "aldric",
+    "Knight_D_Pelegrini",
+    "Castle_Guard_01/02",
+    "Heraklios"
+   ],
+   "uses": [
+    "sword-shield moveset (LeftHand strike @1.233s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Sword_And_Shield_Slash_2.fbx",
+   "name": "Sword_And_Shield_Slash_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Sword And Shield Slash Combo",
+   "cat": "attack",
+   "stance": "sword-shield",
+   "dur": 3.533,
+   "frames30": 106,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.015,
+   "root": {
+    "dx": 0.01,
+    "dz": 2.35,
+    "dist": 2.35,
+    "path": 2.81,
+    "yMin": 0.41,
+    "yMax": 1.3,
+    "yaw": -362
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via kneel)",
+   "airborne": 0.23,
+   "contact": {
+    "strike": 1.867,
+    "eff": "RightFoot",
+    "reachMax": 1.7
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "aldric",
+    "Knight_D_Pelegrini",
+    "Castle_Guard_01/02",
+    "Heraklios"
+   ],
+   "uses": [
+    "sword-shield moveset (RightFoot strike @1.867s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Thrust_Slash.fbx",
+   "name": "Thrust_Slash",
+   "pack": "Mixamo_HF2",
+   "desc": "Thrust And Slash With Blade",
+   "cat": "attack",
+   "stance": "spear/2h",
+   "dur": 3,
+   "frames30": 91,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 2.32,
+    "yMin": 0.75,
+    "yMax": 0.86,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.733,
+    "eff": "RightHand",
+    "reachMax": 1.28
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "Heraklios",
+    "Knight_D_Pelegrini"
+   ],
+   "uses": [
+    "spear/2h moveset (RightHand strike @0.733s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Upward_Thrust.fbx",
+   "name": "Upward_Thrust",
+   "pack": "Mixamo_HF2",
+   "desc": "Upward Weapon Thrust",
+   "cat": "attack",
+   "stance": "spear/2h",
+   "dur": 2.333,
+   "frames30": 70,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.009,
+   "root": {
+    "dx": 0,
+    "dz": -0.01,
+    "dist": 0.01,
+    "path": 2.47,
+    "yMin": 0.67,
+    "yMax": 0.85,
+    "yaw": -1
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.733,
+    "eff": "RightHand",
+    "reachMax": 1.16
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "Heraklios",
+    "Knight_D_Pelegrini"
+   ],
+   "uses": [
+    "spear/2h moveset (RightHand strike @0.733s)"
+   ]
+  },
+  {
    "id": "ProLongbow/standing melee punch.fbx",
    "name": "standing melee punch",
    "pack": "ProLongbow",
@@ -5098,6 +5638,48 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/weapons/Two_Hand_Club_Combo.fbx",
+   "name": "Two_Hand_Club_Combo",
+   "pack": "Mixamo_HF2",
+   "desc": "Two Handed Club Combo Attack",
+   "cat": "combo",
+   "stance": "2h-club",
+   "dur": 5.433,
+   "frames30": 164,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 1.47,
+    "dist": 1.47,
+    "path": 2.53,
+    "yMin": 0.79,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.467,
+    "eff": "LeftHand",
+    "reachMax": 0.89
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "Warrok",
+    "maw (weapon variant)",
+    "Goblin"
+   ],
+   "uses": [
+    "2h-club moveset (LeftHand strike @1.467s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)"
+   ]
+  },
+  {
    "id": "ProMeleeAxe/standing melee combo attack ver. 1.fbx",
    "name": "standing melee combo attack ver. 1",
    "pack": "ProMeleeAxe",
@@ -6363,6 +6945,357 @@
     "Heraklios",
     "Uriel",
     "Akai"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Crouch_Death.fbx",
+   "name": "Crouch_Death",
+   "pack": "Mixamo_HF2",
+   "desc": "Dying From A Crouched Position",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 2.367,
+   "frames30": 71,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.842,
+   "root": {
+    "dx": -0.09,
+    "dz": -0.98,
+    "dist": 0.98,
+    "path": 1.01,
+    "yMin": 0.12,
+    "yMax": 0.45,
+    "yaw": -41
+   },
+   "inPlace": false,
+   "posture": "kneel>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "left-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Dying_3.fbx",
+   "name": "Dying_3",
+   "pack": "Mixamo_HF2",
+   "desc": "Explosion From Behind",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 4.667,
+   "frames30": 140,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.109,
+   "root": {
+    "dx": -0.06,
+    "dz": 2.17,
+    "dist": 2.18,
+    "path": 2.21,
+    "yMin": 0.07,
+    "yMax": 0.98,
+    "yaw": -164
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0.33,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Dying_5.fbx",
+   "name": "Dying_5",
+   "pack": "Mixamo_HF2",
+   "desc": "Death Hit From The Back Falling On One Knee",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 4.333,
+   "frames30": 131,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.012,
+   "root": {
+    "dx": -0.53,
+    "dz": 1.38,
+    "dist": 1.48,
+    "path": 1.65,
+    "yMin": 0.13,
+    "yMax": 0.99,
+    "yaw": -99
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "left-hand",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Dying_8.fbx",
+   "name": "Dying_8",
+   "pack": "Mixamo_HF2",
+   "desc": "Laying On The Ground Dying",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 6.833,
+   "frames30": 206,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.01,
+    "yMin": 0.04,
+    "yMax": 0.04,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "ground>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Dying.fbx",
+   "name": "Dying",
+   "pack": "Mixamo_HF2",
+   "desc": "Dying With Front Impact To The Head And Fall On One Knee",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 4.4,
+   "frames30": 133,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.003,
+   "root": {
+    "dx": -0.34,
+    "dz": 0.04,
+    "dist": 0.34,
+    "path": 1.89,
+    "yMin": 0.1,
+    "yMax": 0.95,
+    "yaw": 28
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Knocked_Out.fbx",
+   "name": "Knocked_Out",
+   "pack": "Mixamo_HF2",
+   "desc": "Knocked Out Falling To Back",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 4.933,
+   "frames30": 149,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.048,
+   "root": {
+    "dx": -0.94,
+    "dz": -1.07,
+    "dist": 1.42,
+    "path": 1.61,
+    "yMin": 0.01,
+    "yMax": 0.96,
+    "yaw": -18
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Knocked_Unconscious.fbx",
+   "name": "Knocked_Unconscious",
+   "pack": "Mixamo_HF2",
+   "desc": "Pilot Flying Helicopter Getting Knocked Unconscious",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 4.567,
+   "frames30": 137,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.032,
+   "root": {
+    "dx": 0.01,
+    "dz": -0.01,
+    "dist": 0.01,
+    "path": 0.23,
+    "yMin": 0.53,
+    "yMax": 0.55,
+    "yaw": 2
+   },
+   "inPlace": true,
+   "posture": "kneel>kneel",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends kneel"
+   },
+   "handedness": "right-hand",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Turn_To_Knocked_Unconscious.fbx",
+   "name": "Turn_To_Knocked_Unconscious",
+   "pack": "Mixamo_HF2",
+   "desc": "Turn To Getting Knocked Unconscious",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 4.6,
+   "frames30": 138,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.839,
+   "root": {
+    "dx": 0.15,
+    "dz": 4.02,
+    "dist": 4.02,
+    "path": 4.51,
+    "yMin": 0.11,
+    "yMax": 0.96,
+    "yaw": -197
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0.9,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "death pool (direction from name + measured fall direction)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/deaths/Walking_To_Dying.fbx",
+   "name": "Walking_To_Dying",
+   "pack": "Mixamo_HF2",
+   "desc": "Walking While Aiming Rifle To Immediate Dying",
+   "cat": "death",
+   "stance": "unarmed",
+   "dur": 3.067,
+   "frames30": 92,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.938,
+   "root": {
+    "dx": -0.21,
+    "dz": 1.61,
+    "dist": 1.63,
+    "path": 1.77,
+    "yMin": 0.2,
+    "yMax": 0.91,
+    "yaw": 125
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
    ],
    "uses": [
     "death pool (direction from name + measured fall direction)"
@@ -8862,6 +9795,421 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/entrance/Being_Cocky.fbx",
+   "name": "Being_Cocky",
+   "pack": "Mixamo_HF2",
+   "desc": "Cocky Lean Back",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 2.9,
+   "frames30": 88,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.15,
+    "yMin": 0.9,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Focus.fbx",
+   "name": "Focus",
+   "pack": "Mixamo_HF2",
+   "desc": "Shake Off Head Pain And Focus",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 5.5,
+   "frames30": 166,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.204,
+   "root": {
+    "dx": -0.03,
+    "dz": 0.2,
+    "dist": 0.2,
+    "path": 0.74,
+    "yMin": 0.9,
+    "yMax": 0.93,
+    "yaw": 11
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Standing_Taunt_Battlecry.fbx",
+   "name": "Standing_Taunt_Battlecry",
+   "pack": "Mixamo_HF2",
+   "desc": "Battlecry With Axe",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 2.833,
+   "frames30": 85,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.002,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.59,
+    "yMin": 0.76,
+    "yMax": 0.87,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "taunt / intimidation beat"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Shaking_Hands_1.fbx",
+   "name": "Shaking_Hands_1",
+   "pack": "Mixamo_HF2",
+   "desc": "2 People Shaking Hands Part 1 -  Female",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 4.367,
+   "frames30": 132,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.71,
+    "yMin": 0.92,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "pair": {
+    "partner": "Shaking_Hands_2",
+    "role": "aggressor",
+    "note": "mutual"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Shaking_Hands_2.fbx",
+   "name": "Shaking_Hands_2",
+   "pack": "Mixamo_HF2",
+   "desc": "2 People Shaking Hands Part 2 -  Male",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 4.367,
+   "frames30": 132,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.76,
+    "yMin": 0.93,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "pair": {
+    "partner": "Shaking_Hands_1",
+    "role": "victim",
+    "note": "mutual"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Spat_In_Face.fbx",
+   "name": "Spat_In_Face",
+   "pack": "Mixamo_HF2",
+   "desc": "Painfully Getting Spat On In The Face",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 2.533,
+   "frames30": 76,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.113,
+   "root": {
+    "dx": 0.08,
+    "dz": 0.33,
+    "dist": 0.34,
+    "path": 1.18,
+    "yMin": 0.75,
+    "yMax": 0.92,
+    "yaw": 161
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Spit_Reaction",
+    "role": "aggressor"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Spit_Reaction.fbx",
+   "name": "Spit_Reaction",
+   "pack": "Mixamo_HF2",
+   "desc": "Getting Spit In Face And Drawing Weapon",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 4.267,
+   "frames30": 129,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.262,
+   "root": {
+    "dx": 0.04,
+    "dz": -0.04,
+    "dist": 0.06,
+    "path": 0.64,
+    "yMin": 0.85,
+    "yMax": 0.94,
+    "yaw": -13
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "pair": {
+    "partner": "Spat_In_Face",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Angry.fbx",
+   "name": "Angry",
+   "pack": "Mixamo_HF2",
+   "desc": "Standing Angrily",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 19.167,
+   "frames30": 575,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.002,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 2.32,
+    "yMin": 0.94,
+    "yMax": 0.97,
+    "yaw": -1
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Insult.fbx",
+   "name": "Insult",
+   "pack": "Mixamo_HF2",
+   "desc": "Insulting With Rude Gesture",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 2.667,
+   "frames30": 81,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.18,
+    "yMin": 0.92,
+    "yMax": 0.94,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Rallying.fbx",
+   "name": "Rallying",
+   "pack": "Mixamo_HF2",
+   "desc": "Rallying The Crowd To Make Them Cheer",
+   "cat": "emote",
+   "stance": "unarmed",
+   "dur": 6.2,
+   "frames30": 186,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": -1.13,
+    "dist": 1.13,
+    "path": 1.96,
+    "yMin": 0.86,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Sword_And_Shield_Power_Up.fbx",
+   "name": "Sword_And_Shield_Power_Up",
+   "pack": "Mixamo_HF2",
+   "desc": "Sword And Shield Powering Up",
+   "cat": "emote",
+   "stance": "sword-shield",
+   "dur": 2.367,
+   "frames30": 71,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.005,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.3,
+    "yMin": 0.78,
+    "yMax": 0.88,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "aldric",
+    "Knight_D_Pelegrini",
+    "Castle_Guard_01/02",
+    "Heraklios"
+   ],
+   "uses": [
+    "emote"
+   ]
+  },
+  {
    "id": "ProMeleeAxe/standing taunt battlecry.fbx",
    "name": "standing taunt battlecry",
    "pack": "ProMeleeAxe",
@@ -8973,6 +10321,152 @@
    ],
    "inGame": [
     "aldric.taunt"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Draw_A_Great_Sword_1.fbx",
+   "name": "Draw_A_Great_Sword_1",
+   "pack": "Mixamo_HF2",
+   "desc": "Transition From Standing To Drawing Great Sword",
+   "cat": "equip",
+   "stance": "2h-greatsword",
+   "dur": 0.5,
+   "frames30": 16,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.179,
+   "root": {
+    "dx": 0.1,
+    "dz": -0.04,
+    "dist": 0.11,
+    "path": 0.12,
+    "yMin": 0.94,
+    "yMax": 0.95,
+    "yaw": -28
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "Knight_D_Pelegrini",
+    "Heraklios",
+    "Uriel",
+    "Akai"
+   ],
+   "uses": [
+    "entrance / weapon presentation beat"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Sheath_A_Great_Sword_1.fbx",
+   "name": "Sheath_A_Great_Sword_1",
+   "pack": "Mixamo_HF2",
+   "desc": "Transition From Idle To Sheathing A Great Sword",
+   "cat": "equip",
+   "stance": "2h-greatsword",
+   "dur": 0.733,
+   "frames30": 23,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.265,
+   "root": {
+    "dx": 0.09,
+    "dz": 0.25,
+    "dist": 0.27,
+    "path": 0.29,
+    "yMin": 0.89,
+    "yMax": 0.94,
+    "yaw": 6
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "Knight_D_Pelegrini",
+    "Heraklios",
+    "Uriel",
+    "Akai"
+   ],
+   "uses": [
+    "entrance / weapon presentation beat"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Sheathing_Sword.fbx",
+   "name": "Sheathing_Sword",
+   "pack": "Mixamo_HF2",
+   "desc": "Sheathing A Sword",
+   "cat": "equip",
+   "stance": "1h-sword",
+   "dur": 1.667,
+   "frames30": 50,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.064,
+   "root": {
+    "dx": -0.04,
+    "dz": 0.01,
+    "dist": 0.04,
+    "path": 0.12,
+    "yMin": 0.83,
+    "yMax": 0.89,
+    "yaw": 15
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "aldric (shield off)",
+    "Kachujin",
+    "Pirate"
+   ],
+   "uses": [
+    "entrance / weapon presentation beat"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/weapons/Withdrawing_Sword.fbx",
+   "name": "Withdrawing_Sword",
+   "pack": "Mixamo_HF2",
+   "desc": "Withdrawing A Sword",
+   "cat": "equip",
+   "stance": "1h-sword",
+   "dur": 1.5,
+   "frames30": 46,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.07,
+   "root": {
+    "dx": 0.04,
+    "dz": -0.01,
+    "dist": 0.05,
+    "path": 0.19,
+    "yMin": 0.83,
+    "yMax": 0.89,
+    "yaw": -17
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "aldric (shield off)",
+    "Kachujin",
+    "Pirate"
+   ],
+   "uses": [
+    "entrance / weapon presentation beat"
    ]
   },
   {
@@ -9701,9 +11195,9 @@
    "footedness": "both/none",
    "mirrorable": "symmetric-ish (mirror adds little)",
    "pair": {
-    "partner": "Kick_To_The_Groin (NOT OWNED: fetch the kicker)",
+    "partner": "any front kick via contact warp",
     "role": "victim",
-    "note": "measured: doubles over, so this is the receiver"
+    "note": "measured: doubles over. The whole dataset series is receivers, and no kicker clip exists."
    },
    "roles": [
     "hollowjack",
@@ -10182,6 +11676,403 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/paired/Being_Strangled.fbx",
+   "name": "Being_Strangled",
+   "pack": "Mixamo_HF2",
+   "desc": "Getting Snuck Up On And Strangled",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 17.6,
+   "frames30": 529,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.039,
+   "root": {
+    "dx": 0.15,
+    "dz": 1.15,
+    "dist": 1.16,
+    "path": 2.48,
+    "yMin": 0.09,
+    "yMax": 0.97,
+    "yaw": -233
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0.87,
+   "contact": {
+    "strike": 7.4,
+    "eff": "LeftHand",
+    "reachMax": 1.21
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Strangling",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Holding_Down.fbx",
+   "name": "Holding_Down",
+   "pack": "Mixamo_HF2",
+   "desc": "Kneeling To Holding Down Moving Object",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 1.9,
+   "frames30": 57,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.245,
+   "root": {
+    "dx": -0.23,
+    "dz": 0.16,
+    "dist": 0.28,
+    "path": 0.35,
+    "yMin": 0.37,
+    "yMax": 0.42,
+    "yaw": 15
+   },
+   "inPlace": false,
+   "posture": "kneel>kneel",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.1,
+    "eff": "RightHand",
+    "reachMax": 0.62
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Release_Hostage_-_Hostage.fbx",
+   "name": "Release_Hostage_-_Hostage",
+   "pack": "Mixamo_HF2",
+   "desc": "Armed Villain Releasing Hostage",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 3.067,
+   "frames30": 92,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.178,
+   "root": {
+    "dx": -0.09,
+    "dz": 1.33,
+    "dist": 1.33,
+    "path": 1.45,
+    "yMin": 0.84,
+    "yMax": 0.96,
+    "yaw": 6
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.5,
+    "eff": "RightHand",
+    "reachMax": 1.52
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Release_Hostage_-_Villain",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Release_Hostage_-_Villain.fbx",
+   "name": "Release_Hostage_-_Villain",
+   "pack": "Mixamo_HF2",
+   "desc": "Armed Villain Releasing Hostage",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 3.067,
+   "frames30": 92,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.158,
+   "root": {
+    "dx": 0.24,
+    "dz": -0.52,
+    "dist": 0.57,
+    "path": 0.69,
+    "yMin": 0.91,
+    "yMax": 0.95,
+    "yaw": -15
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.6,
+    "eff": "LeftHand",
+    "reachMax": 0.35
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Release_Hostage_-_Hostage",
+    "role": "aggressor"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Restrain.fbx",
+   "name": "Restrain",
+   "pack": "Mixamo_HF2",
+   "desc": "Block And Restraining A Larger Person",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 7.567,
+   "frames30": 227,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.4,
+    "yMin": 0.84,
+    "yMax": 0.92,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.633,
+    "eff": "RightHand",
+    "reachMax": 0.85
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Strangling.fbx",
+   "name": "Strangling",
+   "pack": "Mixamo_HF2",
+   "desc": "Sneaking Up From Behind And Strangling",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 17.567,
+   "frames30": 528,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 1.9,
+    "dist": 1.9,
+    "path": 5.45,
+    "yMin": 0.71,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 7,
+    "eff": "RightHand",
+    "reachMax": 2.41
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Being_Strangled",
+    "role": "aggressor"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Taken_Hostage_-_Victim.fbx",
+   "name": "Taken_Hostage_-_Victim",
+   "pack": "Mixamo_HF2",
+   "desc": "Hostage From Behind By Armed Villain",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 2.167,
+   "frames30": 66,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.178,
+   "root": {
+    "dx": 0.01,
+    "dz": 0.19,
+    "dist": 0.19,
+    "path": 0.39,
+    "yMin": 0.9,
+    "yMax": 0.96,
+    "yaw": -6
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.9,
+    "eff": "LeftHand",
+    "reachMax": 0.36
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Taken_Hostage_-_Villain",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Taken_Hostage_-_Villain.fbx",
+   "name": "Taken_Hostage_-_Villain",
+   "pack": "Mixamo_HF2",
+   "desc": "Armed Villain Taking A Hostage From Behind",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 2.167,
+   "frames30": 66,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.158,
+   "root": {
+    "dx": 0,
+    "dz": 0.69,
+    "dist": 0.69,
+    "path": 0.82,
+    "yMin": 0.86,
+    "yMax": 0.98,
+    "yaw": 14
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.7,
+    "eff": "LeftHand",
+    "reachMax": 0.92
+   },
+   "handedness": "left-hand",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Taken_Hostage_-_Victim",
+    "role": "aggressor"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Vampiric_Bite.fbx",
+   "name": "Vampiric_Bite",
+   "pack": "Mixamo_HF2",
+   "desc": "Lunging Forward To Bite",
+   "cat": "finisher",
+   "stance": "unarmed",
+   "dur": 3.033,
+   "frames30": 91,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.003,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 2.31,
+    "yMin": 0.7,
+    "yMax": 0.88,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.733,
+    "eff": "RightHand",
+    "reachMax": 1.4
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "pair": {
+    "partner": "Getting_Bit (approximate)",
+    "role": "aggressor"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "finisher / execution (paired or solo)"
+   ]
+  },
+  {
    "id": "Mixamo_HF/hit_reactions/Getting_Up_2.fbx",
    "name": "Getting_Up_2",
    "pack": "Mixamo_HF",
@@ -10533,6 +12424,114 @@
    "roles": [
     "Skeletonzombie",
     "Parasite"
+   ],
+   "uses": [
+    "get-up variant (start pose must match the knockdown end pose)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Corkscrew_Kip_Up.fbx",
+   "name": "Corkscrew_Kip_Up",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Sliding Corkscrew To Kip Up",
+   "cat": "getup",
+   "stance": "unarmed",
+   "dur": 2.767,
+   "frames30": 83,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.313,
+   "root": {
+    "dx": -0.03,
+    "dz": 7.71,
+    "dist": 7.71,
+    "path": 7.82,
+    "yMin": 0.14,
+    "yMax": 1.07,
+    "yaw": 9
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch (via ground)",
+   "airborne": 0.47,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "get-up variant (start pose must match the knockdown end pose)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Kip_Up.fbx",
+   "name": "Kip_Up",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Kip Up To Standing",
+   "cat": "getup",
+   "stance": "unarmed",
+   "dur": 2.033,
+   "frames30": 61,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.071,
+   "root": {
+    "dx": 0.11,
+    "dz": -0.02,
+    "dist": 0.11,
+    "path": 0.72,
+    "yMin": 0.12,
+    "yMax": 0.79,
+    "yaw": -201
+   },
+   "inPlace": false,
+   "posture": "ground>crouch",
+   "airborne": 0.73,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "get-up variant (start pose must match the knockdown end pose)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Waking.fbx",
+   "name": "Waking",
+   "pack": "Mixamo_HF2",
+   "desc": "Waking Up While Sitting",
+   "cat": "getup",
+   "stance": "unarmed",
+   "dur": 1.833,
+   "frames30": 56,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.008,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0,
+    "yMin": 0.07,
+    "yMax": 0.07,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "ground>ground",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
    ],
    "uses": [
     "get-up variant (start pose must match the knockdown end pose)"
@@ -11130,6 +13129,366 @@
    "roles": [
     "Skeletonzombie",
     "Parasite"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Double_Leg_Takedown_-_Victim_2.fbx",
+   "name": "Double_Leg_Takedown_-_Victim_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Mma Takedown To Standing Mma Idle",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 3.5,
+   "frames30": 106,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.005,
+   "root": {
+    "dx": -0.15,
+    "dz": -1.16,
+    "dist": 1.17,
+    "path": 1.41,
+    "yMin": 0.1,
+    "yMax": 0.88,
+    "yaw": -93
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 2,
+   "contact": {
+    "strike": 1.467,
+    "eff": "LeftHand",
+    "reachMax": 0.42
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Double_Leg_Takedown_-_Attacker_2",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Double_Leg_Takedown_-_Victim.fbx",
+   "name": "Double_Leg_Takedown_-_Victim",
+   "pack": "Mixamo_HF2",
+   "desc": "Mma Takedown To Ground And Pound",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 7.233,
+   "frames30": 217,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.984,
+   "root": {
+    "dx": 0.25,
+    "dz": -1.34,
+    "dist": 1.36,
+    "path": 1.77,
+    "yMin": 0.09,
+    "yMax": 0.88,
+    "yaw": -112
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.433,
+    "eff": "RightHand",
+    "reachMax": 0.39
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Double_Leg_Takedown_-_Attacker",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Fist_Fight_A.fbx",
+   "name": "Fist_Fight_A",
+   "pack": "Mixamo_HF2",
+   "desc": "Engaged In A Fist Fight",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 4.667,
+   "frames30": 140,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.085,
+   "root": {
+    "dx": 0.41,
+    "dz": -0.8,
+    "dist": 0.9,
+    "path": 2.1,
+    "yMin": 0.76,
+    "yMax": 0.93,
+    "yaw": -31
+   },
+   "inPlace": false,
+   "posture": "stand>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 2.8,
+    "eff": "LeftHand",
+    "reachMax": 0.62
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Fist_Fight_B",
+    "role": "aggressor",
+    "note": "mutual exchange"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Fist_Fight_B.fbx",
+   "name": "Fist_Fight_B",
+   "pack": "Mixamo_HF2",
+   "desc": "Engaged In A Fist Fight",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 4.667,
+   "frames30": 140,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.159,
+   "root": {
+    "dx": 0.72,
+    "dz": -0.79,
+    "dist": 1.06,
+    "path": 2.58,
+    "yMin": 0.65,
+    "yMax": 0.91,
+    "yaw": -53
+   },
+   "inPlace": false,
+   "posture": "stand>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 2.9,
+    "eff": "LeftHand",
+    "reachMax": 0.93
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Fist_Fight_A",
+    "role": "victim",
+    "note": "mutual exchange"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Getting_Bit.fbx",
+   "name": "Getting_Bit",
+   "pack": "Mixamo_HF2",
+   "desc": "Getting Bit On Arm",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 4.067,
+   "frames30": 122,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.268,
+   "root": {
+    "dx": -1.34,
+    "dz": -1.82,
+    "dist": 2.26,
+    "path": 2.39,
+    "yMin": 0.82,
+    "yMax": 0.96,
+    "yaw": 65
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.533,
+    "eff": "RightHand",
+    "reachMax": 0.49
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "Zombie_Neck_Bite / Vampiric_Bite (approximate)",
+    "role": "victim"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Hold_Off_Assailant.fbx",
+   "name": "Hold_Off_Assailant",
+   "pack": "Mixamo_HF2",
+   "desc": "Holding Off Assailant Attacking From Above While Sitting",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 4.767,
+   "frames30": 144,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.07,
+    "yMin": 0.51,
+    "yMax": 0.52,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "kneel>kneel",
+   "airborne": 0,
+   "contact": {
+    "strike": 2.333,
+    "eff": "LeftHand",
+    "reachMax": 0.61
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Kick_To_The_Groin_3.fbx",
+   "name": "Kick_To_The_Groin_3",
+   "pack": "Mixamo_HF2",
+   "desc": "Receive A Kick To The Groin To Falling Down",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 3.467,
+   "frames30": 105,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.861,
+   "root": {
+    "dx": -0.03,
+    "dz": 1.18,
+    "dist": 1.18,
+    "path": 1.73,
+    "yMin": 0.12,
+    "yMax": 1.11,
+    "yaw": -67
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0.13,
+   "contact": {
+    "strike": 0.467,
+    "eff": "LeftFoot",
+    "reachMax": 0.91
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "any front kick via contact warp",
+    "role": "victim",
+    "note": "measured: receiver that collapses"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "grab / throw / takedown (paired)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/paired/Kick_To_The_Groin.fbx",
+   "name": "Kick_To_The_Groin",
+   "pack": "Mixamo_HF2",
+   "desc": "Receive A Kick To The Groin To Standing",
+   "cat": "grapple",
+   "stance": "unarmed",
+   "dur": 2.9,
+   "frames30": 88,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.53,
+    "yMin": 0.78,
+    "yMax": 0.99,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.267,
+    "eff": "LeftHand",
+    "reachMax": 0.17
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "pair": {
+    "partner": "any front kick via contact warp",
+    "role": "victim",
+    "note": "measured: receiver (doubles over)"
+   },
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
    ],
    "uses": [
     "grab / throw / takedown (paired)"
@@ -13556,6 +15915,258 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/reactions/Being_Electrocuted.fbx",
+   "name": "Being_Electrocuted",
+   "pack": "Mixamo_HF2",
+   "desc": "Being Electrocuted Into Unconciousness",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 8.067,
+   "frames30": 242,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.058,
+   "root": {
+    "dx": -0.55,
+    "dz": 1.22,
+    "dist": 1.34,
+    "path": 1.94,
+    "yMin": 0.12,
+    "yMax": 0.96,
+    "yaw": 155
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Getting_Smashed.fbx",
+   "name": "Getting_Smashed",
+   "pack": "Mixamo_HF2",
+   "desc": "Getting Smashed By A Large Object",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 2.267,
+   "frames30": 68,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.728,
+   "root": {
+    "dx": 0.8,
+    "dz": 0.28,
+    "dist": 0.85,
+    "path": 1.03,
+    "yMin": 0.22,
+    "yMax": 0.84,
+    "yaw": 6
+   },
+   "inPlace": false,
+   "posture": "stand>kneel (via ground)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Shoved_Reaction_With_Spin.fbx",
+   "name": "Shoved_Reaction_With_Spin",
+   "pack": "Mixamo_HF2",
+   "desc": "Reaction To Getting Clipped While Walking Unaware",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 4.533,
+   "frames30": 136,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.091,
+   "root": {
+    "dx": 0.45,
+    "dz": 2.1,
+    "dist": 2.15,
+    "path": 2.63,
+    "yMin": 0.86,
+    "yMax": 0.95,
+    "yaw": -198
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Struck_In_Head.fbx",
+   "name": "Struck_In_Head",
+   "pack": "Mixamo_HF2",
+   "desc": "Struck In Head While Sitting",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 5.967,
+   "frames30": 180,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.07,
+    "yMin": 0.39,
+    "yMax": 0.42,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "kneel>kneel",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Stumble_Backwards.fbx",
+   "name": "Stumble_Backwards",
+   "pack": "Mixamo_HF2",
+   "desc": "Slip And Fall Backwards",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 3.333,
+   "frames30": 100,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.864,
+   "root": {
+    "dx": 0.01,
+    "dz": -1.83,
+    "dist": 1.83,
+    "path": 2.06,
+    "yMin": 0.03,
+    "yMax": 0.91,
+    "yaw": 28
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0.17,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Taking_Punch.fbx",
+   "name": "Taking_Punch",
+   "pack": "Mixamo_HF2",
+   "desc": "Getting Hit In The Face From Various Angles",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 5.667,
+   "frames30": 170,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.34,
+    "yMin": 0.81,
+    "yMax": 0.92,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Teeter.fbx",
+   "name": "Teeter",
+   "pack": "Mixamo_HF2",
+   "desc": "Short Teetering On An Edge",
+   "cat": "hit-react",
+   "stance": "unarmed",
+   "dur": 1.833,
+   "frames30": 56,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.49,
+    "yMin": 1.57,
+    "yMax": 1.63,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 1.87,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "hit reaction pool (direction/height/severity tagged by name)"
+   ]
+  },
+  {
    "id": "ProLongbow/standing react small from front.fbx",
    "name": "standing react small from front",
    "pack": "ProLongbow",
@@ -14743,6 +17354,545 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/idles_style/Bouncing_Fight_Idle.fbx",
+   "name": "Bouncing_Fight_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Bouncing Fight Idle With Guard Up",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 2.967,
+   "frames30": 90,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.35,
+    "yMin": 0.86,
+    "yMax": 0.89,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Breathing_Idle.fbx",
+   "name": "Breathing_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 9.933,
+   "frames30": 299,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.63,
+    "yMin": 0.93,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Fighting_Idle.fbx",
+   "name": "Fighting_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Fight Idle Boxing Stance",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 3.3,
+   "frames30": 99,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.016,
+   "root": {
+    "dx": 0,
+    "dz": -0.02,
+    "dist": 0.02,
+    "path": 1.07,
+    "yMin": 0.89,
+    "yMax": 0.99,
+    "yaw": 1
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Knife_Idle.fbx",
+   "name": "Knife_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "\"Knife On The Rear Hand",
+   "cat": "idle",
+   "stance": "dagger/blade",
+   "dur": 4.467,
+   "frames30": 135,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.52,
+    "yMin": 0.81,
+    "yMax": 0.85,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "vex",
+    "Nightshade",
+    "Whiteclown"
+   ],
+   "uses": [
+    "dagger/blade locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Ninja_Idle_3.fbx",
+   "name": "Ninja_Idle_3",
+   "pack": "Mixamo_HF2",
+   "desc": "Female Ninja Idle Var. 3",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 4.933,
+   "frames30": 149,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.52,
+    "yMin": 0.51,
+    "yMax": 0.79,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "crouch>crouch (via kneel)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Ninja_Idle.fbx",
+   "name": "Ninja_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Female Ninja Idle Var. 1",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 9.167,
+   "frames30": 276,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.76,
+    "yMin": 0.74,
+    "yMax": 0.86,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Offensive_Idle.fbx",
+   "name": "Offensive_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Offensive Soccer Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 10.567,
+   "frames30": 317,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.002,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.82,
+    "yMin": 0.94,
+    "yMax": 0.97,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Orc_Idle_2.fbx",
+   "name": "Orc_Idle_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Female Orc Standing Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 7.367,
+   "frames30": 222,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.23,
+    "yMin": 0.93,
+    "yMax": 0.94,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Orc_Idle.fbx",
+   "name": "Orc_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Orc Standing Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 6.667,
+   "frames30": 200,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.09,
+    "yMin": 0.93,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Warrior_Idle.fbx",
+   "name": "Warrior_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Warrior Stretching Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 11.467,
+   "frames30": 344,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.23,
+    "yMin": 0.91,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/idles_style/Zombie_Idle.fbx",
+   "name": "Zombie_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Zombie Twitching Idle",
+   "cat": "idle",
+   "stance": "zombie",
+   "dur": 4.233,
+   "frames30": 127,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.09,
+    "yMin": 0.95,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "Skeletonzombie",
+    "Parasite"
+   ],
+   "uses": [
+    "zombie locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Dizzy_Idle.fbx",
+   "name": "Dizzy_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Rocking Back And Forth As If Dizzy",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 4.267,
+   "frames30": 129,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.59,
+    "yMin": 0.92,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Injured_Hurting_Idle.fbx",
+   "name": "Injured_Hurting_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Injured Holding Hurt Leg Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 6.033,
+   "frames30": 181,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.66,
+    "yMin": 0.79,
+    "yMax": 0.92,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Injured_Idle.fbx",
+   "name": "Injured_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Injured Standard Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 9.333,
+   "frames30": 280,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.002,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.67,
+    "yMin": 0.89,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Injured_Stumble_Idle.fbx",
+   "name": "Injured_Stumble_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Injured Stumbling Idle",
+   "cat": "idle",
+   "stance": "unarmed",
+   "dur": 5.067,
+   "frames30": 152,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.45,
+    "yMin": 0.73,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
    "id": "ProLongbow/standing idle 01.fbx",
    "name": "standing idle 01",
    "pack": "ProLongbow",
@@ -15829,6 +18979,510 @@
     "Heraklios",
     "Uriel",
     "Akai"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Climbing_To_Top.fbx",
+   "name": "Climbing_To_Top",
+   "pack": "Mixamo_HF2",
+   "desc": "Climbing Up A Ladder To Standing",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 4,
+   "frames30": 121,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.462,
+   "root": {
+    "dx": -0.04,
+    "dz": 1.31,
+    "dist": 1.31,
+    "path": 2.06,
+    "yMin": 0.89,
+    "yMax": 2.53,
+    "yaw": 10
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 3.43,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Emerging.fbx",
+   "name": "Emerging",
+   "pack": "Mixamo_HF2",
+   "desc": "Emerging Right From Cover To Aimed Rifle Walk",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 2.3,
+   "frames30": 69,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.248,
+   "root": {
+    "dx": 1.01,
+    "dz": 3,
+    "dist": 3.17,
+    "path": 3.77,
+    "yMin": 0.79,
+    "yMax": 0.89,
+    "yaw": -155
+   },
+   "inPlace": false,
+   "posture": "stand>crouch",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Fall_B_Land_To_Standing_Idle.fbx",
+   "name": "Fall_B_Land_To_Standing_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Land From Fall B To Standing Idle",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 1.567,
+   "frames30": 48,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.566,
+   "root": {
+    "dx": 0,
+    "dz": 1.84,
+    "dist": 1.84,
+    "path": 1.89,
+    "yMin": 0.65,
+    "yMax": 1.23,
+    "yaw": -22
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0.2,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Falling_To_Landing.fbx",
+   "name": "Falling_To_Landing",
+   "pack": "Mixamo_HF2",
+   "desc": "Landing From Falling Idle",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 1.067,
+   "frames30": 33,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.801,
+   "root": {
+    "dx": 0.05,
+    "dz": 0.08,
+    "dist": 0.1,
+    "path": 0.25,
+    "yMin": 0.58,
+    "yMax": 1.46,
+    "yaw": -6
+   },
+   "inPlace": true,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0.23,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Floating.fbx",
+   "name": "Floating",
+   "pack": "Mixamo_HF2",
+   "desc": "Floating In Air Flailing Arms",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 3.6,
+   "frames30": 108,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.012,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.09,
+    "yMin": 1.25,
+    "yMax": 1.28,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 3.43,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Flying.fbx",
+   "name": "Flying",
+   "pack": "Mixamo_HF2",
+   "desc": "Flying Idle",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 2.633,
+   "frames30": 80,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 19.86,
+    "dist": 19.86,
+    "path": 19.86,
+    "yMin": 0.89,
+    "yMax": 0.9,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 2.67,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Freehang_Climb.fbx",
+   "name": "Freehang_Climb",
+   "pack": "Mixamo_HF2",
+   "desc": "Freehang Climb To Standing",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 3.867,
+   "frames30": 116,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.881,
+   "root": {
+    "dx": 0.16,
+    "dz": 0.61,
+    "dist": 0.63,
+    "path": 1.78,
+    "yMin": 1.19,
+    "yMax": 3.24,
+    "yaw": -45
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 3.57,
+   "handedness": "left-hand",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Jump_Down.fbx",
+   "name": "Jump_Down",
+   "pack": "Mixamo_HF2",
+   "desc": "Rifle Jump Down",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 0.667,
+   "frames30": 21,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.212,
+   "root": {
+    "dx": 0.01,
+    "dz": 0,
+    "dist": 0.01,
+    "path": 0.11,
+    "yMin": 0.73,
+    "yMax": 0.91,
+    "yaw": -3
+   },
+   "inPlace": true,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0.17,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Jumping_Down_2.fbx",
+   "name": "Jumping_Down_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Jump Down With One Foot While Holding Rifle",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 2.833,
+   "frames30": 85,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.63,
+   "root": {
+    "dx": 0.06,
+    "dz": 1.65,
+    "dist": 1.66,
+    "path": 1.76,
+    "yMin": 0.7,
+    "yMax": 1.52,
+    "yaw": -15
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 1.27,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Jumping_Down_6.fbx",
+   "name": "Jumping_Down_6",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Hulking Giant Jump Down",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 2.633,
+   "frames30": 80,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.303,
+   "root": {
+    "dx": -0.01,
+    "dz": 1.83,
+    "dist": 1.83,
+    "path": 1.85,
+    "yMin": 0.44,
+    "yMax": 1.79,
+    "yaw": -4
+   },
+   "inPlace": false,
+   "posture": "stand>kneel",
+   "airborne": 1.53,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Jumping_Down_9.fbx",
+   "name": "Jumping_Down_9",
+   "pack": "Mixamo_HF2",
+   "desc": "Jump Down Over A Rail Clumsily",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 6,
+   "frames30": 181,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.095,
+   "root": {
+    "dx": -0.37,
+    "dz": 1.52,
+    "dist": 1.56,
+    "path": 3.5,
+    "yMin": 0.51,
+    "yMax": 1.99,
+    "yaw": 70
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via kneel)",
+   "airborne": 1.57,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Jumping_Down.fbx",
+   "name": "Jumping_Down",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Cape Jump Down",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 2.667,
+   "frames30": 81,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.221,
+   "root": {
+    "dx": 0.01,
+    "dz": 1.94,
+    "dist": 1.94,
+    "path": 2.05,
+    "yMin": 0.46,
+    "yMax": 1.97,
+    "yaw": 6
+   },
+   "inPlace": false,
+   "posture": "stand>crouch (via kneel)",
+   "airborne": 1.7,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Jumping_Over_Into_Combat.fbx",
+   "name": "Jumping_Over_Into_Combat",
+   "pack": "Mixamo_HF2",
+   "desc": "Jumping Over Obstacle Getting Ready To Fight",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 4.167,
+   "frames30": 125,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.274,
+   "root": {
+    "dx": 0.53,
+    "dz": 4.04,
+    "dist": 4.08,
+    "path": 4.22,
+    "yMin": 0.69,
+    "yMax": 1.33,
+    "yaw": -64
+   },
+   "inPlace": false,
+   "posture": "stand>crouch",
+   "airborne": 0.63,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "air: entrances (drop-in, landing), launches"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Vault_Over_Box.fbx",
+   "name": "Vault_Over_Box",
+   "pack": "Mixamo_HF2",
+   "desc": "Vault Over Box And Hide",
+   "cat": "jump-fall",
+   "stance": "unarmed",
+   "dur": 3.533,
+   "frames30": 106,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.382,
+   "root": {
+    "dx": -0.81,
+    "dz": 2.99,
+    "dist": 3.1,
+    "path": 4.31,
+    "yMin": 0.51,
+    "yMax": 1.47,
+    "yaw": 368
+   },
+   "inPlace": false,
+   "posture": "stand>kneel",
+   "airborne": 0.8,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
    ],
    "uses": [
     "air: entrances (drop-in, landing), launches"
@@ -16938,6 +20592,386 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/martial/Armada.fbx",
+   "name": "Armada",
+   "pack": "Mixamo_HF2",
+   "desc": "Capoeira Spin Kick",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 1.633,
+   "frames30": 49,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.029,
+   "root": {
+    "dx": 1.27,
+    "dz": 1.28,
+    "dist": 1.8,
+    "path": 2.03,
+    "yMin": 0.69,
+    "yMax": 0.84,
+    "yaw": 345
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.333,
+    "eff": "LeftFoot",
+    "reachMax": 2.17
+   },
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftFoot strike @1.333s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Flip_Kick.fbx",
+   "name": "Flip_Kick",
+   "pack": "Mixamo_HF2",
+   "desc": "Front Flip To Kick",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 2.8,
+   "frames30": 84,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.344,
+   "root": {
+    "dx": 0.03,
+    "dz": 4.4,
+    "dist": 4.4,
+    "path": 4.94,
+    "yMin": 0.34,
+    "yMax": 2,
+    "yaw": 346
+   },
+   "inPlace": false,
+   "posture": "stand>crouch (via kneel)",
+   "airborne": 0.87,
+   "contact": {
+    "strike": 2.6,
+    "eff": "RightHand",
+    "reachMax": 4.77
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightHand strike @2.6s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Kicking_3.fbx",
+   "name": "Kicking_3",
+   "pack": "Mixamo_HF2",
+   "desc": "Double Front Snap Kick",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 2.2,
+   "frames30": 67,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.53,
+    "yMin": 0.87,
+    "yMax": 1.16,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0.13,
+   "contact": {
+    "strike": 0.433,
+    "eff": "LeftHand",
+    "reachMax": 0.73
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftHand strike @0.433s)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Kicking_7.fbx",
+   "name": "Kicking_7",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Front Snap Kick With The Rear Foot Retreating",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 2.267,
+   "frames30": 68,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.004,
+   "root": {
+    "dx": 0,
+    "dz": -1.61,
+    "dist": 1.61,
+    "path": 1.71,
+    "yMin": 0.78,
+    "yMax": 1.23,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0.2,
+   "contact": {
+    "strike": 0.767,
+    "eff": "LeftHand",
+    "reachMax": 0.39
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftHand strike @0.767s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Leg_Sweep_3.fbx",
+   "name": "Leg_Sweep_3",
+   "pack": "Mixamo_HF2",
+   "desc": "360 Leg Sweep Kick",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 2.867,
+   "frames30": 86,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.001,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.54,
+    "yMin": 0.58,
+    "yMax": 0.75,
+    "yaw": -360
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 1.333,
+    "eff": "RightFoot",
+    "reachMax": 1.08
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightFoot strike @1.333s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Leg_Sweep.fbx",
+   "name": "Leg_Sweep",
+   "pack": "Mixamo_HF2",
+   "desc": "360 Degrees Back Leg Sweep",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 2.333,
+   "frames30": 70,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.006,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.27,
+    "yMin": 0.69,
+    "yMax": 0.78,
+    "yaw": -360
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.6,
+    "eff": "LeftHand",
+    "reachMax": 0.84
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftHand strike @0.6s)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Martelo_2.fbx",
+   "name": "Martelo_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Capoeira High Kick",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 1.3,
+   "frames30": 39,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.024,
+   "root": {
+    "dx": 0.01,
+    "dz": 0.01,
+    "dist": 0.01,
+    "path": 1.32,
+    "yMin": 0.73,
+    "yMax": 0.98,
+    "yaw": -4
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.4,
+    "eff": "LeftFoot",
+    "reachMax": 1.37
+   },
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftFoot strike @0.4s)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Meia_Lua_De_Compasso.fbx",
+   "name": "Meia_Lua_De_Compasso",
+   "pack": "Mixamo_HF2",
+   "desc": "Capoeira Side Step Spin Kick",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 1.733,
+   "frames30": 53,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": -1.77,
+    "dz": 0.73,
+    "dist": 1.92,
+    "path": 2.28,
+    "yMin": 0.68,
+    "yMax": 0.82,
+    "yaw": -375
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "strike": 0.867,
+    "eff": "LeftHand",
+    "reachMax": 2.12
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (LeftHand strike @0.867s)",
+    "gap-closer / lunge (has root travel: drive sim lunge from it)",
+    "high kick / launcher read"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/martial/Roll_Kicking.fbx",
+   "name": "Roll_Kicking",
+   "pack": "Mixamo_HF2",
+   "desc": "Roll Kick Landing On Hands And Knees",
+   "cat": "kick",
+   "stance": "unarmed",
+   "dur": 2.267,
+   "frames30": 68,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.756,
+   "root": {
+    "dx": 0.1,
+    "dz": -0.47,
+    "dist": 0.48,
+    "path": 1.2,
+    "yMin": 0.16,
+    "yMax": 0.92,
+    "yaw": 214
+   },
+   "inPlace": false,
+   "posture": "stand>kneel (via ground)",
+   "airborne": 0.23,
+   "contact": {
+    "strike": 0.767,
+    "eff": "RightFoot",
+    "reachMax": 0.63
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed moveset (RightFoot strike @0.767s)",
+    "high kick / launcher read"
+   ]
+  },
+  {
    "id": "ProLongbow/standing melee kick.fbx",
    "name": "standing melee kick",
    "pack": "ProLongbow",
@@ -17570,6 +21604,162 @@
    "inPlace": false,
    "posture": "stand>ground",
    "airborne": 0.57,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "knockdown / launch reaction (pair with a get-up)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Edge_Slip.fbx",
+   "name": "Edge_Slip",
+   "pack": "Mixamo_HF2",
+   "desc": "Slipping Off An Edge Then Regaining Balance",
+   "cat": "knockdown",
+   "stance": "unarmed",
+   "dur": 2.467,
+   "frames30": 75,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.046,
+   "root": {
+    "dx": 0.03,
+    "dz": -0.24,
+    "dist": 0.24,
+    "path": 0.65,
+    "yMin": 1.41,
+    "yMax": 1.64,
+    "yaw": -8
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 2.5,
+   "contact": {
+    "groundBy": "ends stand"
+   },
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "knockdown / launch reaction (pair with a get-up)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Hit_By_Car.fbx",
+   "name": "Hit_By_Car",
+   "pack": "Mixamo_HF2",
+   "desc": "Getting Hit By A Car While Tired",
+   "cat": "knockdown",
+   "stance": "unarmed",
+   "dur": 4.833,
+   "frames30": 146,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.896,
+   "root": {
+    "dx": -1.6,
+    "dz": 0.23,
+    "dist": 1.61,
+    "path": 1.87,
+    "yMin": 0.13,
+    "yMax": 0.91,
+    "yaw": -36
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0.2,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "knockdown / launch reaction (pair with a get-up)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Tripping.fbx",
+   "name": "Tripping",
+   "pack": "Mixamo_HF2",
+   "desc": "Tripping Forward While Walking",
+   "cat": "knockdown",
+   "stance": "unarmed",
+   "dur": 2.767,
+   "frames30": 83,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.02,
+   "root": {
+    "dx": -0.08,
+    "dz": 3.12,
+    "dist": 3.12,
+    "path": 3.21,
+    "yMin": 0.1,
+    "yMax": 0.95,
+    "yaw": 137
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 0,
+   "contact": {
+    "groundBy": "ends on ground"
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "knockdown / launch reaction (pair with a get-up)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/reactions/Wall_Crash.fbx",
+   "name": "Wall_Crash",
+   "pack": "Mixamo_HF2",
+   "desc": "Swing To Crashing Into A Wall",
+   "cat": "knockdown",
+   "stance": "unarmed",
+   "dur": 2.467,
+   "frames30": 75,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 1.95,
+   "root": {
+    "dx": 0.6,
+    "dz": 1.89,
+    "dist": 1.98,
+    "path": 4.46,
+    "yMin": 0.13,
+    "yMax": 1.75,
+    "yaw": -63
+   },
+   "inPlace": false,
+   "posture": "stand>ground",
+   "airborne": 1.3,
    "contact": {
     "groundBy": "ends on ground"
    },
@@ -18323,6 +22513,581 @@
    ],
    "uses": [
     "2h-greatsword locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Female_Tough_Walk.fbx",
+   "name": "Female_Tough_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Madeline Walk Like A Cowgirl - 2 Strides Loop",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 2.633,
+   "frames30": 80,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 2.91,
+    "dist": 2.91,
+    "path": 2.94,
+    "yMin": 0.89,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Strut_Walking.fbx",
+   "name": "Strut_Walking",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Strut Walk",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 1.433,
+   "frames30": 43,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.023,
+   "root": {
+    "dx": 0,
+    "dz": 1.31,
+    "dist": 1.31,
+    "path": 1.34,
+    "yMin": 0.91,
+    "yMax": 0.95,
+    "yaw": -1
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Swagger_Walk.fbx",
+   "name": "Swagger_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Walking With A Swagger",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 2.8,
+   "frames30": 84,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.009,
+   "root": {
+    "dx": 0,
+    "dz": 2.48,
+    "dist": 2.48,
+    "path": 2.5,
+    "yMin": 0.91,
+    "yMax": 0.96,
+    "yaw": 1
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Walk_In_Circle.fbx",
+   "name": "Walk_In_Circle",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Walking Counter Clockwise",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 17.367,
+   "frames30": 522,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 13.79,
+    "yMin": 0.93,
+    "yMax": 0.97,
+    "yaw": 360
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Drunk_Walk.fbx",
+   "name": "Drunk_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Drunk Walk Forward",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 3,
+   "frames30": 91,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 2.49,
+    "dist": 2.49,
+    "path": 2.53,
+    "yMin": 0.88,
+    "yMax": 0.99,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Dwarf_Walk.fbx",
+   "name": "Dwarf_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Dwarf Walk Forward",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 1.167,
+   "frames30": 35,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.029,
+   "root": {
+    "dx": 0,
+    "dz": 1.68,
+    "dist": 1.68,
+    "path": 1.69,
+    "yMin": 0.86,
+    "yMax": 0.94,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Injured_Run.fbx",
+   "name": "Injured_Run",
+   "pack": "Mixamo_HF2",
+   "desc": "Injured Running",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 0.633,
+   "frames30": 19,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.054,
+   "root": {
+    "dx": 0,
+    "dz": 1.47,
+    "dist": 1.47,
+    "path": 1.48,
+    "yMin": 0.79,
+    "yMax": 0.97,
+    "yaw": -1
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Injured_Walk.fbx",
+   "name": "Injured_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Injured Walking",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 1.633,
+   "frames30": 49,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.038,
+   "root": {
+    "dx": 0,
+    "dz": 1.97,
+    "dist": 1.97,
+    "path": 1.99,
+    "yMin": 0.81,
+    "yMax": 0.96,
+    "yaw": -1
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Old_Man_Walk.fbx",
+   "name": "Old_Man_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Slow Old Man Shuffle Walk",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 1.267,
+   "frames30": 38,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.012,
+   "root": {
+    "dx": 0,
+    "dz": 0.48,
+    "dist": 0.48,
+    "path": 0.54,
+    "yMin": 0.86,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Orc_Walk_2.fbx",
+   "name": "Orc_Walk_2",
+   "pack": "Mixamo_HF2",
+   "desc": "Female Orc Walk Forward",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 1.133,
+   "frames30": 34,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.038,
+   "root": {
+    "dx": -0.01,
+    "dz": 1.55,
+    "dist": 1.55,
+    "path": 1.58,
+    "yMin": 0.85,
+    "yMax": 0.94,
+    "yaw": 3
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Orc_Walk.fbx",
+   "name": "Orc_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Orc Walk Forward",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 1.2,
+   "frames30": 37,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 1.6,
+    "dist": 1.6,
+    "path": 1.62,
+    "yMin": 0.83,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Running_Tired.fbx",
+   "name": "Running_Tired",
+   "pack": "Mixamo_HF2",
+   "desc": "Running Tired To Dizzy",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 7,
+   "frames30": 211,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.179,
+   "root": {
+    "dx": 0.19,
+    "dz": 2.06,
+    "dist": 2.07,
+    "path": 3.42,
+    "yMin": 0.78,
+    "yMax": 0.95,
+    "yaw": -78
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Scary_Clown_Walk.fbx",
+   "name": "Scary_Clown_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Scary Clown Walking And Aiming",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 0.967,
+   "frames30": 29,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.028,
+   "root": {
+    "dx": 0,
+    "dz": 1.23,
+    "dist": 1.23,
+    "path": 1.24,
+    "yMin": 0.83,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Sneak_Walk.fbx",
+   "name": "Sneak_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Ninja Sneak Walk",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 0.9,
+   "frames30": 27,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.038,
+   "root": {
+    "dx": 0,
+    "dz": 2.19,
+    "dist": 2.19,
+    "path": 2.19,
+    "yMin": 0.7,
+    "yMax": 0.74,
+    "yaw": 1
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Walker_Walk.fbx",
+   "name": "Walker_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Walking With Walker",
+   "cat": "locomotion",
+   "stance": "unarmed",
+   "dur": 3.7,
+   "frames30": 112,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0.49,
+    "dist": 0.49,
+    "path": 0.65,
+    "yMin": 0.93,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Zombie_Walk.fbx",
+   "name": "Zombie_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Zombie Walking",
+   "cat": "locomotion",
+   "stance": "zombie",
+   "dur": 4.033,
+   "frames30": 121,
+   "loop": true,
+   "returnsToStart": true,
+   "loopDist": 0.012,
+   "root": {
+    "dx": 0,
+    "dz": 1.31,
+    "dist": 1.31,
+    "path": 1.55,
+    "yMin": 0.81,
+    "yMax": 0.91,
+    "yaw": 1
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "Skeletonzombie",
+    "Parasite"
+   ],
+   "uses": [
+    "zombie locomotion set"
    ]
   },
   {
@@ -20859,6 +25624,294 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/social/Annoyed_Head_Shake.fbx",
+   "name": "Annoyed_Head_Shake",
+   "pack": "Mixamo_HF2",
+   "desc": "Shaking Head No Annoyed",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 2.567,
+   "frames30": 77,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.03,
+    "yMin": 0.96,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Cocky_Head_Turn.fbx",
+   "name": "Cocky_Head_Turn",
+   "pack": "Mixamo_HF2",
+   "desc": "Turning Head To The Side In A Cocky Manner",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 2.533,
+   "frames30": 76,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.08,
+    "yMin": 0.95,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Dismissing_Gesture.fbx",
+   "name": "Dismissing_Gesture",
+   "pack": "Mixamo_HF2",
+   "desc": "Dismissing With Back Hand",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 2.233,
+   "frames30": 68,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.02,
+    "yMin": 0.95,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Hard_Head_Nod.fbx",
+   "name": "Hard_Head_Nod",
+   "pack": "Mixamo_HF2",
+   "desc": "Hard Head Nod Yes",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 1.633,
+   "frames30": 49,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.02,
+    "yMin": 0.96,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "left-hand",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Head_Nod_Yes.fbx",
+   "name": "Head_Nod_Yes",
+   "pack": "Mixamo_HF2",
+   "desc": "Nodding Head Yes",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 2.6,
+   "frames30": 78,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.02,
+    "yMin": 0.96,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Look_Away_Gesture.fbx",
+   "name": "Look_Away_Gesture",
+   "pack": "Mixamo_HF2",
+   "desc": "Sarcastically Looking Away",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 2.333,
+   "frames30": 70,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.1,
+    "yMin": 0.95,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "left-hand",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Shake_Fist.fbx",
+   "name": "Shake_Fist",
+   "pack": "Mixamo_HF2",
+   "desc": "Vexed Shaking Of The Fist",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 2.433,
+   "frames30": 74,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.13,
+    "yMin": 0.95,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Standing_Arguing.fbx",
+   "name": "Standing_Arguing",
+   "pack": "Mixamo_HF2",
+   "desc": "Standing Arguing With Another Person",
+   "cat": "talk",
+   "stance": "unarmed",
+   "dur": 20.8,
+   "frames30": 624,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 1.34,
+    "yMin": 0.93,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "dialogue gesture layer (upper body)"
+   ]
+  },
+  {
    "id": "Mixamo_HF/grabs_throws/Lifting_Object.fbx",
    "name": "Lifting_Object",
    "pack": "Mixamo_HF",
@@ -21132,6 +26185,630 @@
    ]
   },
   {
+   "id": "Mixamo_HF2/entrance/Banging_Fist.fbx",
+   "name": "Banging_Fist",
+   "pack": "Mixamo_HF2",
+   "desc": "Banging Fist On Table",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 2.633,
+   "frames30": 80,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.08,
+    "yMin": 0.72,
+    "yMax": 0.74,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "release": 0.867
+   },
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Bash.fbx",
+   "name": "Bash",
+   "pack": "Mixamo_HF2",
+   "desc": "Overhead Bashing Swing",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 4,
+   "frames30": 121,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.55,
+    "yMin": 0.88,
+    "yMax": 0.93,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 1.433
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Kicking_Out.fbx",
+   "name": "Kicking_Out",
+   "pack": "Mixamo_HF2",
+   "desc": "Kicking While Sitting On Ground",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 1.6,
+   "frames30": 49,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.18,
+    "yMin": 0.06,
+    "yMax": 0.09,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "ground>ground",
+   "airborne": 0,
+   "contact": {
+    "release": 0.433
+   },
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Open_Door_Outwards.fbx",
+   "name": "Open_Door_Outwards",
+   "pack": "Mixamo_HF2",
+   "desc": "Open Door Outwards While Walking",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 4.1,
+   "frames30": 123,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.03,
+   "root": {
+    "dx": 0.01,
+    "dz": 2.08,
+    "dist": 2.08,
+    "path": 2.97,
+    "yMin": 0.87,
+    "yMax": 0.96,
+    "yaw": -2
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 3.867
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Opening_Door_Inwards.fbx",
+   "name": "Opening_Door_Inwards",
+   "pack": "Mixamo_HF2",
+   "desc": "Male Walking And Opening A Door Inwards",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 6.367,
+   "frames30": 192,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 1.68,
+    "dist": 1.68,
+    "path": 2.65,
+    "yMin": 0.88,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 4.933
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Pulling_Lever.fbx",
+   "name": "Pulling_Lever",
+   "pack": "Mixamo_HF2",
+   "desc": "Pulling A Lever Down",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 6.267,
+   "frames30": 189,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.18,
+    "yMin": 0.96,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 1.067
+   },
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Smash.fbx",
+   "name": "Smash",
+   "pack": "Mixamo_HF2",
+   "desc": "Smash With Back Of Rifle Or Staff",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 3,
+   "frames30": 91,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.46,
+    "yMin": 0.77,
+    "yMax": 0.86,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "release": 1
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Carrying.fbx",
+   "name": "Carrying",
+   "pack": "Mixamo_HF2",
+   "desc": "Carrying Someone Idle",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 10,
+   "frames30": 301,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.27,
+    "yMin": 0.91,
+    "yMax": 0.91,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 7.267
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Holding_Idle.fbx",
+   "name": "Holding_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Holding An Object Idle",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 6,
+   "frames30": 181,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.23,
+    "yMin": 0.95,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 2.833
+   },
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Holding_Walk.fbx",
+   "name": "Holding_Walk",
+   "pack": "Mixamo_HF2",
+   "desc": "Holding An Object While Walking",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 1.367,
+   "frames30": 42,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.002,
+   "root": {
+    "dx": 0,
+    "dz": 1.62,
+    "dist": 1.62,
+    "path": 1.63,
+    "yMin": 0.89,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 0.133
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Picking_Up_Object.fbx",
+   "name": "Picking_Up_Object",
+   "pack": "Mixamo_HF2",
+   "desc": "Picking Up An Object With One Hand",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 3.433,
+   "frames30": 104,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.052,
+   "root": {
+    "dx": -0.01,
+    "dz": -0.05,
+    "dist": 0.05,
+    "path": 0.22,
+    "yMin": 0.88,
+    "yMax": 0.94,
+    "yaw": 3
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 0.367
+   },
+   "handedness": "right-hand",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Pull_Heavy_Object.fbx",
+   "name": "Pull_Heavy_Object",
+   "pack": "Mixamo_HF2",
+   "desc": "Pulling A Heavy Object",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 1.1,
+   "frames30": 34,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": -0.27,
+    "dist": 0.27,
+    "path": 0.34,
+    "yMin": 0.75,
+    "yMax": 0.81,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "contact": {
+    "release": 1.033
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Push_Start.fbx",
+   "name": "Push_Start",
+   "pack": "Mixamo_HF2",
+   "desc": "Start To Push A Heavy Object",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 4.733,
+   "frames30": 142,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.454,
+   "root": {
+    "dx": -0.05,
+    "dz": 1.32,
+    "dist": 1.32,
+    "path": 1.36,
+    "yMin": 0.68,
+    "yMax": 0.98,
+    "yaw": 55
+   },
+   "inPlace": false,
+   "posture": "stand>crouch",
+   "airborne": 0,
+   "contact": {
+    "release": 0.433
+   },
+   "handedness": "both/none",
+   "footedness": "right-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Push_Stop.fbx",
+   "name": "Push_Stop",
+   "pack": "Mixamo_HF2",
+   "desc": "Stop Pushing A Heavy Object",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 2.6,
+   "frames30": 78,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.443,
+   "root": {
+    "dx": 0.05,
+    "dz": 0.76,
+    "dist": 0.76,
+    "path": 1.03,
+    "yMin": 0.66,
+    "yMax": 0.91,
+    "yaw": -54
+   },
+   "inPlace": false,
+   "posture": "crouch>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 2.067
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Pushing.fbx",
+   "name": "Pushing",
+   "pack": "Mixamo_HF2",
+   "desc": "Pushing An Object Forward",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 3.967,
+   "frames30": 120,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.434,
+   "root": {
+    "dx": -0.06,
+    "dz": 0.36,
+    "dist": 0.36,
+    "path": 0.97,
+    "yMin": 0.4,
+    "yMax": 0.94,
+    "yaw": -12
+   },
+   "inPlace": false,
+   "posture": "kneel>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 2.033
+   },
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/environment/Putting_Down.fbx",
+   "name": "Putting_Down",
+   "pack": "Mixamo_HF2",
+   "desc": "Putting Down An Object",
+   "cat": "throw-prop",
+   "stance": "unarmed",
+   "dur": 10.333,
+   "frames30": 310,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.04,
+   "root": {
+    "dx": 0.04,
+    "dz": -0.01,
+    "dist": 0.04,
+    "path": 0.41,
+    "yMin": 0.84,
+    "yMax": 0.95,
+    "yaw": -3
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "contact": {
+    "release": 4.367
+   },
+   "handedness": "right-hand",
+   "footedness": "right-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "environment: lift / carry / throw props"
+   ]
+  },
+  {
    "id": "ActionAdventure/run to stop.fbx",
    "name": "run to stop",
    "pack": "ActionAdventure",
@@ -21156,6 +26833,114 @@
    "airborne": 0,
    "handedness": "both/none",
    "footedness": "left-foot",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Run_To_Stop.fbx",
+   "name": "Run_To_Stop",
+   "pack": "Mixamo_HF2",
+   "desc": "Run To Stop Against Object",
+   "cat": "transition",
+   "stance": "unarmed",
+   "dur": 1.8,
+   "frames30": 54,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.335,
+   "root": {
+    "dx": 0.01,
+    "dz": 2.57,
+    "dist": 2.57,
+    "path": 2.69,
+    "yMin": 0.78,
+    "yMax": 1,
+    "yaw": -1
+   },
+   "inPlace": false,
+   "posture": "stand>stand (via crouch)",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Start_Walking.fbx",
+   "name": "Start_Walking",
+   "pack": "Mixamo_HF2",
+   "desc": "Walking From Standing",
+   "cat": "transition",
+   "stance": "unarmed",
+   "dur": 2.933,
+   "frames30": 89,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.081,
+   "root": {
+    "dx": -0.03,
+    "dz": 1.9,
+    "dist": 1.9,
+    "path": 1.94,
+    "yMin": 0.91,
+    "yMax": 0.97,
+    "yaw": 11
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Stop_Walking.fbx",
+   "name": "Stop_Walking",
+   "pack": "Mixamo_HF2",
+   "desc": "Stops Walking While Aiming Rifle",
+   "cat": "transition",
+   "stance": "unarmed",
+   "dur": 2.667,
+   "frames30": 81,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.128,
+   "root": {
+    "dx": -0.01,
+    "dz": 1.52,
+    "dist": 1.52,
+    "path": 1.55,
+    "yMin": 0.88,
+    "yMax": 0.93,
+    "yaw": -7
+   },
+   "inPlace": false,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
    "mirrorable": "symmetric-ish (mirror adds little)",
    "roles": [
     "hollowjack",
@@ -21722,6 +27507,114 @@
    ],
    "uses": [
     "2h-greatsword locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Quick_180_Turn.fbx",
+   "name": "Quick_180_Turn",
+   "pack": "Mixamo_HF2",
+   "desc": "Quick Right 180 Turn",
+   "cat": "turn",
+   "stance": "unarmed",
+   "dur": 1.3,
+   "frames30": 39,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.004,
+   "root": {
+    "dx": 0.01,
+    "dz": -0.03,
+    "dist": 0.03,
+    "path": 0.32,
+    "yMin": 0.83,
+    "yMax": 0.93,
+    "yaw": -181
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "left-hand",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Standing_Turn_Left_90.fbx",
+   "name": "Standing_Turn_Left_90",
+   "pack": "Mixamo_HF2",
+   "desc": "Turning 90 Degrees Left",
+   "cat": "turn",
+   "stance": "unarmed",
+   "dur": 1.867,
+   "frames30": 57,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.47,
+    "yMin": 0.85,
+    "yMax": 0.89,
+    "yaw": 90
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/locomotion_style/Standing_Turn_Right_90.fbx",
+   "name": "Standing_Turn_Right_90",
+   "pack": "Mixamo_HF2",
+   "desc": "Turning 90 Degrees Right With Axe",
+   "cat": "turn",
+   "stance": "unarmed",
+   "dur": 1.633,
+   "frames30": 49,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0.002,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.7,
+    "yMin": 0.81,
+    "yMax": 0.9,
+    "yaw": -90
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "unarmed locomotion set"
    ]
   },
   {
@@ -22891,6 +28784,222 @@
     "path": 0.25,
     "yMin": 0.91,
     "yMax": 0.92,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "victory / crowd pose"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Kneeling_Down.fbx",
+   "name": "Kneeling_Down",
+   "pack": "Mixamo_HF2",
+   "desc": "Standing To Kneeling Down",
+   "cat": "victory-defeat",
+   "stance": "unarmed",
+   "dur": 2.767,
+   "frames30": 83,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.486,
+   "root": {
+    "dx": -0.01,
+    "dz": -0.01,
+    "dist": 0.01,
+    "path": 0.32,
+    "yMin": 0.36,
+    "yMax": 0.97,
+    "yaw": -3
+   },
+   "inPlace": true,
+   "posture": "stand>kneel",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "left-foot",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "defeat / submission / kneel"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Quick_Informal_Bow.fbx",
+   "name": "Quick_Informal_Bow",
+   "pack": "Mixamo_HF2",
+   "desc": "",
+   "cat": "victory-defeat",
+   "stance": "unarmed",
+   "dur": 2.733,
+   "frames30": 83,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.22,
+    "yMin": 0.95,
+    "yMax": 0.96,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "stand>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "victory / crowd pose"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/entrance/Stand_Up_3.fbx",
+   "name": "Stand_Up_3",
+   "pack": "Mixamo_HF2",
+   "desc": "Looking Over Ledge To Standing Up",
+   "cat": "victory-defeat",
+   "stance": "unarmed",
+   "dur": 2.333,
+   "frames30": 70,
+   "loop": false,
+   "returnsToStart": false,
+   "loopDist": 0.957,
+   "root": {
+    "dx": 0.08,
+    "dz": -0.37,
+    "dist": 0.38,
+    "path": 0.59,
+    "yMin": 0.22,
+    "yMax": 1.04,
+    "yaw": 9
+   },
+   "inPlace": false,
+   "posture": "ground>stand",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "victory / crowd pose"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Fist_Pump.fbx",
+   "name": "Fist_Pump",
+   "pack": "Mixamo_HF2",
+   "desc": "Big Standing Fist Pump From Sitting",
+   "cat": "victory-defeat",
+   "stance": "unarmed",
+   "dur": 3.5,
+   "frames30": 106,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.89,
+    "yMin": 0.56,
+    "yMax": 0.95,
+    "yaw": 0
+   },
+   "inPlace": false,
+   "posture": "crouch>crouch",
+   "airborne": 0,
+   "handedness": "right-hand",
+   "footedness": "both/none",
+   "mirrorable": "yes: asymmetric, mirror = opposite-side variant",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "victory / crowd pose"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Kneeling.fbx",
+   "name": "Kneeling",
+   "pack": "Mixamo_HF2",
+   "desc": "Kneeling On One Knee Idle",
+   "cat": "victory-defeat",
+   "stance": "unarmed",
+   "dur": 4.667,
+   "frames30": 140,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.01,
+    "yMin": 0.39,
+    "yMax": 0.39,
+    "yaw": 0
+   },
+   "inPlace": true,
+   "posture": "kneel>kneel",
+   "airborne": 0,
+   "handedness": "both/none",
+   "footedness": "both/none",
+   "mirrorable": "symmetric-ish (mirror adds little)",
+   "roles": [
+    "hollowjack",
+    "vex",
+    "everyone (bare-hand finishers, brawling)"
+   ],
+   "uses": [
+    "defeat / submission / kneel"
+   ]
+  },
+  {
+   "id": "Mixamo_HF2/social/Sad_Idle.fbx",
+   "name": "Sad_Idle",
+   "pack": "Mixamo_HF2",
+   "desc": "Standing In A Sad Disposition",
+   "cat": "victory-defeat",
+   "stance": "unarmed",
+   "dur": 4,
+   "frames30": 121,
+   "loop": false,
+   "returnsToStart": true,
+   "loopDist": 0,
+   "root": {
+    "dx": 0,
+    "dz": 0,
+    "dist": 0,
+    "path": 0.05,
+    "yMin": 0.95,
+    "yMax": 0.96,
     "yaw": 0
    },
    "inPlace": true,
