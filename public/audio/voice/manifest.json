@@ -1,0 +1,1130 @@
+{
+ "gorak.entrance.0": {
+  "file": "voice/gorak/gorak.entrance.0.ogg",
+  "dur": 8.95,
+  "text": "They chained me. They starved me. They threw me in the pit with three bears. Now the bears are a rug, and I am Gorak the Skullsplitter.",
+  "key": "47e01c3d0c3bdc9c:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.entrance.1": {
+  "file": "voice/gorak/gorak.entrance.1.ogg",
+  "dur": 9.85,
+  "text": "Ten winters I have walked into this sand, and ten winters I have walked out. Count your bones, little champion. I will be counting them after.",
+  "key": "8c3b5755a6164876:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.victory.0": {
+  "file": "voice/gorak/gorak.victory.0.ogg",
+  "dur": 2.19,
+  "text": "Who is next? Send two. Send ten!",
+  "key": "e33ed01578f68904:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.victory.1": {
+  "file": "voice/gorak/gorak.victory.1.ogg",
+  "dur": 3.06,
+  "text": "Write it in the sand. Gorak. Still. Standing.",
+  "key": "188ef188eaa32b61:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "aldric.entrance.0": {
+  "file": "voice/aldric/aldric.entrance.0.ogg",
+  "dur": 8.05,
+  "text": "I am Aldric, called Ironwall, captain of the Ninth Shield. I held the Gray Bridge for three days against an army. Today I need only hold this sand.",
+  "key": "987f8e237fe751e5:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.entrance.1": {
+  "file": "voice/aldric/aldric.entrance.1.ogg",
+  "dur": 5.95,
+  "text": "The light does not ask whether you are ready. It simply arrives. Kneel now, and I will remember you kindly.",
+  "key": "b6a44114d64df2d7:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.victory.0": {
+  "file": "voice/aldric/aldric.victory.0.ogg",
+  "dur": 2.6,
+  "text": "The Ninth Shield holds. Mark it in the records.",
+  "key": "865c1b1d7fba9ece:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.victory.1": {
+  "file": "voice/aldric/aldric.victory.1.ogg",
+  "dur": 2.23,
+  "text": "Rise again in a better life, champion.",
+  "key": "e32501dbf0935fd4:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "ozrel.entrance.0": {
+  "file": "voice/ozrel/ozrel.entrance.0.ogg",
+  "dur": 6.85,
+  "text": "They called it an accident. The academy, the library, the dean. I call it a lesson. I am Ozrel the Cinderlord, and class is in session.",
+  "key": "0769785b9804b3ab:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.entrance.1": {
+  "file": "voice/ozrel/ozrel.entrance.1.ogg",
+  "dur": 5.55,
+  "text": "Do you smell that? Smoke. Ash. Opportunity. Ha ha ha! Stand still, and I promise it will only hurt forever.",
+  "key": "31ccf4ccc4bf2c3f:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.victory.0": {
+  "file": "voice/ozrel/ozrel.victory.0.ogg",
+  "dur": 2.54,
+  "text": "Note to self: champions burn slower than books.",
+  "key": "c442b3c292f3da96:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.victory.1": {
+  "file": "voice/ozrel/ozrel.victory.1.ogg",
+  "dur": 1.99,
+  "text": "Applause! Or I set the stands on fire.",
+  "key": "533d88868b85c052:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "erika.entrance.0": {
+  "file": "voice/erika/erika.entrance.0.ogg",
+  "dur": 9.95,
+  "text": "I have tracked wolves through blizzards and kings through their own castles. They call me the Thornshot. I never miss the same target twice. I have never needed to.",
+  "key": "4d3f0bc9516c6e90:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.entrance.1": {
+  "file": "voice/erika/erika.entrance.1.ogg",
+  "dur": 5.85,
+  "text": "Quiet now. Listen. That is your heart. Count the beats you have left, champion. I already have.",
+  "key": "211e6f84e9637202:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.victory.0": {
+  "file": "voice/erika/erika.victory.0.ogg",
+  "dur": 2.63,
+  "text": "Another trophy. The wall is getting crowded.",
+  "key": "3ce6afa0f61084f7:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.victory.1": {
+  "file": "voice/erika/erika.victory.1.ogg",
+  "dur": 2.25,
+  "text": "The forest remembers. So will they.",
+  "key": "b1643c544ee6590f:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "vex.entrance.0": {
+  "file": "voice/vex/vex.entrance.0.ogg",
+  "dur": 9.75,
+  "text": "Do you hear it? Thousands of hearts, racing for me. I have been dead for three hundred years, and I have never felt more alive. I am Vex, the Crimson Whisper.",
+  "key": "91a62f69428f9331:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.entrance.1": {
+  "file": "voice/vex/vex.entrance.1.ogg",
+  "dur": 5.55,
+  "text": "Come, champion. Let me show you what eternity feels like. It is shorter than you think.",
+  "key": "3e922fc320abd866:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.victory.0": {
+  "file": "voice/vex/vex.victory.0.ogg",
+  "dur": 2.5,
+  "text": "The crowd adores me. Of course they do.",
+  "key": "722d15ac8cfd7f6a:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.victory.1": {
+  "file": "voice/vex/vex.victory.1.ogg",
+  "dur": 2.35,
+  "text": "Eternity continues. Yours did not.",
+  "key": "41846cff680da0d8:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "fenrik.entrance.0": {
+  "file": "voice/fenrik/fenrik.entrance.0.ogg",
+  "dur": 6.45,
+  "text": "Cellar. Dark. Needles. They made me. Now I unmake them. Fenrik. Bloodmaw. Hungry.",
+  "key": "96596229d851cd9e:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.entrance.1": {
+  "file": "voice/fenrik/fenrik.entrance.1.ogg",
+  "dur": 4.35,
+  "text": "Smell you. Smell fear. Run. Fenrik likes when they run.",
+  "key": "1af1595f3e16c5ff:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.victory.0": {
+  "file": "voice/fenrik/fenrik.victory.0.ogg",
+  "dur": 2.29,
+  "text": "Fenrik wins! Fenrik eats!",
+  "key": "c05fa00893a42cdf:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.victory.1": {
+  "file": "voice/fenrik/fenrik.victory.1.ogg",
+  "dur": 2.12,
+  "text": "More meat! Bring more!",
+  "key": "18a8b967628740b1:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "maw.entrance.0": {
+  "file": "voice/maw/maw.entrance.0.ogg",
+  "dur": 9.95,
+  "text": "One hundred years beneath your arena. Chains. Dark. Silence. Now the gate is open. Maw is hungry. Maw. Is. Free.",
+  "key": "d06d40475c00a2ef:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.entrance.1": {
+  "file": "voice/maw/maw.entrance.1.ogg",
+  "dur": 7.35,
+  "text": "You build walls. You build cages. Maw eats walls. Maw eats cages. Maw will eat you.",
+  "key": "a42703966b8720fb:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.victory.0": {
+  "file": "voice/maw/maw.victory.0.ogg",
+  "dur": 2.62,
+  "text": "Bring more. Maw still hungry.",
+  "key": "1a426a3025bcaf5c:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.victory.1": {
+  "file": "voice/maw/maw.victory.1.ogg",
+  "dur": 2.78,
+  "text": "Back to the dark? No. Maw stays.",
+  "key": "ed5cde1b74a96108:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "hollowjack.entrance.0": {
+  "file": "voice/hollowjack/hollowjack.entrance.0.ogg",
+  "dur": 8.15,
+  "text": "Harvest time, harvest time, who is ripe for harvest time? Hee hee! I am Hollowjack, the Pumpkin Hulk, and I lift. Your. SPIRITS. Right out of your body!",
+  "key": "38ea7fa0d9e1d948:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.entrance.1": {
+  "file": "voice/hollowjack/hollowjack.entrance.1.ogg",
+  "dur": 6.45,
+  "text": "They carved me a smile so I would never stop grinning. Thanks for that! It makes the stomping so much more cheerful!",
+  "key": "b5b6a0758f6938da:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.victory.0": {
+  "file": "voice/hollowjack/hollowjack.victory.0.ogg",
+  "dur": 1.68,
+  "text": "Happy harvest, everyone!",
+  "key": "5976e1506f4fd6e7:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.victory.1": {
+  "file": "voice/hollowjack/hollowjack.victory.1.ogg",
+  "dur": 1.69,
+  "text": "Another one for the patch!",
+  "key": "cd691112daaf4fe8:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "gorak.faceoff.0": {
+  "file": "voice/gorak/gorak.faceoff.0.ogg",
+  "dur": 2.43,
+  "text": "You are smaller than they promised.",
+  "key": "fa39e79851e9fea8:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.faceoff.1": {
+  "file": "voice/gorak/gorak.faceoff.1.ogg",
+  "dur": 3.56,
+  "text": "Pray loud. The gods are far away and I am very close.",
+  "key": "5ef17bda62fae1e9:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.taunt.0": {
+  "file": "voice/gorak/gorak.taunt.0.ogg",
+  "dur": 3.89,
+  "text": "Is that all? My grandmother hits harder, and she is dead.",
+  "key": "721fdf25e508a386:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.taunt.1": {
+  "file": "voice/gorak/gorak.taunt.1.ogg",
+  "dur": 2.15,
+  "text": "Come closer! The axe is lonely.",
+  "key": "5346b8670fd7096e:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.taunt.2": {
+  "file": "voice/gorak/gorak.taunt.2.ogg",
+  "dur": 2.03,
+  "text": "Ha! Again! Hit me again!",
+  "key": "5f87e50b84842c33:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.ultimate.0": {
+  "file": "voice/gorak/gorak.ultimate.0.ogg",
+  "dur": 1.54,
+  "text": "SKULLSPLITTER!",
+  "key": "42602d7dab7ef104:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.ultimate.1": {
+  "file": "voice/gorak/gorak.ultimate.1.ogg",
+  "dur": 1.9,
+  "text": "Your skull! Is! MINE!",
+  "key": "0fdbd000754617da:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.hurt.0": {
+  "file": "voice/gorak/gorak.hurt.0.ogg",
+  "dur": 1.34,
+  "text": "Grrah!",
+  "key": "96cf91fdb1bf586b:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.hurt.1": {
+  "file": "voice/gorak/gorak.hurt.1.ogg",
+  "dur": 1.47,
+  "text": "Hrrk! Good!",
+  "key": "a9964da3b48afef6:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.hurt.2": {
+  "file": "voice/gorak/gorak.hurt.2.ogg",
+  "dur": 0.64,
+  "text": "Ungh!",
+  "key": "2314bf3b0083b469:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.nearDeath.0": {
+  "file": "voice/gorak/gorak.nearDeath.0.ogg",
+  "dur": 2.6,
+  "text": "Not yet. Gorak does not fall to worms.",
+  "key": "a6f0c8bc7aff5d89:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.nearDeath.1": {
+  "file": "voice/gorak/gorak.nearDeath.1.ogg",
+  "dur": 2.5,
+  "text": "Blood in my eyes. Good. Now I see red.",
+  "key": "e975d263bcfa1739:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.comeback.0": {
+  "file": "voice/gorak/gorak.comeback.0.ogg",
+  "dur": 1.9,
+  "text": "You woke me up. Bad idea.",
+  "key": "bef45387ea5a8dbe:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.comeback.1": {
+  "file": "voice/gorak/gorak.comeback.1.ogg",
+  "dur": 1.72,
+  "text": "Now Gorak is angry!",
+  "key": "e1bc25314938418b:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.kill.0": {
+  "file": "voice/gorak/gorak.kill.0.ogg",
+  "dur": 1.61,
+  "text": "Down you go!",
+  "key": "47eee8d503a6502d:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.kill.1": {
+  "file": "voice/gorak/gorak.kill.1.ogg",
+  "dur": 1.72,
+  "text": "Another skull for the wall!",
+  "key": "0659813790fc418a:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.defeat.0": {
+  "file": "voice/gorak/gorak.defeat.0.ogg",
+  "dur": 2.13,
+  "text": "Tell them... I did not run...",
+  "key": "d0ce2af2ad0d5411:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.defeat.1": {
+  "file": "voice/gorak/gorak.defeat.1.ogg",
+  "dur": 1.63,
+  "text": "Huh... good hit...",
+  "key": "2e820d093fb1f991:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.vs_aldric.0": {
+  "file": "voice/gorak/gorak.vs_aldric.0.ogg",
+  "dur": 3.3,
+  "text": "Shiny man. I will make your shield into a soup bowl.",
+  "key": "bd614d53de9c9f6c:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "gorak.vs_maw.0": {
+  "file": "voice/gorak/gorak.vs_maw.0.ogg",
+  "dur": 1.9,
+  "text": "Big beast. Bigger rug.",
+  "key": "ca7605b20fa5d073:asetrate=24000*0.9,aresample=24000,atempo=1.08,bass=g=6:f=110,acompressor=threshold=-18dB:ratio=4,aecho=0.6:0.4:40:0.25,volume=1.4"
+ },
+ "aldric.faceoff.0": {
+  "file": "voice/aldric/aldric.faceoff.0.ogg",
+  "dur": 3.16,
+  "text": "Your sins are written on your face. I will read them aloud.",
+  "key": "b4113901aa6d3c91:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.faceoff.1": {
+  "file": "voice/aldric/aldric.faceoff.1.ogg",
+  "dur": 2.75,
+  "text": "Raise your guard. I insist on a fair execution.",
+  "key": "8add60e2ca2a101a:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.taunt.0": {
+  "file": "voice/aldric/aldric.taunt.0.ogg",
+  "dur": 2.04,
+  "text": "Is that the best your gods can muster?",
+  "key": "045f2f546f3dc77b:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.taunt.1": {
+  "file": "voice/aldric/aldric.taunt.1.ogg",
+  "dur": 2.25,
+  "text": "Strike true, or do not strike at all.",
+  "key": "c1a83cf1445c4084:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.taunt.2": {
+  "file": "voice/aldric/aldric.taunt.2.ogg",
+  "dur": 2.25,
+  "text": "I have felt sharper words from novices.",
+  "key": "90450f6afc24cc4e:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.ultimate.0": {
+  "file": "voice/aldric/aldric.ultimate.0.ogg",
+  "dur": 1.34,
+  "text": "OATH OF STEEL!",
+  "key": "06f65ae349788516:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.ultimate.1": {
+  "file": "voice/aldric/aldric.ultimate.1.ogg",
+  "dur": 1.35,
+  "text": "Judgement falls!",
+  "key": "85d52942bfc9818d:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.hurt.0": {
+  "file": "voice/aldric/aldric.hurt.0.ogg",
+  "dur": 0.7,
+  "text": "Hold!",
+  "key": "a427cad238c0a42a:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.hurt.1": {
+  "file": "voice/aldric/aldric.hurt.1.ogg",
+  "dur": 1.8,
+  "text": "Hngh! Still standing.",
+  "key": "0cda498cf401316e:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.hurt.2": {
+  "file": "voice/aldric/aldric.hurt.2.ogg",
+  "dur": 0.38,
+  "text": "Steady!",
+  "key": "c2dc4d9e719d3c94:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.nearDeath.0": {
+  "file": "voice/aldric/aldric.nearDeath.0.ogg",
+  "dur": 1.95,
+  "text": "The wall bends... it does not break.",
+  "key": "22eae4d4cefa2473:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.nearDeath.1": {
+  "file": "voice/aldric/aldric.nearDeath.1.ogg",
+  "dur": 1.85,
+  "text": "Light, give me one more breath.",
+  "key": "9d6511c651bf270a:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.comeback.0": {
+  "file": "voice/aldric/aldric.comeback.0.ogg",
+  "dur": 1.99,
+  "text": "The tide turns. As it always does.",
+  "key": "b50b04f8b32a8905:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.comeback.1": {
+  "file": "voice/aldric/aldric.comeback.1.ogg",
+  "dur": 2.17,
+  "text": "You mistook my patience for weakness.",
+  "key": "2c489f8f83de4a4e:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.kill.0": {
+  "file": "voice/aldric/aldric.kill.0.ogg",
+  "dur": 1.61,
+  "text": "Rest now. It is over.",
+  "key": "d48ed03e8298e39f:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.kill.1": {
+  "file": "voice/aldric/aldric.kill.1.ogg",
+  "dur": 1.33,
+  "text": "Justice is done.",
+  "key": "db66ea224c0c1612:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.defeat.0": {
+  "file": "voice/aldric/aldric.defeat.0.ogg",
+  "dur": 1.87,
+  "text": "The wall... has fallen...",
+  "key": "b46b32ed2e6a40ed:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.defeat.1": {
+  "file": "voice/aldric/aldric.defeat.1.ogg",
+  "dur": 1.85,
+  "text": "Forgive me... brothers...",
+  "key": "661218b80a8b6fb5:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.vs_gorak.0": {
+  "file": "voice/aldric/aldric.vs_gorak.0.ogg",
+  "dur": 3.76,
+  "text": "Your axe has widowed half the north, warlord. It ends on this sand.",
+  "key": "19bc37aba551a73f:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "aldric.vs_vex.0": {
+  "file": "voice/aldric/aldric.vs_vex.0.ogg",
+  "dur": 3.61,
+  "text": "I know what you are, bloodsucker. Holy steel remembers your kind.",
+  "key": "82c56069a62359fa:highpass=f=90,acompressor=threshold=-20dB:ratio=3,aecho=0.8:0.55:70|130:0.3|0.2,volume=1.3"
+ },
+ "ozrel.faceoff.0": {
+  "file": "voice/ozrel/ozrel.faceoff.0.ogg",
+  "dur": 2.08,
+  "text": "Oh, you are flammable. How delightful.",
+  "key": "5be02633cc03774d:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.faceoff.1": {
+  "file": "voice/ozrel/ozrel.faceoff.1.ogg",
+  "dur": 2.95,
+  "text": "Let us see what you are made of. Mostly carbon, I suspect.",
+  "key": "b4791fb1929bf65e:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.taunt.0": {
+  "file": "voice/ozrel/ozrel.taunt.0.ogg",
+  "dur": 1.56,
+  "text": "Warm enough for you? Ha ha!",
+  "key": "fd9bfe404edcee30:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.taunt.1": {
+  "file": "voice/ozrel/ozrel.taunt.1.ogg",
+  "dur": 1.91,
+  "text": "Dance, little candle, dance!",
+  "key": "31979364a4e7c0fa:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.taunt.2": {
+  "file": "voice/ozrel/ozrel.taunt.2.ogg",
+  "dur": 1.77,
+  "text": "I have burned better scholars than you.",
+  "key": "1594345d8ac73249:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.ultimate.0": {
+  "file": "voice/ozrel/ozrel.ultimate.0.ogg",
+  "dur": 1.46,
+  "text": "PYRE! Burn, burn, BURN!",
+  "key": "fee5c35aa2f54214:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.ultimate.1": {
+  "file": "voice/ozrel/ozrel.ultimate.1.ogg",
+  "dur": 1.24,
+  "text": "Ashes to ashes!",
+  "key": "239129c5c37b657c:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.hurt.0": {
+  "file": "voice/ozrel/ozrel.hurt.0.ogg",
+  "dur": 1.25,
+  "text": "Agh! Rude!",
+  "key": "36aeb786171d0ad1:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.hurt.1": {
+  "file": "voice/ozrel/ozrel.hurt.1.ogg",
+  "dur": 1.12,
+  "text": "Ow! My beard!",
+  "key": "d71f7698a88095f9:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.hurt.2": {
+  "file": "voice/ozrel/ozrel.hurt.2.ogg",
+  "dur": 1.3,
+  "text": "Hah! Is that all?",
+  "key": "09e7d736fee8c980:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.nearDeath.0": {
+  "file": "voice/ozrel/ozrel.nearDeath.0.ogg",
+  "dur": 2.09,
+  "text": "Close. So close to the final lecture.",
+  "key": "c3ae4a2fa4b3fadb:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.nearDeath.1": {
+  "file": "voice/ozrel/ozrel.nearDeath.1.ogg",
+  "dur": 1.89,
+  "text": "If I go, I take the whole arena with me!",
+  "key": "4798c3ddf2319629:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.comeback.0": {
+  "file": "voice/ozrel/ozrel.comeback.0.ogg",
+  "dur": 2.29,
+  "text": "The fire was never out. Merely sleeping!",
+  "key": "442ec73c5e264107:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.comeback.1": {
+  "file": "voice/ozrel/ozrel.comeback.1.ogg",
+  "dur": 1.3,
+  "text": "Oh, now I am inspired!",
+  "key": "0da953d14852b33d:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.kill.0": {
+  "file": "voice/ozrel/ozrel.kill.0.ogg",
+  "dur": 1.3,
+  "text": "Class dismissed!",
+  "key": "69faabac0d6d3b24:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.kill.1": {
+  "file": "voice/ozrel/ozrel.kill.1.ogg",
+  "dur": 1.53,
+  "text": "Extinguished. Ha!",
+  "key": "0b3bb61e7bd45286:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.defeat.0": {
+  "file": "voice/ozrel/ozrel.defeat.0.ogg",
+  "dur": 1.62,
+  "text": "The flame... gutters...",
+  "key": "dedf25f2081632a8:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.defeat.1": {
+  "file": "voice/ozrel/ozrel.defeat.1.ogg",
+  "dur": 1.5,
+  "text": "Cold... so cold...",
+  "key": "e6b6bdca92cc6349:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "ozrel.vs_hollowjack.0": {
+  "file": "voice/ozrel/ozrel.vs_hollowjack.0.ogg",
+  "dur": 2.92,
+  "text": "A pumpkin? Oh, I am going to carve you a lovely new face.",
+  "key": "bdae54f12a9cfd6d:asetrate=24000*1.03,aresample=24000,aecho=0.8:0.7:23|47:0.4|0.3,chorus=0.6:0.9:50:0.4:0.25:2,acompressor=threshold=-18dB:ratio=3,volume=1.4"
+ },
+ "erika.faceoff.0": {
+  "file": "voice/erika/erika.faceoff.0.ogg",
+  "dur": 1.85,
+  "text": "Stand still. It is kinder.",
+  "key": "04da48b30c3a500f:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.faceoff.1": {
+  "file": "voice/erika/erika.faceoff.1.ogg",
+  "dur": 2.5,
+  "text": "I have your scent. There is nowhere left to run.",
+  "key": "8e4e125dcb260c1d:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.taunt.0": {
+  "file": "voice/erika/erika.taunt.0.ogg",
+  "dur": 0.88,
+  "text": "Too slow.",
+  "key": "ca8195d5220ed28a:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.taunt.1": {
+  "file": "voice/erika/erika.taunt.1.ogg",
+  "dur": 1.85,
+  "text": "Missed me. Try aiming.",
+  "key": "6e08874a6bd80201:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.taunt.2": {
+  "file": "voice/erika/erika.taunt.2.ogg",
+  "dur": 1.67,
+  "text": "You fight like a wounded boar.",
+  "key": "981e4ebd8fdf9cac:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.ultimate.0": {
+  "file": "voice/erika/erika.ultimate.0.ogg",
+  "dur": 1.55,
+  "text": "RAIN OF THORNS!",
+  "key": "307b9e959d309cd9:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.ultimate.1": {
+  "file": "voice/erika/erika.ultimate.1.ogg",
+  "dur": 1.57,
+  "text": "Nowhere to hide!",
+  "key": "0092b4d8109537b5:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.hurt.0": {
+  "file": "voice/erika/erika.hurt.0.ogg",
+  "dur": 0.55,
+  "text": "Ah!",
+  "key": "2cf101b83084c1dd:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.hurt.1": {
+  "file": "voice/erika/erika.hurt.1.ogg",
+  "dur": 1.21,
+  "text": "Hnn! Lucky.",
+  "key": "83628bb709166672:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.hurt.2": {
+  "file": "voice/erika/erika.hurt.2.ogg",
+  "dur": 0.88,
+  "text": "Tch!",
+  "key": "c821856cc3296ff6:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.nearDeath.0": {
+  "file": "voice/erika/erika.nearDeath.0.ogg",
+  "dur": 1.91,
+  "text": "Breathe. Aim. One more shot.",
+  "key": "3f3d1af3b2c4743b:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.nearDeath.1": {
+  "file": "voice/erika/erika.nearDeath.1.ogg",
+  "dur": 1.81,
+  "text": "Not like this. Not to you.",
+  "key": "83794edc331689d7:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.comeback.0": {
+  "file": "voice/erika/erika.comeback.0.ogg",
+  "dur": 1.71,
+  "text": "The hunt is not over.",
+  "key": "9ed94df228b800fa:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.comeback.1": {
+  "file": "voice/erika/erika.comeback.1.ogg",
+  "dur": 1.35,
+  "text": "Now I see your rhythm.",
+  "key": "6e553e29d7a3fbd8:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.kill.0": {
+  "file": "voice/erika/erika.kill.0.ogg",
+  "dur": 1.02,
+  "text": "Clean shot.",
+  "key": "7d4fface976a1856:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.kill.1": {
+  "file": "voice/erika/erika.kill.1.ogg",
+  "dur": 1.16,
+  "text": "Target down.",
+  "key": "c70ce5603a8fe28f:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.defeat.0": {
+  "file": "voice/erika/erika.defeat.0.ogg",
+  "dur": 2.13,
+  "text": "I should have... kept my distance...",
+  "key": "dfd02d140d73963a:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.defeat.1": {
+  "file": "voice/erika/erika.defeat.1.ogg",
+  "dur": 1.69,
+  "text": "The hunter... becomes...",
+  "key": "ce0f249a6d4c40ca:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "erika.vs_vex.0": {
+  "file": "voice/erika/erika.vs_vex.0.ogg",
+  "dur": 4.35,
+  "text": "I have hunted your kind for nine years, vampire. Silver tips, just for you.",
+  "key": "16d1586f62ab469b:highpass=f=100,acompressor=threshold=-20dB:ratio=3,aecho=0.7:0.3:30:0.15,volume=1.3"
+ },
+ "vex.faceoff.0": {
+  "file": "voice/vex/vex.faceoff.0.ogg",
+  "dur": 2.11,
+  "text": "You smell of fear. Delicious.",
+  "key": "5803bd53615e78c2:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.faceoff.1": {
+  "file": "voice/vex/vex.faceoff.1.ogg",
+  "dur": 3.41,
+  "text": "Such a strong heartbeat. Let us see how long it lasts.",
+  "key": "14e7f137a4c17c25:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.taunt.0": {
+  "file": "voice/vex/vex.taunt.0.ogg",
+  "dur": 1.29,
+  "text": "Over here, darling.",
+  "key": "12dca2d2311b1167:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.taunt.1": {
+  "file": "voice/vex/vex.taunt.1.ogg",
+  "dur": 1.64,
+  "text": "You missed. Again.",
+  "key": "cba13d4a9b2dcf0e:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.taunt.2": {
+  "file": "voice/vex/vex.taunt.2.ogg",
+  "dur": 1.82,
+  "text": "So slow. So mortal.",
+  "key": "0bdc2ac7a1fe9e00:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.ultimate.0": {
+  "file": "voice/vex/vex.ultimate.0.ogg",
+  "dur": 1.75,
+  "text": "A THOUSAND CUTS!",
+  "key": "72dadd962ce84185:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.ultimate.1": {
+  "file": "voice/vex/vex.ultimate.1.ogg",
+  "dur": 1.14,
+  "text": "Bleed for me!",
+  "key": "265d82f5601a1212:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.hurt.0": {
+  "file": "voice/vex/vex.hurt.0.ogg",
+  "dur": 0.81,
+  "text": "Hss!",
+  "key": "50b2b6fdbe3c7754:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.hurt.1": {
+  "file": "voice/vex/vex.hurt.1.ogg",
+  "dur": 1.35,
+  "text": "Ah! Bold.",
+  "key": "d85ad3258a8a1824:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.hurt.2": {
+  "file": "voice/vex/vex.hurt.2.ogg",
+  "dur": 0.49,
+  "text": "Tsk!",
+  "key": "45b9255c5673cb02:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.nearDeath.0": {
+  "file": "voice/vex/vex.nearDeath.0.ogg",
+  "dur": 2.16,
+  "text": "Not yet. The night is young.",
+  "key": "d910d6fbfc51cb84:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.nearDeath.1": {
+  "file": "voice/vex/vex.nearDeath.1.ogg",
+  "dur": 2.22,
+  "text": "You cornered a predator. Mistake.",
+  "key": "7e558a30eb378ce1:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.comeback.0": {
+  "file": "voice/vex/vex.comeback.0.ogg",
+  "dur": 1.87,
+  "text": "Now you have my attention.",
+  "key": "12f432429ae48c3a:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.comeback.1": {
+  "file": "voice/vex/vex.comeback.1.ogg",
+  "dur": 1.39,
+  "text": "The hunger wakes.",
+  "key": "2e82316a0084473c:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.kill.0": {
+  "file": "voice/vex/vex.kill.0.ogg",
+  "dur": 1.45,
+  "text": "Shh. Sleep.",
+  "key": "8c6d1deeea9a78c6:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.kill.1": {
+  "file": "voice/vex/vex.kill.1.ogg",
+  "dur": 1.1,
+  "text": "Exquisite.",
+  "key": "e5efc48d253a288b:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.defeat.0": {
+  "file": "voice/vex/vex.defeat.0.ogg",
+  "dur": 1.76,
+  "text": "The sun... finally...",
+  "key": "175983c3282c5bcb:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.defeat.1": {
+  "file": "voice/vex/vex.defeat.1.ogg",
+  "dur": 2.28,
+  "text": "Three hundred years... for this...",
+  "key": "4a19c0eaa1d8db4f:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.vs_erika.0": {
+  "file": "voice/vex/vex.vs_erika.0.ogg",
+  "dur": 4.25,
+  "text": "The little hunter again. I kept your last arrow. Shall I return it?",
+  "key": "9a072ba94debe480:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "vex.vs_aldric.0": {
+  "file": "voice/vex/vex.vs_aldric.0.ogg",
+  "dur": 4.25,
+  "text": "Your god abandoned me centuries ago, knight. He will not save you either.",
+  "key": "0fca176b1ffe39f0:asetrate=24000*0.95,aresample=24000,atempo=1.04,aecho=0.8:0.85:60|120|240:0.35|0.25|0.15,highpass=f=120,volume=1.4"
+ },
+ "fenrik.faceoff.0": {
+  "file": "voice/fenrik/fenrik.faceoff.0.ogg",
+  "dur": 0.7,
+  "text": "Meat.",
+  "key": "6343cd5af548a23f:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.faceoff.1": {
+  "file": "voice/fenrik/fenrik.faceoff.1.ogg",
+  "dur": 1.88,
+  "text": "You. Smell. Weak.",
+  "key": "520c7964fa1bfa49:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.taunt.0": {
+  "file": "voice/fenrik/fenrik.taunt.0.ogg",
+  "dur": 1.51,
+  "text": "Hah! Hah!",
+  "key": "85d6ebcda080957a:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.taunt.1": {
+  "file": "voice/fenrik/fenrik.taunt.1.ogg",
+  "dur": 1.39,
+  "text": "Run, meat!",
+  "key": "9eaed21a4cc9ee99:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.taunt.2": {
+  "file": "voice/fenrik/fenrik.taunt.2.ogg",
+  "dur": 1.64,
+  "text": "More! More!",
+  "key": "8c2fb5902079932c:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.ultimate.0": {
+  "file": "voice/fenrik/fenrik.ultimate.0.ogg",
+  "dur": 1.39,
+  "text": "FRENZY!",
+  "key": "a7c96d6ad6692a7d:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.ultimate.1": {
+  "file": "voice/fenrik/fenrik.ultimate.1.ogg",
+  "dur": 1.74,
+  "text": "TEAR! RIP!",
+  "key": "3818abc26852bc1a:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.hurt.0": {
+  "file": "voice/fenrik/fenrik.hurt.0.ogg",
+  "dur": 0.94,
+  "text": "Rrraagh!",
+  "key": "d8174d1e36d284fd:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.hurt.1": {
+  "file": "voice/fenrik/fenrik.hurt.1.ogg",
+  "dur": 0.84,
+  "text": "Hrrk!",
+  "key": "23712c8938f15325:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.hurt.2": {
+  "file": "voice/fenrik/fenrik.hurt.2.ogg",
+  "dur": 0.83,
+  "text": "Grah!",
+  "key": "9bcc705897323fe1:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.nearDeath.0": {
+  "file": "voice/fenrik/fenrik.nearDeath.0.ogg",
+  "dur": 2.01,
+  "text": "Not die. Not die!",
+  "key": "e83b08567cfa2435:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.nearDeath.1": {
+  "file": "voice/fenrik/fenrik.nearDeath.1.ogg",
+  "dur": 2.02,
+  "text": "Blood. Need blood.",
+  "key": "12999061d3bd6cfb:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.comeback.0": {
+  "file": "voice/fenrik/fenrik.comeback.0.ogg",
+  "dur": 1.59,
+  "text": "Fenrik wakes!",
+  "key": "dd7899abd6e47775:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.comeback.1": {
+  "file": "voice/fenrik/fenrik.comeback.1.ogg",
+  "dur": 1.37,
+  "text": "Now you bleed!",
+  "key": "547f73a076abbf19:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.kill.0": {
+  "file": "voice/fenrik/fenrik.kill.0.ogg",
+  "dur": 1.09,
+  "text": "Mine!",
+  "key": "1b1291f30cb19e3c:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.kill.1": {
+  "file": "voice/fenrik/fenrik.kill.1.ogg",
+  "dur": 0.9,
+  "text": "Feast!",
+  "key": "2bc3134308b37ed8:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.defeat.0": {
+  "file": "voice/fenrik/fenrik.defeat.0.ogg",
+  "dur": 2.19,
+  "text": "Cold... dark... cellar...",
+  "key": "da0da3809e6e4489:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.defeat.1": {
+  "file": "voice/fenrik/fenrik.defeat.1.ogg",
+  "dur": 2,
+  "text": "Fenrik... sleeps...",
+  "key": "7adedc8d7dc426b4:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "fenrik.vs_maw.0": {
+  "file": "voice/fenrik/fenrik.vs_maw.0.ogg",
+  "dur": 3.02,
+  "text": "Big one. Old one. Fenrik eats you anyway.",
+  "key": "9b2cdf24767f00d1:asetrate=24000*0.84,aresample=24000,atempo=1.1,acrusher=bits=10:mix=0.15,bass=g=8:f=90,aecho=0.6:0.5:35:0.3,volume=1.6"
+ },
+ "maw.faceoff.0": {
+  "file": "voice/maw/maw.faceoff.0.ogg",
+  "dur": 2.23,
+  "text": "Small. So small.",
+  "key": "f7700d61781913a6:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.faceoff.1": {
+  "file": "voice/maw/maw.faceoff.1.ogg",
+  "dur": 2.36,
+  "text": "Maw hungry. You will do.",
+  "key": "619764d726526c35:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.taunt.0": {
+  "file": "voice/maw/maw.taunt.0.ogg",
+  "dur": 2.14,
+  "text": "Maw does not feel that.",
+  "key": "1e7936a3b69cf3c8:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.taunt.1": {
+  "file": "voice/maw/maw.taunt.1.ogg",
+  "dur": 2.45,
+  "text": "Hit harder, small thing.",
+  "key": "b247f034607a9641:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.taunt.2": {
+  "file": "voice/maw/maw.taunt.2.ogg",
+  "dur": 1.91,
+  "text": "Ha. Ha. Ha.",
+  "key": "ac1cc8d800f2c54d:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.ultimate.0": {
+  "file": "voice/maw/maw.ultimate.0.ogg",
+  "dur": 1.21,
+  "text": "DEVOUR!",
+  "key": "aa777a5c7342031a:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.ultimate.1": {
+  "file": "voice/maw/maw.ultimate.1.ogg",
+  "dur": 1.98,
+  "text": "MAW CONSUMES!",
+  "key": "bd4aa8b30522082d:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.hurt.0": {
+  "file": "voice/maw/maw.hurt.0.ogg",
+  "dur": 1.27,
+  "text": "Hrrrm.",
+  "key": "19dc0473c8b1761c:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.hurt.1": {
+  "file": "voice/maw/maw.hurt.1.ogg",
+  "dur": 1,
+  "text": "Grrrr.",
+  "key": "ceb65caec48cafde:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.hurt.2": {
+  "file": "voice/maw/maw.hurt.2.ogg",
+  "dur": 1.08,
+  "text": "Hnnnngh.",
+  "key": "8deb7923a8a4433a:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.nearDeath.0": {
+  "file": "voice/maw/maw.nearDeath.0.ogg",
+  "dur": 2.54,
+  "text": "Maw has slept through worse.",
+  "key": "40f38f94dc96540f:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.nearDeath.1": {
+  "file": "voice/maw/maw.nearDeath.1.ogg",
+  "dur": 2.44,
+  "text": "Maw... does not... fall!",
+  "key": "15acc8bac99a8934:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.comeback.0": {
+  "file": "voice/maw/maw.comeback.0.ogg",
+  "dur": 1.94,
+  "text": "Now Maw is awake.",
+  "key": "8f39c455ab23aa5a:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.comeback.1": {
+  "file": "voice/maw/maw.comeback.1.ogg",
+  "dur": 2.33,
+  "text": "Maw remembers how to kill.",
+  "key": "1c2518be7e5205de:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.kill.0": {
+  "file": "voice/maw/maw.kill.0.ogg",
+  "dur": 1.68,
+  "text": "Swallowed.",
+  "key": "1ed37849678fb63e:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.kill.1": {
+  "file": "voice/maw/maw.kill.1.ogg",
+  "dur": 2.28,
+  "text": "Gone. Like the others.",
+  "key": "25aea804d1c0c6a9:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.defeat.0": {
+  "file": "voice/maw/maw.defeat.0.ogg",
+  "dur": 2.49,
+  "text": "The chains... again...",
+  "key": "66e68d9ea32629d3:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.defeat.1": {
+  "file": "voice/maw/maw.defeat.1.ogg",
+  "dur": 3.17,
+  "text": "Maw... sleeps... another century...",
+  "key": "6fc254c7bbd2f31b:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.vs_fenrik.0": {
+  "file": "voice/maw/maw.vs_fenrik.0.ogg",
+  "dur": 6.35,
+  "text": "Little beast. Maw ate your kind for breakfast before your cellar was dug.",
+  "key": "d1d5d4334d3852f2:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "maw.vs_gorak.0": {
+  "file": "voice/maw/maw.vs_gorak.0.ogg",
+  "dur": 3.67,
+  "text": "Loud man with axe. Maw swallowed louder.",
+  "key": "58b813b137d9bffe:asetrate=24000*0.8,aresample=24000,atempo=1.12,bass=g=10:f=70,aecho=0.8:0.8:90|180:0.45|0.3,acompressor=threshold=-16dB:ratio=5,volume=1.7"
+ },
+ "hollowjack.faceoff.0": {
+  "file": "voice/hollowjack/hollowjack.faceoff.0.ogg",
+  "dur": 1.55,
+  "text": "Ooh, you look squishy!",
+  "key": "c90005c3e36bc42e:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.faceoff.1": {
+  "file": "voice/hollowjack/hollowjack.faceoff.1.ogg",
+  "dur": 3.26,
+  "text": "Hee hee! Do you want to see a magic trick? It is called flat.",
+  "key": "9122ea3e5c8a6c90:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.taunt.0": {
+  "file": "voice/hollowjack/hollowjack.taunt.0.ogg",
+  "dur": 0.85,
+  "text": "Boo!",
+  "key": "ef2192e9be00027d:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.taunt.1": {
+  "file": "voice/hollowjack/hollowjack.taunt.1.ogg",
+  "dur": 1.38,
+  "text": "Gourd-geous!",
+  "key": "a1e4daea55394b3c:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.taunt.2": {
+  "file": "voice/hollowjack/hollowjack.taunt.2.ogg",
+  "dur": 1.23,
+  "text": "Do you even lift?",
+  "key": "5f0c2d78697b2d85:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.ultimate.0": {
+  "file": "voice/hollowjack/hollowjack.ultimate.0.ogg",
+  "dur": 1.55,
+  "text": "BONFIRE NIGHT!",
+  "key": "0435cf1e4f9e6b0c:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.ultimate.1": {
+  "file": "voice/hollowjack/hollowjack.ultimate.1.ogg",
+  "dur": 1.64,
+  "text": "Light the lanterns!",
+  "key": "95207f0aadddc59c:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.hurt.0": {
+  "file": "voice/hollowjack/hollowjack.hurt.0.ogg",
+  "dur": 1.26,
+  "text": "Ow! My rind!",
+  "key": "a2e8c6aa5dfef481:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.hurt.1": {
+  "file": "voice/hollowjack/hollowjack.hurt.1.ogg",
+  "dur": 1.11,
+  "text": "Oof!",
+  "key": "6ba37a35b3f18fae:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.hurt.2": {
+  "file": "voice/hollowjack/hollowjack.hurt.2.ogg",
+  "dur": 1.33,
+  "text": "Hey! Rude!",
+  "key": "2009c136b2fab587:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.nearDeath.0": {
+  "file": "voice/hollowjack/hollowjack.nearDeath.0.ogg",
+  "dur": 1.82,
+  "text": "Little cracked. Still smiling!",
+  "key": "d5c15a1c41189663:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.nearDeath.1": {
+  "file": "voice/hollowjack/hollowjack.nearDeath.1.ogg",
+  "dur": 1.22,
+  "text": "Not mashed yet!",
+  "key": "34ddadfc8e3c086c:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.comeback.0": {
+  "file": "voice/hollowjack/hollowjack.comeback.0.ogg",
+  "dur": 1.74,
+  "text": "The pumpkin is BACK!",
+  "key": "05edd92e348fdcda:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.comeback.1": {
+  "file": "voice/hollowjack/hollowjack.comeback.1.ogg",
+  "dur": 1.61,
+  "text": "Second helping, coming up!",
+  "key": "dfd18e4fcb450c9a:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.kill.0": {
+  "file": "voice/hollowjack/hollowjack.kill.0.ogg",
+  "dur": 1.02,
+  "text": "Squish!",
+  "key": "5deff0e8b72db753:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.kill.1": {
+  "file": "voice/hollowjack/hollowjack.kill.1.ogg",
+  "dur": 1.02,
+  "text": "Pie time!",
+  "key": "bf1897e3b2e81f3a:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.defeat.0": {
+  "file": "voice/hollowjack/hollowjack.defeat.0.ogg",
+  "dur": 1.78,
+  "text": "My candle... is going out...",
+  "key": "6d2ab5c2de63451b:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.defeat.1": {
+  "file": "voice/hollowjack/hollowjack.defeat.1.ogg",
+  "dur": 1.66,
+  "text": "Tell the patch... I said boo...",
+  "key": "e3499d0ac7c963c5:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ },
+ "hollowjack.vs_ozrel.0": {
+  "file": "voice/hollowjack/hollowjack.vs_ozrel.0.ogg",
+  "dur": 2.55,
+  "text": "Fire man! You want to roast me? Join the queue!",
+  "key": "3e7d2e6690f5de2a:vibrato=f=6:d=0.25,flanger=delay=3:depth=3:regen=20:width=60:speed=0.4,acompressor=threshold=-18dB:ratio=3,aecho=0.7:0.4:50:0.2,volume=1.4"
+ }
+}

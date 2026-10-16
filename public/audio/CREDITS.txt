@@ -1,0 +1,43 @@
+THE ARENA - AUDIO CREDITS & LICENSES
+=====================================
+
+All sound files shipped in audio/sfx and audio/music were trimmed, length-capped,
+peak-normalised, converted to mono (sfx) and re-encoded as Ogg Vorbis
+("changes were made" for attribution purposes). Original archives are not shipped.
+
+1. "Swords & Blades SFX Pack" - The Soundrack
+   License: Creative Commons Attribution 4.0 International (CC BY 4.0)
+   https://creativecommons.org/licenses/by/4.0/
+   (license deed PDF was included in the download)
+   Used for: sword whooshes, sword hits/clangs, parries, heavy impacts.
+   Modified: trimmed, normalised, re-encoded.
+
+2. "Sword Combat Sound Effects Pack - FREE VERSION" - Hove Audio
+   https://hoveaudio.gumroad.com/
+   License: NOT STATED in the archive (the included ~README.txt only contains a
+   store link). Distributed as a free/royalty-free pack per the downloader.
+   ** Confirm the license on the Hove Audio store page before public release. **
+   Used for: stab impacts, whooshes, metal collisions, ring shimmer, human effort
+   and damage grunts.
+
+3. Kenney (www.kenney.nl) - "Impact Sounds", "RPG Audio", "Voiceover Pack: Fighter"
+   License: Creative Commons Zero (CC0 1.0) - credit appreciated, not required.
+   Used for: punches, body thuds, footsteps, cloth, wood/plate/stone impacts,
+   knife slices (arrow hits), announcer lines.
+   ("Voiceover Pack #1" was downloaded but is not used.)
+   Voiceover Pack credits (as provided): male voice Jeffrey M. Smith,
+   female voice Giselle.
+
+4. "Monster Sound Effects Volume 2" - Ogrebane
+   License: CC0 per the source page (no license file was included in the archive).
+   Used for: creature roars and grunts (pitched down) for Fenrik, Maw, Hollowjack.
+
+5. "Epic Boss Battle [Seamlessly Looping]" - Juhani Junkala
+   License: CC0 (per the source page; no license file included).
+   Used for: fight music loop (re-encoded to Ogg Vorbis).
+
+6. Character voices (audio/voice/) - generated offline with OmniVoice
+   (k2-fsa/OmniVoice, Apache-2.0 model code) in voice-design + voice-clone mode,
+   then processed with ffmpeg. Dialogue written for this project.
+
+7. Crowd bed, fire, roars, drums and stingers - synthesised at runtime (WebAudio).

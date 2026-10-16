@@ -1,0 +1,52 @@
+(arena tactics layer DISABLED: no grabbing / toppling / barrel shots / hazard baiting)
+
+=== ARENA SIM REPORT: 1680 matches in 170.1s ===
+Duration  mean 67.7s | p10 52.1 | median 66.1 | p90 85.4 | in 45-90s: 92.6%
+Momentum swings (HP-lead flips, 8% hysteresis): 0:19.7%  1:29.8%  2:30.4%  3:14.1%  4+:6.0%  | mean 1.58 | >=2 swings: 50.5%
+One-sided: 1.0% | Timeouts: 0.0% | Draws: 0.0% | Comeback wins (winner was down >=25% HP): 41.8%
+Per match: hits 38.7, dodges 2.2, parries 2.27, ultimates 2.75, last stands 0.91, second winds 1.06, stalemate breaks 0.18, ring-shrink reached 77.6%
+
+Win rate matrix (row beats column, both sides combined):
+        gorak   aldric  ozrel   erika   vex     fenrik  maw     hollowjackOVERALL
+gorak     -     62%     47%     53%     63%     37%     52%     58%     53.1%
+aldric  38%       -     58%     50%     38%     53%     50%     53%     48.8%
+ozrel   53%     42%       -     67%     55%     40%     37%     35%     46.9%
+erika   47%     50%     33%       -     70%     38%     40%     52%     47.1%
+vex     37%     62%     45%     30%       -     57%     38%     40%     44.0%
+fenrik  63%     47%     60%     62%     43%       -     45%     42%     51.7%
+maw     48%     50%     63%     60%     62%     55%       -     47%     55.0%
+hollowjack42%     47%     65%     48%     60%     58%     53%       -     53.3%
+
+--- AI metrics (1680 matches)
+In preferred range band: gorak 66.2% | aldric 56.4% | ozrel 36.5% | erika 35.5% | vex 63.3% | fenrik 78.8% | maw 65.3% | hollowjack 74.2%
+Retreats/match 7.69 | kiting shots/match 9.27 | feints/match 5.37 | counters/match 2.04
+Whiff/dodge/parry punish rate: 56.1% (24666 openings)
+Move variety: mean top-move share 29.4%, fighters with a move >35%: 24.6%, normalised entropy 0.88
+Repeated-pattern rate (same move 3x in a row): 4.4%
+Dumb hits (walked into a telegraphed windup): 6.2% of hits
+Cornered episodes/match 1.77, escaped within 4s: 45.5%
+Ranged fighter approaching low-HP melee: 5.1% of eligible ticks
+Time behind cover vs ranged opponents: 0.90 s/match
+Kills without contact: 0/1680
+
+--- Arena play (1680 matches)
+Matches with arena interaction (pickup/topple/explosion/hazard hit): 33.1% | with any destruction (prop/cover damage): 82.1%
+Props: pickups/match 0.00 | throws/match 0.00 | throw hit rate n/a (blocked n/a, swatted n/a) | breaks/match 1.11
+Cover: hits on cover/match 1.80 | topples/match 0.09 | crush hits/match 0.02 | explosions/match 0.19 | chandeliers/match 0.02
+Hazard hits/match 0.28 | environmental kills 40/1680 (2.4%) {"explosion":11,"geyser":3,"wall_slam":7,"lava":2,"pillar_slam":12,"spike trap":3,"falling":2}
+
+By arena: matches | mean duration | >=2 swings | timeouts | env-damage matches
+  theme colosseum      260 |  67.3s |  48.5% | 0 | 43%
+  theme skytemple      252 |  68.5s |  50.8% | 0 | 11%
+  theme sakura         213 |  68.4s |  53.1% | 0 | 9%
+  theme forge          230 |  67.1s |  52.2% | 0 | 46%
+  theme glacier        230 |  67.6s |  50.9% | 0 | 40%
+  theme moonlake       240 |  67.0s |  47.5% | 0 | 5%
+  theme desert         255 |  68.0s |  51.4% | 0 | 40%
+  layout pit           312 |  67.5s |  49.0% | 0 | 22%
+  layout oval          333 |  67.5s |  49.5% | 0 | 22%
+  layout cross         344 |  67.6s |  50.6% | 0 | 25%
+  layout split         362 |  67.4s |  53.3% | 0 | 39%
+  layout gauntlet      329 |  68.3s |  49.8% | 0 | 30%
+
+Determinism (all themes): same seed+arena identical = true, different arena seed differs = true

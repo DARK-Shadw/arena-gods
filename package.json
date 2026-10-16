@@ -1,0 +1,29 @@
+{
+  "name": "arena",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Spectator-first AI gladiator arena prototype (Three.js + deterministic sim)",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "sim:test": "tsx tools/simtest.ts",
+    "typecheck": "tsc --noEmit",
+    "audio:build": "tsx tools/audio/build-sfx.ts",
+    "audio:check": "tsx tools/audio/check.ts",
+    "tts:gen": "node tools/tts/run.mjs"
+  },
+  "dependencies": {
+    "three": "0.170.0"
+  },
+  "devDependencies": {
+    "@gltf-transform/cli": "^4.1.1",
+    "@types/node": "22.10.2",
+    "@types/three": "0.170.0",
+    "playwright-core": "^1.57.0",
+    "tsx": "4.19.2",
+    "typescript": "5.7.2",
+    "vite": "6.0.7"
+  }
+}

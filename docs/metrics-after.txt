@@ -1,0 +1,27 @@
+=== ARENA SIM REPORT: 1680 matches in 75.6s ===
+Duration  mean 66.8s | p10 51.7 | median 65.3 | p90 83.0 | in 45-90s: 93.2%
+Momentum swings (HP-lead flips, 8% hysteresis): 0:22.3%  1:27.5%  2:30.1%  3:14.8%  4+:5.4%  | mean 1.54 | >=2 swings: 50.2%
+One-sided: 2.6% | Timeouts: 0.0% | Draws: 0.0% | Comeback wins (winner was down >=25% HP): 37.7%
+Per match: hits 38.1, dodges 2.1, parries 2.28, ultimates 2.48, last stands 0.88, second winds 1.08, stalemate breaks 0.16, ring-shrink reached 75.7%
+Win rate matrix (row beats column, both sides combined):
+        gorak   aldric  ozrel   erika   vex     fenrik  maw     hollowjackOVERALL
+gorak     -     52%     52%     48%     57%     48%     53%     48%     51.2%
+aldric  48%       -     42%     37%     23%     57%     73%     43%     46.2%
+ozrel   48%     58%       -     53%     53%     37%     50%     40%     48.6%
+erika   52%     63%     47%       -     57%     50%     53%     42%     51.9%
+vex     43%     77%     47%     43%       -     67%     52%     40%     52.6%
+fenrik  52%     43%     63%     50%     33%       -     60%     50%     50.2%
+maw     47%     27%     50%     47%     48%     40%       -     57%     45.0%
+hollowjack52%     57%     60%     58%     60%     50%     43%       -     54.3%
+--- AI metrics (1680 matches)
+In preferred range band: gorak 67.6% | aldric 57.3% | ozrel 34.9% | erika 33.1% | vex 63.0% | fenrik 79.2% | maw 66.0% | hollowjack 75.1%
+Retreats/match 7.39 | kiting shots/match 8.89 | feints/match 5.32 | counters/match 1.96
+Whiff/dodge/parry punish rate: 56.7% (24389 openings)
+Move variety: mean top-move share 29.6%, fighters with a move >35%: 25.4%, normalised entropy 0.88
+Repeated-pattern rate (same move 3x in a row): 4.4%
+Dumb hits (walked into a telegraphed windup): 5.9% of hits
+Cornered episodes/match 1.59, escaped within 4s: 49.3%
+Ranged fighter approaching low-HP melee: 4.7% of eligible ticks
+Time behind cover vs ranged opponents: 0.59 s/match
+Kills without contact: 0/1680
+Determinism: same seed identical = true, different seed differs = true

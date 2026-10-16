@@ -1,0 +1,29 @@
+> arena@0.1.0 sim:test
+> tsx tools/simtest.ts 30
+=== ARENA SIM REPORT: 1680 matches in 36.2s ===
+Duration  mean 68.3s | p10 52.2 | median 66.5 | p90 87.2 | in 45-90s: 92.2%
+Momentum swings (HP-lead flips, 8% hysteresis): 0:18.2%  1:28.0%  2:32.3%  3:14.6%  4+:6.9%  | mean 1.65 | >=2 swings: 53.8%
+One-sided: 2.2% | Timeouts: 0.1% | Draws: 0.0% | Comeback wins (winner was down >=25% HP): 38.8%
+Per match: hits 34.8, dodges 4.7, parries 3.27, ultimates 2.48, last stands 0.85, second winds 1.06, stalemate breaks 0.58, ring-shrink reached 77.1%
+Win rate matrix (row beats column, both sides combined):
+        gorak   aldric  ozrel   erika   vex     fenrik  maw     hollowjackOVERALL
+gorak     -     45%     57%     42%     43%     55%     48%     48%     48.3%
+aldric  55%       -     45%     50%     52%     62%     57%     57%     53.8%
+ozrel   43%     55%       -     48%     52%     38%     47%     47%     47.1%
+erika   58%     50%     52%       -     47%     40%     58%     65%     52.9%
+vex     57%     48%     48%     53%       -     47%     58%     50%     51.7%
+fenrik  45%     38%     62%     60%     53%       -     45%     45%     49.8%
+maw     52%     43%     53%     42%     42%     55%       -     35%     46.0%
+hollowjack52%     43%     53%     35%     50%     55%     65%       -     50.5%
+--- AI metrics (1680 matches)
+In preferred range band: gorak 57.9% | aldric 61.5% | ozrel 38.1% | erika 24.1% | vex 73.5% | fenrik 52.3% | maw 67.5% | hollowjack 60.1%
+Retreats/match 5.95 | kiting shots/match 7.31 | feints/match 0.00 | counters/match 0.00
+Whiff/dodge/parry punish rate: 41.4% (26914 openings)
+Move variety: mean top-move share 46.2%, fighters with a move >35%: 83.3%, normalised entropy 0.89
+Repeated-pattern rate (same move 3x in a row): 14.2%
+Dumb hits (walked into a telegraphed windup): 8.9% of hits
+Cornered episodes/match 1.86, escaped within 4s: 26.7%
+Ranged fighter approaching low-HP melee: 30.6% of eligible ticks
+Time behind cover vs ranged opponents: 0.98 s/match
+Kills without contact: 37/1679
+Determinism: same seed identical = true, different seed differs = true
