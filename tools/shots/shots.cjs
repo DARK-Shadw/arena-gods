@@ -3,6 +3,7 @@
 //
 //   npm run build
 //   node tools/shots/shots.cjs <outDir> <theme[:layout[:aseed]]> [...more] [--q=2] [--fight=20] [--bench] [--w=1280 --h=720] [--swiftshader]
+//   --dev=5173 loads from the running dev server instead of dist/ (no build needed); --extra=k=v&k2=v2 appends URL params
 //
 // For every arena: a wide establishing view, a mid shot, a low dramatic angle,
 // and (with --fight=t) a seek into the fight at sim time t with the director camera.
@@ -54,7 +55,9 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
   const results = [];
   for (const spec of specs) {
     const [theme, layout = 'pit', aseed = '7'] = spec.split(':');
-    const url = `http://arena.local/index.html?manual=1&auto=1&skip=${intro ? 0 : 1}&a=${fighters[0]}&b=${fighters[1]}&seed=${fseed}&theme=${theme}&layout=${layout}&aseed=${aseed}&q=${Q}`;
+    const devPort = opt('dev', null);
+    const host = devPort ? `http://localhost:${devPort}` : 'http://arena.local';
+    const url = `${host}/index.html?manual=1&auto=1&skip=${intro ? 0 : 1}&a=${fighters[0]}&b=${fighters[1]}&seed=${fseed}&theme=${theme}&layout=${layout}&aseed=${aseed}&q=${Q}${opt('extra', '') ? '&' + opt('extra', '') : ''}`;
     const t0 = Date.now();
     await page.goto(url);
     const tag = `${theme}_${layout}_${aseed}`;

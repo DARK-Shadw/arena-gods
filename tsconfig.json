@@ -13,5 +13,6 @@
     "noEmit": true,
     "types": ["node", "vite/client"]
   },
-  "include": ["src", "tools"]
+  "include": ["src", "tools"],
+  "exclude": ["tools/anim/_scratch"]
 }

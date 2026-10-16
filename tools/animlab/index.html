@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Animation Lab</title>
+    <style>
+      :root { --bg: #111214; --panel: #1b1d21; --line: #2c2f35; --ink: #e6e6e6; --dim: #9aa0a8; --acc: #e8c27a; }
+      * { box-sizing: border-box; }
+      html, body { margin: 0; height: 100%; background: var(--bg); color: var(--ink); font: 13px/1.35 system-ui, sans-serif; overflow: hidden; }
+      #app { display: grid; grid-template-columns: 330px 1fr; height: 100%; }
+      #side { border-right: 1px solid var(--line); background: var(--panel); display: flex; flex-direction: column; min-height: 0; }
+      #side .row { display: flex; gap: 6px; align-items: center; padding: 6px 10px; }
+      #side select, #side input[type=text] { flex: 1; background: #101114; color: var(--ink); border: 1px solid var(--line); padding: 4px 6px; border-radius: 4px; }
+      #list { flex: 1; overflow: auto; border-top: 1px solid var(--line); }
+      #list .grp { color: var(--acc); padding: 6px 10px 2px; font-weight: 600; text-transform: uppercase; font-size: 11px; letter-spacing: .06em; }
+      #list .it { padding: 2px 10px 2px 16px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--dim); }
+      #list .it:hover { background: #24272c; color: var(--ink); }
+      #list .it.sel { background: #33302a; color: var(--acc); }
+      #main { position: relative; min-width: 0; }
+      #c { width: 100%; height: 100%; display: block; }
+      #hud { position: absolute; left: 10px; top: 8px; pointer-events: none; white-space: pre; font: 12px/1.35 ui-monospace, monospace; color: #d8d8d8; text-shadow: 0 1px 2px #000; }
+      #bar { position: absolute; left: 0; right: 0; bottom: 0; padding: 8px 12px; background: rgba(16,17,20,.88); border-top: 1px solid var(--line); }
+      #tl { position: relative; height: 26px; background: #0d0e10; border: 1px solid var(--line); border-radius: 3px; cursor: pointer; }
+      #tl .ph { position: absolute; top: 0; bottom: 0; width: 2px; background: var(--acc); }
+      #tl .mk { position: absolute; top: 0; bottom: 0; width: 2px; opacity: .85; }
+      #tl .lb { position: absolute; top: 2px; font-size: 10px; color: #ccc; transform: translateX(3px); pointer-events: none; }
+      #ctl { display: flex; gap: 8px; align-items: center; margin-top: 6px; flex-wrap: wrap; }
+      button, .chk { background: #23262b; color: var(--ink); border: 1px solid var(--line); padding: 3px 9px; border-radius: 4px; cursor: pointer; font: inherit; }
+      button:hover { border-color: #555; }
+      label.chk input { vertical-align: -2px; }
+      .help { color: var(--dim); font-size: 11px; padding: 6px 10px; border-top: 1px solid var(--line); }
+    </style>
+  </head>
+  <body>
+    <div id="app">
+      <div id="side">
+        <div class="row"><b style="color:var(--acc)">ANIMATION LAB</b></div>
+        <div class="row">A <select id="fa"></select></div>
+        <div class="row">B <select id="fb"><option value="">(none)</option></select></div>
+        <div class="row"><select id="src"><option value="lib">Shared library (built)</option><option value="own">Fighter's own clips</option><option value="raw">Raw catalog FBX (all 753)</option></select></div>
+        <div class="row"><input id="q" type="text" placeholder="filter… (name, role, tag, from:L, sev:3)" /></div>
+        <div id="list"></div>
+        <div class="help">Click a clip: plays on A (and B). Shift+click: B only. Keys: Space play/pause · , . step frame · M mirror on B · R root motion · K skeleton · 1-4 speed</div>
+      </div>
+      <div id="main">
+        <canvas id="c"></canvas>
+        <div id="hud"></div>
+        <div id="bar">
+          <div id="tl"><div class="ph" id="ph"></div></div>
+          <div id="ctl">
+            <button id="play">▶ / ❚❚</button>
+            <button id="prev">◀ frame</button>
+            <button id="next">frame ▶</button>
+            <span>speed <select id="spd"><option>0.1</option><option>0.25</option><option>0.5</option><option selected>1</option><option>2</option></select></span>
+            <label class="chk"><input type="checkbox" id="root" /> root motion</label>
+            <label class="chk"><input type="checkbox" id="skel" /> skeleton</label>
+            <label class="chk"><input type="checkbox" id="loop" checked /> loop</label>
+            <label class="chk"><input type="checkbox" id="mirrorB" /> B = mirror of A</label>
+            <label class="chk"><input type="checkbox" id="trail" checked /> trajectories</label>
+            <span id="info" style="color:var(--dim)"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="./lab.ts"></script>
+  </body>
+</html>
