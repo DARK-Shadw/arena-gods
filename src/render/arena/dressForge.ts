@@ -2,6 +2,7 @@
  * Theme dressing: the Molten Forge - a basalt cathedral over rivers of fire.
  */
 import * as THREE from 'three';
+import type { V3 } from './arenaView';
 import type { Arena } from './arenaView';
 import type { Dressing } from './dressing';
 import { TEX, canvasTexture } from './textures';
@@ -191,7 +192,20 @@ export function dressForge(a: Arena): Dressing {
       port.position.z = 0.2;
       g.add(port);
       for (const s of [-1, 1]) g.add(a.flame(new THREE.Vector3(s * 2.5, 3.6, 0.6), 1.0, '#ff7a2a', s > 0));
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.4, 1.6), lightColor: '#ff7a30' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.4, 1.6),
+        lightColor: '#ff7a30',
+        anchors: {
+          barrier: 'portcullis',
+          barrierHalfW: 1.6,
+          barrierH: 4.6,
+          tunnel: { depth: 6, height: 5, floorY: 0 },
+          // the boundary wall's iron coping (3.42 m) beside the gate gap
+          perches: [-1, 1].map((s) => ({ id: s < 0 ? 'wall_l' : 'wall_r', pos: [s * 3.9, 3.42, 1.0 - 1.2] as V3, depth: 0.6 })),
+          wallH: 3.42,
+        },
+      };
     });
   }
 

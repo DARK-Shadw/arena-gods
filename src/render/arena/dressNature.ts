@@ -2,6 +2,7 @@
  * Theme dressing: the Blossom Shrine, the Moonlit Lake Temple, the Aurora Glacier.
  */
 import * as THREE from 'three';
+import type { V3 } from './arenaView';
 import type { Obstacle } from '../../sim/arenaGen';
 import type { Arena } from './arenaView';
 import type { Dressing } from './dressing';
@@ -255,7 +256,21 @@ export function dressSakura(a: Arena): Dressing {
       }
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.2, 1.4), lightColor: '#ffb07a' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.2, 1.4),
+        lightColor: '#ffb07a',
+        anchors: {
+          barrier: 'rope',
+          barrierHalfW: 2.2,
+          barrierH: 4.1,
+          tunnel: { depth: 5, height: 99, floorY: 0 },
+          // the torii's top beam (kasagi)
+          perches: [{ id: 'torii', pos: [0, 5.71, 0.05], depth: 0.56 }],
+          lowWall: { pos: [5.4, 1.07, 0.95 - 0.95], height: 1.07 },
+          wallH: 1.07,
+        },
+      };
     });
   }
 
@@ -456,7 +471,24 @@ export function dressMoonlake(a: Arena): Dressing {
       port.add(veil);
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.4, 1.4), lightColor: '#a8c8ff' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.4, 1.4),
+        lightColor: '#a8c8ff',
+        anchors: {
+          barrier: 'veil',
+          barrierHalfW: 1.9,
+          barrierH: 4.2,
+          // the bridge behind the moon gate
+          tunnel: { depth: 9, height: 99, floorY: 0 },
+          // the little roof on top of the moon gate
+          // the eave at the front of the moon-gate roof (jumping off the ridge would cut through the roof)
+          perches: [{ id: 'roof_eave', pos: [0, 4.62, 1.3], depth: 0.3 }],
+          // bridge sides over the lake
+          rims: [-1, 1].map((s) => ({ id: s < 0 ? 'bridge_l' : 'bridge_r', pos: [s * 1.5, 0, -4.0] as V3, drop: 0.55, dir: [-s, 0] as [number, number] })),
+          wallH: 0,
+        },
+      };
     });
   }
 
@@ -554,7 +586,19 @@ export function dressGlacier(a: Arena): Dressing {
       }
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.2, 1.2), lightColor: '#7ae0ff' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.2, 1.2),
+        lightColor: '#7ae0ff',
+        anchors: {
+          barrier: 'icicles',
+          barrierHalfW: 1.8,
+          barrierH: 3.6,
+          tunnel: { depth: 4, height: 99, floorY: 0 },
+          perches: [],
+          wallH: 1.6,
+        },
+      };
     });
   }
 

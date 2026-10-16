@@ -2,6 +2,7 @@
  * Theme dressing: the Gilded Colosseum, the Sky Sanctum, the Sunset Ruins.
  */
 import * as THREE from 'three';
+import type { V3 } from './arenaView';
 import type { HazardDef, Obstacle } from '../../sim/arenaGen';
 import type { Arena } from './arenaView';
 import type { Dressing } from './dressing';
@@ -251,7 +252,22 @@ export function dressColosseum(a: Arena): Dressing {
       }
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.4, 1.6), lightColor: '#ffb060' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.4, 1.6),
+        lightColor: '#ffb060',
+        anchors: {
+          barrier: 'portcullis',
+          barrierHalfW: 1.45,
+          barrierH: 3.6,
+          tunnel: { depth: 7, height: 3.7, floorY: 0 },
+          // podium wall top (3.45 m, 0.78-1.3 m behind the boundary), beside the gate gap
+          perches: [-1, 1].map((s) => ({ id: s < 0 ? 'wall_l' : 'wall_r', pos: [s * 3.0, 3.45, 0.9 - 0.92] as V3, depth: 0.5 })),
+          // crowd tiers (second row), clear of the gate's entablature (half width 3.7)
+          stands: [[5.2, 4.57, 0.9 - 2.7], [-5.2, 4.57, 0.9 - 2.7]],
+          wallH: 3.45,
+        },
+      };
     });
   }
 
@@ -457,7 +473,23 @@ export function dressSkytemple(a: Arena): Dressing {
       port.add(veil);
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 3, 1.4), lightColor: '#ffe6b0' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 3, 1.4),
+        lightColor: '#ffe6b0',
+        anchors: {
+          barrier: 'veil',
+          barrierHalfW: 1.8,
+          barrierH: 4.6,
+          // the causeway out into the sky is the walk-in space (no roof)
+          tunnel: { depth: 11, height: 99, floorY: 0 },
+          perches: [],
+          // causeway side edges over the void: climb up from below
+          rims: [-1, 1].map((s) => ({ id: s < 0 ? 'causeway_l' : 'causeway_r', pos: [s * 1.6, 0, -3.0] as V3, drop: 30, dir: [-s, 0] as [number, number] })),
+          lowWall: { pos: [5.2, 1.08, 1.0 - 0.95], height: 1.08 },
+          wallH: 1.08,
+        },
+      };
     });
   }
 
@@ -729,7 +761,20 @@ export function dressDesert(a: Arena): Dressing {
       port.position.z = 0.2;
       g.add(port);
       for (const s of [-1, 1]) g.add(a.flame(new THREE.Vector3(s * 2.2, 3.3, 0.6), 0.8, '#ff9a40', s > 0));
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.4, 1.6), lightColor: '#ffa050' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.4, 1.6),
+        lightColor: '#ffa050',
+        anchors: {
+          barrier: 'portcullis',
+          barrierHalfW: 1.5,
+          barrierH: 3.9,
+          tunnel: { depth: 6, height: 4.0, floorY: 0 },
+          // the lintel between the pylons (top 5.2 m, 1.6 m deep)
+          perches: [{ id: 'lintel', pos: [0, 5.2, 0.15], depth: 1.6 }],
+          wallH: 2.2,
+        },
+      };
     });
   }
 

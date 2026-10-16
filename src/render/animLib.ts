@@ -178,10 +178,10 @@ export function hipsYAt(d: DecodedClip, t: number) {
  * mode 'root': hips XZ follow the full path (lab / root-motion preview).
  */
 const modelCache = new WeakMap<THREE.Object3D, Map<string, THREE.AnimationClip>>();
-export function buildLibClip(id: string, model: THREE.Object3D, hipsCm: number, mode: 'inplace' | 'root' = 'inplace', name = 'lib:' + id): THREE.AnimationClip | null {
+export function buildLibClip(id: string, model: THREE.Object3D, hipsCm: number, mode: 'inplace' | 'root' = 'inplace', name = 'lib:' + id, yShift = 0): THREE.AnimationClip | null {
   let cache = modelCache.get(model);
   if (!cache) modelCache.set(model, (cache = new Map()));
-  const key = id + '|' + mode;
+  const key = id + '|' + mode + '|' + yShift;
   const hit = cache.get(key);
   if (hit) return hit;
   const d = decodeClip(id);
@@ -216,7 +216,7 @@ export function buildLibClip(id: string, model: THREE.Object3D, hipsCm: number, 
       const ox = mode === 'root' ? hx : hx - d.root[i * 3];
       const oz = mode === 'root' ? hz : hz - d.root[i * 3 + 1];
       v[i * 3] = rest.x + ox * hipsCm;
-      v[i * 3 + 1] = hy * hipsCm;
+      v[i * 3 + 1] = (hy + yShift) * hipsCm;
       v[i * 3 + 2] = rest.z + oz * hipsCm;
     }
     tracks.push(new THREE.VectorKeyframeTrack(hipsBone.name + '.position', d.times as unknown as number[], v as unknown as number[]));

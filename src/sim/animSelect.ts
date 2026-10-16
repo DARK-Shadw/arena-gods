@@ -74,6 +74,11 @@ export class AnimSelector {
     this.rng = new Rng((seed ^ 0x5eed5a11) >>> 0);
   }
 
+  /** weighted index from the animation stream */
+  pickIndex(w: number[]): number {
+    const i = this.rng.weighted(w);
+    return i < 0 ? 0 : i;
+  }
   /** uniform [0,1) from the animation stream (launch rolls) */
   roll(): number {
     return this.rng.next();

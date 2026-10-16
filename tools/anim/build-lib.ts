@@ -449,6 +449,38 @@ function measure(spec: LibClipSpec, S: Sampled) {
         }
     m.travelT = +tt.toFixed(2);
   }
+  if (spec.role === 'entrance' || spec.role === 'pair' || spec.role === 'finisher') {
+    // IMPACTS: an effector moving fast that suddenly stops (fist on bars, shoulder into a door,
+    // axe into the ground, foot stomp) - cues bind to these frames, not to timeline seconds
+    const effs = ['RightHand', 'LeftHand', 'RightFoot', 'LeftFoot', 'Head', 'Spine2'];
+    const sp = (j: string, i: number) => {
+      const a = J(S, j, Math.max(0, i - 1)),
+        b = J(S, j, i);
+      return Math.hypot(b[0] - a[0], b[1] - a[1], b[2] - a[2]) * FPS;
+    };
+    const imp: [number, string][] = [];
+    for (let i = 3; i < n - 1; i++)
+      for (const j of effs) {
+        const before = Math.max(sp(j, i - 1), sp(j, i - 2));
+        const now = sp(j, i);
+        const thr = j === 'Spine2' || j === 'Head' ? 1.4 : 2.2;
+        if (before > thr && now < before * 0.35 && !imp.some(([t]) => Math.abs(t - i / FPS) < 0.2)) imp.push([+(i / FPS).toFixed(2), j]);
+      }
+    m.impacts = imp.slice(0, 16);
+    // where the impacting effector is relative to the (smoothed) root at that moment: [x left, y, z forward] hips units
+    const R = rootCurve(S);
+    m.impactPos = m.impacts && (m.impacts as [number, string][]).map(([t, j]) => {
+      const i = Math.min(n - 1, Math.round(t * FPS));
+      const p = J(S, j, i);
+      return [+(p[0] - R.rx[i]).toFixed(3), +p[1].toFixed(3), +(p[2] - R.rz[i]).toFixed(3)];
+    });
+  }
+  if (spec.role === 'knockdown' || spec.role === 'launch' || spec.role === 'death') {
+    // lying body: chest relative to the end root (finishers aim at it)
+    const R = rootCurve(S);
+    const c = J(S, 'Spine2', n - 1);
+    m.endChest = [+(c[0] - R.rx[n - 1]).toFixed(3), +c[1].toFixed(3), +(c[2] - R.rz[n - 1]).toFixed(3)];
+  }
   if (spec.role === 'dodge') {
     const [dx, dz] = m.travel as number[];
     m.dir = Math.abs(dz) >= Math.abs(dx) ? (dz < 0 ? 'B' : 'F') : dx > 0 ? 'L' : 'R';
@@ -572,7 +604,7 @@ if (!ONLY) {
 export interface AnimClipData {
   role: string; tags: string[]; dur: number; posture: [string, string]; hMin: number; lift: number; apexT: number; groundT: number;
   startFace: string; endFace: string; travel: [number, number]; trim: [number, number, number]; mirror: boolean;
-  from?: 'F' | 'B' | 'L' | 'R'; exc?: number; sev?: number; height?: 'head' | 'body'; impactT?: number; dir?: 'F' | 'B' | 'L' | 'R'; travelT: number;
+  from?: 'F' | 'B' | 'L' | 'R'; exc?: number; sev?: number; height?: 'head' | 'body'; impactT?: number; dir?: 'F' | 'B' | 'L' | 'R'; travelT: number; impacts?: [number, string][]; impactPos?: [number, number, number][]; endChest?: [number, number, number];
 }
 export const ANIM: Record<string, AnimClipData> = {
 ${simRows}

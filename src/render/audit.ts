@@ -56,7 +56,7 @@ export async function runAudit(scene: THREE.Scene, pairs: [string, string][], se
         rec.events.some(
           (e) =>
             Math.abs(e.t - t) < 0.02 &&
-            (((e.type === 'hit' || e.type === 'prop_hit' || e.type === 'crush' || e.type === 'hazard_hit') && e.b === victim) || e.type === 'wall_slam' || e.type === 'pillar_slam' || e.type === 'explosion'),
+            (((e.type === 'hit' || e.type === 'prop_hit' || e.type === 'crush' || e.type === 'hazard_hit') && e.b === victim) || (e.type === 'finisher_contact' && e.data?.kind === 'kill' && e.b === victim) || e.type === 'wall_slam' || e.type === 'pillar_slam' || e.type === 'explosion'),
         );
       if (kill && !contactAt(kill.t, kill.b)) deathsWithoutHit++;
       let hi = 0;

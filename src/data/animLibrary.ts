@@ -118,6 +118,11 @@ export const ANIM_LIBRARY: LibClipSpec[] = [
   e('entrance', 'entrance', 'Mixamo_HF2/social/Rallying', { id: 'Rallying' }),
   e('entrance', 'entrance', 'Mixamo_HF2/social/Fist_Pump', { id: 'Fist_Pump' }),
   e('entrance', 'entrance', 'Mixamo_HF2/idles_style/Orc_Idle', { id: 'Orc_Idle' }),
+  e('entrance', 'entrance', 'Mixamo_HF2/environment/Push_Start', { id: 'Push_Start' }),
+  e('entrance', 'entrance', 'Mixamo_HF2/environment/Pushing', { id: 'Pushing' }),
+  e('entrance', 'entrance', 'Mixamo_HF2/locomotion_style/Orc_Walk', { id: 'Orc_Walk' }),
+  e('entrance', 'entrance', 'Mixamo_HF2/locomotion_style/Sneak_Walk', { id: 'Sneak_Walk' }),
+  e('entrance', 'entrance', 'Mixamo_HF2/idles_style/Ninja_Idle', { id: 'Ninja_Idle' }),
 
   // ------------------------------------------------------------ paired scenes + finisher solos (lazily loaded)
   e('finisher', 'pair', GT + 'Shoulder_Throw_Aggressor', { raw: true }),

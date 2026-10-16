@@ -29,7 +29,13 @@ import { buildEntrance, buildFaceoff, type CineCtx, type CineLine } from './cine
 import type { Timeline } from './cinematic/timeline';
 import { runAudit } from './render/audit';
 import { runAnimAudit } from './render/animAudit';
+import { runPairAudit } from './render/pairAudit';
 import { initLib } from './render/animLib';
+import { validateEntrances } from './cinematic/validateEntrances';
+import { FinisherFx } from './render/finisherFx';
+import { ContactWarp } from './render/contactWarp';
+import { BEHEAD_CLEAN, FIN_BY_ID, fxOf } from './sim/finishers';
+import { auditMatch, type CamMatchScore } from './camera/cameraAudit';
 
 type AppState = 'menu' | 'loading' | 'intro' | 'faceoff' | 'fight' | 'post';
 
@@ -45,6 +51,10 @@ class App {
   autoQuality = false;
   private qSamples: number[] = [];
   vfx = new VFX();
+  finFx!: FinisherFx;
+  warp?: ContactWarp;
+  /** headless audits: skip the GPU render */
+  headless = false;
   post: Post;
   ui: UI;
   controls: OrbitControls;
@@ -72,6 +82,9 @@ class App {
   private startToken = 0;
   sound!: SoundDirector;
   dialogue!: DialogueManager;
+  /** cutscene clock scale (entrance slow-motion beats) */
+  private cineScale = 1;
+  private cineScaleUntil = 0;
   /** pending ?t= jump (sim seconds), consumed when the fight starts */
   private jumpT = 0;
   /** true while skipping cutscenes: suppresses their voice cues */
@@ -93,11 +106,13 @@ class App {
     this.renderer.shadowMap.enabled = true;
     this.renderer.shadowMap.type = this.quality >= 1 ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    this.renderer.localClippingEnabled = true; // finisher plane cuts
     this.renderer.toneMappingExposure = 1.3;
     this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1400);
     this.camera.position.set(10, 7, 10);
     this.rig = new CameraRig(this.camera);
     this.scene.add(this.vfx.group);
+    this.finFx = new FinisherFx(this.scene, this.vfx);
     this.scene.add(this.keyLight, this.keyLight.target, this.rimLight, this.rimLight.target);
     this.post = new Post(this.renderer, this.scene, this.camera);
     this.post.quality = this.quality;
@@ -202,7 +217,7 @@ class App {
     this.ui.splashText('<small>THE GATES OPEN…</small>', 'victory');
     let assets;
     try {
-      [assets] = await Promise.all([Promise.all([loadCharacter(c.a), loadCharacter(c.b)]), initLib('core')]);
+      [assets] = await Promise.all([Promise.all([loadCharacter(c.a), loadCharacter(c.b)]), initLib('core', 'entrance', 'finisher')]);
     } catch (e) {
       console.error(e);
       this.ui.splashText('<small>failed to load fighter models (see console)</small>', 'victory');
@@ -227,8 +242,10 @@ class App {
     for (const v of this.views) v.dispose(this.scene);
     this.views = [new FighterView(c.a, assets[0], this.scene), new FighterView(c.b, assets[1], this.scene)];
     this.playback = new Playback(this.rec);
+    this.warp = new ContactWarp(this.rec);
     this.director = new Director(this.rig, this.rec);
     this.vfx.clear();
+    this.finFx.clear();
     for (const e of this.projMeshes.values()) this.scene.remove(e.mesh);
     this.projMeshes.clear();
     this.arena.resetProps();
@@ -245,7 +262,20 @@ class App {
   }
 
   private ctx(): CineCtx {
-    return { scene: this.scene, arena: this.arena, vfx: this.vfx, rig: this.rig, audio, ui: this.ui, onAnnounce: (w) => !this.skipping && this.sound?.announce(w) };
+    return {
+      scene: this.scene,
+      arena: this.arena,
+      vfx: this.vfx,
+      rig: this.rig,
+      audio,
+      ui: this.ui,
+      onAnnounce: (w) => !this.skipping && this.sound?.announce(w),
+      slowmo: (scale, realDur) => {
+        this.cineScale = scale;
+        this.cineScaleUntil = this.realT + realDur;
+      },
+      seed: this.choice.seed,
+    };
   }
 
   /** Wrap a picked dialogue line for a cutscene timeline. */
@@ -401,6 +431,14 @@ class App {
       case 'KeyO':
         this.post.dofEnabled = !this.post.dofEnabled;
         break;
+      case 'KeyB': {
+        // "bad camera here": a URL that reproduces this exact moment
+        const url = this.reportUrl();
+        console.info('[camera report]', url, this.director?.shotName, this.director?.lastScores.join(' '));
+        navigator.clipboard?.writeText(url).catch(() => {});
+        this.ui.toast('CAMERA REPORT', 'URL copied (see console)', '#d0c0a0', 1.6);
+        break;
+      }
     }
   }
 
@@ -468,7 +506,8 @@ class App {
       this.realT += realDt;
       const tl = this.timelines[0];
       if (tl) {
-        tl.update(realDt);
+        if (this.realT > this.cineScaleUntil) this.cineScale = 1;
+        tl.update(realDt * this.cineScale);
         if (tl.done) {
           this.timelines.shift();
           if (this.timelines.length === 1) this.state = 'faceoff';
@@ -483,6 +522,9 @@ class App {
       if (sn === 'killcam' || sn.startsWith('react') || sn === 'victory') dof = 1;
       focus = this.camera.position.distanceTo(this.rig.target);
       if (sn === 'killcam') desat = 0.35;
+      // finisher freeze beat: drained colour while time holds
+      if (sn === 'finisher' && this.realT < this.director.freezeUntil) desat = 0.65;
+      if (sn === 'cutin') desat = 0.2;
     } else {
       // menu: slow establishing orbit
       this.realT += realDt;
@@ -501,13 +543,14 @@ class App {
       audio.setListener(this.camera.position.x, this.camera.position.z, -fwd.z, fwd.x);
     }
     this.vfx.update(fxDt);
+    this.finFx.update(fxDt);
     this.arena.update(realDt, this.camera, this.renderer.domElement.height);
     audio.update(this.state === 'fight' ? this.playback.frameAt(this.playback.t).tension : 0.15);
     audio.setCrowd(this.arena.excitement);
     this.aberration *= Math.exp(-realDt * 8);
     this.flash *= Math.exp(-realDt * 10);
     this.post.update(realDt, { dof, focus, aberration: this.aberration, desat, flash: this.flash });
-    if (!this.noRender) this.post.render();
+    if (!this.noRender && !this.headless) this.post.render();
   }
 
   private updateCineLights() {
@@ -536,6 +579,7 @@ class App {
     const evs = pb.advance(simDt);
     const fr = pb.frameAt(pb.t);
     for (let i = 0; i < 2; i++) this.views[i].updateFromFrame(fr.f[i], Math.max(simDt, 1e-4), fr.f[1 - i], realDt);
+    this.warp?.apply(this.views, pb.t);
     this.arena.applyFrame(
       fr,
       simDt,
@@ -888,8 +932,48 @@ class App {
         case 'hazard_burn':
           if (a) this.vfx.fire(a.position.clone().setY(0.4), new THREE.Vector3(0, 2, 0), 6, 0.4, 0.5);
           break;
+        case 'finisher_start': {
+          const def = FIN_BY_ID[String(e.data?.id)];
+          if (def && aDef) toast(def.name, aDef.name, aDef.color, 2.4);
+          this.ui.speedLines?.(0.45);
+          this.flash = 0.12;
+          audio.stinger('dread');
+          break;
+        }
+        case 'finisher_contact': {
+          if (!a || !b) break;
+          const p = b.chestWorld();
+          if (e.data?.kind === 'kill') {
+            const def = FIN_BY_ID[String(e.data?.id)];
+            let fx = (String(e.data?.fx ?? '') || (def ? fxOf(def, a.def.id) : 'crush')) as Parameters<FinisherFx['play']>[0];
+            if (fx === 'behead' && !BEHEAD_CLEAN.has(b.def.id)) fx = 'bisect';
+            const dir = b.position.clone().sub(a.position).setY(0).normalize();
+            const at = fx === 'behead' ? b.headWorld().setY(b.headWorld().y - 0.2) : p;
+            this.finFx.play(fx, b.model, { attacker: a.model, plane: a.bladePlane(p), at, dir });
+            b.onHit(a.position, 2.4, fx === 'behead' ? 'head' : 'body');
+            this.aberration = 1.4;
+            audio.boom(0.8);
+          } else {
+            this.vfx.sparks(p, 24, '#fff0c8', 6);
+            this.vfx.dust(b.position, 8, 1.0);
+            b.onHit(a.position, 1.3, 'body');
+          }
+          break;
+        }
+        case 'launch_land':
+          if (a) {
+            this.vfx.dust(a.position, 26, 1.8);
+            this.vfx.shockwave(a.position, '#c8b090', 4, 0.5);
+            // into the fire / spikes: the landing is the finisher
+            const fs = this.rec.events.find((x) => x.type === 'finisher_start' && x.data?.kind === 'launch' && x.b === e.a && Math.abs(x.t - e.t) < 2);
+            if (fs) this.finFx.play(String(fs.data?.fx ?? 'burn') as Parameters<FinisherFx['play']>[0], a.model, { at: a.chestWorld() });
+          }
+          break;
         case 'kill':
-          if (b) {
+          if (b && FIN_BY_ID[String(e.data?.move)]) {
+            // finisher kill: its own FX already played on the contact
+            this.aberration = 0.8;
+          } else if (b) {
             const p = b.chestWorld();
             this.vfx.sparks(p, 80, '#fff0c0', 11);
             this.vfx.flash(p, '#fff0d0', 3, 30);
@@ -1032,9 +1116,70 @@ class App {
   audit(pairs: [string, string][], seeds = 2) {
     return runAudit(this.scene, pairs, seeds);
   }
+  /** URL reproducing the current fight moment (fighters, seeds, arena, time) */
+  reportUrl(): string {
+    const t = this.playback ? Math.max(0, this.playback.t - 1.0) : 0;
+    const a = this.arenaSpec;
+    return `${location.origin}${location.pathname}?auto=1&a=${this.choice.a}&b=${this.choice.b}&seed=${this.choice.seed}&theme=${a.theme}&layout=${a.layout}&aseed=${a.seed}&t=${t.toFixed(2)}&pause=1`;
+  }
+  /**
+   * Camera readability audit over many matches (see camera/cameraAudit.ts).
+   * list: [a, b, seed, theme, layout, aseed]
+   */
+  async cameraAudit(list: [string, string, number, string, string, number][]): Promise<CamMatchScore[]> {
+    const out: CamMatchScore[] = [];
+    this.headless = true;
+    this.manual = true;
+    try {
+      for (const [a, b, seed, theme, layout, aseed] of list) {
+        await this.start({ ...this.choice, a, b, seed, skipIntro: true, arena: { theme: theme as ThemeId, layout: layout as LayoutId, seed: aseed } });
+        if (this.state !== 'fight') this.beginFight();
+        this.realT = 0;
+        out.push(auditMatch(this as unknown as Parameters<typeof auditMatch>[0], `${a}-${b}#${seed} ${theme}/${layout}#${aseed}`));
+      }
+    } finally {
+      this.headless = false;
+    }
+    return out;
+  }
+  /** Paired-contact audit for finishers (see render/pairAudit.ts). */
+  pairAudit(list: [string, string, number, string, string, number][]) {
+    return runPairAudit(this.scene, list);
+  }
   /** Animation quality audit (see render/animAudit.ts). */
   animAudit(pairs: [string, string][], seeds = 2, opts: { blend?: 'inertial' | 'xfade'; feet?: boolean } = {}) {
     return runAnimAudit(this.scene, pairs, seeds, opts);
+  }
+  /** Headless entrance validator (see cinematic/validateEntrances.ts). */
+  async validateEntrances(o: { fighters?: string[]; themes?: string[]; layouts?: string[]; gates?: number[] } = {}) {
+    await initLib('core', 'entrance');
+    const fighters = o.fighters ?? FIGHTERS.map((f) => f.id);
+    const assets = await Promise.all(fighters.map((f) => loadCharacter(f)));
+    const views: Record<string, FighterView> = {};
+    fighters.forEach((f, i) => (views[f] = new FighterView(f, assets[i], this.scene)));
+    await Promise.all(Object.values(views).map((v) => v.ready));
+    for (const v of this.views) v.rig.root.visible = false;
+    const defs = Object.fromEntries(FIGHTERS.map((f) => [f.id, f]));
+    const prevState = this.state;
+    this.state = 'intro';
+    try {
+      return await validateEntrances({
+        ctx: () => this.ctx(),
+        buildArena: async (theme, layout) => {
+          this.ensureArena({ theme: theme as ThemeId, layout: layout as LayoutId, seed: 7 });
+          return this.arena;
+        },
+        views,
+        defs,
+        fighters,
+        themes: o.themes ?? THEMES,
+        layouts: o.layouts ?? LAYOUTS,
+        gates: o.gates,
+      });
+    } finally {
+      for (const v of Object.values(views)) v.dispose(this.scene);
+      this.state = prevState;
+    }
   }
   /** Test hook: free camera at a pose (renders one frame). */
   debugView(p: [number, number, number], look: [number, number, number], fov = 50) {

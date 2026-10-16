@@ -37,7 +37,11 @@ export type ShotName =
   | 'victory'
   | 'destruct'
   | 'throw_0'
-  | 'throw_1';
+  | 'throw_1'
+  | 'launch_0'
+  | 'launch_1'
+  | 'finisher'
+  | 'cutin';
 
 interface ShotState {
   name: ShotName;
@@ -90,6 +94,13 @@ export class Director {
   /** world point a destruction shot looks at */
   private focus = new THREE.Vector3();
   private focusH = 1;
+  /** running finisher: scene frame + kind (authored camera track) */
+  private fin: { t0: number; kind: string; x: number; z: number; yaw: number; att: number; vic: number; cutAt: number } | null = null;
+  private finStart = -1;
+  /** scratch camera for shot scoring */
+  private probeCam = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 400);
+  /** last coverage choices with their scores (debug overlay) */
+  lastScores: string[] = [];
 
   constructor(rig: CameraRig, rec: MatchRecord) {
     this.rig = rig;
@@ -100,6 +111,12 @@ export class Director {
       this.killer = kill.a;
       const atk = [...rec.events].reverse().find((e) => e.type === 'attack_start' && e.a === kill.a && e.t <= kill.t);
       this.killStart = Math.max(atk ? atk.t : kill.t - 0.8, kill.t - 1.1);
+      const fs = rec.events.find((e) => e.type === 'finisher_start' && e.data?.kind !== 'launch');
+      if (fs) {
+        // the finisher has its own camera track: the kill sequence starts with it
+        this.finStart = fs.t;
+        this.killStart = fs.t;
+      }
     }
     this.size = [getFighter(rec.ids[0]).stats.radius, getFighter(rec.ids[1]).stats.radius];
     this.L = generateArena(rec.arena);
@@ -110,7 +127,10 @@ export class Director {
   timeScale(realT: number, simT: number): number {
     if (realT < this.hitStopUntil) return 0.02;
     let s = 1;
-    if (this.killT > 0) {
+    if (this.killT > 0 && this.finStart >= 0) {
+      if (simT >= this.killT && simT < this.killT + 0.7) s = 0.3;
+      else if (simT >= this.killT + 0.7 && simT < this.killT + 1.4) s = 0.3 + ((simT - this.killT - 0.7) / 0.7) * 0.7;
+    } else if (this.killT > 0) {
       if (simT >= this.killStart && simT < this.killT) s = 0.22;
       else if (simT >= this.killT && simT < this.killT + 1.4) s = 0.12 + ((simT - this.killT) / 1.4) * 0.5;
       else if (simT >= this.killT + 1.4 && simT < this.killT + 2.2) s = 0.62 + ((simT - this.killT - 1.4) / 0.8) * 0.38;
@@ -136,7 +156,7 @@ export class Director {
   }
   private cutNext = true;
 
-  private chooseCoverage(inp: DirectorInput) {
+  private chooseCoverage(inp: DirectorInput, focus = -1) {
     const f = inp.frame;
     const sep = Math.hypot(f.f[0].x - f.f[1].x, f.f[0].z - f.f[1].z);
     const ten = f.tension;
@@ -149,6 +169,13 @@ export class Director {
     ];
     // don't repeat the same shot
     for (const x of w) if (x[0] === this.shot.name) x[1] *= 0.2;
+    // SHOT SCORING: evaluate each candidate's actual camera pose (framing, occlusion, size) before cutting
+    this.lastScores = [];
+    for (const x of w) {
+      const q = this.scoreShot(x[0], inp, focus);
+      this.lastScores.push(`${x[0]}:${q.toFixed(2)}`);
+      x[1] *= q < 0.35 ? 0.02 : q;
+    }
     const sum = w.reduce((s, x) => s + x[1], 0);
     let r = Math.random() * sum;
     let pick: ShotName = 'two_shot';
@@ -182,7 +209,18 @@ export class Director {
             this.hitStopUntil = realT + (ult ? 0.11 : 0.085);
             this.rig.addShake(ult ? 0.55 : 0.4);
             this.rig.punchFov(-4);
-            if (!ult && simT < this.killStart - 1) this.request(e.a === 0 ? 'hero_0' : 'hero_1', 50, 1.6, realT);
+            if (!ult && simT < this.killStart - 1) {
+              // contact-aware hero shot: take the side from which the blow lands visibly
+              const hero: ShotName = e.a === 0 ? 'hero_0' : 'hero_1';
+              let q = this.scoreShot(hero, inp, e.b ?? -1);
+              if (q < 0.45) {
+                this.side *= -1;
+                const q2 = this.scoreShot(hero, inp, e.b ?? -1);
+                if (q2 < q) this.side *= -1;
+                q = Math.max(q, q2);
+              }
+              if (q >= 0.45) this.request(hero, 50, 1.6, realT);
+            }
           } else {
             this.hitStopUntil = Math.max(this.hitStopUntil, realT + 0.035);
             this.rig.addShake(0.16);
@@ -287,6 +325,52 @@ export class Director {
           this.hitStopUntil = realT + 0.08;
           this.rig.addShake(0.45);
           break;
+        case 'launch': {
+          // follow the flight from the side, a beat of slow motion as they leave the ground
+          if (e.a >= 0 && (this.killStart < 0 || simT < this.killStart - 0.5)) {
+            const ok = this.request(e.a === 0 ? 'launch_0' : 'launch_1', 82, 1.7, realT, { smoothPos: 0.12, smoothLook: 0.06 });
+            if (ok) {
+              this.slowUntilSim = simT + 0.35;
+              this.slowScale = 0.45;
+            }
+          }
+          this.rig.addShake(0.45);
+          break;
+        }
+        case 'launch_land':
+          this.rig.addShake(0.5);
+          this.rig.punchFov(-3);
+          break;
+        case 'finisher_start': {
+          // FREEZE BEAT: both actors hold for 0.35 s, then the authored track takes over
+          if (e.data?.kind === 'launch') {
+            this.request(e.b === 0 ? 'launch_0' : 'launch_1', 101, 3, realT, { force: true });
+            this.slowUntilSim = simT + 0.9;
+            this.slowScale = 0.35;
+            break;
+          }
+          this.hitStopUntil = realT + 0.35;
+          this.freezeUntil = realT + 0.35;
+          this.fin = { t0: realT, kind: String(e.data?.kind ?? 'pair'), x: Number(e.data?.x), z: Number(e.data?.z), yaw: Number(e.data?.yaw ?? 0), att: e.a, vic: e.b ?? 1 - e.a, cutAt: -1 };
+          this.request('finisher', 102, 99, realT, { force: true, smoothPos: 0.35, smoothLook: 0.18 });
+          this.letterbox = true;
+          break;
+        }
+        case 'finisher_contact':
+          if (e.data?.kind === 'kill' && this.fin) {
+            // cut-in on the contact, then back to the track
+            this.fin.cutAt = realT;
+            this.request('cutin', 103, 0.9, realT, { force: true });
+            this.rig.addShake(0.7);
+            this.rig.punchFov(-6);
+          } else {
+            this.rig.addShake(0.35);
+            this.hitStopUntil = realT + 0.06;
+          }
+          break;
+        case 'finisher_end':
+          this.fin = null;
+          break;
         case 'crush':
         case 'hazard_hit':
           this.rig.addShake(0.5);
@@ -295,16 +379,34 @@ export class Director {
       }
     }
     if (this.log.length > 14) this.log.length = 14;
+    // CONTACT-AWARE FRAMING: a blow that lands where the current camera cannot see it forces a re-pick
+    for (const e of inp.newEvents) {
+      if (e.type !== 'hit' || e.b === undefined || e.b < 0) continue;
+      if (this.shot.priority >= 50 || realT - this.lastCut < 0.4) continue;
+      if (this.scoreShot(this.shot.name, inp, e.b) < 0.4) {
+        this.chooseCoverage(inp, e.b);
+        this.log.unshift('[cam] contact re-pick');
+      }
+      break;
+    }
 
     // ---- kill cam / victory (known ahead of time)
-    if (this.killT > 0) {
+    if (this.shot.name === 'cutin' && realT - this.shot.start > this.shot.dur && this.fin) this.request('finisher', 102, 99, realT, { force: true, smoothPos: 0.4, smoothLook: 0.2 });
+    if (this.killT > 0 && this.finStart < 0) {
       if (simT >= this.killStart && simT < this.killT + 1.6 && this.shot.name !== 'killcam') {
+        // pick the killcam side that sees both bodies and the blow
+        const q1 = this.scoreShot('killcam', inp, this.rec.events.find((e) => e.type === 'kill')?.b ?? -1);
+        this.side *= -1;
+        const q2 = this.scoreShot('killcam', inp, this.rec.events.find((e) => e.type === 'kill')?.b ?? -1);
+        if (q2 < q1) this.side *= -1;
         this.request('killcam', 100, 99, realT, { force: true });
         this.letterbox = true;
       }
       if (simT >= this.killT + 1.6 && this.shot.name !== 'victory') {
         this.request('victory', 101, 99, realT, { force: true, smoothPos: 0.5, smoothLook: 0.3 });
       }
+    } else if (this.killT > 0 && !this.fin && simT >= this.killT + 1.2 && this.shot.name !== 'victory') {
+      this.request('victory', 104, 99, realT, { force: true, smoothPos: 0.5, smoothLook: 0.3 });
       if (simT >= this.killT && simT < this.killT + 0.05) {
         this.rig.addShake(0.7);
         this.rig.punchFov(-6);
@@ -312,6 +414,10 @@ export class Director {
     }
 
     if (realT - this.shot.start > this.shot.dur && this.shot.priority < 100) this.chooseCoverage(inp);
+    else if (this.shot.priority < 100 && this.shot.priority >= 35 && realT - this.shot.start > 0.6 && this.scoreShot(this.shot.name, inp) < 0.25) {
+      // an event shot that turned bad (fighter hidden / out of frame): fall back to the best coverage
+      this.chooseCoverage(inp);
+    }
 
     if (!this.enabled) return;
     this.rig.subjects = [inp.chest[0], inp.chest[1]];
@@ -387,8 +493,9 @@ export class Director {
         const fwd = them.clone().sub(me).normalize();
         const right = new THREE.Vector3(-fwd.z, 0, fwd.x).multiplyScalar(this.side * (i === 0 ? 1 : -1));
         const big = this.size[i] / 0.6;
-        P.copy(me).addScaledVector(fwd, -2.2 - big * 1.3).addScaledVector(right, 0.9 + big * 0.7);
-        P.y = 1.7 + big * 0.5;
+        // far enough to the side that the near shoulder never covers the opponent
+        P.copy(me).addScaledVector(fwd, -2.2 - big * 1.3).addScaledVector(right, 1.35 + big * 0.9);
+        P.y = 1.85 + big * 0.5;
         L.copy(chest[1 - i]);
         L.y -= 0.15;
         this.fov = 46;
@@ -402,11 +509,11 @@ export class Director {
         const fwd = them.clone().sub(me).normalize();
         const right = new THREE.Vector3(-fwd.z, 0, fwd.x).multiplyScalar(this.side * (i === 0 ? 1 : -1));
         // low, in front-side of the attacker, looking up past them to the target
-        P.copy(me).addScaledVector(fwd, 1.2 + t * 0.2).addScaledVector(right, 2.6 - t * 0.3);
-        P.y = 0.45;
-        L.copy(chest[i]).lerp(chest[1 - i], 0.35);
-        L.y += 0.25;
-        this.fov = 40 - Math.min(6, t * 4);
+        P.copy(me).addScaledVector(fwd, 1.0 + t * 0.2).addScaledVector(right, 3.0 - t * 0.3);
+        P.y = 0.55;
+        L.copy(chest[i]).lerp(chest[1 - i], 0.45);
+        L.y += 0.2;
+        this.fov = 46 - Math.min(5, t * 3);
         break;
       }
       case 'track_0':
@@ -452,8 +559,9 @@ export class Director {
         // distance so both fighters stay in frame at the final (narrow) fov
         const halfH = Math.atan(Math.tan((this.fov * Math.PI) / 360) * this.rig.cam.aspect);
         const dist = Math.max(2.6, (sep / 2 + 1.1) / Math.tan(halfH)) * (1.12 - k * 0.12);
-        P.copy(mid).addScaledVector(perp, dist).addScaledVector(axis, (this.killer === 0 ? -1 : 1) * 0.6);
-        P.y = 0.75 + k * 0.15;
+        // slightly toward the victim's side and a little higher: the killer's body never covers the victim
+        P.copy(mid).addScaledVector(perp, dist).addScaledVector(axis, (this.killer === 0 ? 1 : -1) * 0.7);
+        P.y = 1.05 + k * 0.15;
         L.copy(impact);
         break;
       }
@@ -484,6 +592,54 @@ export class Director {
         this.fov = 50;
         break;
       }
+      case 'launch_0':
+      case 'launch_1': {
+        // side-on, a little ahead of the flying fighter, both kept in frame
+        const v = s.name === 'launch_0' ? 0 : 1;
+        const flyer = v === 0 ? A : B;
+        const other = v === 0 ? B : A;
+        const dirF = flyer.clone().sub(other).setY(0);
+        if (dirF.lengthSq() < 1e-4) dirF.set(1, 0, 0);
+        dirF.normalize();
+        const side = new THREE.Vector3(-dirF.z, 0, dirF.x).multiplyScalar(this.side);
+        const mid2 = flyer.clone().lerp(other, 0.35);
+        const d = Math.max(5.5, flyer.distanceTo(other) * 0.8 + 3.5);
+        P.copy(mid2).addScaledVector(side, d).addScaledVector(dirF, 1.2);
+        P.y = 1.6;
+        L.copy(chest[v]).lerp(chest[1 - v], 0.3);
+        this.fov = 50;
+        break;
+      }
+      case 'finisher': {
+        // authored track in the scene frame: low orbit around the pair, closing in
+        const F = this.fin;
+        const t2 = inp.realT - (F?.t0 ?? s.start);
+        const c = chest[0].clone().lerp(chest[1], 0.5);
+        const yaw = F ? F.yaw : Math.atan2(axis.x, axis.z);
+        const kind = F?.kind ?? 'pair';
+        const a0 = yaw + Math.PI / 2 + (this.side > 0 ? 0 : Math.PI);
+        const a = a0 + Math.min(0.9, t2 * 0.12) * this.side;
+        const r = kind === 'downed' ? 4.2 - Math.min(1, t2 * 0.2) : 3.6 + sep * 0.4 - Math.min(0.8, t2 * 0.12);
+        P.set(c.x + Math.sin(a) * r, kind === 'downed' ? 2.6 - Math.min(1.4, t2 * 0.35) : 0.9 + Math.min(0.5, t2 * 0.08), c.z + Math.cos(a) * r);
+        L.copy(c);
+        L.y = kind === 'downed' ? 0.7 : 1.15;
+        this.fov = 44 - Math.min(6, t2 * 1.5);
+        break;
+      }
+      case 'cutin': {
+        // close on the contact: the victim's chest from the attacker's off side, low
+        const F = this.fin;
+        const vi = F ? F.vic : 1;
+        const ai = F ? F.att : 0;
+        const hit = chest[vi].clone();
+        const fromA = chest[vi].clone().sub(chest[ai]).setY(0).normalize();
+        const side = new THREE.Vector3(-fromA.z, 0, fromA.x).multiplyScalar(this.side);
+        P.copy(hit).addScaledVector(side, 2.0).addScaledVector(fromA, -0.6);
+        P.y = Math.max(0.5, hit.y - 0.1);
+        L.copy(hit);
+        this.fov = 34;
+        break;
+      }
       case 'victory': {
         const w = this.killer >= 0 ? this.killer : 0;
         const me = w === 0 ? A : B,
@@ -502,6 +658,66 @@ export class Director {
       }
     }
   }
+
+  /**
+   * Shot quality 0..1 for a candidate: both fighters framed in the safe area,
+   * not hidden behind cover / hanging hazards, and big enough to read.
+   */
+  scoreShot(name: ShotName, inp: DirectorInput, focus = -1): number {
+    const saved = { shot: this.shot, pos: this.pos.clone(), look: this.look.clone(), fov: this.fov };
+    this.shot = { ...this.shot, name, start: inp.realT };
+    this.computeShot(inp);
+    const P = this.pos.clone(),
+      L = this.look.clone(),
+      fov = this.fov;
+    this.shot = saved.shot;
+    this.pos.copy(saved.pos);
+    this.look.copy(saved.look);
+    this.fov = saved.fov;
+    const cam = this.probeCam;
+    cam.fov = fov;
+    cam.aspect = this.rig.cam.aspect;
+    cam.position.copy(P);
+    cam.lookAt(L);
+    cam.updateProjectionMatrix();
+    cam.updateMatrixWorld(true);
+    let q = 1;
+    for (let i = 0; i < 2; i++) {
+      const c = inp.chest[i].clone().project(cam);
+      const h = inp.heads[i].clone().project(cam);
+      if (c.z >= 1 || Math.abs(c.x) > 0.9 || Math.abs(c.y) > 0.9) q *= 0.25;
+      else if (Math.abs(h.y) > 0.95) q *= 0.8;
+      // pillars / hanging hazards between the camera and the chest
+      for (const pl of camWorld.obstacles) {
+        const t = inp.chest[i];
+        const dx = t.x - P.x,
+          dz = t.z - P.z;
+        const l2 = dx * dx + dz * dz || 1e-6;
+        let u = ((pl.x - P.x) * dx + (pl.z - P.z) * dz) / l2;
+        u = Math.max(0, Math.min(1, u));
+        const px = P.x + dx * u - pl.x,
+          pz = P.z + dz * u - pl.z;
+        const y = P.y + (t.y - P.y) * u;
+        if (px * px + pz * pz < (pl.r + 0.15) * (pl.r + 0.15) && y < pl.h) q *= 0.3;
+      }
+      const size = Math.abs(h.y - c.y);
+      if (size < 0.06) q *= 0.6;
+      // the other fighter's body in front of this one's chest
+      const o = inp.chest[1 - i];
+      const t = inp.chest[i];
+      const d = t.clone().sub(P);
+      const u = Math.max(0, Math.min(1, o.clone().sub(P).dot(d) / d.lengthSq()));
+      if (u < 0.92) {
+        const closest = P.clone().addScaledVector(d, u);
+        const r = this.size[1 - i] * 0.8;
+        if (Math.hypot(closest.x - o.x, closest.z - o.z) < r && Math.abs(closest.y - o.y) < 0.6) q *= i === focus ? 0.15 : 0.6;
+      }
+    }
+    return q;
+  }
+
+  /** frozen display (finisher freeze beat): the app holds both actors' poses */
+  freezeUntil = -1;
 
   /** True once the killing-blow sequence has begun (suppress minor UI). */
   inKillSequence(simT: number) {

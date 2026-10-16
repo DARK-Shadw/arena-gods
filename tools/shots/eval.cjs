@@ -6,6 +6,7 @@ const path = require('path'),
   fs = require('fs');
 const args = process.argv.slice(2);
 const opt = (k, d) => {
+  if (args.includes(`--${k}`)) return 'true';
   const a = args.find((x) => x.startsWith(`--${k}=`));
   return a ? a.slice(k.length + 3) : d;
 };
@@ -19,7 +20,18 @@ const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234'
   const logs = [];
   page.on('console', (m) => (m.type() === 'error' || m.type() === 'warning' || /\[audit\]/.test(m.text())) && logs.push(m.text()));
   page.on('pageerror', (e) => logs.push('PAGEERROR ' + e.message));
-  await page.goto(`http://localhost:${port}${url}`);
+  if (opt('dist', null)) {
+    // run against a production build (dist/ or --dist=<dir>): immune to dev-server reloads while editing
+    const DIST = path.resolve(__dirname, '../..', opt('dist') === 'true' ? 'dist' : opt('dist'));
+    const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary', '.bin': 'application/octet-stream', '.svg': 'image/svg+xml', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.wav': 'audio/wav', '.png': 'image/png' };
+    await page.route('http://arena.local/**', (route) => {
+      const rel = decodeURIComponent(new URL(route.request().url()).pathname).replace(/^\//, '') || 'index.html';
+      const p = path.join(DIST, rel);
+      if (fs.existsSync(p) && fs.statSync(p).isFile()) route.fulfill({ path: p, contentType: MIME[path.extname(p)] || 'application/octet-stream' });
+      else route.fulfill({ status: 404, body: '' });
+    });
+    await page.goto(`http://arena.local${url}`);
+  } else await page.goto(`http://localhost:${port}${url}`);
   await page.waitForFunction((w) => !!window[w], waitFor, { timeout: 180000 });
   const t0 = Date.now();
   const res = await page.evaluate(async (e) => {

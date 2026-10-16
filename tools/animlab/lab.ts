@@ -170,6 +170,8 @@ const ownRoot = () => ($('root') as HTMLInputElement).checked;
 async function setClip(a: Actor, ref: string) {
   a.mixer.stopAllAction();
   a.decoded = null;
+  a.root.userData.sceneFix = false;
+  a.base.set(actors.indexOf(a) === 1 ? 1.7 : 0, 0, 0);
   let clip: THREE.AnimationClip | null = null;
   if (ref.startsWith('lib:')) {
     const id = ref.slice(4);
@@ -208,7 +210,7 @@ function apply() {
     a.mixer.update(0);
     // root motion for library clips: move the actor root by the clip's root curve
     a.root.position.copy(a.base);
-    a.root.rotation.y = 0;
+    if (!a.root.userData.sceneFix) a.root.rotation.y = 0;
     if (a.decoded && ownRoot()) {
       // (hips already carry the full path in 'root' mode)
     }

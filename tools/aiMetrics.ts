@@ -198,6 +198,8 @@ export function accountAi(agg: AiAgg, rec: MatchRecord) {
         (x) =>
           Math.abs(x.t - e.t) < 0.02 &&
           (((x.type === 'hit' || x.type === 'prop_hit' || x.type === 'crush' || x.type === 'hazard_hit') && x.b === e.b) ||
+            // finisher kills land on the scene's measured contact frame
+            (x.type === 'finisher_contact' && x.data?.kind === 'kill' && x.b === e.b) ||
             ((x.type === 'wall_slam' || x.type === 'pillar_slam') && x.a === e.b) ||
             x.type === 'explosion'),
       );

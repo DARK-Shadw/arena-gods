@@ -118,7 +118,8 @@ export type FState =
   | 'throw'
   | 'dead'
   | 'victory'
-  | 'launched';
+  | 'launched'
+  | 'scene';
 
 export type EventType =
   | 'match_start'
@@ -137,6 +138,9 @@ export type EventType =
   | 'getup'
   | 'launch'
   | 'launch_land'
+  | 'finisher_start'
+  | 'finisher_contact'
+  | 'finisher_end'
   | 'wall_slam'
   | 'pillar_slam'
   | 'prop_break'

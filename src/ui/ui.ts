@@ -6,6 +6,7 @@
 import { FIGHTERS } from '../sim/fighters';
 import { LAYOUTS, THEMES, type LayoutId, type ThemeId } from '../sim/arenaGen';
 import { THEME_DEFS } from '../render/arena/themes';
+import { goreLevel, setGoreLevel, type GoreLevel } from '../render/finisherFx';
 import type { FighterDef, Frame, MatchResult } from '../sim/types';
 
 const $ = <T extends HTMLElement = HTMLElement>(html: string): T => {
@@ -20,6 +21,8 @@ export interface MenuChoice {
   seed: number;
   skipIntro: boolean;
   arena: { theme: ThemeId | 'random'; layout: LayoutId | 'random'; seed: number };
+  /** (set as a side effect: the gore level is stored in localStorage) */
+  gore?: undefined;
 }
 
 const LAYOUT_LABEL: Record<LayoutId, string> = { pit: 'Circular pit', oval: 'Grand oval', cross: 'Crossroads (central pillars)', split: 'Divided (river + bridges)', gauntlet: 'Narrow gauntlet' };
@@ -152,6 +155,19 @@ export class UI {
   hideSplash() {
     this.splash.className = 'splash';
   }
+  /** anime speed lines over the screen (finisher freeze beat) */
+  speedLines(dur: number) {
+    let el = this.root.querySelector<HTMLDivElement>('.speedlines');
+    if (!el) {
+      el = document.createElement('div');
+      el.className = 'speedlines';
+      this.root.appendChild(el);
+    }
+    el.classList.remove('show');
+    void el.offsetWidth;
+    el.style.setProperty('--dur', `${dur}s`);
+    el.classList.add('show');
+  }
 
   // ---------------------------------------------------------------- subtitles
   subtitle(name: string, text: string, color: string, dur: number) {
@@ -232,6 +248,7 @@ export class UI {
           <label>Fight seed <input class="seed" type="number" value="${initial.seed}"></label>
           <button class="reseed">🎲</button>
           <label class="chk"><input class="skip" type="checkbox" ${initial.skipIntro ? 'checked' : ''}> Skip entrances</label>
+          <label>Gore <select class="gore">${(['off', 'stylised', 'full'] as const).map((g) => `<option value="${g}" ${goreLevel() === g ? 'selected' : ''}>${g === 'off' ? 'Off (clean)' : g === 'stylised' ? 'Stylised' : 'Full'}</option>`).join('')}</select></label>
         </div>
         <button class="go">ENTER THE ARENA</button>
         <button class="audio-btn">Audio settings (V)</button>
@@ -278,6 +295,7 @@ export class UI {
         seed: Number(seedIn.value) || 1,
         skipIntro: this.menu.querySelector<HTMLInputElement>('.skip')!.checked,
         arena: { theme, layout: this.menu.querySelector<HTMLSelectElement>('.layout')!.value as LayoutId | 'random', seed: Number(aseedIn.value) || 1 },
+        gore: (setGoreLevel(this.menu.querySelector<HTMLSelectElement>('.gore')!.value as GoreLevel), undefined),
       });
     });
     this.menu.classList.remove('hidden');

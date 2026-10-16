@@ -28,6 +28,32 @@ import { Drama } from './drama';
 import { clipTime, moveReach, segSegDist, strikePoints, toWorld, type MoveReach } from './reach';
 import { AnimSelector, clipData, styleOf, type Dir } from './animSelect';
 import { LAUNCH, launchForce } from './launch';
+import { FINISHERS, HIPS_M, execInfo, fxOf, sceneOf, sceneRoot, sceneToWorld, type FinisherDef } from './finishers';
+
+/** a running finisher (see finishers.ts) */
+interface FinRun {
+  def: FinisherDef;
+  att: number;
+  vic: number;
+  t: number;
+  ox: number;
+  oz: number;
+  yaw: number;
+  hA: number;
+  from: number;
+  to: number;
+  alignT: number;
+  a0: [number, number];
+  v0: [number, number];
+  hitsLeft: number[];
+  killAt: number;
+  killed: boolean;
+  // downed
+  fallDur?: number;
+  walk?: { from: [number, number]; to: [number, number]; t0: number; t1: number; face: number };
+  exec?: { clip: string; t: number; off: [number, number]; dur: number; start: number; from: number };
+  end: number;
+}
 export { LAUNCH, launchForce } from './launch';
 
 const MAGNET = 0.6; // max extra step-in during windup so attacks reach when they should
@@ -181,6 +207,9 @@ export class Match {
   anim: AnimSelector;
   launches = 0;
   private lastLaunchT = -99;
+  /** running finisher scene (at most one, it ends the match) */
+  fin: FinRun | null = null;
+  finishers = 0;
   projectiles: Projectile[] = [];
   private projCounter = 0;
   /** analytics for tools/simtest: contact distance at every melee hit */
@@ -314,13 +343,14 @@ export class Match {
       f.stateDur = d.dur / f.clipRate;
     } else if (s === 'dead') {
       if (f.launch) return; // the launch clip carries the death flight
+      if (this.fin && this.fin.vic === f.idx) return; // the finisher scene carries the death
       const nx = r ? f.x - r.x : -Math.sin(f.facing),
         nz = r ? f.z - r.z : -Math.cos(f.facing);
       const l = hypot(nx, nz) || 1;
       f.clip = this.anim.death(f.idx, this.t, { from, sev: r?.sev ?? 3, style, spaceBehind: this.spaceAlong(f, nx / l, nz / l) });
       f.clipT0 = 0;
       f.clipRate = 1.05;
-    } else if (s !== 'launched' && s !== 'dodge') {
+    } else if (s !== 'launched' && s !== 'dodge' && s !== 'scene') {
       f.clip = '';
     }
     if (s !== 'stagger' && s !== 'knockdown' && s !== 'dead' && s !== 'launched') f.react = null;
@@ -515,12 +545,12 @@ export class Match {
     return f.state === 'dead';
   }
   isDown(f: FighterState): boolean {
-    return f.state === 'dead' || f.state === 'knockdown' || f.state === 'launched';
+    return f.state === 'dead' || f.state === 'knockdown' || f.state === 'launched' || f.state === 'scene';
   }
 
   isInvulnerable(f: FighterState): boolean {
     if (f.state === 'dodge') return f.stateT >= 0.03 && f.stateT <= 0.34;
-    if (f.state === 'knockdown' || f.state === 'launched') return true;
+    if (f.state === 'knockdown' || f.state === 'launched' || f.state === 'scene') return true;
     if (f.state === 'getup') return f.stateT < Math.max(0.35, f.stateDur * 0.55);
     if (f.state === 'dead') return true;
     return false;
@@ -541,9 +571,11 @@ export class Match {
     this.ringS = ringRadiusAt(this.t) / ARENA.fightR;
     this.drama.preTick();
 
-    for (const f of this.f) this.updateFighter(f, this.f[1 - f.idx], dt);
-    if (!this.over) for (const f of this.f) aiTick(this, f, this.f[1 - f.idx]);
-    for (const f of this.f) this.integrate(f, this.f[1 - f.idx], dt);
+    if (this.fin) this.tickFinisher(dt);
+    const inScene = (f: FighterState) => !!this.fin && (f.idx === this.fin.att || f.idx === this.fin.vic);
+    for (const f of this.f) if (!inScene(f)) this.updateFighter(f, this.f[1 - f.idx], dt);
+    if (!this.over) for (const f of this.f) if (!inScene(f)) aiTick(this, f, this.f[1 - f.idx]);
+    for (const f of this.f) if (!inScene(f)) this.integrate(f, this.f[1 - f.idx], dt);
     this.collideFighters();
     for (const f of this.f) this.resolveAttack(f, this.f[1 - f.idx]);
     this.updateProjectiles();
@@ -1244,6 +1276,7 @@ export class Match {
     // launch force: knockback x the attacker's mass, more on counters / off-balance victims, less on heavy victims
     const force = knock ? launchForce(att, def, m, ph) : 0;
     const wouldKill = def.hp - dmg * this.drama.incomingMul(def) <= 0;
+    if (wouldKill && !this.fin && !this.over && this.tryFinisher(att, def, m, nx, nz, !!knock, dmg)) return;
     if (knock && wouldKill && this.tryLaunch(def, att, m, nx, nz, force, true)) {
       // lethal launch: the body flies on the arc (the kill below happens at the same tick)
     }
@@ -1277,6 +1310,288 @@ export class Match {
     def.kx = nx * kb;
     def.kz = nz * kb;
     if (m.stagger >= 0.5) this.emit('stagger', def.idx, att.idx, { move: m.id });
+  }
+
+  // ---------------------------------------------------------------- finishers
+  /**
+   * The blow is lethal: maybe turn the death into a finisher (rarer in lopsided
+   * fights, more likely for proud fighters and in tense ones). Returns true when
+   * a finisher started (the death then happens on the scene's kill contact).
+   */
+  private tryFinisher(att: FighterState, def: FighterState, m: MoveDef, nx: number, nz: number, knock: boolean, dmg: number): boolean {
+    if (this.t > ARENA.timeLimit - 7) return false;
+    const P = att.def.personality;
+    const hpGap = att.hp / att.maxHp - def.hp / def.maxHp;
+    const p = Math.max(0.05, Math.min(0.6, 0.16 + P.pride * 0.22 + (this.drama.tension > 0.55 ? 0.08 : 0) - (hpGap > 0.6 ? 0.12 : 0)));
+    if (this.anim.roll() > p) return false;
+    const cands: { f: FinisherDef; w: number }[] = [];
+    for (const f of FINISHERS) {
+      if (!f.users.includes('*') && !f.users.includes(att.def.id)) continue;
+      if (m.ranged && f.kind !== 'spell') continue;
+      if (f.minWeight && att.def.stats.weight < f.minWeight) continue;
+      if (f.maxVictimWeight && def.def.stats.weight > f.maxVictimWeight) continue;
+      if (f.kind === 'downed' && (!knock || !execInfo(att.def.id, f))) continue;
+      if (f.kind === 'spell' && (!execInfo(att.def.id, f) || hypot(def.x - att.x, def.z - att.z) > 6)) continue;
+      if (f.kind === 'launch' && (!knock || !this.hazardBehind(def, nx, nz))) continue;
+      if (f.kind === 'pair' && !this.pairFits(att, def, f)) continue;
+      cands.push({ f, w: f.weight });
+    }
+    if (!cands.length) return false;
+    const i = this.anim.pickIndex(cands.map((c) => c.w));
+    const f = cands[i].f;
+    // the blow lands (non-lethal now); the finisher kills on its own contact frame
+    this.applyDamage(def, Math.min(dmg, Math.max(0, def.hp - 1)), att, m.id, false);
+    att.fury = Math.min(100, att.fury + dmg * 0.035);
+    if (f.kind === 'launch') {
+      const hz = this.hazardBehind(def, nx, nz)!;
+      this.finishers++;
+      this.emit('finisher_start', att.idx, def.idx, { id: f.id, name: f.name, kind: f.kind, fx: hz.kind === 'spikes' ? 'impale' : this.arena.theme === 'glacier' ? 'shatter' : fxOf(f, att.def.id), x: +def.x.toFixed(2), z: +def.z.toFixed(2), hx: +hz.x.toFixed(2), hz: +hz.z.toFixed(2) });
+      const dx = hz.x - def.x,
+        dz = hz.z - def.z;
+      const d = hypot(dx, dz);
+      this.tryLaunch(def, att, m, dx / d, dz / d, Math.max(LAUNCH.minForce, d / 0.62), true, true);
+      this.applyDamage(def, 1e6, att, f.id, true);
+      return true;
+    }
+    this.startFinisher(f, att, def, nx, nz);
+    return true;
+  }
+
+  /** a hazard 2.4-6.2 m behind the victim, within 40 degrees of the push direction */
+  private hazardBehind(def: FighterState, nx: number, nz: number) {
+    let best: (typeof this.arena.hazards)[number] | null = null,
+      bd = 99;
+    for (const h of this.arena.hazards) {
+      if (h.kind !== 'lava' && h.kind !== 'firepit' && h.kind !== 'spikes') continue;
+      const dx = h.x - def.x,
+        dz = h.z - def.z;
+      const d = hypot(dx, dz);
+      if (d < 2.0 || d > 6.8) continue;
+      const l = hypot(nx, nz) || 1;
+      if ((dx * nx + dz * nz) / (d * l) < 0.6) continue;
+      if (d < bd) {
+        bd = d;
+        best = h;
+      }
+    }
+    return best;
+  }
+
+  /** scene frame for a pair finisher: anchored on the attacker, rotated so the victim's role starts toward the real victim */
+  private pairFrame(att: FighterState, def: FighterState, f: FinisherDef) {
+    const S = sceneOf(f)!;
+    const hA = HIPS_M[att.def.id] ?? 1;
+    const from = f.trim![0];
+    const pa = sceneRoot(S.attRoot, from),
+      pv = sceneRoot(S.vicRoot, from);
+    const angScene = atan2(pv[0] - pa[0], pv[1] - pa[1]);
+    const angReal = atan2(def.x - att.x, def.z - att.z);
+    const yaw = angReal - angScene;
+    // anchor: attacker stays where he is
+    const [rx, rz] = sceneToWorld(0, 0, yaw, pa[0] * hA, pa[1] * hA);
+    return { S, hA, yaw, ox: att.x - rx, oz: att.z - rz };
+  }
+  private pairFits(att: FighterState, def: FighterState, f: FinisherDef): boolean {
+    const S = sceneOf(f);
+    if (!S || !f.trim) return false;
+    const { hA, yaw, ox, oz } = this.pairFrame(att, def, f);
+    for (let t = f.trim[0]; t <= f.trim[1]; t += 0.4)
+      for (const c of [S.attRoot, S.vicRoot]) {
+        const p = sceneRoot(c, t);
+        const [x, z] = sceneToWorld(ox, oz, yaw, p[0] * hA, p[1] * hA);
+        if (this.world.edgeGap(x, z) < 0.5) return false;
+        for (let i = 0; i < this.arena.obstacles.length; i++) {
+          if (!this.world.standing(i)) continue;
+          const o = this.arena.obstacles[i];
+          if (hypot(x - o.x, z - o.z) < o.r + 0.55) return false;
+        }
+        for (const h of this.arena.hazards) if (h.kind !== 'chandelier' && hypot(x - h.x, z - h.z) < h.r + 0.3) return false;
+      }
+    return true;
+  }
+
+  private startFinisher(f: FinisherDef, att: FighterState, def: FighterState, nx: number, nz: number) {
+    const both = [att, def];
+    for (const x of both) {
+      x.kx = x.kz = 0;
+      x.mx = x.mz = 0;
+      x.launch = null;
+      x.y = 0;
+    }
+    const fx = fxOf(f, att.def.id);
+    if (f.kind === 'pair') {
+      const { S, hA, yaw, ox, oz } = this.pairFrame(att, def, f);
+      const from = f.trim![0],
+        to = Math.min(f.trim![1], S.dur);
+      const pa = sceneRoot(S.attRoot, from),
+        pv = sceneRoot(S.vicRoot, from);
+      const run: FinRun = {
+        def: f, att: att.idx, vic: def.idx, t: 0, ox, oz, yaw, hA, from, to, alignT: 0.25,
+        a0: [att.x, att.z], v0: [def.x, def.z],
+        hitsLeft: [...(f.hits ?? [])], killAt: f.kill!, killed: false, end: 0.25 + (to - from),
+      };
+      void pa;
+      void pv;
+      this.fin = run;
+      this.setState(att, 'scene', run.end);
+      this.setState(def, 'scene', run.end);
+      att.clip = S.att;
+      def.clip = S.vic;
+      for (const x of both) {
+        x.clipT0 = from;
+        x.clipRate = 0; // frozen on the first frame during the alignment window
+      }
+      att.facing = yaw - S.attYaw0;
+      def.facing = yaw - S.attYaw0 + S.align.yaw;
+    } else if (f.kind === 'spell') {
+      // the victim reels in place (slow big reaction), the caster casts; the kill lands on the release frame
+      const ex = execInfo(att.def.id, f)!;
+      def.react = { x: att.x, z: att.z, sev: 3, height: 'body' };
+      this.setState(def, 'scene', 99);
+      def.clip = this.anim.hit(def.idx, this.t, { from: this.dirFrom(def, att.x, att.z), sev: 3, style: styleOf(def.def.id) });
+      def.clipT0 = 0;
+      def.clipRate = 0.45;
+      const from = Math.max(0, ex.t - 0.8);
+      const start = 0.3;
+      const run: FinRun = {
+        def: f, att: att.idx, vic: def.idx, t: 0, ox: def.x, oz: def.z, yaw: atan2(def.x - att.x, def.z - att.z), hA: HIPS_M[att.def.id] ?? 1, from, to: ex.t + 1.2, alignT: 0,
+        a0: [att.x, att.z], v0: [def.x, def.z], hitsLeft: [], killAt: start + (ex.t - from), killed: false,
+        walk: { from: [att.x, att.z], to: [att.x, att.z], t0: 0, t1: 0.01, face: atan2(def.x - att.x, def.z - att.z) }, exec: { ...ex, start, from }, end: start + (ex.t - from) + 1.6,
+      };
+      this.fin = run;
+      this.setState(att, 'scene', run.end);
+      att.clip = '';
+    } else {
+      // downed: the victim goes down (fall clip), the attacker walks up and executes
+      const ex = execInfo(att.def.id, f)!;
+      const l = hypot(nx, nz) || 1;
+      def.react = { x: att.x, z: att.z, sev: 3, height: 'body' };
+      this.setState(def, 'scene', 99);
+      def.clip = this.anim.knockdown(def.idx, this.t, { from: this.dirFrom(def, att.x, att.z), style: styleOf(def.def.id) });
+      const kd = clipData(def.clip)!;
+      def.clipT0 = 0;
+      def.clipRate = 1.25;
+      const fallDur = kd.groundT / 1.25 + 0.3;
+      // aim at the lying body's chest (measured at the end of the chosen fall clip, victim's own scale)
+      const hv = HIPS_M[def.def.id] ?? 1;
+      const ec = (kd as unknown as { endChest?: [number, number, number] }).endChest ?? [0, 0.3, -0.35];
+      const [cx, cz] = sceneToWorld(0, 0, def.facing, ec[0] * hv, ec[2] * hv);
+      const tx = def.x + cx,
+        tz = def.z + cz;
+      void l;
+      // stand so the strike point (character space x left, z forward) lands on it
+      const face = atan2(tx - att.x, tz - att.z);
+      const [ox, oz] = sceneToWorld(0, 0, face, ex.off[0], ex.off[1]);
+      const spot: [number, number] = [tx - ox, tz - oz];
+      const walkD = hypot(spot[0] - att.x, spot[1] - att.z);
+      const walkT = Math.max(0.35, walkD / 2.4);
+      const start = Math.max(fallDur, 0.3 + walkT);
+      const from = Math.max(0, ex.t - 0.9);
+      const run: FinRun = {
+        def: f, att: att.idx, vic: def.idx, t: 0, ox: tx, oz: tz, yaw: face, hA: HIPS_M[att.def.id] ?? 1, from, to: ex.t + 0.8, alignT: 0,
+        a0: [att.x, att.z], v0: [def.x, def.z], hitsLeft: [], killAt: start + (ex.t - from), killed: false,
+        fallDur, walk: { from: [att.x, att.z], to: spot, t0: 0.3, t1: 0.3 + walkT, face }, exec: { ...ex, start, from }, end: start + (ex.t - from) + 0.8,
+      };
+      this.fin = run;
+      this.setState(att, 'scene', run.end);
+      att.clip = '';
+    }
+    this.finishers++;
+    this.emit('finisher_start', att.idx, def.idx, { id: f.id, name: f.name, kind: f.kind, fx, x: +this.fin!.ox.toFixed(2), z: +this.fin!.oz.toFixed(2), yaw: +this.fin!.yaw.toFixed(3) });
+  }
+
+  private tickFinisher(dt: number) {
+    const F = this.fin!;
+    if (F.def.kind === 'launch') return;
+    F.t += dt;
+    const att = this.f[F.att],
+      def = this.f[F.vic];
+    for (const x of [att, def]) x.stateT += dt;
+    if (F.def.kind === 'pair') {
+      const S = sceneOf(F.def)!;
+      const k = Math.min(1, F.t / F.alignT);
+      const ct = F.from + Math.max(0, F.t - F.alignT);
+      for (const [x, curve, p0] of [
+        [att, S.attRoot, F.a0],
+        [def, S.vicRoot, F.v0],
+      ] as [FighterState, number[], [number, number]][]) {
+        const p = sceneRoot(curve, ct);
+        const [wx, wz] = sceneToWorld(F.ox, F.oz, F.yaw, p[0] * F.hA, p[1] * F.hA);
+        // alignment window: slide from where they stood onto the scene's start marks
+        x.x = k < 1 ? p0[0] + (wx - p0[0]) * k : wx;
+        x.z = k < 1 ? p0[1] + (wz - p0[1]) * k : wz;
+        x.clipT0 = ct;
+        x.clipRate = 0;
+        x.stateT = 0;
+      }
+      for (const h of F.hitsLeft.slice()) if (ct >= h) {
+        F.hitsLeft.shift();
+        this.emit('finisher_contact', att.idx, def.idx, { id: F.def.id, kind: 'hit', t: +h.toFixed(2) });
+      }
+      if (!F.killed && ct >= F.killAt) this.finisherKill(F, att, def);
+      if (F.t >= F.end) this.endFinisher(F, att);
+      return;
+    }
+    // downed execution
+    const ex = F.exec!;
+    // victim: fall (or reel, for spells), clip time keeps running, the render holds the last frame
+    def.clipT0 = 0;
+    def.clipRate = F.def.kind === 'spell' ? 0.45 : 1.25;
+    def.stateT = F.t;
+    const w = F.walk!;
+    if (F.t < w.t0) {
+      att.clip = '';
+      att.mx = att.mz = 0;
+    } else if (F.t < w.t1) {
+      const k = (F.t - w.t0) / (w.t1 - w.t0);
+      const nxp = w.from[0] + (w.to[0] - w.from[0]) * k,
+        nzp = w.from[1] + (w.to[1] - w.from[1]) * k;
+      att.mx = (nxp - att.x) / Math.max(1e-3, dt);
+      att.mz = (nzp - att.z) / Math.max(1e-3, dt);
+      att.x = nxp;
+      att.z = nzp;
+      att.facing = atan2(F.ox - att.x, F.oz - att.z);
+      att.clip = '';
+    } else {
+      att.mx = att.mz = 0;
+      att.x = w.to[0];
+      att.z = w.to[1];
+      att.facing = w.face;
+      if (F.t >= ex.start) {
+        att.clip = ex.clip;
+        att.clipT0 = ex.from + (F.t - ex.start);
+        att.clipRate = 0;
+        att.stateT = 0;
+      } else att.clip = '';
+    }
+    if (!F.killed && F.t >= F.killAt) this.finisherKill(F, att, def);
+    if (F.t >= F.end) this.endFinisher(F, att);
+  }
+
+  private finisherKill(F: FinRun, att: FighterState, def: FighterState) {
+    F.killed = true;
+    this.emit('finisher_contact', att.idx, def.idx, { id: F.def.id, kind: 'kill', fx: fxOf(F.def, att.def.id) });
+    def.react = { x: att.x, z: att.z, sev: 3, height: 'body' };
+    const keep = { clip: att.clip, t0: att.clipT0, rate: att.clipRate, st: att.stateT };
+    const vKeep = { clip: def.clip, t0: def.clipT0, rate: def.clipRate, st: def.stateT };
+    this.applyDamage(def, 1e6, att, F.def.id, true);
+    // the scene keeps both roles going (applyDamage idles the killer and kills the victim)
+    att.state = 'scene';
+    att.clip = keep.clip;
+    att.clipT0 = keep.t0;
+    att.clipRate = keep.rate;
+    att.stateT = keep.st;
+    def.clip = vKeep.clip;
+    def.clipT0 = vKeep.t0;
+    def.clipRate = vKeep.rate;
+    def.stateT = vKeep.st;
+  }
+
+  private endFinisher(F: FinRun, att: FighterState) {
+    this.emit('finisher_end', att.idx, F.vic, { id: F.def.id });
+    this.fin = null;
+    att.clip = '';
+    this.setState(att, 'idle');
   }
 
   /** did the blow land high (head) or on the body: strike point height at the contact frame */

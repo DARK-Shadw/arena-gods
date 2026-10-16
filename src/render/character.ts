@@ -189,6 +189,9 @@ export class AnimController {
   has(name: string) {
     return this.clips.has(name);
   }
+  clip(name: string): THREE.AnimationClip | null {
+    return this.clips.get(name) ?? null;
+  }
   /** add a clip at runtime (shared prop-interaction clips, library clips) */
   addClip(clip: THREE.AnimationClip, dur?: number) {
     this.clips.set(clip.name, clip);

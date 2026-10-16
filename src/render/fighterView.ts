@@ -184,13 +184,70 @@ export class FighterView {
     if (!id) return '';
     const name = 'lib:' + id;
     if (this.anim.has(name)) return name;
-    const clip = buildLibClip(id, this.model, this.anim.meta.hipsY);
+    const [base, shift] = id.split('@');
+    const clip = buildLibClip(base, this.model, this.anim.meta.hipsY, 'inplace', name, shift ? Number(shift) : 0);
     if (!clip) return '';
     this.anim.addClip(clip, clip.duration);
     return name;
   }
   private lastClip = '';
+  /** world velocity of the weapon tip / striking hand (m/s) */
+  tipVel = new THREE.Vector3();
+  private lastTip = new THREE.Vector3();
+  /** the blade plane right now: contains the blade (hand -> tip) and its motion */
+  bladePlane(at: THREE.Vector3): THREE.Plane {
+    const tip = this.tipWorld(new THREE.Vector3());
+    const hand = this.rig.joints.haR.getWorldPosition(new THREE.Vector3());
+    const blade = tip.clone().sub(hand);
+    const n = blade.clone().cross(this.tipVel.lengthSq() > 0.01 ? this.tipVel : new THREE.Vector3(0, -1, 0));
+    if (n.lengthSq() < 1e-6) n.set(0, 1, 0);
+    return new THREE.Plane().setFromNormalAndCoplanarPoint(n.normalize(), at);
+  }
   private flightTilt = 0;
+
+  /**
+   * Pose probe: where joints are (character space, metres: +Z forward, +X left,
+   * +Y up from the feet) at a clip time, sampled on this rig without disturbing
+   * the current pose. Used to place actors so hands / weapon reach a target.
+   */
+  probe(clipName: string, time: number, joints: string[]): Record<string, THREE.Vector3> {
+    const name = clipName.startsWith('lib:') ? this.libName(clipName.slice(4)) : clipName;
+    const out: Record<string, THREE.Vector3> = {};
+    const clip = name ? this.anim.clip(name) : null;
+    if (!clip) return out;
+    const saved: [THREE.Object3D, THREE.Quaternion, THREE.Vector3][] = [];
+    this.model.traverse((o) => {
+      if ((o as THREE.Bone).isBone) saved.push([o, o.quaternion.clone(), o.position.clone()]);
+    });
+    const rp = this.root.position.clone(),
+      rr = this.root.rotation.y;
+    this.root.position.set(0, 0, 0);
+    this.root.rotation.y = 0;
+    const mixer = new THREE.AnimationMixer(this.model);
+    const act = mixer.clipAction(clip);
+    act.play();
+    act.time = Math.min(time, clip.duration - 1e-3);
+    mixer.update(0);
+    this.root.updateMatrixWorld(true);
+    for (const j of joints) {
+      const o = j === 'tip' ? (this.tip ?? this.bones.RightHand) : this.bones[j];
+      if (o) out[j] = o.getWorldPosition(new THREE.Vector3());
+    }
+    act.stop();
+    mixer.uncacheRoot(this.model);
+    for (const [o, q, p] of saved) {
+      o.quaternion.copy(q);
+      o.position.copy(p);
+    }
+    this.root.position.copy(rp);
+    this.root.rotation.y = rr;
+    this.root.updateMatrixWorld(true);
+    return out;
+  }
+  /** hips height in metres (scale of root-motion curves) */
+  get hipsM() {
+    return this.anim.meta.hipsY * 0.01 * this.anim.meta.scale;
+  }
 
   /** Called by the app for block events (plays a block-impact reaction). */
   onBlocked() {
@@ -278,6 +335,12 @@ export class FighterView {
       case 'launched':
         req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'launch' } : { name: 'fall', auto: true, cat: 'launch' };
         break;
+      case 'scene': {
+        // finisher role: shared-library clip, or the fighter's own move clip ('own:<move>'); no clip = walking up
+        const name = fr.clip.startsWith('own:') ? fr.clip.slice(4) : lib;
+        req = name && A.has(name) ? { name, time: Math.min(A.dur(name) - 0.02, fr.clipT), cat: 'scene' } : {};
+        break;
+      }
       case 'winded':
         req = { name: 'winded', auto: true, fadeIn: 6, cat: 'other' };
         break;
@@ -326,8 +389,13 @@ export class FighterView {
       }
     } else this.flightTilt *= Math.exp(-realDt * 10);
     this.model.rotation.x = -this.flightTilt;
-    A.update(dt, { ...req, fwd: fr.state === 'idle' || fr.state === 'block' ? fwd : 0, side: fr.state === 'idle' || fr.state === 'block' ? side : 0 }, realDt);
+    const loco = fr.state === 'idle' || fr.state === 'block' || (fr.state === 'scene' && !req.name);
+    A.update(dt, { ...req, fwd: loco ? fwd : 0, side: loco ? side : 0 }, realDt);
     this.root.updateMatrixWorld(true);
+    // weapon tip velocity (finisher cut plane = blade direction x swing direction)
+    const tipNow = this.tipWorld(new THREE.Vector3());
+    if (dt > 0) this.tipVel.copy(tipNow).sub(this.lastTip).divideScalar(dt);
+    this.lastTip.copy(tipNow);
 
     // weapon/limb trail during active frames
     const attacking = fr.state === 'attack' && (fr.phase === 1 || (fr.phase === 0 && fr.phaseT > 0.85) || (fr.phase === 2 && fr.phaseT < 0.12));
@@ -405,9 +473,11 @@ export class FighterView {
         if (meta) req = { name: inp.clip, time: this.warpAttack(meta, this.moves[inp.clip!], inp.phase ?? 0, inp.phaseT ?? 0).time };
         break;
       }
-      case 'clip':
-        if (inp.clip) req = { name: inp.clip, time: Math.min(A.dur(inp.clip) - 0.05, t), fadeIn: 8 };
+      case 'clip': {
+        const name = inp.clip?.startsWith('lib:') ? this.libName(inp.clip.slice(4)) : inp.clip;
+        if (name) req = { name, time: Math.min(A.dur(name) - 0.02, t), fadeIn: 8, cat: 'cine' };
         break;
+      }
     }
     A.overlayTarget = 0;
     A.update(dt, { ...req, fwd, side: 0 });

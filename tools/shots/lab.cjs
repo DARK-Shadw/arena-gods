@@ -28,13 +28,15 @@ const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234'
   await page.waitForFunction(() => window.__lab && window.__lab.ready, null, { timeout: 120000 });
   for (const s of spec) {
     await page.evaluate(async (s) => {
-      await window.__lab.show(s.a, s.clip, s.b, s.clipB);
+      if (s.scene) await window.__lab.pairScene(s.scene, s.a, s.b);
+      else await window.__lab.show(s.a, s.clip, s.b, s.clipB);
       if (s.view) window.__lab.view(s.view[0], s.view[1]);
     }, s);
     let i = 0;
     for (const t of s.times) {
       await page.evaluate((t) => window.__lab.seek(t), t);
       await page.waitForTimeout(30);
+      if (s.scene) console.log(s.name, t, JSON.stringify(await page.evaluate(() => window.__lab.contactNow())));
       await page.screenshot({ path: path.join(out, `${s.name}_${String(i++).padStart(2, '0')}.png`), clip: s.crop ? { x: s.crop[0], y: s.crop[1], width: s.crop[2], height: s.crop[3] } : undefined });
     }
     console.log('captured', s.name, s.times.length);

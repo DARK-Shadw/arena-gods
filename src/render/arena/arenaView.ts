@@ -31,6 +31,35 @@ export interface Gate {
   light: THREE.PointLight;
   group: THREE.Group;
   smashed: boolean;
+  /** what the dressing actually built around this gate (gate frame: x right, y up, z into the arena from the boundary) */
+  anchors: GateAnchors;
+}
+
+export type V3 = [number, number, number];
+/**
+ * STAGE ANCHORS: published by each theme's gate builder from the geometry it
+ * created, so entrance choreography can only use surfaces that exist.
+ */
+export interface GateAnchors {
+  barrier: 'portcullis' | 'veil' | 'rope' | 'icicles' | 'none';
+  /** barrier plane z (gate frame), half width, height */
+  barrierZ: number;
+  barrierHalfW: number;
+  barrierH: number;
+  /** walk-out space behind the barrier: depth (m, from the barrier backwards) and clear height */
+  tunnel?: { depth: number; height: number; floorY: number };
+  /** standable surfaces above the gate / on the wall (top surface y), with the facing into the arena */
+  perches: { id: string; pos: V3; depth: number }[];
+  /** platform edges with a drop below (climb-up entrances): pos = top of the edge, dir = inward unit (x, z) */
+  rims: { id: string; pos: V3; drop: number; dir: [number, number] }[];
+  /** crowd tier spots (stands) */
+  stands: V3[];
+  /** low wall / fence next to the gate that can be vaulted (top y) */
+  lowWall?: { pos: V3; height: number };
+  /** boundary wall height next to the gate */
+  wallH: number;
+  /** the barrier's breakable pieces (restored on reset) */
+  pieces: { obj: THREE.Object3D; pos: THREE.Vector3; rot: THREE.Euler; vis: boolean }[];
 }
 
 export interface Mood {
@@ -662,6 +691,14 @@ export class Arena {
       g.portcullis.visible = true;
       g.portcullis.position.set(0, 0, 0.2);
       g.portcullis.rotation.set(0, 0, 0);
+      for (const pc of g.anchors.pieces) {
+        pc.obj.position.copy(pc.pos);
+        pc.obj.rotation.copy(pc.rot);
+        pc.obj.visible = pc.vis;
+        pc.obj.scale.setScalar(1);
+        const mt = (pc.obj as THREE.Mesh).material as THREE.Material & { opacity?: number; userData: { op?: number } };
+        if (mt && mt.userData && mt.userData.op !== undefined) mt.opacity = mt.userData.op;
+      }
       g.smashed = false;
       g.light.intensity = 0;
     }
