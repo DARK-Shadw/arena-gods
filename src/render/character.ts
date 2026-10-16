@@ -18,6 +18,7 @@ import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
+import { FootLock, Inertializer, PhaseMatcher, SpringFlinch } from './poseFx';
 
 export interface ClipMeta {
   dur: number;
@@ -85,10 +86,72 @@ interface Layer {
   target: number;
   manual: boolean;
   time: number;
-  fade: number; // per-second blend speed
+  fade: number; // per-second blend speed (crossfade mode)
 }
 
 export const LOCO = ['idle', 'walk', 'walkBack', 'strafeL', 'strafeR', 'run'] as const;
+
+/** Clip categories for the transition table. */
+export type AnimCat = 'loco' | 'attack' | 'hit' | 'block' | 'dodge' | 'knockdown' | 'getup' | 'death' | 'launch' | 'taunt' | 'carry' | 'scene' | 'cine' | 'other';
+
+/**
+ * Transition table (inertialization blend time, seconds) - data, not code.
+ * Hit reactions are snappy so the flinch starts on the contact frame; returns
+ * to locomotion are longer and phase-matched.
+ */
+export const TRANSITIONS: Record<string, number> = {
+  '*>hit': 0.09,
+  '*>launch': 0.07,
+  '*>death': 0.1,
+  '*>knockdown': 0.1,
+  'knockdown>getup': 0.16,
+  'launch>getup': 0.16,
+  'attack>attack': 0.1,
+  'loco>attack': 0.12,
+  'block>attack': 0.1,
+  '*>attack': 0.14,
+  '*>dodge': 0.1,
+  'attack>loco': 0.26,
+  'hit>loco': 0.24,
+  'dodge>loco': 0.22,
+  'getup>loco': 0.28,
+  'block>loco': 0.18,
+  'loco>block': 0.14,
+  '*>scene': 0.2,
+  'scene>*': 0.25,
+  '*>loco': 0.24,
+  '*>*': 0.18,
+};
+export function blendTime(from: AnimCat, to: AnimCat): number {
+  return TRANSITIONS[`${from}>${to}`] ?? TRANSITIONS[`*>${to}`] ?? TRANSITIONS[`${from}>*`] ?? TRANSITIONS['*>*'];
+}
+
+/** 'inertial' (default) or the legacy normalised cross-fade ('xfade', for A/B comparisons: ?blend=xfade). */
+export let BLEND_MODE: 'inertial' | 'xfade' = typeof location !== 'undefined' && new URLSearchParams(location.search).get('blend') === 'xfade' ? 'xfade' : 'inertial';
+export function setBlendMode(m: 'inertial' | 'xfade') {
+  BLEND_MODE = m;
+}
+
+/** foot locking on/off (?feet=0 to compare) */
+export let FOOT_LOCK = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('feet') !== '0' : true;
+export function setFootLock(on: boolean) {
+  FOOT_LOCK = on;
+}
+
+export interface AnimRequest {
+  name?: string;
+  time?: number;
+  auto?: boolean;
+  /** legacy cross-fade speed (per second) */
+  fadeIn?: number;
+  /** category for the transition table */
+  cat?: AnimCat;
+  /** same clip restarted (new attack id) */
+  restart?: boolean;
+  fwd: number;
+  side: number;
+  speedScale?: number;
+}
 
 export class AnimController {
   mixer: THREE.AnimationMixer;
@@ -98,17 +161,35 @@ export class AnimController {
   /** Name of the clip currently owning the one-shot slot ('' = locomotion). */
   current = '';
   private oneShotWeight = 0;
+  private curCat: AnimCat = 'loco';
+  private lastTime = 0;
+  readonly root: THREE.Object3D;
+  inert: Inertializer;
+  flinch: SpringFlinch;
+  phase: PhaseMatcher;
+  feet: FootLock;
+  /** metrics: transitions handled */
+  transitions = 0;
+  /** shared normalised locomotion phase (sync group) */
+  private locoPhase = 0;
+  /** true on frames where a transition started (metrics) */
+  justTransitioned = false;
 
-  constructor(root: THREE.Object3D, clips: THREE.AnimationClip[], meta: FighterMeta) {
+  constructor(root: THREE.Object3D, clips: THREE.AnimationClip[], meta: FighterMeta, rng?: () => number) {
+    this.root = root;
     this.mixer = new THREE.AnimationMixer(root);
     this.meta = meta;
     for (const c of clips) this.clips.set(c.name, c);
+    this.inert = new Inertializer(root);
+    this.flinch = new SpringFlinch(root, rng);
+    this.phase = new PhaseMatcher(root);
+    this.feet = new FootLock(root);
   }
 
   has(name: string) {
     return this.clips.has(name);
   }
-  /** add a clip at runtime (shared prop-interaction clips) */
+  /** add a clip at runtime (shared prop-interaction clips, library clips) */
   addClip(clip: THREE.AnimationClip, dur?: number) {
     this.clips.set(clip.name, clip);
     if (dur !== undefined) this.meta.clips[clip.name] = { dur, loop: false, speed: 0, dir: [0, 0], strike: 0, peaks: [], eff: '', start: 0, loopActive: false };
@@ -156,12 +237,16 @@ export class AnimController {
    * Set this frame's pose request.
    * one-shot: { name, time } with manual time, or { name, auto: true } for a loop.
    * locomotion: local velocity (m/s) fwd/side (side > 0 = moving left).
+   * dt = animation (sim) time; realDt = wall time (springs keep moving during hit-stop).
    */
-  update(
-    dt: number,
-    req: { name?: string; time?: number; auto?: boolean; fadeIn?: number; fwd: number; side: number; speedScale?: number },
-  ) {
+  update(dt: number, req: AnimRequest, realDt = dt) {
     const want = req.name && this.has(req.name) ? req.name : '';
+    const cat: AnimCat = want ? (req.cat ?? 'other') : 'loco';
+    const inertial = BLEND_MODE === 'inertial';
+    // ---- transition detection (new clip, restart of the same clip, time jump back)
+    let transition = want !== this.current;
+    if (!transition && want && !req.auto && req.time !== undefined && (req.restart || req.time < this.lastTime - 0.2)) transition = true;
+    const fromCat = this.curCat;
     // --- one-shot slot
     if (want !== this.current) {
       if (this.current) {
@@ -169,6 +254,15 @@ export class AnimController {
         if (old) {
           old.target = 0;
           old.fade = 10;
+          if (inertial) old.weight = 0;
+        }
+      }
+      // entering locomotion: enter the shared cycle at the phase matching the current stance
+      if (!want && inertial) {
+        const l = this.layer('walk');
+        if (l) {
+          const c = l.action.getClip();
+          this.locoPhase = (((this.phase.match(c) - this.phase.offset(c)) / c.duration) % 1 + 1) % 1;
         }
       }
       this.current = want;
@@ -176,6 +270,7 @@ export class AnimController {
         const l = this.layer(want)!;
         l.fade = req.fadeIn ?? 12;
         if (!req.auto) l.weight = Math.min(l.weight, 0.001);
+        if (inertial) l.weight = 1;
       }
     }
     if (want) {
@@ -183,12 +278,14 @@ export class AnimController {
       l.target = 1;
       l.manual = !req.auto;
       if (l.manual) l.time = Math.max(0, Math.min(req.time ?? 0, l.action.getClip().duration - 1e-3));
+      this.lastTime = req.time ?? 0;
     }
+    this.curCat = cat;
     const oneTarget = want ? 1 : 0;
-    this.oneShotWeight += (oneTarget - this.oneShotWeight) * (1 - Math.exp(-(want ? (req.fadeIn ?? 12) : 8) * dt));
+    if (inertial) this.oneShotWeight = oneTarget;
+    else this.oneShotWeight += (oneTarget - this.oneShotWeight) * (1 - Math.exp(-(want ? (req.fadeIn ?? 12) : 8) * dt));
 
     // --- locomotion weights
-    const sc = this.meta.scale;
     const sp = Math.hypot(req.fwd, req.side);
     const loco: Record<string, number> = { idle: 0, walk: 0, walkBack: 0, strafeL: 0, strafeR: 0, run: 0 };
     const moving = Math.min(1, sp / 0.5);
@@ -199,7 +296,6 @@ export class AnimController {
       const sum = af + as;
       const runSpeed = this.meta.clips.run?.speed ?? 3;
       const walkSpeed = this.meta.clips.walk?.speed ?? 1.3;
-      // forward: walk -> run as speed rises
       const runK = Math.max(0, Math.min(1, (sp - walkSpeed * 1.1) / Math.max(0.3, runSpeed * 0.75 - walkSpeed * 1.1)));
       if (req.fwd >= 0) {
         loco.walk = (af / sum) * moving * (1 - runK);
@@ -209,17 +305,38 @@ export class AnimController {
       else loco.strafeR = (as / sum) * moving;
     }
     const locoScale = 1 - this.oneShotWeight;
+    // SYNC GROUP: all moving cycles share one normalised phase (left foot forward = 0),
+    // so blended walk / strafe / run feet stay in step instead of mushing.
+    let rate = 0,
+      wsum = 0;
     for (const n of LOCO) {
       const w = loco[n] * locoScale;
       const l = this.layer(n);
       if (!l) continue;
-      l.manual = false;
       l.target = w;
-      l.weight = w; // locomotion weights are already smooth (velocity is smooth)
+      l.weight = w;
       const clipSpeed = this.meta.clips[n]?.speed ?? 0;
-      if (clipSpeed > 0.05 && n !== 'idle') l.action.timeScale = Math.max(0.5, Math.min(2.2, sp / clipSpeed)) * (req.speedScale ?? 1);
-      else l.action.timeScale = req.speedScale ?? 1;
+      const ts = (clipSpeed > 0.05 && n !== 'idle' ? Math.max(0.5, Math.min(2.2, sp / clipSpeed)) : 1) * (req.speedScale ?? 1);
+      l.action.timeScale = ts;
+      if (n === 'idle' || BLEND_MODE !== 'inertial') {
+        l.manual = false;
+        continue;
+      }
+      l.manual = true;
+      if (w > 0) {
+        rate += (w * ts) / l.action.getClip().duration;
+        wsum += w;
+      }
     }
+    if (wsum > 0) this.locoPhase = (this.locoPhase + (rate / wsum) * dt) % 1;
+    if (BLEND_MODE === 'inertial')
+      for (const n of LOCO) {
+        if (n === 'idle') continue;
+        const l = this.layers.get(n);
+        if (!l) continue;
+        const c = l.action.getClip();
+        l.time = (this.phase.offset(c) + this.locoPhase * c.duration) % c.duration;
+      }
 
     // --- blend one-shot layers
     let total = 0;
@@ -229,6 +346,7 @@ export class AnimController {
         continue;
       }
       if (n === this.current) l.weight = this.oneShotWeight;
+      else if (inertial) l.weight = 0;
       else l.weight += (0 - l.weight) * (1 - Math.exp(-l.fade * dt));
       if (l.weight < 0.002 && n !== this.current) l.weight = 0;
       total += l.weight;
@@ -250,6 +368,17 @@ export class AnimController {
       const w = this.overlayW * (1 - this.oneShotWeight);
       if (w > 0.002) for (const [o, q] of this.overlayPose) o.quaternion.slerp(q, w);
     }
+    // --- inertialization (post-process) + spring additives
+    this.justTransitioned = transition;
+    if (transition) {
+      this.transitions++;
+      if (inertial) this.inert.begin(blendTime(fromCat, cat));
+    }
+    this.inert.apply(dt);
+    // foot locking only where feet are meant to stand: locomotion / guard / idle-like states
+    this.feet.update(dt, this.root, FOOT_LOCK && !want ? true : FOOT_LOCK && (cat === 'block' || cat === 'attack' || cat === 'taunt' || cat === 'carry'));
+    this.flinch.update(realDt, this.root);
+    this.phase.track();
   }
 }
 
