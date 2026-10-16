@@ -1,0 +1,773 @@
+[
+ {
+  "aggressor": "Shoulder_Throw_Aggressor",
+  "victim": "Shoulder_Throw_Victim",
+  "durA": 6.67,
+  "durV": 6.67,
+  "startA": [
+   2.21,
+   0.06,
+   -160
+  ],
+  "startV": [
+   -2.04,
+   -0.04,
+   33
+  ],
+  "startDist": 4.25,
+  "closest": {
+   "d": 0.09,
+   "t": 5.1,
+   "eff": "RightFoot"
+  },
+  "contacts": [
+   {
+    "t": 4.57,
+    "d": 0.25,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 4.83,
+    "d": 0.18,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 5.1,
+    "d": 0.09,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 5.57,
+    "d": 0.24,
+    "eff": "LeftFoot"
+   }
+  ],
+  "sharedFrame": true
+ },
+ {
+  "aggressor": "Hell_Slammer_A",
+  "victim": "Hell_Slammer_B",
+  "durA": 7.57,
+  "durV": 7.57,
+  "startA": [
+   1.07,
+   0.24,
+   -158
+  ],
+  "startV": [
+   -0.63,
+   -0.33,
+   -99
+  ],
+  "startDist": 1.79,
+  "closest": {
+   "d": 0.14,
+   "t": 3.57,
+   "eff": "LeftHand"
+  },
+  "contacts": [
+   {
+    "t": 1.4,
+    "d": 0.16,
+    "eff": "RightHand"
+   },
+   {
+    "t": 2,
+    "d": 0.23,
+    "eff": "RightHand"
+   },
+   {
+    "t": 2.27,
+    "d": 0.24,
+    "eff": "RightHand"
+   },
+   {
+    "t": 2.53,
+    "d": 0.21,
+    "eff": "RightHand"
+   },
+   {
+    "t": 2.8,
+    "d": 0.17,
+    "eff": "RightHand"
+   },
+   {
+    "t": 3.07,
+    "d": 0.18,
+    "eff": "RightHand"
+   },
+   {
+    "t": 3.33,
+    "d": 0.18,
+    "eff": "RightHand"
+   },
+   {
+    "t": 3.6,
+    "d": 0.18,
+    "eff": "LeftHand"
+   }
+  ],
+  "sharedFrame": true
+ },
+ {
+  "aggressor": "Rockin_Shackle_A",
+  "victim": "Rockin_Shackle_B",
+  "durA": 5,
+  "durV": 5,
+  "startA": [
+   -0.02,
+   0.78,
+   126
+  ],
+  "startV": [
+   0.03,
+   -0.82,
+   -39
+  ],
+  "startDist": 1.6,
+  "closest": {
+   "d": 0.23,
+   "t": 1.03,
+   "eff": "LeftHand"
+  },
+  "contacts": [
+   {
+    "t": 1,
+    "d": 0.24,
+    "eff": "LeftHand"
+   }
+  ],
+  "sharedFrame": true
+ },
+ {
+  "aggressor": "Brutal_Assassination_2",
+  "victim": "Brutal_Assassination",
+  "durA": 4.93,
+  "durV": 4.93,
+  "startA": [
+   0,
+   0,
+   -33
+  ],
+  "startV": [
+   0,
+   0,
+   -22
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.18,
+   "t": 0.63,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0.6,
+    "d": 0.21,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.008374014760817469,
+   "dx": -0.7,
+   "dz": 0.3,
+   "yaw": 345,
+   "contactD": -0.03,
+   "contactT": 3.4,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Stealth_Assassination_2",
+  "victim": "Stealth_Assassination",
+  "durA": 7,
+  "durV": 7,
+  "startA": [
+   0,
+   0,
+   -43
+  ],
+  "startV": [
+   0,
+   0,
+   -43
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.19,
+   "t": 6.4,
+   "eff": "RightFoot"
+  },
+  "contacts": [
+   {
+    "t": 5.6,
+    "d": 0.24,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 5.87,
+    "d": 0.22,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 6.13,
+    "d": 0.22,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 6.4,
+    "d": 0.19,
+    "eff": "RightFoot"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 1.07693040263257e-9,
+   "dx": -0.4,
+   "dz": 0.3,
+   "yaw": 0,
+   "contactD": -0.01,
+   "contactT": 6.07,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Double_Leg_Takedown_-_Attacker",
+  "victim": "Double_Leg_Takedown_-_Victim",
+  "durA": 7.23,
+  "durV": 7.23,
+  "startA": [
+   0,
+   0.01,
+   -36
+  ],
+  "startV": [
+   0,
+   0.01,
+   -21
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.24,
+   "t": 0.1,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0,
+    "d": 0.24,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.0008361395655151682,
+   "dx": 0.3,
+   "dz": 1,
+   "yaw": 345,
+   "contactD": -0.01,
+   "contactT": 0.8,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Double_Leg_Takedown_-_Attacker_2",
+  "victim": "Double_Leg_Takedown_-_Victim_2",
+  "durA": 3.5,
+  "durV": 3.5,
+  "startA": [
+   0,
+   0.01,
+   -36
+  ],
+  "startV": [
+   0,
+   0.01,
+   -20
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.24,
+   "t": 0,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0,
+    "d": 0.24,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.0022117126662833976,
+   "dx": 0.3,
+   "dz": 0.7,
+   "yaw": 345,
+   "contactD": -0.01,
+   "contactT": 0.4,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Fist_Fight_A",
+  "victim": "Fist_Fight_B",
+  "durA": 4.67,
+  "durV": 4.67,
+  "startA": [
+   0,
+   0,
+   -56
+  ],
+  "startV": [
+   0,
+   0,
+   -30
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.08,
+   "t": 2.63,
+   "eff": "LeftHand"
+  },
+  "contacts": [
+   {
+    "t": 0,
+    "d": 0.22,
+    "eff": "RightHand"
+   },
+   {
+    "t": 0.27,
+    "d": 0.19,
+    "eff": "RightHand"
+   },
+   {
+    "t": 0.53,
+    "d": 0.17,
+    "eff": "RightHand"
+   },
+   {
+    "t": 0.8,
+    "d": 0.14,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 1.07,
+    "d": 0.22,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 1.73,
+    "d": 0.21,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 2.6,
+    "d": 0.19,
+    "eff": "LeftHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.009168515835371585,
+   "dx": -0.4,
+   "dz": 0.3,
+   "yaw": 330,
+   "contactD": -0.04,
+   "contactT": 3.67,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Strangling",
+  "victim": "Being_Strangled",
+  "durA": 17.57,
+  "durV": 17.6,
+  "startA": [
+   0,
+   0,
+   -41
+  ],
+  "startV": [
+   0,
+   0,
+   2
+  ],
+  "startDist": 0.01,
+  "closest": {
+   "d": 0.17,
+   "t": 17.53,
+   "eff": "RightFoot"
+  },
+  "contacts": [
+   {
+    "t": 16.6,
+    "d": 0.23,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 16.87,
+    "d": 0.18,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 17.13,
+    "d": 0.17,
+    "eff": "RightFoot"
+   },
+   {
+    "t": 17.4,
+    "d": 0.17,
+    "eff": "RightFoot"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.005432265321284528,
+   "dx": 0.8,
+   "dz": 0.5,
+   "yaw": 315,
+   "contactD": -0.06,
+   "contactT": 16.93,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Taken_Hostage_-_Villain",
+  "victim": "Taken_Hostage_-_Victim",
+  "durA": 2.17,
+  "durV": 2.17,
+  "startA": [
+   0,
+   0,
+   -41
+  ],
+  "startV": [
+   0,
+   0,
+   -5
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.23,
+   "t": 0.03,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0,
+    "d": 0.24,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.011757686758766492,
+   "dx": -0.5,
+   "dz": 0.3,
+   "yaw": 330,
+   "contactD": -0.07,
+   "contactT": 0.47,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Release_Hostage_-_Villain",
+  "victim": "Release_Hostage_-_Hostage",
+  "durA": 3.07,
+  "durV": 3.07,
+  "startA": [
+   0,
+   0,
+   -26
+  ],
+  "startV": [
+   0,
+   -0.01,
+   -11
+  ],
+  "startDist": 0.01,
+  "closest": {
+   "d": 0.03,
+   "t": 1.17,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0.63,
+    "d": 0.24,
+    "eff": "RightHand"
+   },
+   {
+    "t": 0.9,
+    "d": 0.23,
+    "eff": "RightHand"
+   },
+   {
+    "t": 1.17,
+    "d": 0.03,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.00019999334856063596,
+   "dx": 0.3,
+   "dz": 0.3,
+   "yaw": 345,
+   "contactD": -0.04,
+   "contactT": 0.93,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Shaking_Hands_1",
+  "victim": "Shaking_Hands_2",
+  "durA": 4.37,
+  "durV": 4.37,
+  "startA": [
+   0,
+   0,
+   2
+  ],
+  "startV": [
+   0,
+   0,
+   4
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.21,
+   "t": 0.63,
+   "eff": "LeftHand"
+  },
+  "contacts": [
+   {
+    "t": 0.37,
+    "d": 0.25,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 0.63,
+    "d": 0.21,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 0.9,
+    "d": 0.25,
+    "eff": "LeftHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.005984603278858332,
+   "dx": -0.3,
+   "dz": 0.3,
+   "yaw": 0,
+   "contactD": 0,
+   "contactT": 2.8,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Spat_In_Face",
+  "victim": "Spit_Reaction",
+  "durA": 2.53,
+  "durV": 4.27,
+  "startA": [
+   0,
+   0,
+   6
+  ],
+  "startV": [
+   0,
+   0,
+   -8
+  ],
+  "startDist": 0.01,
+  "closest": {
+   "d": 0,
+   "t": 1.5,
+   "eff": "LeftHand"
+  },
+  "contacts": [
+   {
+    "t": 0.3,
+    "d": 0.18,
+    "eff": "RightHand"
+   },
+   {
+    "t": 0.57,
+    "d": 0.16,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 0.83,
+    "d": 0.17,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 1.1,
+    "d": 0.1,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 1.37,
+    "d": 0.04,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 1.63,
+    "d": 0.06,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 1.9,
+    "d": 0.09,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 2.17,
+    "d": 0.09,
+    "eff": "LeftHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.019894136454775998,
+   "dx": -0.4,
+   "dz": 0.3,
+   "yaw": 15,
+   "contactD": 0.01,
+   "contactT": 0.2,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Vampiric_Bite",
+  "victim": "Getting_Bit",
+  "durA": 3.03,
+  "durV": 4.07,
+  "startA": [
+   0.12,
+   0,
+   -62
+  ],
+  "startV": [
+   0,
+   -0.07,
+   13
+  ],
+  "startDist": 0.14,
+  "closest": {
+   "d": 0.06,
+   "t": 0,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0,
+    "d": 0.06,
+    "eff": "RightHand"
+   },
+   {
+    "t": 0.27,
+    "d": 0.11,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.0014866678421397714,
+   "dx": 0.8,
+   "dz": 0.3,
+   "yaw": 285,
+   "contactD": -0.1,
+   "contactT": 0.73,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Flying_Shoulder_Throw",
+  "victim": "Getting_Thrown",
+  "durA": 3.7,
+  "durV": 4.33,
+  "startA": [
+   0,
+   0.01,
+   17
+  ],
+  "startV": [
+   0,
+   0,
+   -57
+  ],
+  "startDist": 0.01,
+  "closest": {
+   "d": 0.4,
+   "t": 0,
+   "eff": "LeftHand"
+  },
+  "contacts": [],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.0036207092529593867,
+   "dx": 0.4,
+   "dz": 0.3,
+   "yaw": 75,
+   "contactD": -0.01,
+   "contactT": 0.13,
+   "pen": 0
+  }
+ },
+ {
+  "aggressor": "Grab_And_Slam",
+  "victim": "Getting_Thrown",
+  "durA": 4.27,
+  "durV": 4.33,
+  "startA": [
+   0,
+   0,
+   32
+  ],
+  "startV": [
+   0,
+   0,
+   -57
+  ],
+  "startDist": 0,
+  "closest": {
+   "d": 0.14,
+   "t": 0.5,
+   "eff": "RightHand"
+  },
+  "contacts": [
+   {
+    "t": 0,
+    "d": 0.18,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 0.27,
+    "d": 0.2,
+    "eff": "LeftHand"
+   },
+   {
+    "t": 0.53,
+    "d": 0.15,
+    "eff": "RightHand"
+   }
+  ],
+  "sharedFrame": false,
+  "solved": {
+   "score": 0.0024433008228091544,
+   "dx": -0.4,
+   "dz": 0.5,
+   "yaw": 90,
+   "contactD": -0.09,
+   "contactT": 0.73,
+   "pen": 0
+  }
+ }
+]
