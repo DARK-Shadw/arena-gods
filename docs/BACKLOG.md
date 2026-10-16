@@ -9,6 +9,7 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 
 ## 0. Vision and decisions (don't lose these)
 - **Concept:** spectator-first "gods watching AI gladiators". Players are gods: they bet on fighters and nudge fights with limited, risky powers (boost, heal, debuff). Browser game; players open the site and watch a live match with other gods. Win bets for EXP, god rank and currency that buys more influence. Inspired by Omniscient Reader. Fights must feel like a cinema; every match unique.
+- **Big vision (read `docs/vision.md`):** a living world of persistent champions with memory, rivalries, lineage/revenge heirs and an evolutionary "Judgement"; matches are real sims with visuals. Staged: persistent roster in browser, offline evolution of founders, then server/live room, then dynasties and narrative layer.
 - **Pillars:** the fight must be fun to watch (legibility, drama curve, personality); animation and characters must feel real; strong auto-director camera.
 - **Betting:** play currency only, never real money (gambling law). Earned by winning, never bought.
 - **Finishers/gore:** finishers are Mortal-Kombat-style. Gore setting off / stylised / full, DEFAULT = off (clean: dissolve/flash versions). Revisit when the user says otherwise.
