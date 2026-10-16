@@ -57,7 +57,7 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - Live room: scheduled matches on a server, shared viewing with other gods, spectator sync, replays for cold start, seasons/modifiers.
 - Backend: server runs the sim once and streams events; clients play back.
 - Replay/highlights: "play of the match", slow-mo replay, commentary.
-- UI/HUD polish, menus, announcer graphics, tutorial/onboarding.
+- UI/HUD polish, menus, announcer graphics, tutorial/onboarding. **UI TARGET LOOK:** `docs/concept-art/ui-select-screen.png` (dark-fantasy "THE ARENA" select screen: West/East gate fighter panels with portrait + name + epithet + move name, P1 red / P2 blue selection frames, Random buttons, arena theme cards with thumbnails and flavour lines, layout / arena seed / fight seed / skip entrances / gore controls, big "ENTER THE ARENA" button, gold serif title, ornate dark-metal frames, background = blurred arena art). Restyle the whole UI (select screen, HUD health bars, announcer, menus) to match. **TITLE / MENU BACKGROUND:** `docs/concept-art/title-bg-godsring.png` (gods in crowns watching the arena from a balcony: this is the game's core fantasy). The image shows the title "GODSRING" with tagline "Champions fight. Gods decide." (name not decided; ask the user whether to rename from Arena Gods). Needs: portraits for each fighter (render from models or use art), arena thumbnails, fonts (Cinzel-like serif display + readable body), frame/panel CSS or 9-slice art.
 - **Shareable demo** (hosted build) to get friends' feedback ASAP.
 
 ---
