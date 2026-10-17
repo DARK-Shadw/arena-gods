@@ -35,13 +35,13 @@ const FIGHTERS = ['gorak', 'aldric', 'ozrel', 'erika', 'vex', 'fenrik', 'maw', '
   }
   for (const [kind, gore, f, steps] of [
     ['bisect', 'full', 'aldric', 24],
-    ['bisect', 'stylised', 'gorak', 24],
-    ['behead', 'stylised', 'vex', 14],
+    ['bisect', 'standard', 'gorak', 24],
+    ['behead', 'standard', 'vex', 14],
     ['behead', 'off', 'vex', 20],
     ['burn', 'off', 'erika', 45],
     ['shatter', 'off', 'fenrik', 26],
     ['dissolve', 'off', 'ozrel', 22],
-    ['drain', 'stylised', 'hollowjack', 30],
+    ['drain', 'standard', 'hollowjack', 30],
   ]) {
     await pose(f);
     const shown = await page.evaluate(([k, g, s]) => window.__lab.fxDemo(k, g, s), [kind, gore, steps]);

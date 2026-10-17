@@ -12,7 +12,7 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - **Big vision (read `docs/vision.md`):** a living world of persistent champions with memory, rivalries, lineage/revenge heirs and an evolutionary "Judgement"; matches are real sims with visuals. Staged: persistent roster in browser, offline evolution of founders, then server/live room, then dynasties and narrative layer.
 - **Pillars:** the fight must be fun to watch (legibility, drama curve, personality); animation and characters must feel real; strong auto-director camera.
 - **Betting:** play currency only, never real money (gambling law). Earned by winning, never bought.
-- **Finishers/gore:** finishers are Mortal-Kombat-style. Gore setting off / stylised / full, DEFAULT = off (clean: dissolve/flash versions). Revisit when the user says otherwise.
+- **Finishers/gore:** finishers are Mortal-Kombat-style. Gore setting off / standard / full, DEFAULT = standard (ON: Elden-Ring-like blood, severing finishers shown). Owner decision 2026-10-17; supersedes the earlier "default off". One constant: `GORE_DEFAULT` in `src/render/fx/fxSettings.ts`; storage key `arena.gore.v2`; `off` stays selectable in the menu.
 - **Sim is authoritative and deterministic:** the same seed gives the same fight in Node and in the browser (custom `dmath`). Animation and cosmetics must never change sim results.
 - **Test with real people early.** The user has made 10+ demos nobody played; a shareable build and friend playtests are part of the plan.
 - **Tooling:** the user has Blender 5.0 installed (C:\Program Files\Blender Foundation\Blender 5.0), Piper and Chatterbox/OmniVoice/F5/Orpheus TTS in tts-lab, ffmpeg. The user prefers Opus for the heavy build work.
@@ -35,7 +35,7 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - Sim-chosen reaction, fall, get-up, death and dodge variety; launches and knockback.
   - Arena-aware entrances for all 8 fighters. The validator reports 638/638 clean on every theme × layout × gate.
   - 8 finishers (Rock'n Shackle replaced by Immolation). Paired contacts all within 0.12 m, using the contact warp and limb IK.
-  - Finisher FX: bisect, behead, burn, shatter, dissolve, drain. Gore setting off/stylised/full, default off.
+  - Finisher FX: bisect, behead, burn, shatter, dissolve, drain. Gore setting off/standard/full (standard was called stylised), default standard since 2026-10-17.
   - Camera: shot scoring with real line of sight, contact-aware re-picks, finisher track and cut-in, launch follow, killcam side choice, headless readability audit, `?t=` / B-key repro URLs.
 
 - **FX overhaul F0 (foundation)**, on branch `anim-plan`; details in `docs/milestones/F0/README.md`, API in `docs/fx-api.md`.
@@ -45,7 +45,7 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - The old `vfx` API is kept as a facade.
   - Shockwave, debris, arrow and projectile leaks fixed.
   - `npm run fx:check`; `tools/shots/fxprobe.cjs` measures before/after.
-  - Gore default unchanged (`off`).
+  - Gore default switched ON (`standard`) right after F0, on the owner's decision. Severing finishers now show by default; combat blood comes with F3.
 
 ## 2. IN PROGRESS
 - **Animation overhaul review:** the owner plays `anim-plan` and judges the feel, then it is merged to main. Repro URLs are in `docs/milestones/M4/README.md`.

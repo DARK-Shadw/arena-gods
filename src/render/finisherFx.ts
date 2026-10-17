@@ -14,9 +14,10 @@
  *  dissolve noise dissolve with a glowing edge (the clean version of the cuts)
  *  crush / impale  impact flash + dust (+ blood at full gore)
  *
- * GORE: 'off' (default) never renders blood or severing: cuts become a
- * dissolve-flash, blood becomes dust; 'stylised' severs with dark ink caps and
- * dark particles; 'full' uses red caps and blood.
+ * GORE (default 'standard', see fx/fxSettings.ts GORE_DEFAULT): 'off' never renders
+ * blood or severing (cuts become a dissolve-flash, blood becomes dust);
+ * 'standard' severs with dark-red caps and a short dark-blood spray; 'full' uses
+ * brighter red caps and heavy blood.
  */
 import * as THREE from 'three';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
@@ -26,7 +27,7 @@ import { goreLevel, type GoreLevel } from './fx/fxSettings';
 export type FinFx = 'crush' | 'drain' | 'behead' | 'bisect' | 'burn' | 'shatter' | 'impale' | 'dissolve';
 
 // the gore setting lives in fx/fxSettings.ts now (same key, same default 'off'); re-exported for old imports
-export { goreLevel, setGoreLevel, type GoreLevel } from './fx/fxSettings';
+export { goreLevel, setGoreLevel, GORE_DEFAULT, type GoreLevel } from './fx/fxSettings';
 
 /** what is actually shown for an effect at a gore level */
 export function resolveFx(fx: FinFx, gore: GoreLevel): FinFx {
@@ -35,8 +36,9 @@ export function resolveFx(fx: FinFx, gore: GoreLevel): FinFx {
   return fx;
 }
 
-const capColor = (gore: GoreLevel) => new THREE.Color(gore === 'full' ? '#5a0606' : '#16070c');
-const bloodColor = (gore: GoreLevel) => (gore === 'full' ? '#8a0a0a' : '#1a0d14');
+// standard: dark, wet blood (was ink-black under 'stylised'); full: brighter red
+const capColor = (gore: GoreLevel) => new THREE.Color(gore === 'full' ? '#5a0606' : '#3a0508');
+const bloodColor = (gore: GoreLevel) => (gore === 'full' ? '#8a0a0a' : '#4a0609');
 
 // ------------------------------------------------------------------ shader hooks
 interface FxUniforms {

@@ -35,7 +35,7 @@ This milestone does not restyle anything. The goal was the same effects on a fou
   - `debrisBurst` now uses one `InstancedMesh` with analytic bounces; before, it created a box geometry per piece and a material per burst and never disposed either.
   - `arrow` uses a pool.
   - Projectile meshes share one geometry and one material per kind; before, each projectile allocated new ones.
-- **Gore:** the code moved to `fxSettings.ts` and `finisherFx` re-exports it. **The default is still `off` and the key is unchanged.**
+- **Gore:** the code moved to `fxSettings.ts` and `finisherFx` re-exports it. The default was still `off` at F0. **Update (2026-10-17): the owner confirmed gore ON; the default is now `standard` (`GORE_DEFAULT`), key `arena.gore.v2`.**
 - **Fixed in passing:**
   - Dust ignored its height, so the chandelier and gate-top dust spawned on the floor.
   - Particle size was in pixels, so particles shrank on HiDPI and 4K screens. Size is now in world units, calibrated to look the same as before on a 1080 px framebuffer.

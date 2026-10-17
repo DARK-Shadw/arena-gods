@@ -73,7 +73,7 @@ Reproduce a finisher (`t` = a little before it starts):
 | Into the Fire | `/?auto=1&a=gorak&b=erika&seed=15889&theme=sakura&layout=gauntlet&aseed=856741&t=75` |
 | Immolation | `/?auto=1&a=ozrel&b=gorak&seed=8181&theme=colosseum&layout=cross&aseed=514322&t=61` |
 
-Add `&gore=full` or `&gore=stylised` to see the gore versions.
+Gore now defaults to `standard` (severing shown; 2026-10-17). Add `&gore=off` to see the clean versions these sheets were judged with, or `&gore=full`.
 
 ## Camera readability (`camera-audit.json`, 8 matches, headless)
 The director's cosmetic randomness is now seeded per match during audits, so A/B runs are comparable (within about ±0.3%).

@@ -12,7 +12,7 @@ The FX foundation lives in `src/render/fx/`. Import everything from `src/render/
 | `particles.ts` | `GpuParticles`: stateless instanced-quad particles (closed-form drag + gravity in the vertex shader). |
 | `fxRng.ts` | `FxRng` (seeded stream), `hash1 / hashN / hashStr`, `spawnSeed`. |
 | `fxClock.ts` | `FxClock`: FX time `t` and the impact-light clock `light`. |
-| `fxSettings.ts` | Quality tier (`fxSettings.setQuality`, `TIER_CAPS`) and the gore level (`goreLevel`, `setGoreLevel`; default still `off`). |
+| `fxSettings.ts` | Quality tier (`fxSettings.setQuality`, `TIER_CAPS`) and the gore level (`goreLevel`, `setGoreLevel`, `parseGore`; default `GORE_DEFAULT = 'standard'`, key `arena.gore.v2`, `?gore=off|standard|full`, `stylised` = alias of `standard`). |
 | `profiler.ts` | `fxProfiler`: CPU ms of `frame()` and `update()` (EMA + max). The time source is injected by the game. |
 
 ## Standalone director (FX Lab, tests)

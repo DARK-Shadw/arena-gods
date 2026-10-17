@@ -12,7 +12,7 @@ Three.js + Vite + TypeScript. Run from this directory.
 
 ## Hard rules
 - The sim (`src/sim/*`) is authoritative and deterministic: same seed gives the same fight in Node and in the browser (custom `dmath`). Animation, camera, FX and audio must never change sim results. After touching `src/sim`, run `npm run sim:test -- 40` and check win rates 45-55%, 0 timeouts, 0 kills without contact, determinism OK.
-- Betting is play currency only, never real money. Finishers: gore setting defaults to OFF (clean).
+- Betting is play currency only, never real money. Gore defaults ON at `standard` (Elden-Ring-like blood, severing finishers shown; owner decision 2026-10-17, supersedes the earlier "off by default"); `off` (clean) and `full` stay selectable in the menu. The default is the single constant `GORE_DEFAULT` in `src/render/fx/fxSettings.ts`.
 - Branches: `main` is the stable line; feature work goes on branches (current: `anim-plan`). Do not push to `main` without being asked.
 
 ## Layout

@@ -84,7 +84,7 @@ export interface FxDef {
   /** post kicks the game applies this frame (max with what is already running) */
   post?: { aberration?: number; flash?: number };
   /** id substitution by gore level (blood rows from F3 on). null = nothing at that level */
-  gore?: { off?: string | null; stylised?: string | null; full?: string | null };
+  gore?: { off?: string | null; standard?: string | null; full?: string | null };
   /** budget culling order (higher survives); unused until the F3 budget */
   priority: number;
   /** camera shake amplitude, read by the camera director once plan §3.6 is agreed; ignored now */

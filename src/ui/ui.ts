@@ -6,7 +6,7 @@
 import { FIGHTERS } from '../sim/fighters';
 import { LAYOUTS, THEMES, type LayoutId, type ThemeId } from '../sim/arenaGen';
 import { THEME_DEFS } from '../render/arena/themes';
-import { goreLevel, setGoreLevel, type GoreLevel } from '../render/finisherFx';
+import { goreLevel, setGoreLevel, GORE_LEVELS, type GoreLevel } from '../render/fx/fxSettings';
 import type { FighterDef, Frame, MatchResult } from '../sim/types';
 
 const $ = <T extends HTMLElement = HTMLElement>(html: string): T => {
@@ -248,7 +248,7 @@ export class UI {
           <label>Fight seed <input class="seed" type="number" value="${initial.seed}"></label>
           <button class="reseed">🎲</button>
           <label class="chk"><input class="skip" type="checkbox" ${initial.skipIntro ? 'checked' : ''}> Skip entrances</label>
-          <label>Gore <select class="gore">${(['off', 'stylised', 'full'] as const).map((g) => `<option value="${g}" ${goreLevel() === g ? 'selected' : ''}>${g === 'off' ? 'Off (clean)' : g === 'stylised' ? 'Stylised' : 'Full'}</option>`).join('')}</select></label>
+          <label>Gore <select class="gore">${GORE_LEVELS.map((g) => `<option value="${g}" ${goreLevel() === g ? 'selected' : ''}>${g === 'off' ? 'Off (clean)' : g === 'standard' ? 'Standard' : 'Full'}</option>`).join('')}</select></label>
         </div>
         <button class="go">ENTER THE ARENA</button>
         <button class="audio-btn">Audio settings (V)</button>
@@ -267,6 +267,8 @@ export class UI {
       }),
     );
     const aseedIn = this.menu.querySelector<HTMLInputElement>('.aseed')!;
+    // gore is saved only when the user changes it (the old menu saved it on every submit)
+    this.menu.querySelector<HTMLSelectElement>('.gore')!.addEventListener('change', (e) => setGoreLevel((e.target as HTMLSelectElement).value as GoreLevel));
     this.menu.querySelector('.rearena')!.addEventListener('click', () => (aseedIn.value = String(Math.floor(Math.random() * 1e6))));
     sync();
     this.menu.querySelectorAll<HTMLButtonElement>('.fcard').forEach((el) =>
@@ -295,7 +297,7 @@ export class UI {
         seed: Number(seedIn.value) || 1,
         skipIntro: this.menu.querySelector<HTMLInputElement>('.skip')!.checked,
         arena: { theme, layout: this.menu.querySelector<HTMLSelectElement>('.layout')!.value as LayoutId | 'random', seed: Number(aseedIn.value) || 1 },
-        gore: (setGoreLevel(this.menu.querySelector<HTMLSelectElement>('.gore')!.value as GoreLevel), undefined),
+        gore: undefined, // saved by the select's change listener (only when the user changes it)
       });
     });
     this.menu.classList.remove('hidden');

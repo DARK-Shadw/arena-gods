@@ -35,7 +35,7 @@ Status: PLAN. Nothing in it is implemented yet. It was written on 2026-10-17 on 
    - status effects (F6);
    - cinematic beats and post (F7);
    - the spell-FX foundation for the later magic overhaul (F8).
-4. **Blood** is planned at Elden Ring level and ON by default. It is controlled by one gore setting, `off / standard / full`. The finisher default changes from `off` to `standard`. **The owner must confirm this** (see §3.7 and §6).
+4. **Blood** is planned at Elden Ring level and ON by default. It is controlled by one gore setting, `off / standard / full`. The finisher default changes from `off` to `standard`. **Confirmed by the owner on 2026-10-17 and implemented** (see §3.7).
 5. **Budget on the Intel Arc iGPU:**
    - at most 2.0 ms GPU and 0.6 ms CPU for FX in typical combat on high;
    - peaks up to 3.5 ms during an explosion or ultimate;
@@ -344,12 +344,12 @@ The lookup order is `(fighter,move)` → `move` → `fx tag` → `kind` + `weapo
 - `ui.ts:251` renders the select. `ui.ts:298` **writes the select value to localStorage on every menu submit**, so every tester who has opened the menu has `'off'` stored. Changing the code default alone would not reach them.
 - `CLAUDE.md` and `docs/BACKLOG.md` §0 both say "defaults to OFF".
 
-**Proposal** (owner to confirm; see §6):
+**Decision (owner, 2026-10-17): gore defaults ON at `standard`.** This supersedes the earlier "off by default" decision. Implemented after F0: `GORE_DEFAULT` in `fxSettings.ts`, new key `arena.gore.v2`, `?gore=stylised` alias, menu writes on change only. Combat blood (sprays, decals, wounds) arrives with F3; until then `standard` changes the finishers only.
 
 | Level | Combat blood (sprays, floor splatter, pools, weapon blood, wounds) | Finishers |
 |---|---|---|
 | `off` | none: dust, fibre and dark mist instead | dissolve versions (as today) |
-| `standard` (**proposed default**) | Elden-Ring-like: sprays on cuts, splatter decals, pooling under the downed and dead, blood on blades and claws, wounds on bodies | severing finishers show, with dark-red caps and a short spray. This is today's `stylised`, recoloured from ink to blood. |
+| `standard` (**default**) | Elden-Ring-like: sprays on cuts, splatter decals, pooling under the downed and dead, blood on blades and claws, wounds on bodies | severing finishers show, with dark-red caps and a short spray. This is today's `stylised`, recoloured from ink to blood. |
 | `full` | as standard, with more volume (more droplets, larger pools, longer drips) | today's `full` (red caps, heavy blood) |
 
 **Where to change it:**
@@ -357,7 +357,7 @@ The lookup order is `(fighter,move)` → `move` → `fx tag` → `kind` + `weapo
 2. Map `'stylised'` to `'standard'`, keeping `?gore=stylised` as an alias.
 3. Use a **new storage key** `arena.gore.v2`, so old forced-`off` values do not mask the new default. The old key is ignored.
 4. `ui.ts` changes the option labels (`Off (clean) / Standard / Full`) and writes only when the user changes the select, not on every submit.
-5. Update the doc lines: `CLAUDE.md` ("Finishers: gore setting defaults to OFF") and `docs/BACKLOG.md` §0. These are doc edits that need the owner's yes.
+5. Update the doc lines: `CLAUDE.md` and `docs/BACKLOG.md` §0 (done).
 
 Every FX def that shows blood declares `gore: {off: <substitute id>}`. Hollowjack never bleeds (pumpkin pulp at every level).
 
@@ -563,7 +563,7 @@ Effort is in agent-days. **"Seq"** marks a milestone that must run after the pre
 
 **Questions for the owner (only these need an answer):**
 
-1. **Gore default.** Proposal:
+1. **Gore default.** ANSWERED (2026-10-17): yes, ON at `standard` with severing shown; implemented. The original proposal:
    - blood at the "standard" (Elden-Ring-like) level is ON by default;
    - finisher severing is shown at standard, with dark-red caps;
    - the stored setting resets once (new storage key), so everyone sees the new default;

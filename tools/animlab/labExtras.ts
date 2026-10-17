@@ -9,6 +9,7 @@ import { SCENES } from '../../src/sim/scenes.gen';
 import { buildLibClip } from '../../src/render/animLib';
 import { FinisherFx, headSplitStats, type FinFx, type GoreLevel } from '../../src/render/finisherFx';
 import { VFX } from '../../src/render/vfx';
+import { parseGore } from '../../src/render/fx/fxSettings';
 
 interface LabApi {
   actors: ({ model: THREE.Object3D; root: THREE.Group; mixer: THREE.AnimationMixer; action: THREE.AnimationAction | null; dur: number; hipsCm: number; hipsM: number; base: THREE.Vector3; clipName: string; decoded: unknown; fid: string } | null)[];
@@ -39,7 +40,7 @@ export function attachLab(api: LabApi & { scene: THREE.Scene; renderer: THREE.We
   api.fxDemo = async (kind, gore, steps) => {
     api.fxReset!();
     fx = new FinisherFx(api.scene, vfx);
-    fx.gore = gore;
+    fx.gore = parseGore(gore) ?? gore; // 'stylised' is the old name of 'standard'
     const A = api.actors[0]!;
     A.root.updateMatrixWorld(true);
     const box = new THREE.Box3().setFromObject(A.model);

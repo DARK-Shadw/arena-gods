@@ -1,29 +1,44 @@
 /**
  * FX settings: quality tier and gore level (single source of truth).
  *
- * Gore: the code lives here now (finisherFx re-exports it unchanged). The
- * DEFAULT IS STILL 'off' and the storage key is unchanged: changing the default
- * (plan §3.7: 'standard' + a new key) waits for the owner's decision.
+ * Gore (plan §3.7, confirmed by the owner 2026-10-17): DEFAULT ON at
+ * 'standard' (Elden-Ring-like: severing finishers shown with dark-red caps,
+ * combat blood from F3). 'off' = clean (dissolve versions), 'full' = more blood.
+ * The default is the single constant GORE_DEFAULT below. The storage key is new
+ * ('arena.gore.v2') so an 'off' that the old menu saved on every submit cannot
+ * mask the default; the old key 'arena.gore' is ignored.
+ * 'stylised' (the old name of 'standard') is accepted as an alias in URLs.
  */
 
-export type GoreLevel = 'off' | 'stylised' | 'full';
+export type GoreLevel = 'off' | 'standard' | 'full';
 export type FxQuality = 0 | 1 | 2;
 
-const GORE_KEY = 'arena.gore';
+/** THE gore default (one place). */
+export const GORE_DEFAULT: GoreLevel = 'standard';
+export const GORE_LEVELS: readonly GoreLevel[] = ['off', 'standard', 'full'];
+const GORE_KEY = 'arena.gore.v2';
 
+/** parse a gore value ('stylised' is the legacy alias of 'standard'); undefined if invalid */
+export function parseGore(v: string | null | undefined): GoreLevel | undefined {
+  if (v === 'stylised') return 'standard';
+  return v === 'off' || v === 'standard' || v === 'full' ? v : undefined;
+}
+
+/** ?gore= in the URL, else the saved choice, else GORE_DEFAULT */
 export function goreLevel(): GoreLevel {
   try {
-    const q = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('gore') : null;
-    if (q === 'off' || q === 'stylised' || q === 'full') return q;
-    const v = typeof localStorage !== 'undefined' ? localStorage.getItem(GORE_KEY) : null;
-    if (v === 'off' || v === 'stylised' || v === 'full') return v;
+    const q = typeof location !== 'undefined' ? parseGore(new URLSearchParams(location.search).get('gore')) : undefined;
+    if (q) return q;
+    const v = typeof localStorage !== 'undefined' ? parseGore(localStorage.getItem(GORE_KEY)) : undefined;
+    if (v) return v;
   } catch {
     /* storage blocked */
   }
-  return 'off';
+  return GORE_DEFAULT;
 }
 
 export function setGoreLevel(g: GoreLevel) {
+  g = parseGore(g) ?? GORE_DEFAULT;
   try {
     localStorage.setItem(GORE_KEY, g);
   } catch {
