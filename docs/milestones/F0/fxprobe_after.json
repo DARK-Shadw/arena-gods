@@ -1,0 +1,463 @@
+{
+ "w": 1920,
+ "h": 1080,
+ "fights": [
+  {
+   "tag": "gorak-erika#4242_colosseum",
+   "moments": [
+    [
+     "heavy_hit",
+     7.22
+    ],
+    [
+     "parry",
+     47.95
+    ],
+    [
+     "ultimate",
+     40.05
+    ],
+    [
+     "knockdown",
+     10.8
+    ]
+   ],
+   "bench20": {
+    "avg": 65.57,
+    "p95": 127.4,
+    "calls": 313,
+    "tris": 724932
+   },
+   "benchHit": {
+    "avg": 60.52,
+    "p95": 100.2,
+    "calls": 414,
+    "tris": 778214
+   },
+   "fxCpu": {
+    "msPerFrame": 0.0497,
+    "p95": 0.2,
+    "maxAdd": 62,
+    "maxAlpha": 39
+   },
+   "idleUpdateMs": 0.0008,
+   "seekSameSession": [
+    {
+     "k": "heavy_hit",
+     "t": 7.22,
+     "n": {
+      "add": 54,
+      "alpha": 10,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": true,
+     "s1": "3a181c9b",
+     "s2": "3a181c9b"
+    },
+    {
+     "k": "parry",
+     "t": 47.95,
+     "n": {
+      "add": 109,
+      "alpha": 0,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "7b6e8b35",
+     "s2": "6b541f11"
+    },
+    {
+     "k": "ultimate",
+     "t": 40.05,
+     "n": {
+      "add": 113,
+      "alpha": 0,
+      "rings": 1,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": true,
+     "s1": "44a43595",
+     "s2": "44a43595"
+    },
+    {
+     "k": "knockdown",
+     "t": 10.8,
+     "n": {
+      "add": 57,
+      "alpha": 10,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": true,
+     "s1": "3f2c1e3c",
+     "s2": "3f2c1e3c"
+    }
+   ],
+   "leak": {
+    "before": {
+     "geometries": 212,
+     "textures": 108,
+     "programs": 50,
+     "groupChildren": 36,
+     "heapMB": 93.3
+    },
+    "after": {
+     "geometries": 214,
+     "textures": 108,
+     "programs": 53,
+     "groupChildren": 36,
+     "heapMB": 117.9
+    }
+   },
+   "seekFreshLoad": {
+    "fresh": [
+     {
+      "id": "4:a3675b65",
+      "st": "3a181c9b",
+      "n": {
+       "add": 54,
+       "alpha": 10,
+       "rings": 0,
+       "debris": 0
+      }
+     },
+     {
+      "id": "4:a3675b65",
+      "st": "3a181c9b",
+      "n": {
+       "add": 54,
+       "alpha": 10,
+       "rings": 0,
+       "debris": 0
+      }
+     }
+    ],
+    "idEqual": true,
+    "stateEqual": true
+   }
+  },
+  {
+   "tag": "ozrel-maw#77_forge",
+   "moments": [
+    [
+     "heavy_hit",
+     8.32
+    ],
+    [
+     "block",
+     23.67
+    ],
+    [
+     "ultimate",
+     31.92
+    ],
+    [
+     "explosion",
+     51.52
+    ],
+    [
+     "knockdown",
+     8.32
+    ]
+   ],
+   "bench20": {
+    "avg": 48.59,
+    "p95": 92.5,
+    "calls": 110,
+    "tris": 264890
+   },
+   "benchHit": {
+    "avg": 59.67,
+    "p95": 147.8,
+    "calls": 149,
+    "tris": 290644
+   },
+   "fxCpu": {
+    "msPerFrame": 0.0417,
+    "p95": 0.1,
+    "maxAdd": 88,
+    "maxAlpha": 58
+   },
+   "idleUpdateMs": 0.0033,
+   "seekSameSession": [
+    {
+     "k": "heavy_hit",
+     "t": 8.32,
+     "n": {
+      "add": 0,
+      "alpha": 5,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": true,
+     "s1": "bfa01912",
+     "s2": "bfa01912"
+    },
+    {
+     "k": "block",
+     "t": 23.67,
+     "n": {
+      "add": 87,
+      "alpha": 0,
+      "rings": 1,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "297f51e9",
+     "s2": "c2e1ccb1"
+    },
+    {
+     "k": "ultimate",
+     "t": 31.92,
+     "n": {
+      "add": 94,
+      "alpha": 0,
+      "rings": 1,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": true,
+     "s1": "250020da",
+     "s2": "250020da"
+    },
+    {
+     "k": "explosion",
+     "t": 51.52,
+     "n": {
+      "add": 150,
+      "alpha": 34,
+      "rings": 2,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": true,
+     "s1": "52e3892a",
+     "s2": "52e3892a"
+    },
+    {
+     "k": "knockdown",
+     "t": 8.32,
+     "n": {
+      "add": 0,
+      "alpha": 5,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": false,
+     "stateEqual": false,
+     "s1": "bfa01912",
+     "s2": "23e5f495"
+    }
+   ],
+   "leak": {
+    "before": {
+     "geometries": 103,
+     "textures": 58,
+     "programs": 49,
+     "groupChildren": 36,
+     "heapMB": 96.2
+    },
+    "after": {
+     "geometries": 103,
+     "textures": 58,
+     "programs": 52,
+     "groupChildren": 36,
+     "heapMB": 83.8
+    }
+   },
+   "seekFreshLoad": {
+    "fresh": [
+     {
+      "id": "4:1bd9d918",
+      "st": "23e5f495",
+      "n": {
+       "add": 42,
+       "alpha": 50,
+       "rings": 1,
+       "debris": 0
+      }
+     },
+     {
+      "id": "4:1bd9d918",
+      "st": "23e5f495",
+      "n": {
+       "add": 42,
+       "alpha": 50,
+       "rings": 1,
+       "debris": 0
+      }
+     }
+    ],
+    "idEqual": true,
+    "stateEqual": true
+   }
+  },
+  {
+   "tag": "aldric-vex#1234_glacier",
+   "moments": [
+    [
+     "heavy_hit",
+     9.42
+    ],
+    [
+     "block",
+     6.14
+    ],
+    [
+     "parry",
+     8.69
+    ],
+    [
+     "ultimate",
+     52.24
+    ],
+    [
+     "knockdown",
+     9.42
+    ]
+   ],
+   "bench20": {
+    "avg": 53.8,
+    "p95": 91,
+    "calls": 982,
+    "tris": 258892
+   },
+   "benchHit": {
+    "avg": 78.53,
+    "p95": 120.2,
+    "calls": 967,
+    "tris": 261778
+   },
+   "fxCpu": {
+    "msPerFrame": 0.0508,
+    "p95": 0.2,
+    "maxAdd": 52,
+    "maxAlpha": 51
+   },
+   "idleUpdateMs": 0.0007,
+   "seekSameSession": [
+    {
+     "k": "heavy_hit",
+     "t": 9.42,
+     "n": {
+      "add": 41,
+      "alpha": 0,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "1211ee95",
+     "s2": "c1a9395f"
+    },
+    {
+     "k": "block",
+     "t": 6.14,
+     "n": {
+      "add": 27,
+      "alpha": 37,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "dc569b6f",
+     "s2": "2c7b9195"
+    },
+    {
+     "k": "parry",
+     "t": 8.69,
+     "n": {
+      "add": 52,
+      "alpha": 8,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "496434bc",
+     "s2": "c431370"
+    },
+    {
+     "k": "ultimate",
+     "t": 52.24,
+     "n": {
+      "add": 52,
+      "alpha": 8,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "8019046e",
+     "s2": "90ad7742"
+    },
+    {
+     "k": "knockdown",
+     "t": 9.42,
+     "n": {
+      "add": 41,
+      "alpha": 0,
+      "rings": 0,
+      "debris": 0
+     },
+     "idEqual": true,
+     "stateEqual": false,
+     "s1": "3f691ffb",
+     "s2": "e3b5461e"
+    }
+   ],
+   "leak": {
+    "before": {
+     "geometries": 282,
+     "textures": 254,
+     "programs": 49,
+     "groupChildren": 36,
+     "heapMB": 107.6
+    },
+    "after": {
+     "geometries": 282,
+     "textures": 254,
+     "programs": 52,
+     "groupChildren": 36,
+     "heapMB": 113.6
+    }
+   },
+   "seekFreshLoad": {
+    "fresh": [
+     {
+      "id": "1:abbe06bb",
+      "st": "f8da7c62",
+      "n": {
+       "add": 41,
+       "alpha": 0,
+       "rings": 0,
+       "debris": 0
+      }
+     },
+     {
+      "id": "1:abbe06bb",
+      "st": "f8da7c62",
+      "n": {
+       "add": 41,
+       "alpha": 0,
+       "rings": 0,
+       "debris": 0
+      }
+     }
+    ],
+    "idEqual": true,
+    "stateEqual": true
+   }
+  }
+ ],
+ "logs": []
+}

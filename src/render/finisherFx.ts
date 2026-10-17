@@ -21,29 +21,12 @@
 import * as THREE from 'three';
 import * as SkeletonUtils from 'three/examples/jsm/utils/SkeletonUtils.js';
 import type { VFX } from './vfx';
+import { goreLevel, type GoreLevel } from './fx/fxSettings';
 
-export type GoreLevel = 'off' | 'stylised' | 'full';
 export type FinFx = 'crush' | 'drain' | 'behead' | 'bisect' | 'burn' | 'shatter' | 'impale' | 'dissolve';
 
-const KEY = 'arena.gore';
-export function goreLevel(): GoreLevel {
-  try {
-    const q = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('gore') : null;
-    if (q === 'off' || q === 'stylised' || q === 'full') return q;
-    const v = localStorage.getItem(KEY);
-    if (v === 'off' || v === 'stylised' || v === 'full') return v;
-  } catch {
-    /* storage blocked */
-  }
-  return 'off';
-}
-export function setGoreLevel(g: GoreLevel) {
-  try {
-    localStorage.setItem(KEY, g);
-  } catch {
-    /* storage blocked */
-  }
-}
+// the gore setting lives in fx/fxSettings.ts now (same key, same default 'off'); re-exported for old imports
+export { goreLevel, setGoreLevel, type GoreLevel } from './fx/fxSettings';
 
 /** what is actually shown for an effect at a gore level */
 export function resolveFx(fx: FinFx, gore: GoreLevel): FinFx {
@@ -310,7 +293,7 @@ export class FinisherFx {
       t += dt;
       const k = Math.min(1.05, t / dur);
       for (const u of U) u.uDissolve.value = k;
-      if (Math.random() < 0.6) this.vfx.embers(new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3()), 2, '#ffd9a0', 0.8);
+      if (this.vfx.rand() < 0.6) this.vfx.embers(new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3()), 2, '#ffd9a0', 0.8);
       return t < dur + 0.2;
     });
   }
@@ -329,9 +312,9 @@ export class FinisherFx {
         u.uDissolve.value = Math.max(0, (k - 0.65) / 0.35);
       }
       const c = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3());
-      if (Math.random() < 0.9) this.vfx.fire(c.clone().add(new THREE.Vector3((Math.random() - 0.5) * 0.6, (Math.random() - 0.3) * 1.2, (Math.random() - 0.5) * 0.6)), new THREE.Vector3(0, 1.6, 0), 1, 0.35, 0.4);
-      if (Math.random() < 0.7) this.vfx.embers(c, 3, '#ff9a40', 1.0);
-      if (k > 0.6 && Math.random() < 0.5) this.vfx.smoke(c.clone().setY(0.3), 1, '#1a1410', 1.2, 0.8);
+      if (this.vfx.rand() < 0.9) this.vfx.fire(c.clone().add(new THREE.Vector3((this.vfx.rand() - 0.5) * 0.6, (this.vfx.rand() - 0.3) * 1.2, (this.vfx.rand() - 0.5) * 0.6)), new THREE.Vector3(0, 1.6, 0), 1, 0.35, 0.4);
+      if (this.vfx.rand() < 0.7) this.vfx.embers(c, 3, '#ff9a40', 1.0);
+      if (k > 0.6 && this.vfx.rand() < 0.5) this.vfx.smoke(c.clone().setY(0.3), 1, '#1a1410', 1.2, 0.8);
       return t < dur + 0.3;
     });
   }
@@ -344,10 +327,10 @@ export class FinisherFx {
       t += dt;
       for (const u of U) u.uDrain.value = Math.min(1, t / 1.4);
       const c = new THREE.Box3().setFromObject(root).getCenter(new THREE.Vector3());
-      if (attacker && Math.random() < 0.8) {
+      if (attacker && this.vfx.rand() < 0.8) {
         const a = new THREE.Box3().setFromObject(attacker).getCenter(new THREE.Vector3());
         this.vfx.smoke(c, 1, this.gore === 'full' ? '#5a0a10' : '#2a1838', 0.4, 0.5);
-        this.vfx.embers(c.clone().lerp(a, Math.random()), 1, this.gore === 'full' ? '#a01020' : '#b080ff', 0.4);
+        this.vfx.embers(c.clone().lerp(a, this.vfx.rand()), 1, this.gore === 'full' ? '#a01020' : '#b080ff', 0.4);
       }
       return t < 2.0;
     });
@@ -389,7 +372,7 @@ export class FinisherFx {
             const mesh = new THREE.Mesh(cg, iceMat);
             mesh.position.copy(c);
             mesh.castShadow = true;
-            this.add(mesh, c.clone().sub(at).setY(0).normalize().multiplyScalar(1.5 + Math.random() * 3).add(new THREE.Vector3(0, 1 + Math.random() * 2.5, 0)), 3.5);
+            this.add(mesh, c.clone().sub(at).setY(0).normalize().multiplyScalar(1.5 + this.vfx.rand() * 3).add(new THREE.Vector3(0, 1 + this.vfx.rand() * 2.5, 0)), 3.5);
           }
           g.dispose();
         }
@@ -463,7 +446,7 @@ export class FinisherFx {
       let t = 0;
       this.tasks.push((dt) => {
         t += dt;
-        if (Math.random() < 0.7) this.vfx.sparks(at.clone().setY(at.y - 0.25), 3, '#7a0808', 2);
+        if (this.vfx.rand() < 0.7) this.vfx.sparks(at.clone().setY(at.y - 0.25), 3, '#7a0808', 2);
         return t < 1.2;
       });
     } else this.vfx.sparks(at, 40, '#2a1420', 5);
@@ -552,7 +535,7 @@ export class FinisherFx {
       holder.matrixWorldNeedsUpdate = true;
       // the clipping plane travels with the half
       keepB.copy(plane).applyMatrix4(M);
-      if (this.gore === 'full' && t < 1.2 && Math.random() < 0.6) this.vfx.sparks(pivot, 3, '#7a0808', 2);
+      if (this.gore === 'full' && t < 1.2 && this.vfx.rand() < 0.6) this.vfx.sparks(pivot, 3, '#7a0808', 2);
       return t < 1.6;
     });
     if (this.gore !== 'off') this.vfx.sparks(pivot, 50, bloodColor(this.gore), 6);
@@ -562,7 +545,7 @@ export class FinisherFx {
   private add(obj: THREE.Object3D, vel: THREE.Vector3, life: number) {
     this.scene.add(obj);
     this.temp.push(obj);
-    this.pieces.push({ obj, vel, spin: new THREE.Vector3((Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8, (Math.random() - 0.5) * 8), life });
+    this.pieces.push({ obj, vel, spin: new THREE.Vector3((this.vfx.rand() - 0.5) * 8, (this.vfx.rand() - 0.5) * 8, (this.vfx.rand() - 0.5) * 8), life });
   }
 
   update(dt: number) {

@@ -38,6 +38,15 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - Finisher FX: bisect, behead, burn, shatter, dissolve, drain. Gore setting off/stylised/full, default off.
   - Camera: shot scoring with real line of sight, contact-aware re-picks, finisher track and cut-in, launch follow, killcam side choice, headless readability audit, `?t=` / B-key repro URLs.
 
+- **FX overhaul F0 (foundation)**, on branch `anim-plan`; details in `docs/milestones/F0/README.md`, API in `docs/fx-api.md`.
+  - FX director fed by the sim event stream, with effects as data (`src/render/fx/fxDefs.ts`, 57 defs).
+  - Stateless GPU particles: reproducible from (seed, time), scrubbable, and a `?t=` load gives an identical FX state.
+  - Seeded randomness, with no `Math.random`, `setTimeout` or `performance.now` on FX paths.
+  - The old `vfx` API is kept as a facade.
+  - Shockwave, debris, arrow and projectile leaks fixed.
+  - `npm run fx:check`; `tools/shots/fxprobe.cjs` measures before/after.
+  - Gore default unchanged (`off`).
+
 ## 2. IN PROGRESS
 - **Animation overhaul review:** the owner plays `anim-plan` and judges the feel, then it is merged to main. Repro URLs are in `docs/milestones/M4/README.md`.
 - **Voice cloning** (`tts-final/`): 68 of 227 lines generated. Resume (run in a normal terminal, ~2.5-3.5 h):
@@ -98,6 +107,11 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - Arenas: 3-6 s build time at load (CPU texture gen); some textures leak when switching themes; `window.__THREE` exposed for debugging; discrete-GPU frame rates unverified (iGPU 13.5-19.5 ms/frame at high).
 - Audio: footsteps busy with fast fighters; Erika's pain grunts are pitched male grunts; Hove Base Metal/Wood files identical; synth fire/crowd/stingers still synthesized; nobody has listened to the new TTS yet; announcer lines failing ASR.
 - Sim: ring of fire reaches fighters in ~77% of matches. Sudden death now escalates (×1.5, +0.25/s after 100 s) to remove the last two time-outs (grindy Vex/Aldric).
+- FX (after F0):
+  - `fx.seek` rebuilds only the 1.5 s warm-up window. Smoke, ember and debris tails that started earlier are missing after a `?t=` jump; true replay comes with F3.
+  - Falling particles rest on the floor instead of bouncing.
+  - Trails are still frame-rate dependent (F3 ribbons).
+  - FX tier counts are not scaled yet.
 - Process: the machine has had low-memory kills (dev server killed 3x); keep heavy jobs sequential; Claude Code reaps background jobs under memory pressure (or start with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`).
 
 ---

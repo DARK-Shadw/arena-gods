@@ -17,7 +17,8 @@ import { solids as camSolids, rayProxies } from './camera/cameraAudit';
 import { buildReveal } from './cinematic/reveal';
 import { FighterView } from './render/fighterView';
 import { loadCharacter } from './render/character';
-import { VFX } from './render/vfx';
+import type { VFX } from './render/vfx';
+import { FxDirector, fxProfiler, fxSettings, type FxWorld } from './render/fx';
 import { Post } from './render/post';
 import { Playback } from './render/playback';
 import { CameraRig } from './camera/cameraRig';
@@ -51,7 +52,9 @@ class App {
   quality = 2;
   autoQuality = false;
   private qSamples: number[] = [];
-  vfx = new VFX();
+  /** FX director (event-driven effects, seeded, on the FX clock); `vfx` is its legacy facade */
+  fx = new FxDirector();
+  vfx: VFX = this.fx.vfx;
   finFx!: FinisherFx;
   warp?: ContactWarp;
   /** headless audits: skip the GPU render */
@@ -113,6 +116,8 @@ class App {
     this.camera.position.set(10, 7, 10);
     this.rig = new CameraRig(this.camera);
     this.scene.add(this.vfx.group);
+    fxProfiler.now = () => performance.now();
+    fxSettings.setQuality(this.quality);
     this.finFx = new FinisherFx(this.scene, this.vfx);
     this.scene.add(this.keyLight, this.keyLight.target, this.rimLight, this.rimLight.target);
     this.post = new Post(this.renderer, this.scene, this.camera);
@@ -258,7 +263,7 @@ class App {
     this.playback = new Playback(this.rec);
     this.warp = new ContactWarp(this.rec);
     this.director = new Director(this.rig, this.rec);
-    this.vfx.clear();
+    this.fx.setMatch(this.rec, c.seed, this.fxWorld());
     this.finFx.clear();
     for (const e of this.projMeshes.values()) this.scene.remove(e.mesh);
     this.projMeshes.clear();
@@ -407,6 +412,7 @@ class App {
         this.autoQuality = false;
         this.quality = (this.quality + 2) % 3;
         this.post.quality = this.quality;
+        fxSettings.setQuality(this.quality);
         this.renderer.setPixelRatio(Math.min(this.quality >= 2 ? 2 : this.quality === 1 ? 1.5 : 1, window.devicePixelRatio));
         this.resize();
         const spec = this.arenaSpec;
@@ -483,6 +489,7 @@ class App {
   setQuality(q: number) {
     this.quality = q;
     this.post.quality = q;
+    fxSettings.setQuality(q);
     this.renderer.setPixelRatio(Math.min(q >= 2 ? 2 : q === 1 ? 1.5 : 1, window.devicePixelRatio));
     this.renderer.shadowMap.type = q >= 1 ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
     const sm = q >= 1 ? 2048 : 1024;
@@ -556,9 +563,13 @@ class App {
       const fwd = this.rig.target.clone().sub(this.camera.position);
       audio.setListener(this.camera.position.x, this.camera.position.z, -fwd.z, fwd.x);
     }
-    this.vfx.update(fxDt);
-    // the impact light fades in real time even while the action is frozen / slowed (else it blooms the frame white)
-    if (fxDt < realDt) this.vfx.flashLight.intensity *= Math.exp(-(realDt - fxDt) * 14);
+    // the impact light runs on real dt (keeps fading while the action is frozen / slowed, else it blooms the frame white)
+    this.fx.update(fxDt, realDt);
+    {
+      const pp = this.fx.takePost();
+      this.aberration = Math.max(this.aberration, pp.aberration);
+      this.flash = Math.max(this.flash, pp.flash);
+    }
     this.finFx.update(fxDt);
     this.arena.update(realDt, this.camera, this.renderer.domElement.height);
     audio.update(this.state === 'fight' ? this.playback.frameAt(this.playback.t).tension : 0.15);
@@ -605,9 +616,11 @@ class App {
     this.arena.updateDebris(simDt);
     camWorld.obstacles = this.arena.standing();
     camWorld.hanging = this.arena.hangingNow();
+    for (const v of this.views) v.fxTime = pb.t;
+    this.fx.frame({ events: evs, frame: fr, simT: pb.t, simDt });
     this.handleEvents(evs, fr);
-    this.continuousFx(fr, simDt);
-    this.updateProjectiles(fr, simDt);
+    this.continuousFx(fr);
+    this.updateProjectiles(fr);
     this.dialogueEvents(evs); // first, so spoken hurt lines suppress generic grunts
     this.sound.frame(fr, simDt, realDt, scale);
     this.sound.events(evs, fr);
@@ -633,6 +646,10 @@ class App {
           `shot ${this.director.shotName}${this.freeCam ? ' (FREE CAM)' : ''}  side ${this.director.side}  tension ${fr.tension.toFixed(2)}  momentum ${fr.momentum.toFixed(2)}  ring ${fr.ringS.toFixed(2)}  arena ${this.arenaSpec.theme}/${this.arenaSpec.layout}#${this.arenaSpec.seed}`,
           ff(0),
           ff(1),
+          (() => {
+            const x = this.fx.stats();
+            return `fx t ${x.t.toFixed(2)}  particles ${x.particles.add}+${x.particles.alpha}  rings ${x.rings}  debris ${x.debris}  effects ${x.effects}  cpu ${x.cpu.frameMs.toFixed(3)}+${x.cpu.updateMs.toFixed(3)} ms  q${x.quality} gore ${x.gore}`;
+          })(),
           `result: winner ${this.rec.result.winner >= 0 ? this.defs[this.rec.result.winner].id : 'draw'}  swings ${this.rec.result.swings}  comeback ${this.rec.result.comeback}`,
           '--- events / cuts',
           ...this.director.log.slice(0, 12),
@@ -705,65 +722,50 @@ class App {
     return this.moveCache[`${this.defs[i].id}:${id}`];
   }
 
-  /** Per-frame effects tied to attack phases (whooshes, fire streams, buffs). */
-  private continuousFx(fr: Frame, simDt: number) {
+  /** Attack-phase observations for audio (the visuals of these and of the continuous emitters live in fx/fxDefs.ts). */
+  private continuousFx(fr: Frame) {
     for (let i = 0; i < 2; i++) {
       const f = fr.f[i];
-      const v = this.views[i];
       const mv = f.moveId ? this.moveOf(i, f.moveId) : undefined;
       const newAttack = f.attackId !== this.lastAttackId[i];
-      if (f.state === 'attack' && mv && (f.phase !== this.lastPhase[i] || newAttack)) {
-        if (f.phase === 1) this.onActiveStart(i, mv);
+      if (f.state === 'attack' && mv && (f.phase !== this.lastPhase[i] || newAttack) && f.phase === 1) {
+        if (mv.fx === 'fire' || mv.fx === 'pyre') audio.fire(mv.fx === 'pyre');
+        if (mv.fx === 'nova') audio.fire(true);
       }
       this.lastPhase[i] = f.state === 'attack' ? f.phase : -1;
       this.lastAttackId[i] = f.attackId;
-      if (simDt <= 0) continue;
-      const rate = simDt * 60;
-      // fire streams
-      if (f.state === 'attack' && mv && f.phase === 1 && (mv.fx === 'fire' || mv.fx === 'pyre')) {
-        const p = v.castWorld();
-        const dir = new THREE.Vector3(Math.sin(f.facing), -0.05, Math.cos(f.facing));
-        const big = mv.fx === 'pyre';
-        for (let k = 0; k < (big ? 2 : 1) * rate; k++) this.vfx.fire(p, dir.clone().multiplyScalar(3), 1, big ? 0.5 : 0.3, 0.5);
-      }
-      if (f.state === 'attack' && mv && mv.fx === 'shadow' && f.phase <= 1 && Math.random() < 0.5 * rate) {
-        this.vfx.smoke(v.position.clone().setY(0.3), 1, '#1d1626', 0.7, 0.3);
-      }
-      // windup glow for ultimates
-      if (f.state === 'attack' && mv?.kind === 'ultimate' && f.phase === 0 && Math.random() < 0.6 * rate) {
-        this.vfx.embers(v.position.clone().setY(0.4), 2, v.ap.accent, 0.8);
-      }
-      if ((f.buff > 0 || f.lastStand) && Math.random() < 0.35 * rate) this.vfx.embers(v.position.clone().setY(0.2), 1, f.lastStand ? '#ff3a2a' : v.ap.accent, 0.5);
-      if (f.state === 'dodge' && Math.random() < 0.5 * rate) this.vfx.dust(v.position, 1, 0.6);
-    }
-    // ring of fire embers
-    if (fr.ringS < 0.995 && simDt > 0) {
-      const L = this.arena.layout;
-      for (let k = 0; k < 3; k++) {
-        const a = Math.random() * Math.PI * 2;
-        this.vfx.fire(new THREE.Vector3(Math.cos(a) * (L.rx * fr.ringS + 0.4), 0.1, Math.sin(a) * (L.rz * fr.ringS + 0.4)), new THREE.Vector3(0, 2.5, 0), 1, 0.45, 0.3);
-      }
     }
   }
 
-  /** Projectiles come from the sim (they must physically reach the target before damage). */
+  /**
+   * Projectile meshes (the sim's projectiles must physically reach the target before damage).
+   * Trails and impact sparks are FX defs (proj.*); meshes share one geometry + material per kind.
+   */
   private projMeshes = new Map<number, { mesh: THREE.Object3D; last: THREE.Vector3; fx: string }>();
-  private updateProjectiles(fr: Frame, simDt: number) {
+  private projAssets = new Map<string, { geo: THREE.BufferGeometry; mat: THREE.Material }>();
+  private projAsset(fx: string) {
+    let a = this.projAssets.get(fx);
+    if (!a) {
+      const color = fx === 'arrow' ? '#e8fff0' : fx === 'shadow' ? '#c070ff' : fx === 'seed' ? '#c8ff60' : '#ffa040';
+      let geo: THREE.BufferGeometry;
+      if (fx === 'arrow') {
+        geo = new THREE.CylinderGeometry(0.018, 0.018, 0.85, 5);
+        geo.rotateX(Math.PI / 2);
+      } else geo = new THREE.SphereGeometry(fx === 'pyre' ? 0.32 : fx === 'seed' ? 0.09 : 0.18, 10, 8);
+      const mat = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: fx === 'arrow' ? 0.95 : 0.9, blending: THREE.AdditiveBlending, depthWrite: false });
+      a = { geo, mat };
+      this.projAssets.set(fx, a);
+    }
+    return a;
+  }
+  private updateProjectiles(fr: Frame) {
     const seen = new Set<number>();
     for (const p of fr.proj) {
       seen.add(p.id);
       let e = this.projMeshes.get(p.id);
       if (!e) {
-        const color = p.fx === 'arrow' ? '#e8fff0' : p.fx === 'shadow' ? '#c070ff' : p.fx === 'seed' ? '#c8ff60' : '#ffa040';
-        let mesh: THREE.Object3D;
-        if (p.fx === 'arrow') {
-          const g = new THREE.CylinderGeometry(0.018, 0.018, 0.85, 5);
-          g.rotateX(Math.PI / 2);
-          mesh = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false }));
-        } else {
-          const r = p.fx === 'pyre' ? 0.32 : p.fx === 'seed' ? 0.09 : 0.18;
-          mesh = new THREE.Mesh(new THREE.SphereGeometry(r, 10, 8), new THREE.MeshBasicMaterial({ color, transparent: true, opacity: 0.9, blending: THREE.AdditiveBlending, depthWrite: false }));
-        }
+        const A = this.projAsset(p.fx);
+        const mesh = new THREE.Mesh(A.geo, A.mat);
         this.scene.add(mesh);
         e = { mesh, last: new THREE.Vector3(p.x, p.y, p.z), fx: p.fx };
         this.projMeshes.set(p.id, e);
@@ -773,32 +775,29 @@ class App {
       if (pos.distanceToSquared(e.last) > 1e-6) e.mesh.lookAt(pos.clone().add(pos.clone().sub(e.last)));
       e.mesh.position.copy(pos);
       e.last.copy(pos);
-      if (simDt > 0) {
-        if (e.fx === 'arrow') this.vfx.embers(pos, 1, '#e8fff0', 0.02);
-        else if (e.fx === 'shadow') this.vfx.smoke(pos, 1, '#2a1838', 0.35, 0.1);
-        else if (e.fx !== 'seed') this.vfx.fire(pos, new THREE.Vector3(0, 0.6, 0), 2, e.fx === 'pyre' ? 0.6 : 0.35, 0.2);
-      }
     }
     for (const [id, e] of this.projMeshes) {
       if (seen.has(id)) continue;
-      this.vfx.sparks(e.last, 10, e.fx === 'arrow' ? '#e8fff0' : '#ffb060', 4);
       this.scene.remove(e.mesh);
       this.projMeshes.delete(id);
     }
   }
 
-  private onActiveStart(i: number, mv: MoveDef) {
-    const v = this.views[i];
-    if (mv.fx === 'fire' || mv.fx === 'pyre') audio.fire(mv.fx === 'pyre');
-    if (mv.fx === 'nova') {
-      this.vfx.shockwave(v.position, '#ff7a20', 7, 0.5);
-      for (let k = 0; k < 40; k++) {
-        const a = (k / 40) * Math.PI * 2;
-        this.vfx.fire(v.position.clone().setY(0.6), new THREE.Vector3(Math.cos(a) * 8, 1, Math.sin(a) * 8), 1, 0.5, 0.3);
-      }
-      audio.fire(true);
-    }
-    if ((mv.lunge ?? 0) > 3) this.vfx.dust(v.position, 10, 1);
+  /** Read-only view of the match for the FX director (anchors, colours, layout). */
+  private fxWorld(): FxWorld {
+    const L = () => this.arena.layout;
+    return {
+      chest: (i) => this.views[i].chestWorld(),
+      head: (i) => this.views[i].headWorld(),
+      cast: (i) => this.views[i].castWorld(),
+      feet: (i) => this.views[i].position,
+      accent: (i) => this.views[i].ap.accent,
+      move: (i, id) => this.moveOf(i, id),
+      obstacle: (i) => L().obstacles[i],
+      hazard: (i) => L().hazards[i],
+      ring: () => ({ rx: L().rx, rz: L().rz }),
+      isFinisher: (m) => !!FIN_BY_ID[m],
+    };
   }
 
   private handleEvents(evs: SimEvent[], fr: Frame) {
@@ -824,7 +823,6 @@ class App {
       switch (e.type) {
         case 'hit': {
           if (!b || !a) break;
-          const p = b.chestWorld().lerp(a.chestWorld(), 0.25);
           const heavy = !!e.data?.heavy;
           {
             // procedural flinch on the victim (real-time springs: keeps moving through hit-stop)
@@ -833,77 +831,31 @@ class App {
             const ult = e.data?.kind === 'ultimate';
             b.onHit(a.position, (ult ? 2.2 : heavy ? 1.6 : 0.85) * Math.min(1.3, 0.8 + a.def.stats.weight * 0.2), high ? 'head' : 'body');
           }
-          const fx = String(e.data?.fx ?? '');
-          const color = fx === 'fire' || fx === 'pyre' || fx === 'nova' ? '#ff8a30' : fx === 'shadow' ? '#c79bff' : fx === 'holy' ? '#ffe08a' : '#fff1c8';
-          this.vfx.sparks(p, heavy ? 40 : 14, color, heavy ? 9 : 6);
-          this.vfx.flash(p, color, heavy ? 1.6 : 0.8, heavy ? 14 : 5);
-          if (heavy) {
-            this.vfx.dust(b.position, 10, 1.2);
-            this.aberration = 1;
-            this.flash = 0.06;
-          }
-          if (fx === 'quake') {
-            this.vfx.shockwave(a.position, '#ffb070', 8, 0.6);
-            this.vfx.dust(a.position, 30, 2.5);
-          }
-          if (fx === 'fire' || fx === 'pyre') this.vfx.fire(p, new THREE.Vector3(0, 2, 0), 6, 0.4, 1);
+          // impact visuals: fx defs impact.* (fx/fxDefs.ts RESOLVE.hit)
           break;
         }
         case 'block': {
           if (!a || !b) break;
           a.onBlocked();
           a.onHit(b.position, 0.45, 'body');
-          const p = a.chestWorld().lerp(b.chestWorld(), 0.3);
-          this.vfx.sparks(p, 16, '#ffd59a', 5);
-          this.vfx.flash(p, '#ffe2b0', 0.5, 3);
           break;
         }
         case 'parry': {
           if (!a || !b) break;
-          const p = a.chestWorld().lerp(b.chestWorld(), 0.35);
           b.onHit(a.position, 1.0, 'body');
-          this.vfx.sparks(p, 50, '#cfe6ff', 9);
-          this.vfx.flash(p, '#d8ecff', 1.6, 16);
-          this.aberration = 0.8;
           minorToast('PARRY', aDef!.name, '#bfe0ff', 1.0);
           break;
         }
         case 'guard_break':
-          if (a) this.vfx.sparks(a.chestWorld(), 30, '#ffb070', 7);
           minorToast('GUARD BROKEN', aDef?.name ?? '', '#ffb070', 1.2);
-          break;
-        case 'dodge':
-          if (a) this.vfx.dust(a.position, 8, 0.9);
-          break;
-        case 'whiff':
-          break;
-        case 'knockdown':
-          if (a) {
-            setTimeout(() => {
-              this.vfx.dust(a.position, 18, 1.6);
-              this.vfx.shockwave(a.position, '#c8b090', 3, 0.4);
-            }, 150);
-          }
           break;
         case 'wall_slam':
         case 'pillar_slam':
-          if (a) {
-            this.vfx.dust(a.position, 20, 1.5);
-            this.vfx.sparks(a.chestWorld(), 20, '#ffcf8a', 6);
-          }
           toast(e.type === 'wall_slam' ? 'INTO THE SPIKES' : 'PILLAR SLAM', aDef?.name ?? '', '#ffb070', 1.2);
           break;
-        case 'prop_break': {
-          const at = new THREE.Vector3(Number(e.data?.x ?? 0), Number(e.data?.y ?? 0) + 0.3, Number(e.data?.z ?? 0));
-          this.vfx.dust(at, 10, 1.0);
-          break;
-        }
         case 'ability_used':
           if (a && aDef) {
             toast(String(e.data?.name ?? 'ULTIMATE'), aDef.name, aDef.color, 1.6);
-            this.vfx.flash(a.chestWorld(), a.ap.accent, 2.5, 20);
-            this.vfx.shockwave(a.position, a.ap.accent, 4, 0.6);
-            this.flash = 0.08;
           }
           break;
         case 'exhausted':
@@ -918,16 +870,12 @@ class App {
           if (a && aDef) {
             const cornered = e.data?.kind === 'cornered';
             toast(cornered ? 'CORNERED' : 'SECOND WIND', aDef.name, aDef.color, 2);
-            this.vfx.embers(a.position.clone().setY(0.3), 60, a.ap.accent, 1.2);
-            this.vfx.shockwave(a.position, a.ap.accent, 5, 0.7);
           }
           break;
         case 'last_stand':
           if (a && aDef) {
             // no banner over a finisher (the victim's last stand would cover the kill)
             if (!/^(finisher|cutin)$/.test(this.director.shotName)) toast('LAST STAND', aDef.name, '#ff4a3a', 2.2);
-            this.vfx.embers(a.position.clone().setY(0.3), 80, '#ff3a2a', 1.4);
-            this.vfx.shockwave(a.position, '#ff3a2a', 6, 0.8);
           }
           break;
         case 'near_death':
@@ -947,14 +895,10 @@ class App {
         case 'sudden_death':
           toast('SUDDEN DEATH', 'all blows strike harder', '#ff3a2a', 2.2);
           break;
-        case 'hazard_burn':
-          if (a) this.vfx.fire(a.position.clone().setY(0.4), new THREE.Vector3(0, 2, 0), 6, 0.4, 0.5);
-          break;
         case 'finisher_start': {
           const def = FIN_BY_ID[String(e.data?.id)];
           if (def && aDef) realToast(def.name, aDef.name, aDef.color, 2.4);
           this.ui.speedLines?.(0.45);
-          this.flash = 0.12;
           audio.stinger('dread');
           break;
         }
@@ -969,35 +913,17 @@ class App {
             const at = fx === 'behead' ? b.headWorld().setY(b.headWorld().y - 0.2) : p;
             this.finFx.play(fx, b.model, { attacker: a.model, plane: a.bladePlane(p), at, dir });
             b.onHit(a.position, 2.4, fx === 'behead' ? 'head' : 'body');
-            this.aberration = 1.4;
             audio.boom(0.8);
           } else {
-            this.vfx.sparks(p, 24, '#fff0c8', 6);
-            this.vfx.dust(b.position, 8, 1.0);
             b.onHit(a.position, 1.3, 'body');
           }
           break;
         }
         case 'launch_land':
           if (a) {
-            this.vfx.dust(a.position, 26, 1.8);
-            this.vfx.shockwave(a.position, '#c8b090', 4, 0.5);
             // into the fire / spikes: the landing is the finisher
             const fs = this.rec.events.find((x) => x.type === 'finisher_start' && x.data?.kind === 'launch' && x.b === e.a && Math.abs(x.t - e.t) < 2);
             if (fs) this.finFx.play(String(fs.data?.fx ?? 'burn') as Parameters<FinisherFx['play']>[0], a.model, { at: a.chestWorld() });
-          }
-          break;
-        case 'kill':
-          if (b && FIN_BY_ID[String(e.data?.move)]) {
-            // finisher kill: its own FX already played on the contact
-            this.aberration = 0.8;
-          } else if (b) {
-            const p = b.chestWorld();
-            this.vfx.sparks(p, 80, '#fff0c0', 11);
-            this.vfx.flash(p, '#fff0d0', 3, 30);
-            this.vfx.shockwave(b.position, '#ffffff', 7, 0.8);
-            this.flash = 0.25;
-            this.aberration = 1.5;
           }
           break;
       }
@@ -1011,17 +937,6 @@ class App {
     const name = (i: number | undefined) => (i !== undefined && i >= 0 ? this.defs[i].name : '');
     switch (e.type) {
       case 'explosion': {
-        const p = new THREE.Vector3(Number(d.x), Math.max(0.6, Number(d.y)), Number(d.z));
-        this.vfx.flash(p, '#ffc070', 4, 40);
-        this.vfx.shockwave(p.clone().setY(0.1), '#ffb060', 7, 0.6);
-        for (let k = 0; k < 60; k++) {
-          const v = new THREE.Vector3(Math.random() - 0.5, Math.random() * 0.9 + 0.2, Math.random() - 0.5).normalize().multiplyScalar(6 + Math.random() * 6);
-          this.vfx.fire(p, v, 1, 0.7, 0.6);
-        }
-        this.vfx.smoke(p, 14, '#1a1410', 2.0, 1.4);
-        this.vfx.sparks(p, 50, '#ffd090', 12);
-        this.flash = 0.07;
-        this.aberration = 1.2;
         toast('KABOOM!', e.a >= 0 ? `${name(e.a)} lit the powder` : '', '#ff9a40', 1.4);
         break;
       }
@@ -1038,61 +953,32 @@ class App {
         break;
       case 'prop_hit': {
         if (!b) break;
-        const p = new THREE.Vector3(Number(d.x), Number(d.y), Number(d.z));
-        this.vfx.sparks(p, 24, '#fff0c8', 7);
-        this.vfx.flash(p, '#fff0d0', 1.4, 10);
-        this.vfx.dust(b.position, 10, 1.2);
-        this.aberration = 0.8;
         minorToast(`${String(d.kind).toUpperCase()} TO THE FACE`, name(e.a), this.defs[e.a].color, 1.2);
         break;
       }
       case 'prop_batted':
         if (a) {
-          this.vfx.sparks(a.chestWorld(), 30, '#ffe0a0', 8);
           minorToast('SWATTED ASIDE', name(e.a), this.defs[e.a].color, 1.0);
         }
         break;
-      case 'topple': {
-        const o = L.obstacles[Number(d.obs)];
-        if (o) this.vfx.dust(new THREE.Vector3(o.x, 0.2, o.z), 16, 1.6);
+      case 'topple':
         toast('IT\'S COMING DOWN', '', '#e8d8b0', 1.3);
         break;
-      }
-      case 'topple_impact': {
-        const p = new THREE.Vector3(Number(d.x), 0.2, Number(d.z));
-        this.vfx.dust(p, 40, 3.5);
-        this.vfx.shockwave(p, '#d8c8a8', 6, 0.7);
-        break;
-      }
       case 'crush':
         if (b) {
-          this.vfx.sparks(b.chestWorld(), 40, '#fff0c0', 9);
-          this.flash = 0.1;
           toast('CRUSHED!', name(e.b), '#ffcf8a', 1.6);
         }
         break;
-      case 'cover_hit': {
-        const o = L.obstacles[Number(d.obs)];
-        if (o) this.vfx.dust(new THREE.Vector3(o.x, 1.2, o.z), 4, 0.8);
-        break;
-      }
       case 'hazard_trigger': {
         const h = L.hazards[Number(d.haz)];
         if (!h) break;
-        const p = new THREE.Vector3(h.x, 0.2, h.z);
-        if (h.kind === 'spikes') this.vfx.sparks(p, 10, '#ffb070', 4);
-        else if (h.kind === 'geyser') this.vfx.smoke(p, 8, '#e8f0f8', 1.0, 0.6);
-        else if (h.kind === 'chandelier') {
-          this.vfx.dust(new THREE.Vector3(h.x, 6.5, h.z), 12, 1.0);
+        if (h.kind === 'chandelier') {
           audio.play('clang', { pos: { x: h.x, z: h.z }, rate: 0.6, vol: 0.5 });
         }
         break;
       }
       case 'chandelier_impact': {
-        const p = new THREE.Vector3(Number(d.x), 0.3, Number(d.z));
-        this.vfx.sparks(p, 50, '#ffcf80', 9);
-        this.vfx.dust(p, 30, 2.5);
-        this.vfx.shockwave(p, '#e0c8a0', 5, 0.6);
+        const p = { x: Number(d.x), z: Number(d.z) };
         audio.play('wall_slam', { pos: { x: p.x, z: p.z }, hitNow: true, rate: 0.7 });
         audio.boom(0.7);
         toast('FROM ABOVE!', '', '#ffcf8a', 1.4);
@@ -1101,17 +987,14 @@ class App {
       case 'hazard_hit': {
         const h = L.hazards[Number(d.haz)];
         if (!h || !b) break;
-        const p = b.position.clone().setY(0.4);
+        const p = b.position;
         if (h.kind === 'lava' || h.kind === 'firepit') {
-          for (let k = 0; k < 24; k++) this.vfx.fire(p, new THREE.Vector3((Math.random() - 0.5) * 3, 3 + Math.random() * 3, (Math.random() - 0.5) * 3), 1, 0.6, 0.6);
           audio.fire(true);
           minorToast(h.kind === 'lava' ? 'INTO THE LAVA' : 'INTO THE FIRE', name(e.b), '#ff7a30', 1.3);
         } else if (h.kind === 'spikes') {
-          this.vfx.sparks(p, 30, '#ffd0a0', 8);
           audio.play('hit_blade', { pos: { x: p.x, z: p.z }, hitNow: true, rate: 0.8 });
           minorToast('SPIKE TRAP', name(e.b), '#ffb070', 1.2);
         } else if (h.kind === 'geyser') {
-          this.vfx.smoke(p, 30, '#eef6ff', 2.2, 2.5);
           minorToast('LAUNCHED', name(e.b), '#bfe8ff', 1.2);
         }
         break;
@@ -1126,9 +1009,26 @@ class App {
     this.arena.resetProps();
     for (const e of this.rec.events) if (e.type === 'topple') this.arena.toppleDir.set(Number(e.data?.obs), { dx: Number(e.data?.dx), dz: Number(e.data?.dz) });
     this.playback.seek(Math.max(0, t - 1.5));
+    // FX: clear + reseed at the warm-up start; the warm-up below re-spawns the window's effects with their original seeds
+    this.fx.seek(this.playback.t);
+    this.finFx.clear();
+    for (const e of this.projMeshes.values()) this.scene.remove(e.mesh);
+    this.projMeshes.clear();
     this.director = new Director(this.rig, this.rec);
     // warm up the views/director for 1.5s of sim at fixed steps
     this.stepFrames(90, 1 / 60);
+  }
+  /** FX counters: live particles per layer, rings, debris, effects, CPU ms (see docs/fx-api.md). */
+  fxStats() {
+    return this.fx.stats();
+  }
+  /** Hash of the live effect list (id, spawn time, seed): same seed + time => same hash. */
+  fxHash() {
+    return this.fx.hash();
+  }
+  /** Hash of the full live FX state (every particle's spawn data, rings, debris, light). */
+  fxStateHash() {
+    return this.fx.stateHash();
   }
   /** Phantom-hit audit (see render/audit.ts). */
   audit(pairs: [string, string][], seeds = 2) {

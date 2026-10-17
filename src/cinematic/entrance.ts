@@ -577,8 +577,9 @@ function addFx(
         ctx.rig.addShake(0.35);
         V.dust(G.w([0, 3.5, 0.5]), 8, 1.5);
         gateObj.portcullis.position.z = 0.35;
-        setTimeout(() => (gateObj.portcullis.position.z = 0.2), 90);
       });
+      // the rattle settles 90 ms later on the cutscene clock (was a wall-clock setTimeout)
+      tl.cue('vfx', t + 0.09, () => (gateObj.portcullis.position.z = 0.2));
       break;
     case 'gate_smash': {
       const vel = new THREE.Vector3();
@@ -692,7 +693,7 @@ function addFx(
         (_k, lt) => {
           flame.scale.y = 0.9 + Math.sin(lt * 17 + arg) * 0.12;
           if (light) light.intensity = Math.min(9, lt * 20) * (0.9 + Math.sin(lt * 23) * 0.1);
-          if (Math.random() < 0.15) V.embers(new THREE.Vector3(p.x, 1.7, p.z), 1, '#ffb060', 0.1);
+          if (V.rand() < 0.15) V.embers(new THREE.Vector3(p.x, 1.7, p.z), 1, '#ffb060', 0.1);
         },
         () => {
           flame.visible = true;
@@ -728,8 +729,8 @@ function addFx(
         (k) => {
           const strength = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25;
           light.intensity = 40 * strength;
-          for (let i = 0; i < 6; i++) V.fire(new THREE.Vector3(p.x + (Math.random() - 0.5) * 0.9, Math.random() * 1.5, p.z + (Math.random() - 0.5) * 0.9), new THREE.Vector3(0, 6 + Math.random() * 4, 0), 1, 0.7 * strength + 0.2, 0.5);
-          if (Math.random() < 0.5) V.embers(p.clone().setY(1), 2, '#ffaa40', 1);
+          for (let i = 0; i < 6; i++) V.fire(new THREE.Vector3(p.x + (V.rand() - 0.5) * 0.9, V.rand() * 1.5, p.z + (V.rand() - 0.5) * 0.9), new THREE.Vector3(0, 6 + V.rand() * 4, 0), 1, 0.7 * strength + 0.2, 0.5);
+          if (V.rand() < 0.5) V.embers(p.clone().setY(1), 2, '#ffaa40', 1);
         },
         () => {
           ctx.scene.add(light);
@@ -857,7 +858,7 @@ function addFx(
         dur,
         (k) => {
           (disc.material as THREE.MeshBasicMaterial).opacity = Math.min(0.92, k * 6) * (k > 0.8 ? (1 - k) * 5 : 1);
-          if (Math.random() < 0.6) V.smoke(p.clone().setY(0.2), 1, '#1a1024', 0.9, 0.5);
+          if (V.rand() < 0.6) V.smoke(p.clone().setY(0.2), 1, '#1a1024', 0.9, 0.5);
         },
         () => {
           ctx.scene.add(disc);

@@ -9,6 +9,7 @@
     "build": "tsc --noEmit && vite build",
     "preview": "vite preview",
     "sim:test": "tsx tools/simtest.ts",
+    "fx:check": "tsx tools/fxcheck.ts",
     "typecheck": "tsc --noEmit",
     "audio:build": "tsx tools/audio/build-sfx.ts",
     "audio:check": "tsx tools/audio/check.ts",

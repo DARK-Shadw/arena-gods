@@ -58,6 +58,8 @@ export class FighterView {
   private tmpA = new THREE.Vector3();
   private tmpB = new THREE.Vector3();
   weaponGlow = 0;
+  /** sim-time clock for cosmetic pulses (set by the game each fight tick); replaces performance.now */
+  fxTime = 0;
   /** resolves when runtime-loaded clips (shared props, animation library) are attached */
   ready: Promise<void>;
   /** variant picks per pool (metrics: repetition / entropy) */
@@ -404,7 +406,7 @@ export class FighterView {
     // telegraph decal during windup of big / slow moves
     if (fr.state === 'attack' && move && fr.phase === 0 && (move.kind === 'heavy' || move.kind === 'ultimate' || move.kind === 'gap' || move.windup >= 0.6)) {
       const reach = move.range + this.def.stats.radius * 0.5 + Math.max(0, move.lunge ?? 0) * 0.6;
-      this.telegraph.show(fr.x, fr.z, fr.facing, reach, move.arc, !!move.aoe, fr.phaseT, move.kind === 'ultimate');
+      this.telegraph.show(fr.x, fr.z, fr.facing, reach, move.arc, !!move.aoe, fr.phaseT, move.kind === 'ultimate', this.fxTime);
     } else this.telegraph.hide();
 
     const ult = fr.state === 'attack' && move?.kind === 'ultimate';
@@ -430,7 +432,7 @@ export class FighterView {
   }
 
   private applyGlow(aura: boolean) {
-    const pulse = 0.75 + Math.sin(performance.now() * 0.008) * 0.25;
+    const pulse = 0.75 + Math.sin(this.fxTime * 8) * 0.25;
     const col = new THREE.Color(this.ap.accent).multiplyScalar(this.weaponGlow * 0.18 * pulse);
     for (const m of this.mats) if (m.emissive) m.emissive.copy(col);
     (this.aura.material as THREE.MeshBasicMaterial).opacity = aura ? 0.5 * pulse + this.weaponGlow * 0.05 : 0;
