@@ -710,7 +710,11 @@ export class VFX {
     mix(this.add.hashLive(t));
     mix(this.alpha.hashLive(t));
     mix(this.dist.hashLive(t));
-    for (const k of [...this.sprites.keys()].sort()) mix(this.sprites.get(k)!.hashLive(t));
+    // layers are created on first use: an empty layer must not change the hash
+    for (const k of [...this.sprites.keys()].sort()) {
+      const v = this.sprites.get(k)!.hashLive(t);
+      if (v) mix(hashStr(k)), mix(v);
+    }
     let s = 0;
     for (const g of this.rings) if (g.on && t >= g.t0) s = (s + hashN(Math.round(g.t0 * 1e4), Math.round(g.size * 1e4), Math.round(g.mesh.position.x * 1e4), Math.round(g.mesh.position.z * 1e4))) >>> 0;
     mix(s);

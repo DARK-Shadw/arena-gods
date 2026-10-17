@@ -11,7 +11,13 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
-import { createFxDirector, DEFS } from '../src/render/fx';
+import { createFxDirector, DEFS, FxDirector, fxSettings, REPLAY_TAIL, THEME_FLOOR, type FxWorld } from '../src/render/fx';
+import { simulate } from '../src/sim/match';
+import { FIGHTERS } from '../src/sim/fighters';
+import { generateArena, type ArenaSpec } from '../src/sim/arenaGen';
+import { FIN_BY_ID } from '../src/sim/finishers';
+import type { MoveDef } from '../src/sim/types';
+import { Playback } from '../src/render/playback';
 
 let fail = 0;
 const ok = (cond: boolean, msg: string) => {
@@ -102,6 +108,90 @@ for (const id of probe) {
   }
   ok(counts[0] === 0 && counts[1] === 2 && counts[2] === 3, `distortion tiers q0/q1/q2 = ${counts.join('/')} (want 0/2/3)`);
   createFxDirector({ quality: 2 }).dispose();
+}
+
+// 6. F3: full replay on seek. A recorded match (Node, no bones: every anchor from recorded frames)
+//    played through at fixed steps vs a fresh director that seeks to T - 1.5 s and warms up to T like
+//    the game's debugSeekFight. Must match: the floor decals, the wounds / weapon blood, the live effect
+//    list and the full particle state; long tails (debris, smoke, pools) started before the warm-up must
+//    be alive after the seek; the seek must stay cheap.
+{
+  const fights: [string, string, number, ArenaSpec][] = [
+    ['gorak', 'vex', 4242, { theme: 'colosseum', layout: 'oval', seed: 7 }],
+    ['aldric', 'gorak', 11, { theme: 'forge', layout: 'oval', seed: 2 }],
+    ['ozrel', 'maw', 77, { theme: 'forge', layout: 'pit', seed: 3 }],
+  ];
+  const moves: Record<string, MoveDef> = {};
+  for (const f of FIGHTERS) for (const m of f.moves) moves[`${f.id}:${m.id}`] = m;
+  const now = () => performance.now();
+  for (const q of [2, 0]) {
+    fxSettings.setQuality(q);
+    for (const [a, b, seed, spec] of fights) {
+      const rec = simulate(a, b, seed, true, spec);
+      const L = generateArena(spec);
+      const world: FxWorld = {
+        accent: () => '#ffb060',
+        move: (i, id) => moves[`${rec.ids[i]}:${id}`],
+        obstacle: (i) => L.obstacles[i],
+        hazard: (i) => L.hazards[i],
+        ring: () => ({ rx: L.rx, rz: L.rz }),
+        isFinisher: (m) => !!FIN_BY_ID[m],
+        floorAt: (x, z) => (L.hazards.some((h) => h.kind === 'water' && (x - h.x) ** 2 + (z - h.z) ** 2 < h.r * h.r) ? 'water' : THEME_FLOOR[L.theme] ?? 'stone'),
+      };
+      const dt = 1 / 60;
+      const run = (fx: FxDirector, pb: Playback, T: number) => {
+        while (pb.t < T - 1e-9) {
+          const evs = pb.advance(Math.min(dt, T - pb.t));
+          fx.frame({ events: evs, frame: pb.frameAt(pb.t), simT: pb.t, simDt: dt });
+          fx.update(dt, dt);
+        }
+      };
+      const dur = rec.frames[rec.frames.length - 1].t;
+      for (const T of [Math.min(14, dur - 0.5), Math.min(31, dur - 0.5)]) {
+        const A = new FxDirector();
+        A.setMatch(rec, seed, world, 0);
+        run(A, new Playback(rec), T);
+        const B = new FxDirector();
+        B.setMatch(rec, seed, world, 0);
+        const pb = new Playback(rec);
+        const tw = Math.max(0, T - 1.5);
+        pb.seek(tw);
+        const c0 = now();
+        B.seek(tw);
+        const seekMs = now() - c0;
+        run(B, pb, T);
+        const sa = A.stats(),
+          sb = B.stats();
+        const tag = `${a}-${b}#${seed} q${q} T=${T.toFixed(1)}`;
+        ok(A.decalHash(T) === B.decalHash(T), `seek floor decals ${tag}: ${A.decalHash(T)} vs ${B.decalHash(T)}`);
+        ok(A.bloodHash() === B.bloodHash(), `seek wounds / weapon blood ${tag}: ${A.bloodHash()} vs ${B.bloodHash()}`);
+        ok(A.hash() === B.hash(), `seek live effect list ${tag}: ${A.hash()} vs ${B.hash()}`);
+        ok(A.stateHash() === B.stateHash(), `seek full FX state ${tag}`);
+        const tails = B.liveEffects().filter((e) => e.t0 < tw - 0.05);
+        const tailsA = A.liveEffects().filter((e) => e.t0 < tw - 0.05);
+        ok(tails.length === tailsA.length, `seek long tails ${tag}: ${tails.length} vs ${tailsA.length}`);
+        ok(sb.seek.steps <= Math.ceil(REPLAY_TAIL / rec.dt) + 2 && seekMs < 400, `seek cost ${tag}: ${sb.seek.steps} steps, ${seekMs.toFixed(1)} ms`);
+        console.log(`seek ${tag.padEnd(34)} decals ${String(sa.decals).padStart(3)} wounds ${sa.wounds} live ${sa.effects} (tails before the warm-up: ${tails.length}) replay ${sb.seek.events} events / ${sb.seek.steps} steps ${seekMs.toFixed(1)} ms`);
+        A.dispose(), B.dispose();
+      }
+    }
+  }
+  fxSettings.setQuality(2);
+}
+
+// 7. F3: every new def resolves for every gore level, and gore 'off' spawns no blood decals or wounds
+{
+  for (const g of ['off', 'standard', 'full'] as const) {
+    const fx = createFxDirector({ seed: 3 });
+    fx.gore = g;
+    for (const id of ['blood.cut', 'blood.kill', 'blood.pierce', 'blood.blunt', 'blood.blade', 'blood.pool']) fx.spawn(id, P, { seed: 5, t: 0 });
+    fx.setTime(2);
+    const s = fx.stats();
+    if (g === 'off') ok(s.decals === 0 && s.wounds[0] + s.wounds[1] === 0, `gore off: no blood (decals ${s.decals}, wounds ${s.wounds})`);
+    else ok(s.decals > 0, `gore ${g}: blood decals ${s.decals}`);
+    console.log(`gore ${g.padEnd(8)} decals ${s.decals} wounds ${s.wounds} sprites ${JSON.stringify(s.sprites)}`);
+    fx.dispose();
+  }
 }
 
 // 5. grep gate

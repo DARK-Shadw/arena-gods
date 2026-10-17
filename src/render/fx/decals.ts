@@ -161,8 +161,20 @@ export class FloorDecals {
   }
 
   emit(s: DecalSpawn) {
-    const i = this.cursor;
-    this.cursor = (this.cursor + 1) % this.limit;
+    // full: replace the decal with the earliest spawn time, or drop the new one if it is older still.
+    // The kept set is then "the newest `limit` decals by spawn time" whatever the emission order, so a
+    // seek replay (which emits delayed decals earlier than a play-through) ends with the same floor.
+    let i = this.cursor;
+    if (this.highWater >= this.limit) {
+      let mi = 0,
+        mt = Infinity;
+      for (let k = 0; k < this.limit; k++) {
+        const t = this.data[k * STRIDE + 4];
+        if (t < mt) (mt = t), (mi = k);
+      }
+      if (s.t0 <= mt) return;
+      i = mi;
+    } else this.cursor = (this.cursor + 1) % this.limit;
     const o = i * STRIDE;
     const d = this.data;
     const cell = Math.max(0, DECAL_CELLS.indexOf(s.cell));
