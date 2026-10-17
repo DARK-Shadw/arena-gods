@@ -22,6 +22,10 @@ import { FxClock } from './fxClock';
 import { FxRng, hashN, hashStr } from './fxRng';
 import { GpuParticles } from './particles';
 import { fxSettings, TIER_CAPS } from './fxSettings';
+import { DistortionSprites } from './distortion';
+import { LAYER } from './fxLayers';
+import { SOFTNESS } from './softDepth';
+import { HDR_SCALE } from './fxDefs';
 
 type V3 = { x: number; y: number; z: number };
 
@@ -71,6 +75,14 @@ export class VFX {
   /** additive (sparks, flashes, fire, embers) and alpha (dust, smoke) particle layers */
   add: GpuParticles;
   alpha: GpuParticles;
+  /** F1 screen distortion sprites (heat shimmer, shock ripples) on LAYER.FX_DIST */
+  dist: DistortionSprites;
+  /**
+   * Per-spawn overrides set by the director around a layer (undefined = the primitive's default):
+   * soft-particle fade distance (m, 0 = hard) and HDR colour multiplier (fxDefs HDR_SCALE).
+   */
+  softOverride: number | undefined = undefined;
+  hdrOverride: number | undefined = undefined;
   readonly clock = new FxClock();
   flashLight: THREE.PointLight;
 
@@ -104,16 +116,19 @@ export class VFX {
 
   constructor() {
     const caps = TIER_CAPS[2];
-    this.add = new GpuParticles(caps.add, { name: 'add', additive: true });
-    this.alpha = new GpuParticles(caps.alpha, { name: 'alpha', additive: false, maxAlpha: 0.45 });
+    this.add = new GpuParticles(caps.add, { name: 'add', additive: true, layer: LAYER.FX_ADD });
+    this.alpha = new GpuParticles(caps.alpha, { name: 'alpha', additive: false, maxAlpha: 0.45, layer: LAYER.FX_ALPHA });
+    this.dist = new DistortionSprites(64);
     this.group.name = 'fx';
-    this.group.add(this.alpha.mesh, this.add.mesh);
+    // alpha first: the FX pass draws in scene order within a layer mask (dust behind sparks)
+    this.group.add(this.alpha.mesh, this.add.mesh, this.dist.mesh);
     for (let i = 0; i < caps.rings; i++) {
       const mat = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
       const mesh = new THREE.Mesh(this.ringGeo, mat);
       mesh.rotation.x = -Math.PI / 2;
       mesh.visible = false;
       mesh.name = 'fx.ring';
+      mesh.layers.set(LAYER.FX_ADD);
       this.group.add(mesh);
       this.rings.push({ mesh, mat, t0: 0, life: 1, size: 1, on: false });
     }
@@ -124,6 +139,7 @@ export class VFX {
       const mesh = new THREE.Mesh(this.arrowGeo, mat);
       mesh.visible = false;
       mesh.name = 'fx.arrow';
+      mesh.layers.set(LAYER.FX_ADD);
       this.group.add(mesh);
       this.arrows.push({ mesh, mat, from: new THREE.Vector3(), to: new THREE.Vector3(), t0: 0, dur: 1, seed: 0, ticks: 0, hit: false, on: false });
     }
@@ -223,19 +239,29 @@ export class VFX {
   }
 
   // ------------------------------------------------------------------ primitives (explicit rng + spawn time)
+  private soft(def: number) {
+    return this.softOverride ?? def;
+  }
+  /** colour (hex) x HDR multiplier into _c */
+  private hdrColor(color: string, def: number) {
+    return _c.set(color).multiplyScalar(this.hdrOverride ?? def);
+  }
+
   sparksAt(r: FxRng, t0: number, p: V3, n: number, color: string, speed = 7, dir?: V3) {
-    _c.set(color);
+    this.hdrColor(color, HDR_SCALE.sparks);
+    const sf = this.soft(SOFTNESS.sparks);
     for (let i = 0; i < n; i++) {
       _v.set(r.range(-1, 1), r.range(-0.2, 1.2), r.range(-1, 1)).normalize().multiplyScalar(speed * r.range(0.3, 1));
       if (dir) _v.set(_v.x + dir.x * speed * 0.6, _v.y + dir.y * speed * 0.6, _v.z + dir.z * speed * 0.6);
-      this.add.emit(t0, p.x, p.y, p.z, _v.x, _v.y, _v.z, _c.r, _c.g, _c.b, r.range(0.04, 0.09), r.range(0.25, 0.6), 2, 9, 0, SPARK_STRETCH);
+      this.add.emit(t0, p.x, p.y, p.z, _v.x, _v.y, _v.z, _c.r, _c.g, _c.b, r.range(0.04, 0.09), r.range(0.25, 0.6), 2, 9, 0, SPARK_STRETCH, sf);
     }
   }
 
   flashAt(_r: FxRng, t0: number, p: V3, color: string, size = 1.2, light = 6) {
-    _c.set(color);
-    this.add.emit(t0, p.x, p.y, p.z, 0, 0, 0, _c.r, _c.g, _c.b, size, 0.12, 1, 0, 1.5, 0);
-    this.add.emit(t0, p.x, p.y, p.z, 0, 0, 0, _c.r, _c.g, _c.b, size * 0.5, 0.2, 1, 0, 0.5, 0);
+    this.hdrColor(color, HDR_SCALE.flash);
+    const sf = this.soft(SOFTNESS.flash);
+    this.add.emit(t0, p.x, p.y, p.z, 0, 0, 0, _c.r, _c.g, _c.b, size, 0.12, 1, 0, 1.5, 0, sf);
+    this.add.emit(t0, p.x, p.y, p.z, 0, 0, 0, _c.r, _c.g, _c.b, size * 0.5, 0.2, 1, 0, 0.5, 0, sf);
     // the light lives on the light clock (keeps fading during hit-stop); map the spawn onto it
     const lt = this.clock.light - (this.clock.t - t0);
     if (this.flashes.length >= 8) this.flashes.shift();
@@ -243,7 +269,8 @@ export class VFX {
   }
 
   dustAt(r: FxRng, t0: number, p: V3, n: number, spread = 1, color = '#9a8064') {
-    _c.set(color);
+    this.hdrColor(color, HDR_SCALE.dust);
+    const sf = this.soft(SOFTNESS.dust);
     // dust now starts at the given height (was always the floor: the chandelier's ceiling dust and
     // the gate-top dust appeared on the ground); floor callers pass y = 0 and look as before
     const y0 = Math.max(0, p.y);
@@ -254,12 +281,13 @@ export class VFX {
       const vx = r.range(-1, 1) * 2 * spread,
         vy = r.range(0.2, 1.2),
         vz = r.range(-1, 1) * 2 * spread;
-      this.alpha.emit(t0, x, y, z, vx, vy, vz, _c.r, _c.g, _c.b, r.range(0.3, 0.6) * spread, r.range(0.6, 1.3), 2.5, 0, 1.4, 0);
+      this.alpha.emit(t0, x, y, z, vx, vy, vz, _c.r, _c.g, _c.b, r.range(0.3, 0.6) * spread, r.range(0.6, 1.3), 2.5, 0, 1.4, 0, sf);
     }
   }
 
   smokeAt(r: FxRng, t0: number, p: V3, n: number, color = '#2a2230', size = 1.2, rise = 0.8) {
-    _c.set(color);
+    this.hdrColor(color, HDR_SCALE.smoke);
+    const sf = this.soft(SOFTNESS.smoke);
     for (let i = 0; i < n; i++) {
       const x = p.x + r.range(-0.6, 0.6),
         y = p.y + r.range(0, 1.5),
@@ -267,28 +295,48 @@ export class VFX {
       const vx = r.range(-1, 1),
         vy = r.range(0, rise),
         vz = r.range(-1, 1);
-      this.alpha.emit(t0, x, y, z, vx, vy, vz, _c.r, _c.g, _c.b, size * r.range(0.7, 1.3), r.range(1.2, 2.5), 1.2, 0, 1.2, 0);
+      this.alpha.emit(t0, x, y, z, vx, vy, vz, _c.r, _c.g, _c.b, size * r.range(0.7, 1.3), r.range(1.2, 2.5), 1.2, 0, 1.2, 0, sf);
     }
   }
 
   fireAt(r: FxRng, t0: number, p: V3, v: V3, n: number, size = 0.35, spread = 0.6) {
+    const k = this.hdrOverride ?? HDR_SCALE.fire;
+    const sf = this.soft(SOFTNESS.fire);
     for (let i = 0; i < n; i++) {
-      _c.setHSL(r.range(0.02, 0.1), 1, r.range(0.45, 0.6));
+      _c.setHSL(r.range(0.02, 0.1), 1, r.range(0.45, 0.6)).multiplyScalar(k);
       const vx = v.x + r.range(-1, 1) * spread,
         vy = v.y + r.range(0, 1) * spread,
         vz = v.z + r.range(-1, 1) * spread;
-      this.add.emit(t0, p.x, p.y, p.z, vx, vy, vz, _c.r, _c.g, _c.b, size * r.range(0.6, 1.2), r.range(0.3, 0.6), 1.5, -2, 0.8, 0);
+      this.add.emit(t0, p.x, p.y, p.z, vx, vy, vz, _c.r, _c.g, _c.b, size * r.range(0.6, 1.2), r.range(0.3, 0.6), 1.5, -2, 0.8, 0, sf);
     }
   }
 
   embersAt(r: FxRng, t0: number, p: V3, n: number, color = '#ff8a30', area = 1) {
-    _c.set(color);
+    this.hdrColor(color, HDR_SCALE.embers);
+    const sf = this.soft(SOFTNESS.embers);
     for (let i = 0; i < n; i++) {
       const x = p.x + r.range(-1, 1) * area,
         y = p.y + r.range(0, 0.5),
         z = p.z + r.range(-1, 1) * area;
-      this.add.emit(t0, x, y, z, r.range(-0.4, 0.4), r.range(0.8, 2.2), r.range(-0.4, 0.4), _c.r, _c.g, _c.b, r.range(0.03, 0.07), r.range(1, 2.5), 0.5, -0.3, 0, 0);
+      this.add.emit(t0, x, y, z, r.range(-0.4, 0.4), r.range(0.8, 2.2), r.range(-0.4, 0.4), _c.r, _c.g, _c.b, r.range(0.03, 0.07), r.range(1, 2.5), 0.5, -0.3, 0, 0, sf);
     }
+  }
+
+  /**
+   * Heat shimmer column standing at p (distortion.ts kind 0). `tier`: lowest distortion tier that
+   * shows it (TIER_CAPS.dist); returns false when the current tier hides it.
+   */
+  heatAt(r: FxRng, t0: number, p: V3, size: number, height: number, life: number, strength = 1, rise = 1.5, tier: 1 | 2 = 2): boolean {
+    if (fxSettings.caps().dist < tier) return false;
+    this.dist.emit(t0, 0, p.x, p.y, p.z, life, size, strength, height, rise, this.soft(SOFTNESS.heat), r.next() * 64);
+    return true;
+  }
+
+  /** Expanding pressure ripple centred at p (distortion.ts kind 1). */
+  rippleAt(r: FxRng, t0: number, p: V3, size: number, life: number, strength = 1, tier: 1 | 2 = 1): boolean {
+    if (fxSettings.caps().dist < tier) return false;
+    this.dist.emit(t0, 1, p.x, p.y, p.z, life, size, strength, 0, 0, this.soft(SOFTNESS.ripple), r.next() * 64);
+    return true;
   }
 
   shockwaveAt(t0: number, p: V3, color = '#ffd8a0', size = 4, life = 0.5) {
@@ -375,8 +423,10 @@ export class VFX {
     const t = this.clock.t;
     this.add.flush();
     this.alpha.flush();
+    this.dist.flush();
     this.add.setTime(t);
     this.alpha.setTime(t);
+    this.dist.setTime(t);
     for (const g of this.rings) {
       if (!g.on) continue;
       const k = (t - g.t0) / g.life;
@@ -512,6 +562,7 @@ export class VFX {
   clear() {
     this.add.clear();
     this.alpha.clear();
+    this.dist.clear();
     for (const g of this.rings) (g.on = false), (g.mesh.visible = false);
     for (const a of this.arrows) (a.on = false), (a.mesh.visible = false);
     this.dData.fill(0);
@@ -562,6 +613,7 @@ export class VFX {
     };
     this.add.hashInto(t, mix);
     this.alpha.hashInto(t, mix);
+    this.dist.hashInto(t, mix);
     for (const g of this.rings) if (g.on && t >= g.t0) mix(g.t0), mix(g.size), mix(g.mesh.position.x), mix(g.mesh.position.z);
     for (let k = 0; k < this.dHigh; k++) {
       const o = k * 13;
@@ -586,6 +638,7 @@ export class VFX {
       rings: this.rings.filter((g) => g.on && t >= g.t0).length,
       arrows: this.arrows.filter((a) => a.on).length,
       debris,
+      dist: this.dist.alive(t),
       effects: this.liveEffects().length,
       light: +this.flashLight.intensity.toFixed(3),
     };
@@ -595,6 +648,7 @@ export class VFX {
     this.offTier();
     this.add.dispose();
     this.alpha.dispose();
+    this.dist.dispose();
     this.ringGeo.dispose();
     for (const g of this.rings) g.mat.dispose();
     this.arrowGeo.dispose();

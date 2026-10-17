@@ -10,19 +10,27 @@
  *    are not built yet are grey.
  * Effects are pure functions of (seed, t), so the time slider is a frame-exact scrub.
  *
- * URL: ?id=<item key>&seed=1&t=0.4&q=2&gore=standard&bg=dark&pause=1  (gore default: GORE_DEFAULT)
+ * F1: the lab renders through the game's Post (src/render/post.ts): shared depth, soft particles,
+ * distortion, dual bloom and grade. 'F1 tests' items judge each in isolation (soft vs hard, heat
+ * shimmer over the brazier, ripples, bloom / grade presets); the post / soft / distortion switches
+ * and the look, preset and bloom controls in the side bar A/B them.
+ *
+ * URL: ?id=<item key>&seed=1&t=0.4&q=2&gore=standard&bg=dark&pause=1&look=forge&post=0  (gore default: GORE_DEFAULT)
  * Automation (tools/shots/fxsheet.cjs): window.__fxlab = { ready, list(), play(key, {seed, q, gore}),
  *   at(t), stats(), sheet(key, times[]) -> PNG data URL, shot() -> PNG data URL }
  *
  * INTEGRATION TODOs (F3+):
  *  - flipbook atlases are drawn by the lab's own card shader (fxAtlas.ts). Once
  *    src/render/fx gains a 'flipbook' op kind, list atlas-backed FxDefs instead.
- *  - no bloom / post in the lab yet (plan §3.9 asks for the theme grade); colours are
- *    previewed through ACES only, so cores look less hot than in game.
  */
 import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
-import { createFxDirector, fxProfiler, fxSettings, goreLevel, type FxDirector, type GoreLevel } from '../../src/render/fx';
+import { createFxDirector, fxProfiler, fxSettings, goreLevel, FxRng, type FxDirector, type GoreLevel } from '../../src/render/fx';
+import { Post } from '../../src/render/post';
+import { MASK_FX, MASK_WORLD } from '../../src/render/fx/fxLayers';
+import { softDepthUniforms } from '../../src/render/fx/softDepth';
+import { GRADE_PRESETS, THEME_LOOK } from '../../src/render/fx/fxLook';
+import { THEME_DEFS } from '../../src/render/arena/themes';
 // GORE_DEFAULT / parseGore are not re-exported by src/render/fx/index.ts (F0 API); read-only import.
 import { GORE_DEFAULT, parseGore } from '../../src/render/fx/fxSettings';
 import { instantiate, loadCharacter } from '../../src/render/character';
@@ -79,6 +87,7 @@ function applyPreset() {
 function resize() {
   const r = canvas.parentElement!.getBoundingClientRect();
   renderer.setSize(r.width, r.height, false);
+  post.setSize(r.width, r.height);
   camera.aspect = r.width / Math.max(1, r.height);
   camera.updateProjectionMatrix();
 }
@@ -92,6 +101,31 @@ let quality = Number(qs.get('q') ?? 2) as 0 | 1 | 2;
 let gore: GoreLevel = parseGore(qs.get('gore')) ?? goreLevel() ?? GORE_DEFAULT;
 const fx: FxDirector = createFxDirector({ scene, seed, quality });
 const atlases = new FxAtlases(renderer, '/fx/');
+
+// ------------------------------------------------------------------ post (F1): the game's pipeline
+const post = new Post(renderer, scene, camera);
+post.distActive = () => fx.vfx.dist.active;
+let postOn = qs.get('post') !== '0';
+/** look ids: 'lab' (neutral grade, forge-like bloom) or a ThemeId (that theme's grade + its F1 look row) */
+let lookId = qs.get('look') ?? 'lab';
+let presetId = '';
+let presetW = 1;
+function applyLook() {
+  const T = (THEME_DEFS as Record<string, (typeof THEME_DEFS)[keyof typeof THEME_DEFS]>)[lookId];
+  if (T) {
+    renderer.toneMappingExposure = T.exposure;
+    post.setLook({ id: T.id, bloom: T.bloom, grade: T.grade, godrays: 0, sunDir: new THREE.Vector3(0, 1, 0) });
+  } else {
+    renderer.toneMappingExposure = 1;
+    post.setLook({ bloom: { strength: 0.4, radius: 0.6, threshold: 1.2 }, grade: { tint: [1, 1, 1], contrast: 1.05, saturation: 1.05, lift: [0, 0, 0.01], gain: [1, 1, 1], vignette: 0.7 }, godrays: 0, sunDir: new THREE.Vector3(0, 1, 0) });
+    post.setBloom({ threshold: 1.15, knee: 0.55, strength: 0.4, radius: 0.6 });
+    post.setExtras({ shadowTint: [0.92, 0.96, 1.1], highlightTint: [1.06, 1.0, 0.92], crush: 0.015 });
+  }
+  const b = post.currentLook.bloom;
+  ($('bStr') as HTMLInputElement).value = String(b.strength);
+  ($('bThr') as HTMLInputElement).value = String(b.threshold);
+  for (const k of Object.keys(GRADE_PRESETS)) post.setPreset(k, k === presetId ? presetW : 0);
+}
 
 // ------------------------------------------------------------------ dummies + brazier
 const dummies = new THREE.Group();
@@ -194,8 +228,8 @@ async function staticSheet(id: string): Promise<THREE.Object3D> {
 }
 
 // ------------------------------------------------------------------ items
-type Part = { kind: 'def'; id: string } | { kind: 'atlas'; id: string } | { kind: 'static'; id: string } | { kind: 'brazier' };
-interface Item { key: string; group: string; label: string; small?: string; desc: string; planned?: boolean; parts: Part[] }
+type Part = { kind: 'def'; id: string } | { kind: 'atlas'; id: string } | { kind: 'static'; id: string } | { kind: 'brazier' } | { kind: 'fn'; id: string; dur: number; run: () => void };
+interface Item { key: string; group: string; label: string; small?: string; desc: string; planned?: boolean; parts: Part[]; cam?: [[number, number, number], [number, number, number]] }
 const items: Item[] = [];
 
 /** Catalog row -> nearest current preview (F0 def ids and F2 atlases). Unknown ids are dropped at runtime. */
@@ -245,7 +279,56 @@ function toParts(refs: string[] | undefined, defIds: Set<string>): Part[] {
   return parts;
 }
 
+// ------------------------------------------------------------------ F1 test scenes
+/** spawn helpers on the lab director's VFX at FX time 0 with a fixed seed (scrub-exact) */
+const rngFor = (k: number) => new FxRng(((seed * 2654435761) ^ (k * 40503)) >>> 0 || 1);
+function withSoft(soft: number | undefined, fn: () => void) {
+  fx.vfx.softOverride = soft;
+  try {
+    fn();
+  } finally {
+    fx.vfx.softOverride = undefined;
+  }
+}
+function softVsHard(kind: 'dust' | 'smoke' | 'body') {
+  const V = fx.vfx;
+  for (const [side, soft] of [[-1, 0], [1, undefined]] as const) {
+    withSoft(soft, () => {
+      const x = side * 0.95;
+      if (kind === 'dust') {
+        V.dustAt(rngFor(1), 0, { x, y: 0, z: 0.35 }, 22, 1.4, '#9a8064');
+        V.dustAt(rngFor(2), 0.25, { x, y: 0, z: -0.2 }, 16, 1.0, '#8a7462');
+      } else if (kind === 'smoke') {
+        V.smokeAt(rngFor(3), 0, { x, y: -0.4, z: 0.2 }, 10, '#6a625c', 1.6, 0.25);
+      } else {
+        // fog / smoke cards cutting through the dummy's body and the floor
+        V.smokeAt(rngFor(4), 0, { x, y: 0.4, z: 0 }, 8, '#7d7570', 1.3, 0.1);
+        V.sparksAt(rngFor(5), 0, { x, y: 1.2, z: 0.1 }, 30, '#ffd0a0', 6);
+      }
+    });
+  }
+}
+const BRAZIER_CAM: Item['cam'] = [[-0.6, 1.55, 3.2], [-2.2, 1.45, -0.6]];
+function brazierHeat() {
+  // a long-lived shimmer column over the bowl; the lab loops the item
+  fx.vfx.heatAt(rngFor(6), 0, { x: -2.2, y: 1.0, z: -0.6 }, 0.85, 1.9, 6, 1.0, 1.4, 2);
+}
+function f1Items(): Item[] {
+  const G = 'F1 tests (post / depth / distortion)';
+  const L = 'left: HARD (soft = 0) · right: SOFT (per-primitive default). Toggle "soft" in the side bar to A/B the whole frame.';
+  return [
+    { key: 'f1.soft.dust', group: G, label: 'soft vs hard: floor dust', desc: `Two identical dust bursts on the floor at the dummies' feet.\n${L}`, parts: [{ kind: 'fn', id: 'soft.dust', dur: 1.6, run: () => softVsHard('dust') }], cam: [[0, 0.9, 3.4], [0, 0.35, 0]] },
+    { key: 'f1.soft.smoke', group: G, label: 'soft vs hard: smoke on the floor', desc: `Large smoke cards spawned partly below the floor.\n${L}`, parts: [{ kind: 'fn', id: 'soft.smoke', dur: 2.6, run: () => softVsHard('smoke') }], cam: [[0, 1.2, 3.8], [0, 0.4, 0]] },
+    { key: 'f1.soft.body', group: G, label: 'soft vs hard: smoke through a fighter', desc: `Smoke cards cutting through the dummies' bodies, plus sparks (sparks are 5 cm soft).\n${L}`, parts: [{ kind: 'fn', id: 'soft.body', dur: 2.6, run: () => softVsHard('body') }], cam: [[0, 1.3, 3.2], [0, 1.0, 0]] },
+    { key: 'f1.heat.brazier', group: G, label: 'heat shimmer over the brazier', desc: 'Flame02 brazier + a heat distortion column (distortion.ts kind 0). Toggle "distortion" to A/B. Off on low (q0), on medium only for heavy events (this one is high-only, tier 2).', parts: [{ kind: 'brazier' }, { kind: 'fn', id: 'heat', dur: 6, run: brazierHeat }], cam: BRAZIER_CAM },
+    { key: 'f1.heat.explosion', group: G, label: 'explosion: ripple + heat', desc: 'explosion.keg with its F1 layers: a 6 m pressure ripple and a 4.5 m heat column (medium + high).', parts: [{ kind: 'def', id: 'explosion.keg' }], cam: [[0, 1.8, 7.5], [0, 1.5, 0]] },
+    { key: 'f1.ripple.heavy', group: G, label: 'shockwave ripple on a heavy hit', desc: 'impact.default.heavy with its ripple layer (and kill.plain beside it: bigger ripple + vignette kick in game).', parts: [{ kind: 'def', id: 'impact.default.heavy' }, { kind: 'def', id: 'kill.plain' }] },
+    { key: 'f1.bloom', group: G, label: 'bloom + grade: hot cores', desc: 'Brazier, a flash core, sparks and embers for judging bloom (strength / threshold sliders) and the grade presets (preset + weight). Pick a theme under "look" to see its F1 row.', parts: [{ kind: 'brazier' }, { kind: 'def', id: 'impact.fire.heavy' }, { kind: 'def', id: 'secondWind.burst' }], cam: [[-0.4, 1.6, 4.6], [-0.8, 1.1, 0]] },
+  ];
+}
+
 function buildItems() {
+  items.push(...f1Items());
   const defIds = new Set(fx.list());
   for (const id of fx.list()) {
     const d = fx.def(id);
@@ -279,6 +362,7 @@ scene.add(live);
 const cards: { mesh: THREE.Mesh; e: AtlasEntry }[] = [];
 
 function partDuration(p: Part): number {
+  if (p.kind === 'fn') return p.dur;
   if (p.kind === 'def') return fx.timing(p.id)?.duration ?? 2;
   if (p.kind === 'atlas') {
     const e = atlases.entry(p.id);
@@ -299,8 +383,14 @@ async function play(key: string, o: { seed?: number; q?: 0 | 1 | 2; gore?: GoreL
   cards.length = 0;
   fx.reset(seed, 0);
   fx.gore = gore;
+  if (it.cam) {
+    camera.position.set(...it.cam[0]);
+    controls.target.set(...it.cam[1]);
+    controls.update();
+  }
   brazier.visible = ($('brazier') as HTMLInputElement).checked || it.parts.some((p) => p.kind === 'brazier');
-  const spatial = it.parts.filter((p) => p.kind !== 'brazier');
+  for (const p of it.parts) if (p.kind === 'fn') p.run();
+  const spatial = it.parts.filter((p) => p.kind !== 'brazier' && p.kind !== 'fn');
   for (const [i, p] of spatial.entries()) {
     const x = spatial.length > 1 ? (i - (spatial.length - 1) / 2) * 1.7 : 0;
     if (p.kind === 'def') fx.spawn(p.id, { x, y: 1.1, z: 0.25 }, { seed, t: 0 });
@@ -334,6 +424,7 @@ function at(time: number) {
 function setQuality(q: 0 | 1 | 2) {
   quality = q;
   fxSettings.setQuality(q);
+  post.quality = q;
   ($('qual') as HTMLSelectElement).value = String(q);
 }
 function setGore(g: GoreLevel) {
@@ -379,6 +470,7 @@ function stats() {
   return {
     item: current?.key ?? null, t, duration, seed, quality, gore,
     fx: s,
+    post: { on: postOn, look: lookId, preset: presetId, presetW, soft: post.softEnabled, dist: post.distEnabled, bloom: post.currentLook.bloom, gpu: post.gpuTimes() },
     drawCalls: renderer.info.render.calls, triangles: renderer.info.render.triangles,
     frameMs, renderMs,
     atlasFormat: atlases.formatUsed, atlasGpuMB: atlases.gpuBytes() / 1048576,
@@ -392,7 +484,9 @@ function hud() {
     `${s.item ?? '-'}   t ${t.toFixed(3)} / ${duration.toFixed(2)} s   x${speed}${playing ? '' : '  (paused)'}\n` +
     `particles add ${p.add}/${p.addCap}  alpha ${p.alpha}/${p.alphaCap}  effects ${s.fx.effects}  pending ${s.fx.pending}  rings ${s.fx.rings}  debris ${s.fx.debris}\n` +
     `draw calls ${s.drawCalls}  tris ${s.triangles}  frame ${frameMs.toFixed(1)} ms  render(cpu) ${renderMs.toFixed(2)} ms  fx cpu ${s.fx.cpu.frameMs.toFixed(3)}/${s.fx.cpu.updateMs.toFixed(3)} ms\n` +
-    `atlases ${s.atlasFormat}  ~${s.atlasGpuMB.toFixed(1)} MB GPU  textures ${s.textures}   q${quality}  gore ${gore}  seed ${seed}`;
+    `atlases ${s.atlasFormat}  ~${s.atlasGpuMB.toFixed(1)} MB GPU  textures ${s.textures}   q${quality}  gore ${gore}  seed ${seed}\n` +
+    `post ${postOn ? 'on' : 'OFF'}  look ${lookId}  preset ${presetId || '-'} ${presetId ? presetW.toFixed(2) : ''}  soft ${post.softEnabled ? 'on' : 'off'}  dist ${post.distEnabled ? 'on' : 'off'} (${s.fx.dist} live)  bloom ${post.currentLook.bloom.strength.toFixed(2)} @ ${post.currentLook.bloom.threshold.toFixed(2)}` +
+    (gpuLine ? `\ngpu ms  ${gpuLine}` : '');
   $('fmt').textContent = atlases.formatUsed;
 }
 
@@ -408,12 +502,32 @@ function litUniforms() {
     u.uAmbient.value.set(PRESETS[preset].fbAmb);
   }
 }
+let gpuLine = '';
+let gpuFrames = 0;
 function renderNow() {
   litUniforms();
   renderer.info.reset();
   const t0 = performance.now();
-  renderer.render(scene, camera);
+  if (postOn) {
+    // dt = 1: presets snap to their weight (the lab is a still-frame tool)
+    post.update(1, { dof: 0, focus: 5, aberration: 0, desat: 0, flash: 0, vignette: 0 });
+    post.render();
+  } else {
+    // plain render (A/B): world + FX layers in one pass, no depth copy, no distortion
+    const m = camera.layers.mask;
+    camera.layers.mask = MASK_WORLD | MASK_FX;
+    softDepthUniforms.uSoftOn.value = 0;
+    renderer.render(scene, camera);
+    camera.layers.mask = m;
+  }
   renderMs = renderMs * 0.9 + (performance.now() - t0) * 0.1;
+  if (($('gpu') as HTMLInputElement).checked) {
+    if (++gpuFrames % 30 === 0) {
+      const g = post.gpuTimes();
+      gpuLine = Object.entries(g).map(([k, v]) => `${k} ${v.avg.toFixed(2)}`).join('  ');
+      post.setProfiling(true);
+    }
+  }
 }
 function shot(): string {
   renderNow();
@@ -458,6 +572,20 @@ function wire() {
   $('dummies').onchange = () => { dummies.visible = ($('dummies') as HTMLInputElement).checked; };
   $('brazier').onchange = () => { brazier.visible = ($('brazier') as HTMLInputElement).checked; };
   $('mvOn').onchange = () => { if (current) void play(current.key); };
+  $('postOn').onchange = () => { postOn = ($('postOn') as HTMLInputElement).checked; };
+  $('softOn').onchange = () => { post.softEnabled = ($('softOn') as HTMLInputElement).checked; };
+  $('distOn').onchange = () => { post.distEnabled = ($('distOn') as HTMLInputElement).checked; };
+  $('gpu').onchange = () => { const on = ($('gpu') as HTMLInputElement).checked; post.setProfiling(on); gpuLine = on ? '(measuring...)' : ''; };
+  const lk = $('look') as HTMLSelectElement;
+  lk.innerHTML = ['lab', ...Object.keys(THEME_LOOK)].map((k) => `<option value="${k}">${k === 'lab' ? 'lab (neutral)' : k}</option>`).join('');
+  lk.value = lookId;
+  lk.onchange = () => { lookId = lk.value; applyLook(); };
+  const ps = $('preset') as HTMLSelectElement;
+  ps.innerHTML = ['', ...Object.keys(GRADE_PRESETS)].map((k) => `<option value="${k}">${k || 'none'}</option>`).join('');
+  ps.onchange = () => { presetId = ps.value; applyLook(); };
+  $('presetW').oninput = () => { presetW = Number(($('presetW') as HTMLInputElement).value); applyLook(); };
+  $('bStr').oninput = () => post.setBloom({ strength: Number(($('bStr') as HTMLInputElement).value) });
+  $('bThr').oninput = () => post.setBloom({ threshold: Number(($('bThr') as HTMLInputElement).value) });
   $('scrub').oninput = () => { playing = false; at((Number(($('scrub') as HTMLInputElement).value) / 1000) * duration); };
   $('play').onclick = () => { playing = !playing; };
   $('restart').onclick = () => { at(0); playing = true; };
@@ -497,6 +625,7 @@ function tick() {
 async function main() {
   resize();
   applyPreset();
+  applyLook();
   setQuality(quality);
   setGore(gore);
   await atlases.load().catch((e) => console.warn('[fxlab] no atlas manifest', e));
@@ -511,6 +640,22 @@ async function main() {
     ready: true,
     list: () => items.map((i) => ({ key: i.key, group: i.group, parts: i.parts.length, planned: !!i.planned })),
     play: (key: string, o?: { seed?: number; q?: 0 | 1 | 2; gore?: GoreLevel }) => { playing = false; return play(key, o); },
+    /** F1: post switches for A/B sheets: { post, soft, dist, look, preset, presetW, bloom: {strength, threshold} } */
+    setPost: (o: { post?: boolean; soft?: boolean; dist?: boolean; look?: string; preset?: string; presetW?: number; bloom?: { strength?: number; threshold?: number } }) => {
+      if (o.post !== undefined) postOn = o.post;
+      if (o.soft !== undefined) post.softEnabled = o.soft;
+      if (o.dist !== undefined) post.distEnabled = o.dist;
+      if (o.look !== undefined) lookId = o.look;
+      if (o.preset !== undefined) presetId = o.preset;
+      if (o.presetW !== undefined) presetW = o.presetW;
+      applyLook();
+      if (o.bloom) post.setBloom(o.bloom);
+      ($('postOn') as HTMLInputElement).checked = postOn;
+      ($('softOn') as HTMLInputElement).checked = post.softEnabled;
+      ($('distOn') as HTMLInputElement).checked = post.distEnabled;
+      renderNow();
+    },
+    post,
     at: (tt: number) => { playing = false; at(tt); renderNow(); return t; },
     stats,
     sheet,

@@ -19,9 +19,10 @@
  * capped by the driver's max point size.
  */
 import * as THREE from 'three';
+import { SOFT_DEPTH_PARS, softDepthUniforms } from './softDepth';
 
-/** floats per particle: p0.xyz t0 | v0.xyz life | rgb size | drag grav grow stretch */
-const STRIDE = 16;
+/** floats per particle: p0.xyz t0 | v0.xyz life | rgb size | drag grav grow stretch | softness - - - */
+const STRIDE = 20;
 
 /**
  * World size of a particle of nominal `size` 1. The old Points shader used
@@ -38,6 +39,8 @@ export interface ParticleLayerOpts {
   maxAlpha?: number;
   /** camera-near fade (start, end) in metres: particles at the lens would cover the frame */
   near?: [number, number];
+  /** render layer (fxLayers.ts LAYER.FX_ADD / FX_ALPHA); default 0 */
+  layer?: number;
 }
 
 const VERT = /* glsl */ `
@@ -45,6 +48,7 @@ const VERT = /* glsl */ `
   attribute vec4 aV0;   // initial velocity, life
   attribute vec4 aCol;  // linear rgb, size
   attribute vec4 aPhys; // drag, gravity, grow, stretch (s)
+  attribute vec4 aExt;  // soft-depth fade distance (m), unused x3
   uniform float uTime;
   uniform float uScale;
   uniform float uMaxAlpha;
@@ -52,6 +56,8 @@ const VERT = /* glsl */ `
   varying vec2 vUv;
   varying vec3 vColor;
   varying float vAlpha;
+  varying float vDepth;
+  varying float vSoft;
   void main() {
     float age = uTime - aP0.w;
     float life = aV0.w;
@@ -82,6 +88,8 @@ const VERT = /* glsl */ `
     vAlpha *= smoothstep(uNear.x, uNear.y, -mv.z);
     vColor = aCol.rgb;
     vUv = position.xy + 0.5;
+    vDepth = -mv.z;
+    vSoft = aExt.x;
     gl_Position = projectionMatrix * mv;
   }`;
 
@@ -89,11 +97,17 @@ const FRAG = /* glsl */ `
   varying vec2 vUv;
   varying vec3 vColor;
   varying float vAlpha;
+  varying float vDepth;
+  varying float vSoft;
+  ${SOFT_DEPTH_PARS}
   void main() {
     // the old 64-px soft dot: alpha 1 at the centre, 0.6 at 30 % radius, 0 at the edge
     float r = length(vUv - 0.5) * 2.0;
     float a = r < 0.3 ? mix(1.0, 0.6, r / 0.3) : mix(0.6, 0.0, clamp((r - 0.3) / 0.7, 0.0, 1.0));
     a *= vAlpha;
+    if (a < 0.004) discard;
+    // soft particles: fade where the quad meets the floor / a body (F1)
+    a *= fxSoftFade(vDepth, vSoft);
     if (a < 0.004) discard;
     gl_FragColor = vec4(vColor, a);
   }`;
@@ -132,6 +146,7 @@ export class GpuParticles {
     g.setAttribute('aV0', new THREE.InterleavedBufferAttribute(this.buf, 4, 4));
     g.setAttribute('aCol', new THREE.InterleavedBufferAttribute(this.buf, 4, 8));
     g.setAttribute('aPhys', new THREE.InterleavedBufferAttribute(this.buf, 4, 12));
+    g.setAttribute('aExt', new THREE.InterleavedBufferAttribute(this.buf, 4, 16));
     g.instanceCount = 0;
     this.geo = g;
     const near = o.near ?? (o.additive ? [0.5, 2.2] : [1.2, 4.5]);
@@ -142,6 +157,7 @@ export class GpuParticles {
         uScale: { value: PARTICLE_WORLD_SCALE },
         uMaxAlpha: { value: o.maxAlpha ?? 1 },
         uNear: { value: new THREE.Vector2(near[0], near[1]) },
+        ...softDepthUniforms,
       },
       vertexShader: VERT,
       fragmentShader: FRAG,
@@ -153,6 +169,7 @@ export class GpuParticles {
     this.mesh.name = `fx.particles.${o.name}`;
     this.mesh.frustumCulled = false;
     this.mesh.visible = false;
+    if (o.layer !== undefined) this.mesh.layers.set(o.layer);
   }
 
   /** Shorten / restore the ring for a quality tier (no reallocation, no material rebuild). */
@@ -161,7 +178,7 @@ export class GpuParticles {
     if (this.cursor >= this.limit) this.cursor = 0;
   }
 
-  emit(t0: number, px: number, py: number, pz: number, vx: number, vy: number, vz: number, r: number, g: number, b: number, size: number, life: number, drag: number, grav: number, grow: number, stretch: number) {
+  emit(t0: number, px: number, py: number, pz: number, vx: number, vy: number, vz: number, r: number, g: number, b: number, size: number, life: number, drag: number, grav: number, grow: number, stretch: number, soft = 0) {
     const i = this.cursor;
     this.cursor = (this.cursor + 1) % this.limit;
     const o = i * STRIDE;
@@ -182,6 +199,7 @@ export class GpuParticles {
     d[o + 13] = grav;
     d[o + 14] = grow;
     d[o + 15] = stretch;
+    d[o + 16] = soft;
     if (this.dirtyStart < 0) this.dirtyStart = i;
     this.dirtyCount++;
     if (i + 1 > this.highWater) this.highWater = i + 1;

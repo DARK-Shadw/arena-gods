@@ -13,6 +13,8 @@
  * Format spec: docs/fx-pipeline.md.
  */
 import * as THREE from 'three';
+import { LAYER } from '../../src/render/fx/fxLayers';
+import { SOFT_DEPTH_PARS, softDepthUniforms } from '../../src/render/fx/softDepth';
 
 export interface AtlasTier { file: string; w: number; h: number; frame?: number; frameW?: number; frameH?: number; bytes: number; ktx2?: string; ktx2Encoding?: string; scale?: number }
 export interface AtlasEntry {
@@ -130,16 +132,20 @@ export interface FlipbookOpts {
   tint?: THREE.ColorRepresentation;
   intensity?: number;          // HDR multiplier for emissive kinds (plan §2.4: cores 8-30)
   motionVectors?: boolean;     // false = plain crossfade (low tier)
+  /** soft-particle fade distance (m); default 0.25 emissive, 0.6 smoke / dust (F1, softDepth.ts) */
+  soft?: number;
 }
 
 const VERT = /* glsl */ `
 varying vec2 vUv;
+varying float vDepth;
 void main() {
   vUv = uv;
   // camera-facing card: take the object's world position, offset in view space
   vec4 mvPos = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
   vec2 scale = vec2(length(modelMatrix[0].xyz), length(modelMatrix[1].xyz));
   mvPos.xy += position.xy * scale;
+  vDepth = -mvPos.z;
   gl_Position = projectionMatrix * mvPos;
 }`;
 
@@ -158,7 +164,10 @@ uniform vec3 uKeyDir;        // light direction in VIEW space (towards the light
 uniform vec3 uKeyColor;
 uniform vec3 uAmbient;
 uniform float uFade;
+uniform float uSoft;
 varying vec2 vUv;
+varying float vDepth;
+${SOFT_DEPTH_PARS}
 
 vec2 cellUv(float f, vec2 uv) {
   float col = mod(f, uGrid.x);
@@ -198,8 +207,9 @@ void main() {
   } else {
     rgb = c.rgb * uTint * uIntensity;
   }
-  // premultiplied "additive-alpha" output (blend ONE, ONE_MINUS_SRC_ALPHA)
-  gl_FragColor = vec4(rgb * uFade, a * uFade);
+  // premultiplied "additive-alpha" output (blend ONE, ONE_MINUS_SRC_ALPHA); soft fade against the shared depth (F1)
+  float f = uFade * fxSoftFade(vDepth, uSoft);
+  gl_FragColor = vec4(rgb * f, a * f);
   #include <tonemapping_fragment>
   #include <colorspace_fragment>
 }`;
@@ -222,6 +232,8 @@ export function makeFlipbookMaterial(e: AtlasEntry, tex: THREE.Texture, mv: THRE
       uKeyColor: { value: new THREE.Color('#ffe2c0') },
       uAmbient: { value: new THREE.Color('#2a2f3a') },
       uFade: { value: 1 },
+      uSoft: { value: o.soft ?? (kind === 0 ? 0.25 : 0.6) },
+      ...softDepthUniforms,
     },
     vertexShader: VERT,
     fragmentShader: FRAG,
@@ -246,6 +258,8 @@ export function makeFlipbookCard(e: AtlasEntry, mat: THREE.ShaderMaterial, world
   const m = new THREE.Mesh(g, mat);
   m.scale.set(w * worldScale, h * worldScale, 1);
   m.frustumCulled = false;
+  // FX alpha layer: drawn after Post's depth copy, so the soft fade has a depth to read (F1)
+  m.layers.set(LAYER.FX_ALPHA);
   return m;
 }
 

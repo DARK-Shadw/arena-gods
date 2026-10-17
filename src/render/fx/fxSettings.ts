@@ -48,11 +48,15 @@ export function setGoreLevel(g: GoreLevel) {
   fxSettings.emit();
 }
 
-/** Per-tier caps (plan §2.6). Pools are allocated at the high cap once; lower tiers only shorten the ring. */
-export const TIER_CAPS: Record<FxQuality, { add: number; alpha: number; rings: number; debris: number; countScale: number }> = {
-  0: { add: 1500, alpha: 800, rings: 12, debris: 48, countScale: 1 },
-  1: { add: 3000, alpha: 1500, rings: 20, debris: 96, countScale: 1 },
-  2: { add: 4096, alpha: 2048, rings: 24, debris: 128, countScale: 1 },
+/**
+ * Per-tier caps (plan §2.6). Pools are allocated at the high cap once; lower tiers only shorten the ring.
+ * F1: `soft` = soft-particle depth fade (needs Post's linear-depth copy), `dist` = distortion
+ * sprites (0 off, 1 heavy events only = ops with tier <= 1, 2 all). Post reads the same table.
+ */
+export const TIER_CAPS: Record<FxQuality, { add: number; alpha: number; rings: number; debris: number; countScale: number; soft: boolean; dist: 0 | 1 | 2 }> = {
+  0: { add: 1500, alpha: 800, rings: 12, debris: 48, countScale: 1, soft: false, dist: 0 },
+  1: { add: 3000, alpha: 1500, rings: 20, debris: 96, countScale: 1, soft: true, dist: 1 },
+  2: { add: 4096, alpha: 2048, rings: 24, debris: 128, countScale: 1, soft: true, dist: 2 },
 };
 
 type Listener = (s: typeof fxSettings) => void;

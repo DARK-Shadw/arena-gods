@@ -17,6 +17,7 @@ import { FIGHTERS } from '../../src/sim/fighters';
 import { instantiate, loadCharacter, type CharAsset } from '../../src/render/character';
 import { buildLibClip, decodeClip, initLib, libClip, libIndexSync, rootAt, type DecodedClip } from '../../src/render/animLib';
 import { attachLab } from './labExtras';
+import { LAYER } from '../../src/render/fx/fxLayers';
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const qs = new URLSearchParams(location.search);
@@ -31,6 +32,9 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color('#2a2d33');
 scene.fog = new THREE.Fog('#2a2d33', 18, 40);
 const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 200);
+// FX particles live on their own layers since F1 (Post renders them in a separate pass); this lab renders directly
+camera.layers.enable(LAYER.FX_ADD);
+camera.layers.enable(LAYER.FX_ALPHA);
 camera.position.set(0.8, 1.6, 5.2);
 const controls = new OrbitControls(camera, canvas);
 controls.target.set(0.8, 0.95, 0);

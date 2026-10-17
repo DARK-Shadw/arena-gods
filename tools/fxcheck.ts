@@ -56,7 +56,7 @@ for (const id of probe) {
   // expiry
   A.setTime(10);
   const e = A.stats();
-  ok(e.particles.add === 0 && e.particles.alpha === 0 && e.rings === 0 && e.debris === 0 && e.effects === 0, `${id} expires: ${JSON.stringify(e.particles)}`);
+  ok(e.particles.add === 0 && e.particles.alpha === 0 && e.dist === 0 && e.rings === 0 && e.debris === 0 && e.effects === 0, `${id} expires: ${JSON.stringify(e.particles)} dist ${e.dist}`);
   A.dispose(), B.dispose(), C.dispose();
 }
 
@@ -87,6 +87,21 @@ for (const id of probe) {
   const after = fx.stats();
   ok(before.particles.add > 0 && after.particles.add === 0 && after.debris === 0 && after.rings === 0, `clear: ${JSON.stringify(before.particles)} -> ${JSON.stringify(after.particles)}`);
   fx.dispose();
+}
+
+// 4b. F1 distortion tiers: low spawns none, medium only heavy (tier 1) ops, high all
+{
+  const counts: number[] = [];
+  for (const q of [0, 1, 2]) {
+    const fx = createFxDirector({ seed: 9, quality: q });
+    fx.spawn('explosion.keg', P, { seed: 1, t: 0 });
+    fx.spawn('hazard.burn', P, { seed: 2, t: 0 });
+    fx.setTime(0.2);
+    counts.push(fx.stats().dist);
+    fx.dispose();
+  }
+  ok(counts[0] === 0 && counts[1] === 2 && counts[2] === 3, `distortion tiers q0/q1/q2 = ${counts.join('/')} (want 0/2/3)`);
+  createFxDirector({ quality: 2 }).dispose();
 }
 
 // 5. grep gate

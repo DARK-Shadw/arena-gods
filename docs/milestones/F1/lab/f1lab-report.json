@@ -1,0 +1,58 @@
+{
+ "logs": [],
+ "stats": {
+  "item": "f1.bloom",
+  "t": 0.5,
+  "duration": 4,
+  "seed": 1,
+  "quality": 2,
+  "gore": "standard",
+  "fx": {
+   "t": 0.5,
+   "particles": {
+    "add": 75,
+    "alpha": 10,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "dist": 0,
+   "rings": 1,
+   "arrows": 0,
+   "debris": 0,
+   "effects": 2,
+   "pending": 0,
+   "spawns": 2,
+   "light": 0.013,
+   "quality": 2,
+   "gore": "standard",
+   "cpu": {
+    "frameMs": 0,
+    "updateMs": 0,
+    "frameMax": 0,
+    "updateMax": 0
+   }
+  },
+  "post": {
+   "on": true,
+   "look": "lab",
+   "preset": "",
+   "presetW": 1,
+   "soft": true,
+   "dist": true,
+   "bloom": {
+    "threshold": 1.15,
+    "knee": 0.55,
+    "strength": 0.4,
+    "radius": 0.6
+   },
+   "gpu": {}
+  },
+  "drawCalls": 41,
+  "triangles": 93024,
+  "frameMs": 57.27225415356075,
+  "renderMs": 4.866570311559289,
+  "atlasFormat": "webp",
+  "atlasGpuMB": 7.010416666666666,
+  "textures": 40
+ }
+}

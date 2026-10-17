@@ -80,6 +80,8 @@ class App {
   private lastAttackId = [0, 0];
   private aberration = 0;
   private flash = 0;
+  /** F1: vignette kick from FX defs (decays like the flash) */
+  private vignetteKick = 0;
   private fps = 60;
   private moveCache: Record<string, MoveDef> = {};
   private victoryShown = false;
@@ -122,6 +124,7 @@ class App {
     this.scene.add(this.keyLight, this.keyLight.target, this.rimLight, this.rimLight.target);
     this.post = new Post(this.renderer, this.scene, this.camera);
     this.post.quality = this.quality;
+    this.post.distActive = () => this.vfx.dist.active;
     this.ui = new UI(document.getElementById('ui')!);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enabled = false;
@@ -181,7 +184,7 @@ class App {
     this.arena = new Arena(this.scene, this.renderer, generateArena(spec), this.quality);
     const T = THEME_DEFS[spec.theme];
     this.renderer.toneMappingExposure = T.exposure;
-    this.post.setLook({ bloom: T.bloom, grade: T.grade, godrays: T.godrays, sunDir: T.sky.sunDir, rayColor: T.sunColor });
+    this.post.setLook({ id: T.id, bloom: T.bloom, grade: T.grade, godrays: T.godrays, sunDir: T.sky.sunDir, rayColor: T.sunColor });
     this.keyLight.color.set(T.key);
     this.rimLight.color.set(T.rim);
     const L = this.arena.layout;
@@ -569,6 +572,8 @@ class App {
       const pp = this.fx.takePost();
       this.aberration = Math.max(this.aberration, pp.aberration);
       this.flash = Math.max(this.flash, pp.flash);
+      this.vignetteKick = Math.max(this.vignetteKick, pp.vignette);
+      for (const g of pp.grades) this.post.kickPreset(g.id, g.weight, g.dur);
     }
     this.finFx.update(fxDt);
     this.arena.update(realDt, this.camera, this.renderer.domElement.height);
@@ -576,7 +581,8 @@ class App {
     audio.setCrowd(this.arena.excitement);
     this.aberration *= Math.exp(-realDt * 8);
     this.flash *= Math.exp(-realDt * 10);
-    this.post.update(realDt, { dof, focus, aberration: this.aberration, desat, flash: this.flash });
+    this.vignetteKick *= Math.exp(-realDt * 5);
+    this.post.update(realDt, { dof, focus, aberration: this.aberration, desat, flash: this.flash, vignette: this.vignetteKick });
     if (!this.noRender && !this.headless) this.post.render();
   }
 

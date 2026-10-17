@@ -1,6 +1,6 @@
 # Arena Gods: visual effects (FX) overhaul plan
 
-Status: PLAN. Nothing in it is implemented yet. It was written on 2026-10-17 on branch `anim-plan` while the animation overhaul is still running.
+Status: PLAN, written on 2026-10-17 on branch `anim-plan`. F0, F1 and F2 are done (`docs/milestones/F0`, `F1`, `F2`); where they differ from this plan, the milestone README wins and the deviations are marked **[F1]** below.
 
 **Companion documents**
 - `docs/fx-catalog.md` lists every effect with its trigger, duration, layers, technique, assets, light, cost, quality-tier behaviour, audio and priority.
@@ -111,6 +111,7 @@ Status: PLAN. Nothing in it is implemented yet. It was written on 2026-10-17 on 
   - Pass the same depth to Bokeh, so it stops rendering its own. `BokehPass` samples `uniforms.tDepth`, but its `render()` always draws a `MeshDepthMaterial` pass first, so this needs a small subclass that skips that pass. Its shader expects packed RGBA depth unless the `DEPTH_PACKING` define is changed: verify.
   - Pass it to GTAO through its `parameters.depthTexture` if that path works in r170; verify, otherwise leave GTAO as it is.
   - This also removes the hard intersection lines on large dust and smoke cards.
+  - **[F1] Verified and built:** Post (`src/render/post.ts`) no longer uses EffectComposer. GTAO takes the shared depth, but r170's `GTAOPass.setGBuffer()` and `setSize()` throw with an external depth (they touch `normalRenderTarget`, which only exists when GTAO renders its own G-buffer), so a 6-line subclass supplies a stand-in. GTAO's normal-less path rebuilds normals 13 times per pixel inside its denoiser (measured slower than the old G-buffer render), so the half-res linear-depth copy is an RGBA16F target that also carries normals rebuilt once from depth. Bokeh reads the depth texture directly (`DEPTH_PACKING 0`). MSAA on the scene target works (three resolves the depth texture) but is off by default; see the F1 README for its cost.
 - **MSAA.** `EffectComposer`'s targets have no MSAA samples, so `antialias:true` on the renderer has no effect on the composed image. Thin trails and sparks will alias.
   - Give the `ScenePass` target `samples: 4` on high (WebGL2 multisampled render target, resolved automatically), 0 on low.
   - Measure the cost.
@@ -165,7 +166,9 @@ Status: PLAN. Nothing in it is implemented yet. It was written on 2026-10-17 on 
 - **Bloom.**
   - Lower the theme thresholds towards about 1.0–1.2, with strength lowered so the scene does not glow overall. That gives fire bodies soft halos while the cores stay hot.
   - P2 option: replace `UnrealBloomPass` (10 blur passes + composite) with a dual-filter bloom (13-tap downsample, tent upsample; about 6 cheaper passes). Measure first.
+  - **[F1] Done differently:** the dual-filter bloom shipped in F1 (soft-knee Karis prefilter, 4–5 down, tent up, composited inside the final pass). Night and fire themes use thresholds 1.1–1.25; day themes keep 1.6–2.2 because sunlit stone sits at 1.5–3 and hazed over at 1.2. The numbers live in `src/render/fx/fxLook.ts` (`THEME_LOOK`), not in `themes.ts` (the arena session's file). `HDR_SCALE` in `fxDefs.ts` holds the FX intensity convention; its values are below the plan's (sparks 3, flash 2.2, fire 1.8) because the F0 dots overlap additively.
 - **Grade preset stack.** `post.update` gets `presets: {finisher, ultimate, lastStand, killcam, victory}` weights, each preset a small `Grade` delta, blended in on top of the theme grade. The existing `desat`, `flash` and `aberration` become presets fed from FX defs.
+  - **[F1]** Built as `post.setPreset(id, w)` / `post.kickPreset(id, w, dur)` with `GRADE_PRESETS` (finisher, ultimate, lastStand, killcam, victory, impact) and `FxDef.post.grade`. Nothing in the game holds a preset yet: the killcam / finisher `desat` stays as it was until F7 wires the beats. The grade also gained split toning (cool shadows, warm highlights) and a black toe (`crush`).
 - **Distortion.** The grade pass reads `tDistort` (half-res RG) before its CA fetches, so it costs one extra fetch.
 - **Vignette pulse** for last stand and near death.
 - **DOF** stays where it is used today, now fed by the shared depth.
@@ -192,7 +195,7 @@ Typical combat on high, Arc iGPU at 1080p: **2.0 ms GPU and 0.6 ms CPU** for FX.
 | Overdraw cap (screen-equivalents of alpha FX) | 0.75 | 1.5 | 3.0 |
 | Soft particles | depth fade off except fog | on | on |
 | Motion-vector flipbook blend | off (crossfade) | on | on |
-| Distortion buffer | off | heavy events only | on |
+| Distortion buffer | off | heavy events only | on (**[F1]** the pass only runs while a sprite lives) |
 | Afterimage ghosts per fighter | 0 (dust only) | 1 | 3 |
 | FX light pool slots | 1 | 2 | 3 |
 | Arena real flame lights | 1 | 2 | 4 |
@@ -200,7 +203,7 @@ Typical combat on high, Arc iGPU at 1080p: **2.0 ms GPU and 0.6 ms CPU** for FX.
 | Fog cards | 0 | 8 | 20 |
 | Wound spheres per fighter | 4 | 6 | 8 |
 | Atlas resolution | half (1024²) | full (2048²) | full |
-| MSAA on the scene pass | 0 | 0 (measure) | 4 (measure) |
+| MSAA on the scene pass | 0 | 0 (measure) | 4 (measure); **[F1]** measured, default 0 on every tier, `?msaa=4` to force |
 
 `App.setQuality` / `KeyQ` / `autoTune` already exist in `main.ts`. FX read `quality` through one `fxSettings.quality` value with a change listener, and never rebuild materials on a tier change (they toggle uniforms and caps instead).
 

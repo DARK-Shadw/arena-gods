@@ -101,3 +101,34 @@ F0 op kinds map 1:1 to the old primitives: `sparks, flash, dust, smoke, fire, fi
 ## Quality tiers
 
 `fxSettings.setQuality(0|1|2)` (main.ts calls it from `setQuality` / `KeyQ`). Pools are allocated once at the high cap and only the ring length changes (`TIER_CAPS`: additive 1500 / 3000 / 4096, alpha 800 / 1500 / 2048); materials are never rebuilt. `countScale` is 1 on every tier in F0 (no visual change).
+
+## F1 additions (post, depth, distortion)
+
+| File | What it is |
+|---|---|
+| `fxLayers.ts` | `LAYER` (`WORLD 0`, `FX_ADD 20`, `FX_ALPHA 21`, `FX_DIST 22`, `FX_GHOST 23`) and the masks Post renders with. Particles, rings and arrows are on FX layers; debris stays on WORLD (it casts shadows). |
+| `softDepth.ts` | `softDepthUniforms` (shared uniform objects: `uSceneDepth`, `uDepthInvRes`, `uSoftOn`), `SOFT_DEPTH_PARS` (GLSL `fxSoftFade(viewDepth, softness)`), `SOFTNESS` (per-primitive default fade distance in metres). |
+| `distortion.ts` | `DistortionSprites`: stateless heat columns (kind 0) and pressure ripples (kind 1) on `FX_DIST`. |
+| `fxLook.ts` | `THEME_LOOK` (F1 bloom + split-tone + black-crush row per theme), `GRADE_PRESETS` (per-moment grade deltas). |
+| `../post.ts` | `Post`: the pipeline (scene + shared depth, linear depth / normals, GTAO, FX pass, distortion, rays, DOF, dual bloom, final grade). `POST_TIERS`. |
+
+**Defs.**
+- New op kinds: `{ k: 'heat', size, height, life, strength?, rise?, tier? }` and `{ k: 'ripple', size, life, strength?, tier? }`. `tier` is the lowest distortion tier that shows it (`TIER_CAPS.dist`: 0 low = none, 1 medium = ops with tier 1, 2 high = all). Defaults: heat 2, ripple 1.
+- `soft` (metres) on a def or a layer overrides the primitive's soft-particle distance; 0 = hard.
+- `hdr` on sparks / flash / fire / fireBurst / embers overrides the HDR multiplier (`HDR_SCALE` in `fxDefs.ts`).
+- `post.vignette` (0..1 kick) and `post.grade` / `gradeWeight` / `gradeDur` (a `GRADE_PRESETS` pulse). `fx.takePost()` now returns `{ aberration, flash, vignette, grades[] }`; `main.ts` maxes the vignette and forwards grade kicks to `post.kickPreset`.
+
+**Post (game and lab).**
+```ts
+const post = new Post(renderer, scene, camera);      // ?msaa=N forces MSAA on the high tier
+post.quality = 0 | 1 | 2;                             // POST_TIERS
+post.distActive = () => fx.vfx.dist.active;           // skip the distortion pass while nothing lives
+post.setLook({ id: theme.id, bloom, grade, godrays, sunDir, rayColor });
+post.setPreset('killcam', 1);                         // hold a grade preset (eased); 0 releases (F7 hook)
+post.kickPreset('impact', 0.8, 0.4);                  // decaying pulse
+post.update(dt, { dof, focus, aberration, desat, flash, vignette });
+post.render();
+post.setProfiling(true); post.gpuTimes();             // GPU ms per pass (timer queries)
+post.softEnabled / post.distEnabled                   // A/B switches (FX Lab)
+```
+A soft card for another system: spread `softDepthUniforms` into the material's uniforms, include `SOFT_DEPTH_PARS`, pass `-mvPosition.z` in a varying, multiply alpha by `fxSoftFade(depth, softness)` and put the mesh on `LAYER.FX_ALPHA`. A plain `renderer.render` (Animation Lab) must enable the FX layers on its camera to see particles.

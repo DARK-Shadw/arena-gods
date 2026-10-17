@@ -19,7 +19,7 @@ import type { Frame, MatchRecord, MoveDef, SimEvent } from '../../sim/types';
 import { VFX } from './legacyVfx';
 import { FxRng, hashN, hashStr } from './fxRng';
 import { fxSettings, goreLevel, type GoreLevel } from './fxSettings';
-import { CONTINUOUS, DEFS, ON_ACTIVE, PROJ_TRAIL_RATE, RESOLVE, RING_FIRE_RATE, defDuration, projEnd, projTrail, type Anchor, type FxDef, type FxLayer } from './fxDefs';
+import { CONTINUOUS, DEFS, ON_ACTIVE, PROJ_TRAIL_RATE, RESOLVE, RING_FIRE_RATE, RING_HEAT_RATE, defDuration, projEnd, projTrail, type Anchor, type FxDef, type FxLayer } from './fxDefs';
 import { fxProfiler } from './profiler';
 
 type V3 = { x: number; y: number; z: number };
@@ -62,9 +62,20 @@ export interface FxFrameInput {
   simDt: number;
 }
 
+/** Post kicks requested by defs since the last takePost() (main.ts maxes them into the post state). */
+export interface FxPostKicks {
+  aberration: number;
+  flash: number;
+  vignette: number;
+  /** grade preset kicks (post.ts GRADE_PRESETS): strongest weight per id this frame */
+  grades: { id: string; weight: number; dur: number }[];
+}
+
 export interface FxStats {
   t: number;
   particles: { add: number; alpha: number; addCap: number; alphaCap: number };
+  /** live distortion sprites (F1) */
+  dist: number;
   rings: number;
   arrows: number;
   debris: number;
@@ -97,7 +108,7 @@ export class FxDirector {
   private evIndex = new Map<SimEvent, number>();
   private matchSeed = 1;
   private pending: Pending[] = [];
-  private post = { aberration: 0, flash: 0 };
+  private post: FxPostKicks = { aberration: 0, flash: 0, vignette: 0, grades: [] };
   private lastPhase = [-1, -1];
   private lastAttackId = [0, 0];
   private lastSimT = 0;
@@ -138,7 +149,8 @@ export class FxDirector {
   private resetState(t: number, simT = t) {
     this.vfx.reset(this.matchSeed, t);
     this.pending.length = 0;
-    this.post.aberration = this.post.flash = 0;
+    this.post.aberration = this.post.flash = this.post.vignette = 0;
+    this.post.grades.length = 0;
     this.lastPhase = [-1, -1];
     this.lastAttackId = [0, 0];
     this.lastSimT = simT;
@@ -193,7 +205,10 @@ export class FxDirector {
           }
         }
       }
-      if (fr.ringS < 0.995) this.ticks('ring.fire', RING_FIRE_RATE, tPrev, t1, 0x7121, { ringS: fr.ringS });
+      if (fr.ringS < 0.995) {
+        this.ticks('ring.fire', RING_FIRE_RATE, tPrev, t1, 0x7121, { ringS: fr.ringS });
+        if (fxSettings.caps().dist >= 2) this.ticks('ring.heat', RING_HEAT_RATE, tPrev, t1, 0x7122, { ringS: fr.ringS });
+      }
       for (const p of fr.proj) {
         const id = projTrail(p.fx);
         if (id) this.ticks(id, PROJ_TRAIL_RATE, tPrev, t1, hashN(0x9e, p.id), { pos: { x: p.x, y: p.y, z: p.z } });
@@ -259,10 +274,12 @@ export class FxDirector {
     }
   }
 
-  /** Post kicks requested since the last call (the game maxes them into its aberration / flash). */
-  takePost(): { aberration: number; flash: number } {
-    const out = { aberration: this.post.aberration, flash: this.post.flash };
-    this.post.aberration = this.post.flash = 0;
+  /** Post kicks requested since the last call (the game maxes them into its aberration / flash / vignette). */
+  takePost(): FxPostKicks {
+    const P = this.post;
+    const out: FxPostKicks = { aberration: P.aberration, flash: P.flash, vignette: P.vignette, grades: P.grades.slice() };
+    P.aberration = P.flash = P.vignette = 0;
+    P.grades.length = 0;
     return out;
   }
 
@@ -280,8 +297,19 @@ export class FxDirector {
       if (!sub) return false;
       def = DEFS[sub] ?? def;
     }
-    if (def.post?.aberration) this.post.aberration = Math.max(this.post.aberration, def.post.aberration);
-    if (def.post?.flash) this.post.flash = Math.max(this.post.flash, def.post.flash);
+    const pk = def.post;
+    if (pk) {
+      const P = this.post;
+      if (pk.aberration) P.aberration = Math.max(P.aberration, pk.aberration);
+      if (pk.flash) P.flash = Math.max(P.flash, pk.flash);
+      if (pk.vignette) P.vignette = Math.max(P.vignette, pk.vignette);
+      if (pk.grade) {
+        const w = pk.gradeWeight ?? 1;
+        const g = P.grades.find((x) => x.id === pk.grade);
+        if (g) (g.weight = Math.max(g.weight, w)), (g.dur = Math.max(g.dur, pk.gradeDur ?? 0.6));
+        else if (P.grades.length < 8) P.grades.push({ id: pk.grade, weight: w, dur: pk.gradeDur ?? 0.6 });
+      }
+    }
     const now = this.vfx.clock.t;
     def.layers.forEach((L, i) => {
       const at = t0 + (L.delay ?? 0);
@@ -388,6 +416,19 @@ export class FxDirector {
     const op = L.op;
     const s = fxSettings.caps().countScale;
     const N = (n: number) => (s === 1 ? n : Math.max(1, Math.round(n * s)));
+    // per-layer overrides read by the primitives (soft-particle distance, HDR multiplier)
+    V.softOverride = L.soft ?? def.soft;
+    V.hdrOverride = 'hdr' in op ? op.hdr : undefined;
+    try {
+      this.runOp(op, ctx, r, t, p, N);
+    } finally {
+      V.softOverride = undefined;
+      V.hdrOverride = undefined;
+    }
+  }
+
+  private runOp(op: FxLayer['op'], ctx: SpawnCtx, r: FxRng, t: number, p: THREE.Vector3, N: (n: number) => number) {
+    const V = this.vfx;
     switch (op.k) {
       case 'sparks':
         V.sparksAt(r, t, p, N(op.n), this.color(op.color, ctx, '#ffc070'), op.speed ?? 7);
@@ -438,6 +479,12 @@ export class FxDirector {
         }
         break;
       }
+      case 'heat':
+        V.heatAt(r, t, p, op.size, op.height, op.life, op.strength ?? 1, op.rise ?? 1.5, op.tier ?? 2);
+        break;
+      case 'ripple':
+        V.rippleAt(r, t, p, op.size, op.life, op.strength ?? 1, op.tier ?? 1);
+        break;
     }
   }
 
@@ -474,6 +521,7 @@ export class FxDirector {
     return {
       t: +this.vfx.clock.t.toFixed(4),
       particles: { add: c.add, alpha: c.alpha, addCap: c.addCap, alphaCap: c.alphaCap },
+      dist: c.dist,
       rings: c.rings,
       arrows: c.arrows,
       debris: c.debris,

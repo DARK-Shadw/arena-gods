@@ -43,24 +43,46 @@ export type Anchor =
 export type FxColor = string;
 export type Vec3 = [number, number, number];
 
-/** One emission. Kinds map 1:1 to the primitives in legacyVfx.ts (F0); F1+ add flipbook/ribbon/decal/card/dist/light kinds. */
+/**
+ * One emission. Kinds map 1:1 to the primitives in legacyVfx.ts (F0); F1 adds the distortion kinds
+ * `heat` and `ripple`; F3+ add flipbook/ribbon/decal/card/light kinds.
+ * `hdr` (sparks, flash, fire, fireBurst, embers) overrides the primitive's HDR multiplier (HDR_SCALE).
+ */
 export type FxOp =
-  | { k: 'sparks'; n: number; color?: FxColor; speed?: number }
-  | { k: 'flash'; color?: FxColor; size?: number; light?: number }
+  | { k: 'sparks'; n: number; color?: FxColor; speed?: number; hdr?: number }
+  | { k: 'flash'; color?: FxColor; size?: number; light?: number; hdr?: number }
   | { k: 'dust'; n: number; spread?: number; color?: FxColor }
   | { k: 'smoke'; n: number; color?: FxColor; size?: number; rise?: number }
   /** vel: fixed velocity, or 'facing' (actor facing x speed, y = -0.05) */
-  | { k: 'fire'; n: number; size?: number; spread?: number; vel?: Vec3; facing?: number }
+  | { k: 'fire'; n: number; size?: number; spread?: number; vel?: Vec3; facing?: number; hdr?: number }
   /**
    * Fire burst, one particle per direction:
    *  sphere: dir = normalize(r-0.5, r*0.9+0.2, r-0.5) * speed[0..1]
    *  ring:   n evenly spaced horizontal dirs * speed[0], vy = speed[1]
    *  box:    ((r-0.5)*box[0], box[1] + r*box[1], (r-0.5)*box[2])
    */
-  | { k: 'fireBurst'; n: number; shape: 'sphere' | 'ring' | 'box'; speed?: [number, number]; box?: Vec3; size: number; spread: number }
-  | { k: 'embers'; n: number; color?: FxColor; area?: number }
+  | { k: 'fireBurst'; n: number; shape: 'sphere' | 'ring' | 'box'; speed?: [number, number]; box?: Vec3; size: number; spread: number; hdr?: number }
+  | { k: 'embers'; n: number; color?: FxColor; area?: number; hdr?: number }
   | { k: 'shock'; color?: FxColor; size?: number; life?: number }
-  | { k: 'debris'; n: number; color?: FxColor };
+  | { k: 'debris'; n: number; color?: FxColor }
+  /**
+   * F1 screen distortion (distortion.ts). heat: shimmer column standing on the anchor (width `size`,
+   * `height`, rising at `rise` m/s); ripple: expanding pressure ring of radius `size`.
+   * `strength` 1 = a few pixels at 5 m. `tier` = lowest distortion tier that shows it
+   * (TIER_CAPS.dist: 1 = heavy events, also on medium; 2 = high only). Defaults: heat 2, ripple 1.
+   */
+  | { k: 'heat'; size: number; height: number; life: number; strength?: number; rise?: number; tier?: 1 | 2 }
+  | { k: 'ripple'; size: number; life: number; strength?: number; tier?: 1 | 2 };
+
+/**
+ * HDR convention (plan §2.4, applied from F1): linear colour multipliers per primitive, so cores
+ * reach the bloom threshold (~1) and bodies glow softly while smoke and dust stay at scene level.
+ * The hex colours in the rows below are the hue; this table is the intensity. Tune here, or per
+ * op with `hdr`. Plan targets: cores 8-30, bodies 1.5-4, sparks 6-12, smoke/dust <= 1. The
+ * values are lower than the plan's because the F0 shapes overlap (additive) and a soft dot
+ * already sums 2-4 deep in a burst; F3 sprite atlases should move towards the plan's numbers.
+ */
+export const HDR_SCALE = { sparks: 3, flash: 2.2, fire: 1.8, embers: 3, dust: 1, smoke: 1 } as const;
 
 export interface FxLayer {
   op: FxOp;
@@ -72,6 +94,8 @@ export interface FxLayer {
   minY?: number;
   /** seconds after the spawn, on FX time (replaces a wall-clock timer) */
   delay?: number;
+  /** soft-particle fade distance (m) for this layer; overrides the def's `soft` and the primitive default (softDepth.ts SOFTNESS). 0 = hard */
+  soft?: number;
 }
 
 export interface FxDef {
@@ -81,8 +105,14 @@ export interface FxDef {
   at: Anchor;
   y?: number;
   layers: FxLayer[];
-  /** post kicks the game applies this frame (max with what is already running) */
-  post?: { aberration?: number; flash?: number };
+  /**
+   * post kicks the game applies this frame (max with what is already running). `vignette` darkens the
+   * frame edge (0..1, decays in ~0.4 s); `grade` kicks a grade preset (post.ts GRADE_PRESETS) at
+   * `gradeWeight` (default 1) that fades out over `gradeDur` seconds (default 0.6).
+   */
+  post?: { aberration?: number; flash?: number; vignette?: number; grade?: string; gradeWeight?: number; gradeDur?: number };
+  /** soft-particle fade distance (m) for every particle layer of this def (default: per primitive) */
+  soft?: number;
   /** id substitution by gore level (blood rows from F3 on). null = nothing at that level */
   gore?: { off?: string | null; standard?: string | null; full?: string | null };
   /** budget culling order (higher survives); unused until the F3 budget */
@@ -113,14 +143,32 @@ for (const [kind, color] of [
     desc: `heavy hit (${kind})`,
     at: 'contact',
     priority: 60,
-    post: { aberration: 1, flash: 0.06 },
-    layers: [{ op: { k: 'sparks', n: 40, color, speed: 9 } }, { op: { k: 'flash', color, size: 1.6, light: 14 } }, { op: { k: 'dust', n: 10, spread: 1.2 }, at: 'bFeet' }],
+    post: { aberration: 1, flash: 0.06, vignette: 0.12 },
+    layers: [
+      { op: { k: 'sparks', n: 40, color, speed: 9 } },
+      { op: { k: 'flash', color, size: 1.6, light: 14 } },
+      { op: { k: 'dust', n: 10, spread: 1.2 }, at: 'bFeet' },
+      { op: { k: 'ripple', size: 1.4, life: 0.32, strength: 0.9 } },
+    ],
   });
 }
-def({ id: 'impact.quake', desc: 'quake hit: ground ring at the attacker', at: 'aFeet', priority: 55, layers: [{ op: { k: 'shock', color: '#ffb070', size: 8, life: 0.6 } }, { op: { k: 'dust', n: 30, spread: 2.5 } }] });
+def({
+  id: 'impact.quake',
+  desc: 'quake hit: ground ring at the attacker',
+  at: 'aFeet',
+  priority: 55,
+  layers: [{ op: { k: 'shock', color: '#ffb070', size: 8, life: 0.6 } }, { op: { k: 'dust', n: 30, spread: 2.5 } }, { op: { k: 'ripple', size: 4, life: 0.5, strength: 1.1 }, y: 0.4 }],
+});
 def({ id: 'impact.fireBurst', desc: 'fire hit: flames off the contact', at: 'contact', priority: 45, layers: [{ op: { k: 'fire', n: 6, size: 0.4, spread: 1, vel: [0, 2, 0] } }] });
 def({ id: 'block.sparks', desc: 'blocked strike', at: 'blockContact', priority: 50, layers: [{ op: { k: 'sparks', n: 16, color: '#ffd59a', speed: 5 } }, { op: { k: 'flash', color: '#ffe2b0', size: 0.5, light: 3 } }] });
-def({ id: 'parry.flash', desc: 'parry', at: 'parryContact', priority: 70, post: { aberration: 0.8 }, layers: [{ op: { k: 'sparks', n: 50, color: '#cfe6ff', speed: 9 } }, { op: { k: 'flash', color: '#d8ecff', size: 1.6, light: 16 } }] });
+def({
+  id: 'parry.flash',
+  desc: 'parry',
+  at: 'parryContact',
+  priority: 70,
+  post: { aberration: 0.8 },
+  layers: [{ op: { k: 'sparks', n: 50, color: '#cfe6ff', speed: 9 } }, { op: { k: 'flash', color: '#d8ecff', size: 1.6, light: 16 } }, { op: { k: 'ripple', size: 1.1, life: 0.25, strength: 0.7 } }],
+});
 def({ id: 'guard.break', desc: 'guard broken', at: 'aChest', priority: 55, layers: [{ op: { k: 'sparks', n: 30, color: '#ffb070', speed: 7 } }] });
 def({ id: 'dodge.dust', desc: 'dodge start', at: 'aFeet', priority: 20, layers: [{ op: { k: 'dust', n: 8, spread: 0.9 } }] });
 def({
@@ -140,13 +188,13 @@ def({
   desc: 'ultimate used',
   at: 'aChest',
   priority: 80,
-  post: { flash: 0.08 },
-  layers: [{ op: { k: 'flash', color: '$accent', size: 2.5, light: 20 } }, { op: { k: 'shock', color: '$accent', size: 4, life: 0.6 }, at: 'aFeet' }],
+  post: { flash: 0.08, vignette: 0.2 },
+  layers: [{ op: { k: 'flash', color: '$accent', size: 2.5, light: 20 } }, { op: { k: 'shock', color: '$accent', size: 4, life: 0.6 }, at: 'aFeet' }, { op: { k: 'ripple', size: 3, life: 0.5, strength: 1.2 } }],
 });
 def({ id: 'secondWind.burst', desc: 'second wind / cornered', at: 'aFeet', priority: 70, layers: [{ op: { k: 'embers', n: 60, color: '$accent', area: 1.2 }, y: 0.3 }, { op: { k: 'shock', color: '$accent', size: 5, life: 0.7 } }] });
 def({ id: 'lastStand.burst', desc: 'last stand', at: 'aFeet', priority: 75, layers: [{ op: { k: 'embers', n: 80, color: '#ff3a2a', area: 1.4 }, y: 0.3 }, { op: { k: 'shock', color: '#ff3a2a', size: 6, life: 0.8 } }] });
-def({ id: 'hazard.burn', desc: 'standing in fire / lava (tick)', at: 'aFeet', y: 0.4, priority: 40, layers: [{ op: { k: 'fire', n: 6, size: 0.4, spread: 0.5, vel: [0, 2, 0] } }] });
-def({ id: 'finisher.start', desc: 'finisher begins (post only)', at: 'aChest', priority: 90, post: { flash: 0.12 }, layers: [] });
+def({ id: 'hazard.burn', desc: 'standing in fire / lava (tick)', at: 'aFeet', y: 0.4, priority: 40, layers: [{ op: { k: 'fire', n: 6, size: 0.4, spread: 0.5, vel: [0, 2, 0] } }, { op: { k: 'heat', size: 0.9, height: 1.8, life: 0.9, strength: 0.8 }, y: 0.2 }] });
+def({ id: 'finisher.start', desc: 'finisher begins (post only)', at: 'aChest', priority: 90, post: { flash: 0.12, vignette: 0.25 }, layers: [] });
 def({ id: 'finisher.graze', desc: 'non-lethal finisher contact', at: 'bChest', priority: 50, layers: [{ op: { k: 'sparks', n: 24, color: '#fff0c8', speed: 6 } }, { op: { k: 'dust', n: 8, spread: 1.0 }, at: 'bFeet' }] });
 def({ id: 'finisher.kill', desc: 'finisher kill contact (geometry FX are FinisherFx)', at: 'bChest', priority: 90, post: { aberration: 1.4 }, layers: [] });
 def({ id: 'launch.land', desc: 'landing after a launch', at: 'aFeet', priority: 50, layers: [{ op: { k: 'dust', n: 26, spread: 1.8 } }, { op: { k: 'shock', color: '#c8b090', size: 4, life: 0.5 } }] });
@@ -155,8 +203,13 @@ def({
   desc: 'killing blow (no finisher)',
   at: 'bChest',
   priority: 95,
-  post: { flash: 0.25, aberration: 1.5 },
-  layers: [{ op: { k: 'sparks', n: 80, color: '#fff0c0', speed: 11 } }, { op: { k: 'flash', color: '#fff0d0', size: 3, light: 30 } }, { op: { k: 'shock', color: '#ffffff', size: 7, life: 0.8 }, at: 'bFeet' }],
+  post: { flash: 0.25, aberration: 1.5, vignette: 0.35 },
+  layers: [
+    { op: { k: 'sparks', n: 80, color: '#fff0c0', speed: 11 } },
+    { op: { k: 'flash', color: '#fff0d0', size: 3, light: 30 } },
+    { op: { k: 'shock', color: '#ffffff', size: 7, life: 0.8 }, at: 'bFeet' },
+    { op: { k: 'ripple', size: 3.5, life: 0.55, strength: 1.5 } },
+  ],
 });
 def({ id: 'kill.finisher', desc: 'finisher kill (its FX played on contact)', at: 'bChest', priority: 90, post: { aberration: 0.8 }, layers: [] });
 
@@ -166,8 +219,10 @@ def({
   desc: 'powder keg explosion',
   at: 'event',
   priority: 90,
-  post: { flash: 0.07, aberration: 1.2 },
+  post: { flash: 0.07, aberration: 1.2, vignette: 0.3 },
   layers: [
+    { op: { k: 'ripple', size: 6, life: 0.6, strength: 2 }, minY: 0.6 },
+    { op: { k: 'heat', size: 3.2, height: 4.5, life: 2.6, strength: 1.4, rise: 2.2, tier: 1 }, y: 0.1 },
     { op: { k: 'flash', color: '#ffc070', size: 4, light: 40 }, minY: 0.6 },
     { op: { k: 'shock', color: '#ffb060', size: 7, life: 0.6 }, y: 0.1 },
     { op: { k: 'fireBurst', n: 60, shape: 'sphere', speed: [6, 12], size: 0.7, spread: 0.6 }, minY: 0.6 },
@@ -192,12 +247,25 @@ def({
   priority: 70,
   layers: [{ op: { k: 'sparks', n: 50, color: '#ffcf80', speed: 9 } }, { op: { k: 'dust', n: 30, spread: 2.5 } }, { op: { k: 'shock', color: '#e0c8a0', size: 5, life: 0.6 } }],
 });
-def({ id: 'hazard.fire.hit', desc: 'thrown into lava / a fire pit', at: 'bFeet', y: 0.4, priority: 60, layers: [{ op: { k: 'fireBurst', n: 24, shape: 'box', box: [3, 3, 3], size: 0.6, spread: 0.6 } }] });
+def({
+  id: 'hazard.fire.hit',
+  desc: 'thrown into lava / a fire pit',
+  at: 'bFeet',
+  y: 0.4,
+  priority: 60,
+  layers: [{ op: { k: 'fireBurst', n: 24, shape: 'box', box: [3, 3, 3], size: 0.6, spread: 0.6 } }, { op: { k: 'heat', size: 1.6, height: 2.6, life: 1.4, strength: 1.2, tier: 1 }, y: 0.1 }],
+});
 def({ id: 'hazard.spikes.hit', desc: 'thrown onto spikes', at: 'bFeet', y: 0.4, priority: 55, layers: [{ op: { k: 'sparks', n: 30, color: '#ffd0a0', speed: 8 } }] });
 def({ id: 'hazard.geyser.hit', desc: 'launched by a geyser', at: 'bFeet', y: 0.4, priority: 55, layers: [{ op: { k: 'smoke', n: 30, color: '#eef6ff', size: 2.2, rise: 2.5 } }] });
 
 // ---- attack phase observations (render-side, keyed by fighter + attack id)
-def({ id: 'active.nova', desc: 'nova burst at active start', at: 'aFeet', priority: 70, layers: [{ op: { k: 'shock', color: '#ff7a20', size: 7, life: 0.5 } }, { op: { k: 'fireBurst', n: 40, shape: 'ring', speed: [8, 1], size: 0.5, spread: 0.3 }, y: 0.6 }] });
+def({
+  id: 'active.nova',
+  desc: 'nova burst at active start',
+  at: 'aFeet',
+  priority: 70,
+  layers: [{ op: { k: 'shock', color: '#ff7a20', size: 7, life: 0.5 } }, { op: { k: 'fireBurst', n: 40, shape: 'ring', speed: [8, 1], size: 0.5, spread: 0.3 }, y: 0.6 }, { op: { k: 'ripple', size: 4.5, life: 0.5, strength: 1.3 }, y: 0.6 }, { op: { k: 'heat', size: 3, height: 2.4, life: 1.2, strength: 1 } }],
+});
 def({ id: 'active.lunge', desc: 'lunge push-off dust', at: 'aFeet', priority: 25, layers: [{ op: { k: 'dust', n: 10, spread: 1 } }] });
 
 // ---- continuous emitters (one spawn per tick; see CONTINUOUS)
@@ -209,6 +277,8 @@ def({ id: 'aura.buff', desc: 'buff embers (per tick)', at: 'aFeet', y: 0.2, prio
 def({ id: 'aura.lastStand', desc: 'last stand embers (per tick)', at: 'aFeet', y: 0.2, priority: 10, layers: [{ op: { k: 'embers', n: 1, color: '#ff3a2a', area: 0.5 } }] });
 def({ id: 'dodge.trail', desc: 'dodge dust (per tick)', at: 'aFeet', priority: 10, layers: [{ op: { k: 'dust', n: 1, spread: 0.6 } }] });
 def({ id: 'ring.fire', desc: 'ring of fire flame (per tick)', at: 'ringEdge', y: 0.1, priority: 15, layers: [{ op: { k: 'fire', n: 1, size: 0.45, spread: 0.3, vel: [0, 2.5, 0] } }] });
+def({ id: 'ring.heat', desc: 'heat shimmer over the ring of fire (per tick, high tier)', at: 'ringEdge', priority: 5, layers: [{ op: { k: 'heat', size: 1.6, height: 2.2, life: 1.1, strength: 0.8 } }] });
+def({ id: 'stream.heat', desc: 'heat shimmer along a fire stream (per tick, high tier)', at: 'aCast', priority: 5, layers: [{ op: { k: 'heat', size: 0.9, height: 1.2, life: 0.6, strength: 0.7, rise: 1 } }] });
 def({ id: 'proj.arrow.trail', desc: 'arrow glints (per tick)', at: 'origin', priority: 10, layers: [{ op: { k: 'embers', n: 1, color: '#e8fff0', area: 0.02 } }] });
 def({ id: 'proj.shadow.trail', desc: 'shadow bolt smoke (per tick)', at: 'origin', priority: 10, layers: [{ op: { k: 'smoke', n: 1, color: '#2a1838', size: 0.35, rise: 0.1 } }] });
 def({ id: 'proj.fire.trail', desc: 'fireball flames (per tick)', at: 'origin', priority: 10, layers: [{ op: { k: 'fire', n: 2, size: 0.35, spread: 0.2, vel: [0, 0.6, 0] } }] });
@@ -291,6 +361,7 @@ export interface ContinuousDef {
 export const CONTINUOUS: ContinuousDef[] = [
   { key: 'fireStream', rate: 60, when: (f, mv) => (f.state === 'attack' && mv && f.phase === 1 && mv.fx === 'fire' ? 'stream.fire' : null) },
   { key: 'pyreStream', rate: 120, when: (f, mv) => (f.state === 'attack' && mv && f.phase === 1 && mv.fx === 'pyre' ? 'stream.pyre' : null) },
+  { key: 'streamHeat', rate: 8, when: (f, mv) => (f.state === 'attack' && mv && f.phase === 1 && (mv.fx === 'fire' || mv.fx === 'pyre') ? 'stream.heat' : null) },
   { key: 'shadow', rate: 30, when: (f, mv) => (f.state === 'attack' && mv && mv.fx === 'shadow' && f.phase <= 1 ? 'aura.shadow' : null) },
   { key: 'ultWindup', rate: 36, when: (f, mv) => (f.state === 'attack' && mv?.kind === 'ultimate' && f.phase === 0 ? 'aura.ultWindup' : null) },
   { key: 'buff', rate: 21, when: (f) => (f.lastStand ? 'aura.lastStand' : f.buff > 0 ? 'aura.buff' : null) },
@@ -298,6 +369,8 @@ export const CONTINUOUS: ContinuousDef[] = [
 ];
 /** ring of fire: flames per second of sim time while the ring is closing (old: 3 per frame) */
 export const RING_FIRE_RATE = 180;
+/** ring of fire heat shimmer sprites per second of sim time (F1; distortion tier 2 only) */
+export const RING_HEAT_RATE = 9;
 /** projectile trails per second of sim time (old: per frame) */
 export const PROJ_TRAIL_RATE = 60;
 export const projTrail = (fx: string) => (fx === 'arrow' ? 'proj.arrow.trail' : fx === 'shadow' ? 'proj.shadow.trail' : fx === 'seed' ? null : fx === 'pyre' ? 'proj.pyre.trail' : 'proj.fire.trail');
@@ -305,9 +378,13 @@ export const projEnd = (fx: string) => (fx === 'arrow' ? 'proj.arrow.end' : 'pro
 
 /** Longest visible life of a def (s): spawn delay + the longest primitive life. */
 export function defDuration(d: FxDef): number {
-  const L: Record<FxOp['k'], number> = { sparks: 0.6, flash: 0.2, dust: 1.3, smoke: 2.5, fire: 0.6, fireBurst: 0.6, embers: 2.5, shock: 0.5, debris: 6 };
+  const L: Record<FxOp['k'], number> = { sparks: 0.6, flash: 0.2, dust: 1.3, smoke: 2.5, fire: 0.6, fireBurst: 0.6, embers: 2.5, shock: 0.5, debris: 6, heat: 1, ripple: 0.5 };
   let m = 0;
-  for (const l of d.layers) m = Math.max(m, (l.delay ?? 0) + (l.op.k === 'shock' ? (l.op.life ?? 0.5) : L[l.op.k]));
+  for (const l of d.layers) {
+    const op = l.op;
+    const life = op.k === 'shock' ? (op.life ?? 0.5) : op.k === 'heat' || op.k === 'ripple' ? op.life : L[op.k];
+    m = Math.max(m, (l.delay ?? 0) + life);
+  }
   return m;
 }
 

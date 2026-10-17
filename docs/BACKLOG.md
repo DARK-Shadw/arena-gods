@@ -53,6 +53,13 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - Ingested: Unity Labs flipbooks (9 of 22 packs shipped), Kenney Particle Pack (64 sprite masks) and Screaming Brain noise.
   - FX Lab at `/tools/fxlab/`: every F0 def, every atlas, a brazier composite and every catalog row.
 
+- **FX overhaul F1 (shared depth, soft particles, distortion, bloom / grade, tiers)**, on branch `anim-plan`; details and measurements in `docs/milestones/F1/README.md`.
+  - `src/render/post.ts` rewritten without EffectComposer: one scene target with a shared `DepthTexture`, used by GTAO (no second scene render), Bokeh, soft particles and distortion; dual-filter bloom; one final pass for grade + tone map.
+  - Soft particles (per-primitive fade distance, overridable per def); heat shimmer and shock ripples as data (`heat` / `ripple` ops) on explosions, fire hits, heavy hits, kills, ultimates and the ring of fire.
+  - Per-theme F1 look (`src/render/fx/fxLook.ts`): soft-knee bloom, split toning, black crush; grade presets (`post.setPreset` / `kickPreset`) and a vignette kick for F7.
+  - Measured with GPU timer queries on the Arc iGPU: post cost minus the scene pass 7.7 -> 4.2 ms on high, 3.6 -> 2.0 on medium; the low tier renders at 0.75 scale and its whole frame went 16.5 -> 11.1 ms GPU. MSAA measured at +3.3 ms and left off.
+  - FX Lab: post on by default, 'F1 tests' items (soft vs hard, brazier heat shimmer, ripples, bloom and grade presets) and A/B switches.
+
 ## 2. IN PROGRESS
 - **Animation overhaul review:** the owner plays `anim-plan` and judges the feel, then it is merged to main. Repro URLs are in `docs/milestones/M4/README.md`.
 - **Voice cloning** (`tts-final/`): 68 of 227 lines generated. Resume (run in a normal terminal, ~2.5-3.5 h):
@@ -118,6 +125,12 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - Falling particles rest on the floor instead of bouncing.
   - Trails are still frame-rate dependent (F3 ribbons).
   - FX tier counts are not scaled yet.
+- FX / post (after F1):
+  - Distortion, the brighter FX (`HDR_SCALE`) and the per-theme bloom / grade were judged on stills only, not at play speed or on a real monitor.
+  - GTAO now also darkens under alpha-tested foliage; FX are no longer darkened by AO.
+  - Arena braziers have no heat shimmer in the game until F4 (they are arena-owned flames).
+  - Nothing holds a grade preset yet; F7 wires the beats.
+  - Owner decision pending: low tier at 0.75 render scale (default now) or 1.0.
 - FX assets (after F2):
   - Shipped as WebP only (`toktx` is not installed), so atlases use 128-px frames, not the plan's 256-px frames. With KTX2, `pack_atlas.py --hires` can produce the 256-px frames.
   - Unity fps and loop flags are guesses (loops come from a wrap test).
