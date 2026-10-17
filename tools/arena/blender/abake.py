@@ -9,6 +9,9 @@ Extends tools/fx/blender/fxbake.py (args, peak RAM via GetProcessMemoryInfo, fre
   pano_camera    Cycles equirectangular camera with latitude limits (plan 5.6)
   compositor_outputs  5.0 compositor API: compositing_node_group + File Output (directory/file_name/
                  file_output_items), for Depth / AOV passes
+A1 adds:  load_cc0 (fetched CC0 sources from Assets/arena-src), load_image, tri_count, bounds, fit_bounds
+                 (exact PROP_BASE radius / TOP height), uv_unwrap, bake_emit_inputs (PBR channels of the high
+                 material as emission bakes), pack_orm (glTF ORM), empty (sockets / roots with extras)
 Jobs are started by tools/arena/bake.py (one Blender process per job, RAM watchdog, resumable).
 Run by hand:  blender -b --factory-startup -P tools/arena/blender/<job>.py -- --out tools/arena/_bake/<id>
 """
@@ -186,7 +189,8 @@ def assign_bake_image(obj, img):
 
 def bake_maps(low, high, maps, px, out_dir, samples=64, extrusion=0.03, margin=8, prefix='bake'):
     """Selected-to-active Cycles bakes from `high` onto `low` (needs UVs on low).
-    maps: list of 'NORMAL' | 'AO' | 'ROUGHNESS' | 'EMIT' ...  Returns {map: {path, seconds}}."""
+    maps: list of 'NORMAL' | 'AO' | 'ROUGHNESS' | 'EMIT' ...  `high` may be a list (several sources).
+    Returns {map: {path, seconds}}."""
     s = bpy.context.scene
     s.render.engine = 'CYCLES'
     s.cycles.samples = samples
@@ -204,7 +208,8 @@ def bake_maps(low, high, maps, px, out_dir, samples=64, extrusion=0.03, margin=8
             img.colorspace_settings.name = 'Non-Color'
         assign_bake_image(low, img)
         bpy.ops.object.select_all(action='DESELECT')
-        high.select_set(True)
+        for h in (high if isinstance(high, (list, tuple)) else [high]):
+            h.select_set(True)
         low.select_set(True)
         bpy.context.view_layer.objects.active = low
         bpy.ops.object.bake(type=m)
@@ -218,17 +223,210 @@ def bake_maps(low, high, maps, px, out_dir, samples=64, extrusion=0.03, margin=8
 
 # ---------------------------------------------------------------------------- export
 
-def export_glb(path, objects=None, extras=True):
+def export_glb(path, objects=None, extras=True, images='NONE'):
     """glTF exporter, arena conventions: GLB, +Y up, modifiers applied, custom props as extras, no Draco
-    (meshopt + KTX2 come later from gltf-transform, tools/arena/build_assets.mjs)."""
+    (meshopt + KTX2 come later from gltf-transform, tools/arena/build_assets.mjs).
+    images: 'NONE' (A1 default for kit assets: build_assets.mjs attaches the baked PNG sets per material
+    from asset.json, so textures are encoded exactly once), 'AUTO' / 'WEBP' to let Blender embed them."""
     if objects is not None:
         bpy.ops.object.select_all(action='DESELECT')
         for o in objects:
             o.select_set(True)
     kw = dict(filepath=path, export_format='GLB', export_yup=True, export_apply=True, export_extras=extras,
-              use_selection=objects is not None, export_draco_mesh_compression_enable=False)
-    bpy.ops.export_scene.gltf(**kw)
+              use_selection=objects is not None, export_draco_mesh_compression_enable=False,
+              export_image_format=images)
+    try:
+        bpy.ops.export_scene.gltf(**kw)
+    except TypeError:  # older exporters without 'NONE'
+        kw['export_image_format'] = 'AUTO'
+        bpy.ops.export_scene.gltf(**kw)
     return {'path': path, 'bytes': os.path.getsize(path)}
+
+
+# ---------------------------------------------------------------------------- A1: CC0 sources, kit assets
+
+ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
+CC0_SRC = os.path.abspath(os.environ.get('ARENA_SRC') or os.path.join(ROOT, '..', 'Assets', 'arena-src'))
+
+
+def load_cc0(cid, need=()):
+    """A fetched CC0 source ('polyhaven/metal_plate_02') -> {'meta': meta.json, 'dir': ..., '<map>': abs path}.
+    Files come from tools/arena/fetch_cc0.mjs (Assets/arena-src/<source>/<id>/, outside git). Raises with the
+    fetch command when the source (or one of the `need` maps) is missing, so a job fails loudly, not silently."""
+    d = os.path.join(CC0_SRC, *cid.split('/'))
+    mp = os.path.join(d, 'meta.json')
+    if not os.path.exists(mp):
+        raise FileNotFoundError(f'CC0 source {cid} not on disk ({d}); run: node tools/arena/fetch_cc0.mjs {cid.replace("/", ":", 1)}')
+    meta = json.load(open(mp, encoding='utf-8'))
+    out = {'meta': meta, 'dir': d}
+    for k, f in meta.get('files', {}).items():
+        out[k] = os.path.join(d, f)
+    miss = [k for k in need if k not in out or not os.path.exists(out[k])]
+    if miss:
+        raise FileNotFoundError(f'CC0 source {cid}: maps {miss} missing; re-run fetch_cc0.mjs with --maps=' + ','.join(need))
+    return out
+
+
+def load_image(path, non_color=False):
+    img = bpy.data.images.load(path, check_existing=True)
+    if non_color:
+        img.colorspace_settings.name = 'Non-Color'
+    return img
+
+
+def tri_count(obj):
+    """triangles of the evaluated object (modifiers applied)"""
+    dg = bpy.context.evaluated_depsgraph_get()
+    ev = obj.evaluated_get(dg)
+    me = ev.to_mesh()
+    me.calc_loop_triangles()
+    n = len(me.loop_triangles)
+    ev.to_mesh_clear()
+    return n
+
+
+def bounds(objs):
+    """world-space bounds of mesh objects: max horizontal radius from the Z axis, z min / max (Blender Z up)."""
+    import mathutils  # noqa: F401
+    r = 0.0
+    zmin, zmax = 1e9, -1e9
+    for o in objs:
+        mw = o.matrix_world
+        for v in o.data.vertices:
+            p = mw @ v.co
+            r = max(r, math.hypot(p.x, p.y))
+            zmin, zmax = min(zmin, p.z), max(zmax, p.z)
+    return {'radius': r, 'zmin': zmin, 'zmax': zmax}
+
+
+def fit_bounds(objs, radius, height):
+    """Make a set of mesh objects match the sim's prop contract EXACTLY (plan 4.3: PROP_BASE radius, TOP
+    height, origin at the base centre): transforms are applied, then the mesh data is moved so z min = 0
+    and scaled so the max horizontal radius = `radius` and the top = `height`. Returns before / after."""
+    import mathutils
+    for o in objs:
+        o.data.transform(o.matrix_world)
+        o.matrix_world = mathutils.Matrix.Identity(4)
+    b0 = bounds(objs)
+    sxy = radius / b0['radius']
+    sz = height / (b0['zmax'] - b0['zmin'])
+    M = mathutils.Matrix.Diagonal((sxy, sxy, sz, 1.0)) @ mathutils.Matrix.Translation((0, 0, -b0['zmin']))
+    for o in objs:
+        o.data.transform(M)
+        o.data.update()
+    b1 = bounds(objs)
+    return {'before': {k: round(v, 5) for k, v in b0.items()}, 'after': {k: round(v, 6) for k, v in b1.items()}, 'scaleXY': round(sxy, 5), 'scaleZ': round(sz, 5)}
+
+
+def uv_unwrap(obj, px=1024, angle=66, margin_px=8):
+    """Smart UV Project + Pack Islands (5.0 shape_method CONCAVE), margin in pixels at `px`."""
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.object.mode_set(mode='EDIT')
+    bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=math.radians(angle), island_margin=margin_px / px)
+    try:
+        bpy.ops.uv.pack_islands(margin=margin_px / px, shape_method='CONCAVE', rotate=True)
+    except Exception:
+        bpy.ops.uv.pack_islands(margin=margin_px / px)
+    bpy.ops.object.mode_set(mode='OBJECT')
+
+
+def bake_emit_inputs(low, highs, inputs, px, out_dir, prefix, samples=4, extrusion=0.03, margin=8):
+    """Bake Principled BSDF inputs of the HIGH objects' materials ('Base Color', 'Roughness', 'Metallic', ...)
+    onto `low` through an emission rewire (a DIFFUSE colour pass is black on metals, so PBR channels are
+    baked as emission). Returns {input: {path, seconds}}. Colour is saved sRGB, the rest Non-Color."""
+    s = bpy.context.scene
+    s.render.engine = 'CYCLES'
+    s.cycles.samples = samples
+    bk = s.render.bake
+    bk.use_selected_to_active = True
+    bk.cage_extrusion = extrusion
+    bk.margin = margin
+    out = {}
+    for name in inputs:
+        t = time.time()
+        saved = []
+        for h in highs:
+            for slot in h.material_slots:
+                nt = slot.material.node_tree
+                bsdf = next((n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+                mo = next((n for n in nt.nodes if n.type == 'OUTPUT_MATERIAL'), None)
+                if bsdf is None or mo is None:
+                    continue
+                em = nt.nodes.new('ShaderNodeEmission')
+                src = bsdf.inputs[name]
+                if src.is_linked:
+                    nt.links.new(src.links[0].from_socket, em.inputs['Color'])
+                else:
+                    v = src.default_value
+                    em.inputs['Color'].default_value = (v, v, v, 1.0) if isinstance(v, float) else tuple(v)
+                old = mo.inputs['Surface'].links[0].from_socket if mo.inputs['Surface'].is_linked else None
+                nt.links.new(em.outputs['Emission'], mo.inputs['Surface'])
+                saved.append((nt, em, old, mo))
+        key = name.lower().replace(' ', '')
+        img = new_image(f'{prefix}_{key}', px, color=(0, 0, 0, 1))
+        if name != 'Base Color':
+            img.colorspace_settings.name = 'Non-Color'
+        assign_bake_image(low, img)
+        bpy.ops.object.select_all(action='DESELECT')
+        for h in highs:
+            h.select_set(True)
+        low.select_set(True)
+        bpy.context.view_layer.objects.active = low
+        bpy.ops.object.bake(type='EMIT')
+        for nt, em, old, mo in saved:
+            if old is not None:
+                nt.links.new(old, mo.inputs['Surface'])
+            nt.nodes.remove(em)
+        p = os.path.join(out_dir, f'{prefix}_{key}.png')
+        img.filepath_raw = p
+        img.file_format = 'PNG'
+        img.save()
+        out[name] = {'path': p, 'seconds': round(time.time() - t, 2)}
+    return out
+
+
+def pack_orm(ao, rough, metal, out_path):
+    """glTF ORM texture from three single-channel PNGs (R = occlusion, G = roughness, B = metalness),
+    numpy inside Blender (no Pillow there). Inputs are read as Non-Color."""
+    import numpy as np
+    chans = []
+    size = None
+    for p in (ao, rough, metal):
+        im = bpy.data.images.load(p, check_existing=False)
+        im.colorspace_settings.name = 'Non-Color'
+        w, h = im.size
+        size = size or (w, h)
+        if (w, h) != size:
+            im.scale(*size)
+        a = np.empty(size[0] * size[1] * 4, dtype=np.float32)
+        im.pixels.foreach_get(a)
+        chans.append(a.reshape(-1, 4)[:, 0])
+        bpy.data.images.remove(im)
+    out = bpy.data.images.new('orm', size[0], size[1], alpha=False)
+    out.colorspace_settings.name = 'Non-Color'
+    px = np.ones((size[0] * size[1], 4), dtype=np.float32)
+    px[:, 0], px[:, 1], px[:, 2] = chans
+    out.pixels.foreach_set(px.ravel())
+    out.filepath_raw = out_path
+    out.file_format = 'PNG'
+    out.save()
+    return out_path
+
+
+def empty(name, loc=(0, 0, 0), parent=None, **props):
+    """An Empty exported as a glTF node; keyword args become custom props (-> glTF extras)."""
+    e = bpy.data.objects.new(name, None)
+    e.empty_display_size = 0.1
+    bpy.context.scene.collection.objects.link(e)
+    e.location = loc
+    if parent is not None:
+        e.parent = parent
+    for k, v in props.items():
+        e[k] = v
+    return e
 
 
 # ---------------------------------------------------------------------------- panorama

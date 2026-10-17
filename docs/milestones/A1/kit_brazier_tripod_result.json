@@ -1,0 +1,135 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\kit_brazier_tripod",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "px": 1024,
+  "px_low": 512,
+  "ao_samples": 128,
+  "radius": 0.45,
+  "height": 1.2,
+  "cc0": "polyhaven/metal_plate_02",
+  "preview": 512
+ },
+ "steps": [
+  {
+   "step": "build",
+   "value": {
+    "fit": {
+     "LOD0": {
+      "before": {
+       "radius": 0.449,
+       "zmin": -0.0006,
+       "zmax": 1.2
+      },
+      "after": {
+       "radius": 0.45,
+       "zmin": 0.0,
+       "zmax": 1.2
+      },
+      "scaleXY": 1.00223,
+      "scaleZ": 0.9995
+     },
+     "LOD1": {
+      "before": {
+       "radius": 0.449,
+       "zmin": -0.0006,
+       "zmax": 1.2
+      },
+      "after": {
+       "radius": 0.45,
+       "zmin": 0.0,
+       "zmax": 1.2
+      },
+      "scaleXY": 1.00223,
+      "scaleZ": 0.9995
+     }
+    },
+    "tris": {
+     "LOD0": {
+      "iron": 1788,
+      "coals": 96
+     },
+     "LOD1": {
+      "iron": 600,
+      "coals": 64
+     }
+    },
+    "cc0": "polyhaven/metal_plate_02",
+    "device": {
+     "requested": "CPU",
+     "used": "CPU",
+     "devices": []
+    }
+   },
+   "ok": true,
+   "seconds": 3.8,
+   "peakMB": 182,
+   "freeMB": 7469
+  },
+  {
+   "step": "build_high",
+   "value": {
+    "highTris": 119680
+   },
+   "ok": true,
+   "seconds": 0.27,
+   "peakMB": 232,
+   "freeMB": 7429
+  },
+  {
+   "step": "bake_lod0",
+   "value": {
+    "NORMAL": 1.16,
+    "AO": 11.08,
+    "Base Color": 2.05,
+    "Roughness": 2.19,
+    "Metallic": 2.24
+   },
+   "ok": true,
+   "seconds": 19.28,
+   "peakMB": 740,
+   "freeMB": 7133
+  },
+  {
+   "step": "bake_lod1",
+   "value": {
+    "NORMAL": 0.63,
+    "AO": 3.95,
+    "Base Color": 1.3,
+    "Roughness": 1.2,
+    "Metallic": 1.41
+   },
+   "ok": true,
+   "seconds": 8.55,
+   "peakMB": 740,
+   "freeMB": 7075
+  },
+  {
+   "step": "export",
+   "value": {
+    "glb": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\kit_brazier_tripod\\brazier_tripod_raw.glb",
+     "bytes": 94728
+    },
+    "asset": "asset.json"
+   },
+   "ok": true,
+   "seconds": 0.31,
+   "peakMB": 740,
+   "freeMB": 7169
+  },
+  {
+   "step": "preview",
+   "value": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\kit_brazier_tripod\\brazier_tripod_preview.png",
+   "ok": true,
+   "seconds": 8.13,
+   "peakMB": 916,
+   "freeMB": 7101
+  }
+ ],
+ "seconds": 40.4,
+ "peakMB": 916,
+ "failed": []
+}

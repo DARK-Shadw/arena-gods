@@ -15,7 +15,10 @@
     "audio:check": "tsx tools/audio/check.ts",
     "tts:gen": "node tools/tts/run.mjs",
     "arena:concept": "node tools/shots/concept.cjs",
-    "arena:bake": "python -I tools/arena/bake.py"
+    "arena:bake": "python -I tools/arena/bake.py",
+    "arena:fetch": "node tools/arena/fetch_cc0.mjs",
+    "arena:assets": "node tools/arena/build_assets.mjs",
+    "arena:budget": "node tools/arena/check_budget.mjs"
   },
   "dependencies": {
     "three": "0.170.0"

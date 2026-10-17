@@ -1,0 +1,155 @@
+{
+ "_doc": "Arena art manifest (tools/arena/build_assets.mjs). files[tier][format] relative to /arena/. tier full = LOD0 (medium/high), low = LOD1 (low). Loaded by src/render/arena/assets.ts.",
+ "version": 1,
+ "assets": {
+  "kit/brazier_tripod": {
+   "role": "prop",
+   "kind": "brazier",
+   "contract": {
+    "radius": 0.45,
+    "height": 1.2,
+    "source": "src/sim/arenaGen.ts PROP_BASE.brazier.r, src/sim/world.ts TOP.brazier"
+   },
+   "sources": [
+    "polyhaven/metal_plate_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/brazier_tripod.glb",
+     "webp": "kit/brazier_tripod.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/brazier_tripod.low.glb",
+     "webp": "kit/brazier_tripod.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 726616,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 94872
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 420896
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 179909
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 502148,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 70244
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 89970
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 310998
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 322460,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 39778
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 189209
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 75711
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 223936,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 31126
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 52828
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 122236
+       }
+      ]
+     }
+    }
+   }
+  }
+ },
+ "generated": "2026-10-17"
+}

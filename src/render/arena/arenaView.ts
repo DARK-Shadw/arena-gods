@@ -20,6 +20,7 @@ import { Debris, Decals, type DebrisMat } from './debris';
 import { glowMat, lavaMaterial, shaderTime, waterMaterial } from './materials';
 import { merge as mergeAll, braziersGeo, chainGeo, crateGeo, drumGeo, paperLanternGeo, spikeGeo, urnGeo, barrelGeo, rockGeo } from './kit';
 import { buildDressing, type Dressing } from './dressing';
+import type { ArenaPack } from './assets';
 import { canvasTexture, softDot } from './textures';
 import { R } from './noise';
 
@@ -86,6 +87,8 @@ interface PropView {
   glow?: THREE.Mesh;
   fire?: THREE.Object3D;
   gone: boolean;
+  /** A1: kit asset id when the prop is a baked asset (else the legacy procedural mesh) */
+  kit?: string;
 }
 interface HazView {
   def: HazardDef;
@@ -126,11 +129,15 @@ export class Arena {
   private updaters: ((t: number, dt: number) => void)[] = [];
   private lastFrameT = -1;
 
-  constructor(scene: THREE.Scene, renderer: THREE.WebGLRenderer, layout: ArenaLayout, quality = 2) {
+  /** A1: loaded kit art (assets.ts) or null = the legacy procedural dressing (always with ?arena=legacy) */
+  readonly kit: ArenaPack | null;
+
+  constructor(scene: THREE.Scene, renderer: THREE.WebGLRenderer, layout: ArenaLayout, quality = 2, kit: ArenaPack | null = null) {
     installHeightFog();
     this.scene = scene;
     this.layout = layout;
     this.quality = quality;
+    this.kit = kit;
     const T = (this.theme = THEME_DEFS[layout.theme]);
     scene.add(this.group);
 
@@ -242,10 +249,16 @@ export class Arena {
   addProp(kind: string) {
     const D = this.dressing;
     const g = new THREE.Group();
-    const m = new THREE.Mesh(this.propGeo(kind), D.propMat(kind));
-    m.castShadow = m.receiveShadow = true;
-    g.add(m);
-    const pv: PropView = { obj: g, kind, gone: false };
+    // A1: a baked kit asset (authored to PROP_BASE radius / TOP height, origin at the base centre) when the
+    // theme's art maps this kind to a loaded asset; otherwise the legacy procedural prop, unchanged
+    const inst = D.propAsset?.(kind) ?? null;
+    if (inst) g.add(inst.obj);
+    else {
+      const m = new THREE.Mesh(this.propGeo(kind), D.propMat(kind));
+      m.castShadow = m.receiveShadow = true;
+      g.add(m);
+    }
+    const pv: PropView = { obj: g, kind, gone: false, kit: inst?.asset.id };
     if (kind === 'explosive') {
       // glowing rune band + fuse spark
       const band = new THREE.Mesh(new THREE.TorusGeometry(0.39, 0.035, 6, 24), glowMat('#ff6a20', 0.9));
@@ -258,7 +271,10 @@ export class Arena {
       pv.glow = spark;
     }
     if (kind === 'brazier') {
-      const fl = this.flame(new THREE.Vector3(0, 1.2, 0), 0.9, this.theme.fire, true);
+      // kit: the asset's SOCK_flame {size, light}; legacy: the old fixed spot
+      const s = inst?.sockets.find((x) => x.name === 'SOCK_flame');
+      const at = s ? new THREE.Vector3(s.pos[0], s.pos[1], s.pos[2]) : new THREE.Vector3(0, 1.2, 0);
+      const fl = this.flame(at, typeof s?.extras.size === 'number' ? s.extras.size : 0.9, this.theme.fire, s ? Number(s.extras.light ?? 1) > 0 : true);
       g.add(fl);
       pv.fire = fl;
     }
@@ -778,6 +794,8 @@ export class Arena {
   dispose() {
     this.scene.remove(this.group);
     this.group.traverse((o) => {
+      // kit asset clones share geometry / materials with the ArenaAssets cache: it disposes them (release)
+      if (o.userData.kit) return;
       const m = o as THREE.Mesh;
       if (m.geometry) m.geometry.dispose();
       const mat = m.material as THREE.Material | THREE.Material[] | undefined;

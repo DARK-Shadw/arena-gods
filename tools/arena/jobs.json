@@ -1,5 +1,5 @@
 {
- "_doc": "Arena Blender jobs for tools/arena/bake.py. Each job: id, script (Blender) or kind 'cmd' + cmd, args, env, inputs (extra files whose content invalidates done.json), note; any key of `defaults` overrides it per job. MB values are free system RAM thresholds.",
+ "_doc": "Arena Blender jobs for tools/arena/bake.py. Each job: id, script (Blender) or kind 'cmd' + cmd, args, env, inputs (extra files whose content invalidates done.json), note; any key of `defaults` overrides it per job. MB values are free system RAM thresholds. A1: kit asset jobs write <out>/asset.json + <id>_raw.glb + PNG sets; tools/arena/build_assets.mjs turns them into public/arena/kit/*.glb.",
  "blender": "C:/Program Files/Blender Foundation/Blender 5.0/blender.exe",
  "defaults": {
   "startMinFreeMb": 4096,
@@ -227,6 +227,23 @@
    "timeoutMin": 90,
    "startMinFreeMb": 6000,
    "note": "A0: the high-tier layer on the Arc iGPU (oneAPI); needs about 6 GB free"
+  },
+  {
+   "id": "kit_brazier_tripod",
+   "script": "tools/arena/blender/kit_brazier.py",
+   "args": [
+    "--px",
+    "1024",
+    "--px-low",
+    "512",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/metal_plate_02/meta.json"
+   ],
+   "timeoutMin": 30,
+   "note": "A1: tripod brazier prop (PROP_BASE r 0.45, TOP 1.2), LOD0 1024 + LOD1 512 bakes, raw GLB + asset.json"
   }
  ],
  "groups": {
@@ -248,6 +265,12 @@
   "a0-long": [
    "pano_high",
    "pano_high_gpu"
+  ],
+  "kit": [
+   "kit_brazier_tripod"
+  ],
+  "a1": [
+   "kit_brazier_tripod"
   ]
  }
 }

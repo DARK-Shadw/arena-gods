@@ -11,6 +11,8 @@ import { getFighter, FIGHTERS } from './sim/fighters';
 import { generateArena, LAYOUTS, THEMES, type ArenaSpec, type LayoutId, type ThemeId } from './sim/arenaGen';
 import type { FighterDef, Frame, MatchRecord, MoveDef, SimEvent } from './sim/types';
 import { Arena } from './render/arena/arenaView';
+import { ArenaAssets, arenaMode, arenaTexOverride, type ArenaPack } from './render/arena/assets';
+import { tierOf } from './render/arena/art';
 import { THEME_DEFS } from './render/arena/themes';
 import { camWorld } from './camera/cameraRig';
 import { solids as camSolids, rayProxies } from './camera/cameraAudit';
@@ -49,6 +51,12 @@ class App {
   rig: CameraRig;
   arena!: Arena;
   arenaSpec!: ArenaSpec;
+  /** A1: baked arena art (public/arena) loader + cache; `?arena=legacy` never touches it */
+  arenaAssets: ArenaAssets;
+  /** resolves when the first arena is built (kit mode builds after its assets load) */
+  arenaReady: Promise<void>;
+  private arenaQuality = -1;
+  private arenaToken = 0;
   /** render quality 0 low / 1 medium / 2 high */
   quality = 2;
   autoQuality = false;
@@ -122,6 +130,7 @@ class App {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.localClippingEnabled = true; // finisher plane cuts
     this.renderer.toneMappingExposure = 1.3;
+    this.arenaAssets = new ArenaAssets(this.renderer, '/arena/', '/basis/', arenaTexOverride());
     this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1400);
     this.camera.position.set(10, 7, 10);
     this.rig = new CameraRig(this.camera);
@@ -162,7 +171,14 @@ class App {
     const conceptId = q.get('concept');
     const cp = conceptId ? conceptPreset(conceptId) : undefined;
     if (cp) this.choice.arena = { theme: (q.get('theme') as ThemeId) ?? renderTheme(cp, THEMES), layout: (q.get('layout') as LayoutId) ?? cp.layout, seed: Number(q.get('aseed') ?? cp.aseed) };
-    this.ensureArena(this.resolveArena(this.choice));
+    // kit mode builds the first arena after an await, so its flipbook flames would start their atlas download
+    // later than the synchronous legacy build did: start it now (same timing as before A1)
+    if (arenaMode() !== 'legacy')
+      void this.atlases
+        .load()
+        .then(() => Promise.all(['unity_flame02', 'unity_flame03'].filter((id) => this.atlases.has(id)).map((id) => this.atlases.tierTexture(id, this.quality))))
+        .catch(() => {});
+    this.arenaReady = this.ensureArena(this.resolveArena(this.choice));
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('keydown', (e) => this.key(e));
     window.addEventListener('pointerdown', () => audio.init(), { once: false });
@@ -189,18 +205,43 @@ class App {
     return { theme: t, layout: l, seed: c.arena.seed };
   }
 
-  /** (re)build the arena visuals when the spec changes; same spec -> reset dynamic state */
-  ensureArena(spec: ArenaSpec) {
-    const same = this.arena && this.arenaSpec && spec.theme === this.arenaSpec.theme && spec.layout === this.arenaSpec.layout && spec.seed === this.arenaSpec.seed;
-    if (same) {
+  /**
+   * (re)build the arena visuals when the spec changes; same spec -> reset dynamic state.
+   * A1: async. Kit mode first loads the theme's baked art (ArenaAssets, cached; a failure falls back to the
+   * legacy dressing), then builds synchronously. `?arena=legacy` never awaits, so it builds synchronously inside
+   * this call exactly as before. `force` rebuilds the same spec (quality change). A newer call supersedes a
+   * pending one.
+   */
+  async ensureArena(spec: ArenaSpec, force = false): Promise<void> {
+    const legacy = arenaMode() === 'legacy';
+    const same =
+      this.arena && this.arenaSpec && spec.theme === this.arenaSpec.theme && spec.layout === this.arenaSpec.layout && spec.seed === this.arenaSpec.seed && (legacy || tierOf(this.arenaQuality) === tierOf(this.quality));
+    if (same && !force) {
       this.arena.resetProps();
       return;
     }
+    const token = ++this.arenaToken;
     const t0 = performance.now();
+    const layout = generateArena(spec);
+    let pack: ArenaPack | null = null;
+    if (!legacy) {
+      try {
+        pack = await this.arenaAssets.load(spec.theme, this.quality, layout);
+      } catch (e) {
+        console.warn('[arena] kit art unavailable, legacy dressing', e);
+      }
+      if (token !== this.arenaToken) return; // superseded by a newer ensureArena
+    }
+    this.buildArena(spec, layout, pack, t0);
+  }
+
+  private buildArena(spec: ArenaSpec, layout: ReturnType<typeof generateArena>, pack: ArenaPack | null, t0: number) {
     if (this.arena) this.arena.dispose();
     this.flames.reset();
     this.arenaSpec = { ...spec };
-    this.arena = new Arena(this.scene, this.renderer, generateArena(spec), this.quality);
+    this.arenaQuality = this.quality;
+    this.arena = new Arena(this.scene, this.renderer, layout, this.quality, pack);
+    if (pack) this.arenaAssets.release(pack);
     const T = THEME_DEFS[spec.theme];
     this.renderer.toneMappingExposure = T.exposure;
     this.post.setLook({ id: T.id, bloom: T.bloom, grade: T.grade, godrays: T.godrays, sunDir: T.sky.sunDir, rayColor: T.sunColor });
@@ -226,7 +267,7 @@ class App {
     }
     camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: 6.2, z: h.z, r: 1.3 }));
     this.ui.setArenaLabel?.(`${T.name} · ${L.layout} · #${L.seed}`);
-    console.info(`[arena] built ${spec.theme}/${spec.layout}#${spec.seed} in ${(performance.now() - t0).toFixed(0)}ms`);
+    console.info(`[arena] built ${spec.theme}/${spec.layout}#${spec.seed} in ${(performance.now() - t0).toFixed(0)}ms` + (pack ? ` (kit ${pack.tier}/${this.arenaAssets.format}: ${pack.assets.size} assets in ${pack.ms.toFixed(0)}ms${pack.missing.length ? `, missing ${pack.missing.join(',')}` : ''})` : ' (legacy dressing)'));
   }
 
   openMenu() {
@@ -275,7 +316,8 @@ class App {
     this.sound.voiceBusy = () => this.dialogue.busy;
     this.ui.hideSplash();
     const spec = this.resolveArena(c);
-    this.ensureArena(spec);
+    await this.ensureArena(spec);
+    if (token !== this.startToken) return;
     const t0 = performance.now();
     this.rec = simulate(c.a, c.b, c.seed, true, spec);
     console.info(`[arena] simulated ${c.a} vs ${c.b} seed=${c.seed} in ${(performance.now() - t0).toFixed(0)}ms`, this.rec.result);
@@ -438,10 +480,8 @@ class App {
         this.flames.setQuality(this.quality);
         this.renderer.setPixelRatio(Math.min(this.quality >= 2 ? 2 : this.quality === 1 ? 1.5 : 1, window.devicePixelRatio));
         this.resize();
-        const spec = this.arenaSpec;
-        this.arena.dispose();
-        (this as { arena?: Arena }).arena = undefined;
-        this.ensureArena(spec);
+        // rebuild at the new quality (the old arena stays until the new one is built)
+        void this.ensureArena(this.arenaSpec, true);
         this.ui.toast(`QUALITY ${['LOW', 'MEDIUM', 'HIGH'][this.quality]}`, '', '#d0c0a0', 1.2);
         break;
       }
@@ -517,8 +557,8 @@ class App {
     this.renderer.setPixelRatio(Math.min(q >= 2 ? 2 : q === 1 ? 1.5 : 1, window.devicePixelRatio));
     this.renderer.shadowMap.type = q >= 1 ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
     const sm = q >= 1 ? 2048 : 1024;
-    const sh = this.arena.moon.shadow;
-    if (sh.mapSize.x !== sm) {
+    const sh = this.arena?.moon.shadow;
+    if (sh && sh.mapSize.x !== sm) {
       sh.mapSize.set(sm, sm);
       sh.map?.dispose();
       (sh as unknown as { map: THREE.WebGLRenderTarget | null }).map = null;
@@ -541,6 +581,7 @@ class App {
   }
 
   tick(realDt: number) {
+    if (!this.arena) return; // kit mode: the first arena is still loading its assets
     this.fps += (1 / Math.max(1e-3, realDt) - this.fps) * 0.05;
     this.autoTune(realDt);
     let fxDt = realDt;
@@ -1199,7 +1240,7 @@ class App {
       return await validateEntrances({
         ctx: () => this.ctx(),
         buildArena: async (theme, layout) => {
-          this.ensureArena({ theme: theme as ThemeId, layout: layout as LayoutId, seed: 7 });
+          await this.ensureArena({ theme: theme as ThemeId, layout: layout as LayoutId, seed: 7 });
           return this.arena;
         },
         views,

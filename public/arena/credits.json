@@ -1,0 +1,25 @@
+{
+ "_doc": "CC0 / third-party sources used by the arena art (public/arena). One row per source asset. Written by tools/arena/fetch_cc0.mjs; usedBy filled by tools/arena/build_assets.mjs; checked by tools/arena/check_budget.mjs.",
+ "assets": {
+  "polyhaven/metal_plate_02": {
+   "name": "Metal Plate 02",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "licence": "CC0-1.0",
+   "url": "https://polyhaven.com/a/metal_plate_02",
+   "res": "1k",
+   "files": [
+    "metal_plate_02_diff_1k.jpg",
+    "metal_plate_02_rough_1k.png",
+    "metal_plate_02_metal_1k.png",
+    "metal_plate_02_nor_gl_1k.png",
+    "metal_plate_02_arm_1k.png"
+   ],
+   "fetched": "2026-10-17",
+   "usedBy": [
+    "kit/brazier_tripod"
+   ]
+  }
+ }
+}

@@ -4,6 +4,7 @@
 // (side-by-side, blend, guides, metrics C1-C5 + C8, contact sheet).
 //   npm run build && node tools/shots/concept.cjs [--refs=ref-3,ref-4|all] [--q=1] [--views=counter,flank,overview|none]
 //        [--out=docs/milestones/A0/concept] [--dist=dist] [--theme=<id>] [--layout=<id>] [--aseed=<n>]
+//        [--arena=legacy] (A1: pre-A1 procedural dressing) [--arenatex=webp] (A1: WebP fallback art)
 //        [--clip=4] (C9: 8 frames over 4 s per preset, written as a strip) [--compare=0] (renders only)
 // Determinism: Math.random is replaced by a seeded generator before the page loads (the ambient /
 // cosmetic randomness), the fight is frozen at frame 0, and the FX / arena clocks advance by fixed
@@ -25,7 +26,7 @@ const Q = Number(opt('q', '1'));
 const CLIP = Number(opt('clip', '0'));
 const COMPARE = opt('compare', '1') !== '0';
 const VIEWS = opt('views', 'counter,flank,overview') === 'none' ? [] : opt('views', 'counter,flank,overview').split(',');
-const OVR = ['theme', 'layout', 'aseed'].map((k) => (opt(k, '') ? `&${k}=${opt(k, '')}` : '')).join('');
+const OVR = ['theme', 'layout', 'aseed', 'arena', 'arenatex'].map((k) => (opt(k, '') ? `&${k}=${opt(k, '')}` : '')).join('');
 const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234', 'chrome-win64', 'chrome.exe');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.webp': 'image/webp', '.ktx2': 'image/ktx2', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.bin': 'application/octet-stream' };
 

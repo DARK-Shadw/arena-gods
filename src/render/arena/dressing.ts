@@ -2,6 +2,8 @@
  * Theme dressing dispatcher: each theme builds its floor, boundary, gates and
  * backdrop into the arena group and returns the materials / builders the
  * common arena systems need (obstacles, props, hazards, debris types).
+ * A1: with a loaded kit pack (assets.ts) the data-driven dressKit.ts wraps the legacy builder and replaces
+ * the slots its ThemeArt maps to baked assets; `?arena=legacy` (or a failed load) keeps the legacy builders only.
  */
 import * as THREE from 'three';
 import type { HazardDef, Obstacle, ObstacleKind } from '../../sim/arenaGen';
@@ -10,6 +12,8 @@ import type { DebrisMat } from './debris';
 import { dressColosseum, dressDesert, dressSkytemple } from './dressClassic';
 import { dressGlacier, dressMoonlake, dressSakura } from './dressNature';
 import { dressForge } from './dressForge';
+import { dressKit } from './dressKit';
+import type { KitInstance } from './assets';
 
 export interface Dressing {
   mats: Record<string, THREE.Material>;
@@ -27,9 +31,17 @@ export interface Dressing {
   envExtras: THREE.Object3D[];
   /** base intensity of the overhead arena spot */
   spot?: number;
+  /** A1: a baked kit asset for a prop kind (dressKit.ts); absent / null = the legacy procedural prop */
+  propAsset?(kind: string): KitInstance | null;
 }
 
+/** kit art when the arena was given a loaded pack, else (and always with ?arena=legacy) the legacy builders */
 export function buildDressing(a: Arena): Dressing {
+  return a.kit ? dressKit(a, a.kit, legacyDressing) : legacyDressing(a);
+}
+
+/** the pre-A1 procedural theme builders, unchanged (fallback until A21 removes them) */
+export function legacyDressing(a: Arena): Dressing {
   switch (a.layout.theme) {
     case 'colosseum':
       return dressColosseum(a);
