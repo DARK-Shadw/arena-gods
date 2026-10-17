@@ -1,0 +1,167 @@
+{
+ "probe_env": {
+  "id": "probe_env",
+  "status": "ok",
+  "seconds": 24.1,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 917,
+  "peakPrivateMB": 1035,
+  "minFreeMB": 6331,
+  "when": "2026-10-18 01:49",
+  "hash": "617b159fcf9e7681118057edca1948bfac002f90"
+ },
+ "probe_env_oneapi": {
+  "id": "probe_env_oneapi",
+  "status": "ok",
+  "seconds": 12.2,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 925,
+  "peakPrivateMB": 1045,
+  "minFreeMB": 6318,
+  "when": "2026-10-18 01:49",
+  "hash": "554459ae9fba9150084014be8bec08c0af7c22c2"
+ },
+ "probe_bake_256": {
+  "id": "probe_bake_256",
+  "status": "ok",
+  "seconds": 12.1,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 628,
+  "peakPrivateMB": 838,
+  "minFreeMB": 6619,
+  "when": "2026-10-18 01:59",
+  "hash": "57abf005b3e42521c89a7c31f2bd5fecedc88af8"
+ },
+ "probe_bake_1024": {
+  "id": "probe_bake_1024",
+  "status": "ok",
+  "seconds": 34.3,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 1323,
+  "peakPrivateMB": 1586,
+  "minFreeMB": 5875,
+  "when": "2026-10-18 01:59",
+  "hash": "5389024dd0595a350779853627b61bc3326c8c63"
+ },
+ "ktx_probe": {
+  "id": "ktx_probe",
+  "status": "ok",
+  "seconds": 16.0,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 33,
+  "peakPrivateMB": 17,
+  "minFreeMB": 7472,
+  "when": "2026-10-18 02:40",
+  "hash": "aedad0b89419885d6f00f99c4acd46e4d2e76614"
+ },
+ "probe_misc": {
+  "id": "probe_misc",
+  "status": "ok",
+  "seconds": 32.1,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 1367,
+  "peakPrivateMB": 1497,
+  "minFreeMB": 5894,
+  "when": "2026-10-18 01:51",
+  "hash": "42eec9a270321a96105242f816128d7cff57ff9a"
+ },
+ "pano_quick": {
+  "id": "pano_quick",
+  "status": "ok",
+  "seconds": 50.3,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 707,
+  "peakPrivateMB": 938,
+  "minFreeMB": 6558,
+  "when": "2026-10-18 02:00",
+  "hash": "17b98b76266eb4314aaae2622ec4ab4b8f17d4d0"
+ },
+ "pano_quick_gpu": {
+  "id": "pano_quick_gpu",
+  "status": "ok",
+  "seconds": 28.1,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 1723,
+  "peakPrivateMB": 1967,
+  "minFreeMB": 5542,
+  "when": "2026-10-18 02:01",
+  "hash": "83743f4d3539db6d697ea9a882d0fe101fca3566"
+ },
+ "pano_eevee_slice": {
+  "id": "pano_eevee_slice",
+  "status": "ok",
+  "seconds": 24.2,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 1779,
+  "peakPrivateMB": 1920,
+  "minFreeMB": 5491,
+  "when": "2026-10-18 02:01",
+  "hash": "2d504b8c668412dbe5fce8eabdd72227d87af24f"
+ },
+ "pano_fog_quick": {
+  "id": "pano_fog_quick",
+  "status": "ok",
+  "seconds": 58.2,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 640,
+  "peakPrivateMB": 847,
+  "minFreeMB": 6626,
+  "when": "2026-10-18 02:02",
+  "hash": "36be5586a907567e287a8dc53ac32b0edb122ce2"
+ },
+ "pano_medium": {
+  "id": "pano_medium",
+  "status": "ok",
+  "seconds": 154.8,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 2837,
+  "peakPrivateMB": 3109,
+  "minFreeMB": 4471,
+  "when": "2026-10-18 02:05",
+  "hash": "8f61dae61ef0e6527eb4af9f5d8a08f17f38c492"
+ },
+ "pano_medium_gpu": {
+  "id": "pano_medium_gpu",
+  "status": "ok",
+  "seconds": 64.0,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 3867,
+  "peakPrivateMB": 4114,
+  "minFreeMB": 3433,
+  "when": "2026-10-18 02:06",
+  "hash": "9fbb8fe561b281691d586e00cf97b7dc3a4c2494"
+ },
+ "inset_hero": {
+  "id": "inset_hero",
+  "status": "ok",
+  "seconds": 174.6,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 2255,
+  "peakPrivateMB": 2584,
+  "minFreeMB": 5005,
+  "when": "2026-10-18 02:09",
+  "hash": "41d204ebce3c0a5b3d6e12c09ce4a38257dc3eb1"
+ },
+ "pano_high": {
+  "id": "pano_high",
+  "status": "ok",
+  "seconds": 833.5,
+  "pausedSeconds": 0.0,
+  "peakWorkingSetMB": 4666,
+  "peakPrivateMB": 4942,
+  "minFreeMB": 2133,
+  "when": "2026-10-18 02:23",
+  "hash": "fa239cf9e3e842aaa580bf8fff476ba0fdc67190"
+ },
+ "pano_high_gpu": {
+  "id": "pano_high_gpu",
+  "status": "ok",
+  "seconds": 985.7,
+  "pausedSeconds": 766.7,
+  "peakWorkingSetMB": 5706,
+  "peakPrivateMB": 5971,
+  "minFreeMB": 1444,
+  "when": "2026-10-18 02:39",
+  "hash": "ffa556f07c82875b2bfc65cca8aadf8fca438a77"
+ }
+}

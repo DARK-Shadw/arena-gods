@@ -38,6 +38,7 @@ import { FinisherFx } from './render/finisherFx';
 import { ContactWarp } from './render/contactWarp';
 import { BEHEAD_CLEAN, FIN_BY_ID, fxOf } from './sim/finishers';
 import { auditMatch, type CamMatchScore } from './camera/cameraAudit';
+import { applyCamPose, conceptPreset, extraViewPose, faceTowards, HIDDEN_B, renderTheme, type CamPose, type ConceptPreset, type ExtraView } from './render/arena/conceptCams';
 
 type AppState = 'menu' | 'loading' | 'intro' | 'faceoff' | 'fight' | 'post';
 
@@ -76,6 +77,10 @@ class App {
   timelines: Timeline[] = [];
   realT = 0;
   paused = false;
+  /** A0 concept-match mode: fixed camera pose + fighter marks (see render/arena/conceptCams.ts) */
+  /** resolves with conceptInfo() once a ?concept= view is ready (tools/shots/concept.cjs waits on it) */
+  conceptReady: Promise<unknown> | null = null;
+  private concept: { cam: CamPose; marks: [{ x: number; z: number; face: number }, { x: number; z: number; face: number } | null] } | null = null;
   userLetterbox = false;
   timeScale = 1;
   private clock = new THREE.Clock();
@@ -153,12 +158,17 @@ class App {
     };
     // ?t=SECONDS jumps straight to that fight time (bug reports: ?a=&b=&seed=&theme=&layout=&aseed=&t=)
     this.jumpT = Number(q.get('t') ?? 0);
+    // ?concept=ref-3: concept-match view (A0 harness); optional &view=counter|flank|overview, &theme, &layout, &aseed
+    const conceptId = q.get('concept');
+    const cp = conceptId ? conceptPreset(conceptId) : undefined;
+    if (cp) this.choice.arena = { theme: (q.get('theme') as ThemeId) ?? renderTheme(cp, THEMES), layout: (q.get('layout') as LayoutId) ?? cp.layout, seed: Number(q.get('aseed') ?? cp.aseed) };
     this.ensureArena(this.resolveArena(this.choice));
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('keydown', (e) => this.key(e));
     window.addEventListener('pointerdown', () => audio.init(), { once: false });
 
-    if (q.get('auto') === '1') this.start(this.choice);
+    if (cp) this.conceptReady = this.conceptView(cp.id, { view: (q.get('view') as ExtraView | null) ?? undefined, theme: q.get('theme') ?? undefined, layout: q.get('layout') ?? undefined, aseed: q.has('aseed') ? Number(q.get('aseed')) : undefined });
+    else if (q.get('auto') === '1') this.start(this.choice);
     else this.openMenu();
     this.loop();
   }
@@ -570,7 +580,8 @@ class App {
       this.rig.cut(p, new THREE.Vector3(0, 1.5, 0), 55);
       this.rig.update(p, new THREE.Vector3(0, 1.5, 0), 55, realDt);
     }
-    if (this.freeCam) this.controls.update();
+    if (this.freeCam && !this.concept) this.controls.update();
+    if (this.concept) applyCamPose(this.camera, this.concept.cam);
     this.updateCineLights();
     this.dialogue?.update(realDt);
     {
@@ -625,7 +636,7 @@ class App {
     this.timeScale = scale;
     const simDt = realDt * scale;
     const evs = pb.advance(simDt);
-    const fr = pb.frameAt(pb.t);
+    const fr = this.concept ? this.conceptFrame(pb.frameAt(pb.t)) : pb.frameAt(pb.t);
     for (let i = 0; i < 2; i++) this.views[i].updateFromFrame(fr.f[i], Math.max(simDt, 1e-4), fr.f[1 - i], realDt);
     this.warp?.apply(this.views, pb.t);
     this.arena.applyFrame(
@@ -1202,6 +1213,216 @@ class App {
       for (const v of Object.values(views)) v.dispose(this.scene);
       this.state = prevState;
     }
+  }
+  /**
+   * A0 concept-match view: loads the preset's theme / layout / fighters, freezes the fight at frame 0,
+   * puts the fighters on the preset marks, hides the HUD and holds the preset camera
+   * (`view` = a game-only extra view that scales with the layout). Returns the projected guides
+   * (horizon, landmark, fighter boxes) that tools/arena/concept_compare.py checks.
+   */
+  async conceptView(id: string, o: { view?: ExtraView; theme?: string; layout?: string; aseed?: number; settle?: number } = {}) {
+    const p = conceptPreset(id) as ConceptPreset;
+    if (!p) throw new Error(`unknown concept preset ${id}`);
+    const theme = (o.theme ?? renderTheme(p, THEMES)) as ThemeId;
+    this.concept = null;
+    await this.start({ ...this.choice, a: p.a.id, b: p.b?.id ?? HIDDEN_B, seed: p.seed, skipIntro: true, arena: { theme, layout: (o.layout ?? p.layout) as LayoutId, seed: o.aseed ?? p.aseed } });
+    if (this.state !== 'fight') this.beginFight();
+    this.paused = true;
+    this.freeCam = true;
+    this.controls.enabled = false;
+    this.ui.showHud(false);
+    this.ui.setLetterbox(false);
+    const uiEl = document.getElementById('ui');
+    if (uiEl) uiEl.style.display = 'none';
+    const L = this.arena.layout;
+    const cam = o.view ? extraViewPose(o.view, L.rx, L.rz) : { pos: p.pos, yaw: p.yaw, pitch: p.pitch, roll: p.roll, vfov: p.vfov };
+    const bx = p.b ? p.b.x : p.a.x + 6,
+      bz = p.b ? p.b.z : p.a.z;
+    this.concept = {
+      cam,
+      marks: [{ x: p.a.x, z: p.a.z, face: faceTowards(p.a.x, p.a.z, bx, bz) }, p.b ? { x: p.b.x, z: p.b.z, face: faceTowards(p.b.x, p.b.z, p.a.x, p.a.z) } : null],
+    };
+    this.views[1].rig.root.visible = !!p.b;
+    {
+      const fwd = new THREE.Vector3();
+      applyCamPose(this.camera, cam);
+      this.camera.getWorldDirection(fwd);
+      this.controls.target.copy(this.camera.position).addScaledVector(fwd, 8);
+      this.rig.target.copy(this.controls.target);
+    }
+    this.stepFrames(o.settle ?? 45, 1 / 60);
+    this.views[1].rig.root.visible = !!p.b;
+    // one counted frame: draw calls / triangles of the whole frame (scene + post passes)
+    const ri = this.renderer.info;
+    ri.autoReset = false;
+    ri.reset();
+    this.stepFrames(1, 1 / 60);
+    const counts = { calls: ri.render.calls, tris: ri.render.triangles };
+    ri.autoReset = true;
+    return { ...this.conceptInfo(p), ...counts };
+  }
+  /** concept mode: the recorded frame with the fighters moved onto the preset marks, standing still */
+  private conceptFrame(fr: Frame): Frame {
+    const c = this.concept!;
+    const f = fr.f.map((x, i) => {
+      const m = c.marks[i];
+      return m ? { ...x, x: m.x, z: m.z, facing: m.face, vx: 0, vz: 0, y: 0 } : { ...x };
+    }) as Frame['f'];
+    return { ...fr, f };
+  }
+  /**
+   * Sky mask of the current view (white = the sky dome is visible, or geometry the fog has dissolved more than
+   * 85 % into the sky colour; black = anything opaque in front),
+   * at 1/`down` resolution, as a PNG data URL: the game side of check C1 (tools/arena/concept_compare.py).
+   * Transparent things (particles, flames, fog cards, glows) and the FX layers are left out.
+   */
+  conceptSkyMask(down = 4): string {
+    const r = this.renderer;
+    const w = Math.max(1, Math.round(r.domElement.width / down)),
+      h = Math.max(1, Math.round(r.domElement.height / down));
+    const rt = new THREE.WebGLRenderTarget(w, h);
+    // black geometry fogged towards WHITE: the grey level is the fog factor, so far geometry that the fog
+    // has dissolved into the sky (fog > 85 %) counts as sky, as it reads in the frame
+    const black = new THREE.MeshBasicMaterial({ color: 0x000000, fog: true, toneMapped: false });
+    const white = new THREE.MeshBasicMaterial({ color: 0xffffff, fog: false, toneMapped: false, side: THREE.BackSide, depthWrite: false });
+    const sky = this.arena.sky;
+    const hidden: THREE.Object3D[] = [];
+    this.scene.traverse((o) => {
+      const m = o as THREE.Mesh;
+      const mat = m.material as THREE.Material | THREE.Material[] | undefined;
+      const tr = mat && (Array.isArray(mat) ? mat.some((x) => x.transparent) : mat.transparent);
+      if (o.visible && (o === sky || (o as THREE.Points).isPoints || (o as THREE.Sprite).isSprite || (o as THREE.Line).isLine || tr)) {
+        o.visible = false;
+        hidden.push(o);
+      }
+    });
+    const fog = this.scene.fog as THREE.Fog | null;
+    const prevFog = fog ? fog.color.clone() : null;
+    const prev = { bg: this.scene.background, ov: this.scene.overrideMaterial, layers: this.camera.layers.mask, auto: r.autoClear, skyMat: sky.material, cc: r.getClearColor(new THREE.Color()), ca: r.getClearAlpha() };
+    const px = new Uint8Array(w * h * 4);
+    try {
+      this.scene.background = null;
+      if (fog) fog.color.set(0xffffff);
+      this.camera.layers.set(0);
+      r.setRenderTarget(rt);
+      r.setClearColor(0x000000, 1);
+      r.clear();
+      this.scene.overrideMaterial = black;
+      r.render(this.scene, this.camera);
+      this.scene.overrideMaterial = null;
+      r.autoClear = false;
+      sky.visible = true;
+      sky.material = white;
+      r.render(sky, this.camera);
+      r.readRenderTargetPixels(rt, 0, 0, w, h, px);
+    } finally {
+      sky.material = prev.skyMat;
+      if (fog && prevFog) fog.color.copy(prevFog);
+      for (const o of hidden) o.visible = true;
+      this.scene.background = prev.bg;
+      this.scene.overrideMaterial = prev.ov;
+      this.camera.layers.mask = prev.layers;
+      r.autoClear = prev.auto;
+      r.setClearColor(prev.cc, prev.ca);
+      r.setRenderTarget(null);
+      rt.dispose();
+      black.dispose();
+      white.dispose();
+    }
+    const cv = document.createElement('canvas');
+    cv.width = w;
+    cv.height = h;
+    const ctx = cv.getContext('2d')!;
+    const img = ctx.createImageData(w, h);
+    for (let y = 0; y < h; y++)
+      for (let x = 0; x < w; x++) {
+        const v = px[((h - 1 - y) * w + x) * 4];
+        const k = (y * w + x) * 4;
+        img.data[k] = img.data[k + 1] = img.data[k + 2] = v > 216 ? 255 : 0;
+        img.data[k + 3] = 255;
+      }
+    ctx.putImageData(img, 0, 0);
+    return cv.toDataURL('image/png');
+  }
+  /**
+   * Concept harness: show only the sky dome (true) or everything again (false), then render one frame
+   * through the full post pipeline. A screenshot of the sky-only frame against the normal one gives the
+   * VISUAL sky mask (C1): geometry the fog has dissolved into the sky colour counts as sky.
+   */
+  conceptSkyOnly(on: boolean) {
+    if (on) {
+      this.skyOnlyHidden = [];
+      for (const o of this.scene.children) {
+        if ((o as THREE.Light).isLight || !o.visible) continue;
+        if (o === this.arena.group) {
+          for (const c of o.children) if (c !== this.arena.sky && c.visible && !(c as THREE.Light).isLight) (c.visible = false), this.skyOnlyHidden.push(c);
+          continue;
+        }
+        o.visible = false;
+        this.skyOnlyHidden.push(o);
+      }
+    } else {
+      for (const o of this.skyOnlyHidden) o.visible = true;
+      this.skyOnlyHidden = [];
+    }
+    this.post.render();
+  }
+  private skyOnlyHidden: THREE.Object3D[] = [];
+  /** Projected guides of the current concept view (normalised 0..1 screen coords, y down). */
+  conceptInfo(p: ConceptPreset) {
+    const cam = this.camera;
+    cam.updateMatrixWorld(true);
+    const proj = (v: THREE.Vector3) => {
+      const q = v.clone().project(cam);
+      return [+(q.x * 0.5 + 0.5).toFixed(4), +(0.5 - q.y * 0.5).toFixed(4), q.z < 1 ? 1 : 0];
+    };
+    const fwd = new THREE.Vector3();
+    cam.getWorldDirection(fwd);
+    const fh = new THREE.Vector3(fwd.x, 0, fwd.z).normalize();
+    const side = new THREE.Vector3(-fh.z, 0, fh.x);
+    const far = 1e4;
+    const horizon = [-0.6, 0, 0.6].map((s) => proj(cam.position.clone().addScaledVector(fh, far).addScaledVector(side, far * s)));
+    const landmark = proj(new THREE.Vector3(p.landmarkDist, cam.position.y, 0));
+    const boxes = this.views.map((v, i) => {
+      if (!v.rig.root.visible) return null;
+      v.root.updateMatrixWorld(true);
+      let x0 = 9,
+        y0 = 9,
+        x1 = -9,
+        y1 = -9,
+        top = -1e9,
+        foot = 1e9;
+      const w = new THREE.Vector3();
+      v.root.traverse((o) => {
+        if (!(o as THREE.Bone).isBone) return;
+        o.getWorldPosition(w);
+        top = Math.max(top, w.y);
+        foot = Math.min(foot, w.y);
+        const s = proj(w);
+        x0 = Math.min(x0, s[0]);
+        x1 = Math.max(x1, s[0]);
+        y0 = Math.min(y0, s[1]);
+        y1 = Math.max(y1, s[1]);
+      });
+      const h = v.headWorld(new THREE.Vector3());
+      const head = proj(h.clone().setY(top + 0.1));
+      const feet = proj(new THREE.Vector3(v.root.position.x, 0, v.root.position.z));
+      return { id: this.defs[i].id, bones: [x0, y0, x1, y1], head, feet, topY: +(top + 0.1).toFixed(3), mark: [+v.root.position.x.toFixed(2), +v.root.position.z.toFixed(2)] };
+    });
+    return {
+      id: p.id,
+      theme: this.arenaSpec.theme,
+      layout: this.arenaSpec.layout,
+      aseed: this.arenaSpec.seed,
+      rx: this.arena.layout.rx,
+      rz: this.arena.layout.rz,
+      size: [this.renderer.domElement.width, this.renderer.domElement.height],
+      cam: { ...this.concept!.cam, fov: cam.fov, aspect: +cam.aspect.toFixed(4), world: cam.position.toArray().map((x) => +x.toFixed(3)) },
+      horizon,
+      landmark,
+      fighters: boxes,
+      quality: this.quality,
+    };
   }
   /** Test hook: free camera at a pose (renders one frame). */
   debugView(p: [number, number, number], look: [number, number, number], fov = 50) {

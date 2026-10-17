@@ -1,0 +1,58 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_misc",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "frames": 60,
+  "card_frames": 8,
+  "card_px": 512
+ },
+ "steps": [
+  {
+   "step": "cloth_settle",
+   "value": {
+    "frames": 60,
+    "verts": 3321,
+    "bakeSeconds": 5.09,
+    "zRange": [
+     -1.214,
+     1.2
+    ],
+    "glb": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_misc\\probe_banner.glb",
+     "bytes": 145720
+    }
+   },
+   "ok": true,
+   "seconds": 7.15,
+   "peakMB": 218,
+   "freeMB": 7015
+  },
+  {
+   "step": "eevee_cards",
+   "value": {
+    "px": 512,
+    "frames": 8,
+    "secondsPerFrame": [
+     10.58,
+     1.6,
+     1.53,
+     1.46,
+     1.47,
+     1.39,
+     1.43,
+     1.36
+    ],
+    "first": 10.58,
+    "meanRest": 1.46
+   },
+   "ok": true,
+   "seconds": 20.95,
+   "peakMB": 1372,
+   "freeMB": 6859
+  }
+ ],
+ "seconds": 28.1,
+ "peakMB": 1372
+}

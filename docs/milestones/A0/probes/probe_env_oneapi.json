@@ -1,0 +1,368 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_env_oneapi",
+  "min_free_mb": 1500,
+  "threads": 0
+ },
+ "steps": [
+  {
+   "step": "cycles_devices",
+   "value": {
+    "CUDA": [],
+    "OPTIX": [],
+    "HIP": [],
+    "ONEAPI": [
+     {
+      "name": "Intel(R) Arc(TM) Graphics",
+      "type": "ONEAPI"
+     }
+    ],
+    "METAL": "unavailable: bpy_struct: item.attr = val: enum \"METAL\" not found in ('NONE', 'CUDA', 'OPTIX', 'HIP', 'ONEAPI')"
+   },
+   "ok": true,
+   "seconds": 0.68,
+   "peakMB": 254,
+   "freeMB": 6986
+  },
+  {
+   "step": "gn_sdf_nodes",
+   "value": {
+    "nodes": {
+     "GeometryNodeMeshToSDFGrid": {
+      "ok": true,
+      "inputs": [
+       "Mesh",
+       "Voxel Size",
+       "Band Width"
+      ]
+     },
+     "GeometryNodeSDFGridBoolean": {
+      "ok": true,
+      "inputs": [
+       "Grid 1",
+       "Grid 2"
+      ]
+     },
+     "GeometryNodeSDFGridFillet": {
+      "ok": true,
+      "inputs": [
+       "Grid",
+       "Iterations"
+      ]
+     },
+     "GeometryNodeSDFGridOffset": {
+      "ok": true,
+      "inputs": [
+       "Grid",
+       "Distance"
+      ]
+     },
+     "GeometryNodeGridToMesh": {
+      "ok": true,
+      "inputs": [
+       "Grid",
+       "Threshold",
+       "Adaptivity"
+      ]
+     },
+     "GeometryNodeMeshToVolume": {
+      "ok": true,
+      "inputs": [
+       "Mesh",
+       "Density",
+       "Resolution Mode",
+       "Voxel Size",
+       "Voxel Amount",
+       "Interior Band Width"
+      ]
+     },
+     "GeometryNodeVolumeToMesh": {
+      "ok": true,
+      "inputs": [
+       "Volume",
+       "Resolution Mode",
+       "Voxel Size",
+       "Voxel Amount",
+       "Threshold",
+       "Adaptivity"
+      ]
+     },
+     "GeometryNodeRealizeInstances": {
+      "ok": true,
+      "inputs": [
+       "Geometry",
+       "Selection",
+       "Realize All",
+       "Depth"
+      ]
+     },
+     "GeometryNodeUVPackIslands": {
+      "ok": true,
+      "inputs": [
+       "UV",
+       "Selection",
+       "Margin",
+       "Rotate",
+       "Method"
+      ]
+     },
+     "GeometryNodeUVTangent": {
+      "ok": true,
+      "inputs": [
+       "Method",
+       "UV"
+      ]
+     },
+     "GeometryNodeMeshBoolean": {
+      "ok": true,
+      "inputs": [
+       "Mesh 1",
+       "Mesh 2",
+       "Self Intersection",
+       "Hole Tolerant"
+      ]
+     },
+     "GeometryNodeDistributePointsOnFaces": {
+      "ok": true,
+      "inputs": [
+       "Mesh",
+       "Selection",
+       "Distance Min",
+       "Density Max",
+       "Density",
+       "Density Factor",
+       "Seed"
+      ]
+     }
+    },
+    "allGridNodeTypes": [
+     "GeometryNodeDistributePointsInGrid",
+     "GeometryNodeFieldToGrid",
+     "GeometryNodeFieldToGridItem",
+     "GeometryNodeFieldToGridItems",
+     "GeometryNodeGetNamedGrid",
+     "GeometryNodeGridAdvect",
+     "GeometryNodeGridCurl",
+     "GeometryNodeGridDivergence",
+     "GeometryNodeGridGradient",
+     "GeometryNodeGridInfo",
+     "GeometryNodeGridLaplacian",
+     "GeometryNodeGridPrune",
+     "GeometryNodeGridToMesh",
+     "GeometryNodeGridVoxelize",
+     "GeometryNodeMeshGrid",
+     "GeometryNodeMeshToDensityGrid",
+     "GeometryNodeMeshToSDFGrid",
+     "GeometryNodePointsToSDFGrid",
+     "GeometryNodeSDFGridBoolean",
+     "GeometryNodeSDFGridFillet",
+     "GeometryNodeSDFGridLaplacian",
+     "GeometryNodeSDFGridMean",
+     "GeometryNodeSDFGridMeanCurvature",
+     "GeometryNodeSDFGridMedian",
+     "GeometryNodeSDFGridOffset",
+     "GeometryNodeSampleGrid",
+     "GeometryNodeSampleGridIndex",
+     "GeometryNodeSetGridBackground",
+     "GeometryNodeSetGridTransform",
+     "GeometryNodeStoreNamedGrid"
+    ]
+   },
+   "ok": true,
+   "seconds": 0.01,
+   "peakMB": 255,
+   "freeMB": 6986
+  },
+  {
+   "step": "bake_settings",
+   "value": {
+    "bakeOp": true,
+    "bakeProps": [
+     "rna_type",
+     "type",
+     "cage_object",
+     "filepath",
+     "width",
+     "height",
+     "margin",
+     "margin_type",
+     "max_ray_distance",
+     "cage_extrusion",
+     "normal_space",
+     "normal_r",
+     "normal_g",
+     "normal_b",
+     "image_settings",
+     "target",
+     "save_mode",
+     "view_from",
+     "use_selected_to_active",
+     "use_clear",
+     "use_split_materials",
+     "use_automatic_name",
+     "use_cage",
+     "use_pass_emit",
+     "use_pass_direct",
+     "use_pass_indirect",
+     "use_pass_color",
+     "use_pass_diffuse",
+     "use_pass_glossy",
+     "use_pass_transmission",
+     "pass_filter",
+     "use_multires",
+     "use_lores_mesh",
+     "displacement_space"
+    ],
+    "cyclesBakeType": [
+     "COMBINED",
+     "AO",
+     "SHADOW",
+     "POSITION",
+     "NORMAL",
+     "UV",
+     "ROUGHNESS",
+     "EMIT",
+     "ENVIRONMENT",
+     "DIFFUSE",
+     "GLOSSY",
+     "TRANSMISSION"
+    ]
+   },
+   "ok": true,
+   "seconds": 0.0,
+   "peakMB": 255,
+   "freeMB": 6985
+  },
+  {
+   "step": "gltf_exporter",
+   "value": {
+    "count": 109,
+    "relevant": [
+     "export_image_format",
+     "export_image_add_webp",
+     "export_image_webp_fallback",
+     "export_texture_dir",
+     "export_image_quality",
+     "export_draco_mesh_compression_enable",
+     "export_draco_mesh_compression_level",
+     "export_draco_position_quantization",
+     "export_draco_normal_quantization",
+     "export_draco_texcoord_quantization",
+     "export_draco_color_quantization",
+     "export_draco_generic_quantization",
+     "export_unused_images",
+     "export_unused_textures",
+     "export_extras",
+     "export_yup",
+     "export_apply"
+    ],
+    "imageFormats": [
+     "AUTO",
+     "JPEG",
+     "WEBP",
+     "NONE"
+    ],
+    "version": "5.0.21"
+   },
+   "ok": true,
+   "seconds": 0.0,
+   "peakMB": 255,
+   "freeMB": 6985
+  },
+  {
+   "step": "sky_texture",
+   "value": {
+    "skyTypes": [
+     "SINGLE_SCATTERING",
+     "MULTIPLE_SCATTERING",
+     "PREETHAM",
+     "HOSEK_WILKIE"
+    ],
+    "props": [
+     "rna_type",
+     "type",
+     "location",
+     "location_absolute",
+     "width",
+     "height",
+     "dimensions",
+     "name",
+     "label",
+     "inputs",
+     "outputs",
+     "internal_links",
+     "parent",
+     "warning_propagation",
+     "use_custom_color",
+     "color",
+     "color_tag",
+     "select",
+     "show_options",
+     "show_preview",
+     "hide",
+     "mute",
+     "show_texture",
+     "texture_mapping",
+     "color_mapping",
+     "sky_type",
+     "sun_disc",
+     "sun_size",
+     "sun_intensity",
+     "sun_elevation",
+     "sun_rotation",
+     "altitude",
+     "air_density",
+     "aerosol_density",
+     "ozone_density",
+     "sun_direction",
+     "turbidity",
+     "ground_albedo"
+    ]
+   },
+   "ok": true,
+   "seconds": 0.0,
+   "peakMB": 255,
+   "freeMB": 6984
+  },
+  {
+   "step": "eevee_panorama",
+   "value": {
+    "seconds": 4.06,
+    "pixels": {
+     "red": 408,
+     "green": 0,
+     "blue": 0,
+     "yellow": 0
+    },
+    "visible": [
+     "red"
+    ],
+    "equirect": false,
+    "file": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_env_oneapi\\eevee_pano.png"
+   },
+   "ok": true,
+   "seconds": 4.26,
+   "peakMB": 1183,
+   "freeMB": 6820
+  },
+  {
+   "step": "python_thread_during_render",
+   "value": {
+    "renderSeconds": 3.16,
+    "ticksDuringRender": 29,
+    "expected": 31
+   },
+   "ok": true,
+   "seconds": 3.27,
+   "peakMB": 1183,
+   "freeMB": 6760
+  }
+ ],
+ "env": {
+  "CYCLES_ONEAPI_ALL_DEVICES": "1",
+  "cpus": 18
+ },
+ "seconds": 8.3,
+ "peakMB": 1183
+}

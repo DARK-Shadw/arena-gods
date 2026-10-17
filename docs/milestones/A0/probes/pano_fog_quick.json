@@ -1,0 +1,108 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\pano_fog_quick",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "w": 2048,
+  "h": 341,
+  "samples": 32,
+  "denoise": false,
+  "fog": true,
+  "engine": "cycles",
+  "device": "CPU",
+  "slice": false,
+  "tile": 1024,
+  "tag": "",
+  "repeat": 1
+ },
+ "steps": [
+  {
+   "step": "build_scene",
+   "value": {
+    "objects": 5421,
+    "instancedBlocks": 5403
+   },
+   "ok": true,
+   "seconds": 14.11,
+   "peakMB": 411,
+   "freeMB": 6858
+  },
+  {
+   "step": "setup",
+   "value": {
+    "device": {
+     "requested": "CPU",
+     "used": "CPU",
+     "devices": []
+    },
+    "compositor": {
+     "linked": [
+      "Image",
+      "Depth",
+      "emit"
+     ],
+     "missing": [],
+     "rlOutputs": [
+      "Image",
+      "Alpha",
+      "Depth",
+      "emit",
+      "Normal",
+      "UV",
+      "Vector",
+      "Position",
+      "Deprecated",
+      "Deprecated",
+      "Shadow",
+      "Ambient Occlusion",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Object Index",
+      "Material Index",
+      "Mist",
+      "Emission",
+      "Environment",
+      "Diffuse Direct",
+      "Diffuse Indirect",
+      "Diffuse Color",
+      "Glossy Direct",
+      "Glossy Indirect",
+      "Glossy Color",
+      "Transmission Direct",
+      "Transmission Indirect",
+      "Transmission Color",
+      "Subsurface Direct",
+      "Subsurface Indirect"
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 0.0,
+   "peakMB": 411,
+   "freeMB": 6857
+  },
+  {
+   "step": "render",
+   "value": {
+    "seconds": 39.6,
+    "allRuns": [
+     39.6
+    ],
+    "files": {
+     "pano_cycles_2048x341_s32_fog_cpu.png": 1038376,
+     "pano_cycles_2048x341_s32_fog_cpu_.exr": 13989422
+    },
+    "tag": "cycles_2048x341_s32_fog_cpu",
+    "msPerMegapixelPerSample": 1771.99
+   },
+   "ok": true,
+   "seconds": 39.58,
+   "peakMB": 861,
+   "freeMB": 6692
+  }
+ ],
+ "seconds": 53.7,
+ "peakMB": 861
+}

@@ -1,0 +1,119 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\pano_medium_gpu",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "w": 4096,
+  "h": 683,
+  "samples": 64,
+  "denoise": true,
+  "fog": false,
+  "engine": "cycles",
+  "device": "ONEAPI",
+  "slice": false,
+  "tile": 1024,
+  "tag": "",
+  "repeat": 1
+ },
+ "steps": [
+  {
+   "step": "build_scene",
+   "value": {
+    "objects": 5420,
+    "instancedBlocks": 5403
+   },
+   "ok": true,
+   "seconds": 13.81,
+   "peakMB": 416,
+   "freeMB": 6871
+  },
+  {
+   "step": "setup",
+   "value": {
+    "device": {
+     "requested": "ONEAPI",
+     "used": "ONEAPI",
+     "devices": [
+      {
+       "name": "Intel Core Ultra 5 125H",
+       "type": "CPU",
+       "use": false
+      },
+      {
+       "name": "Intel(R) Arc(TM) Graphics",
+       "type": "ONEAPI",
+       "use": true
+      }
+     ]
+    },
+    "compositor": {
+     "linked": [
+      "Image",
+      "Depth",
+      "emit"
+     ],
+     "missing": [],
+     "rlOutputs": [
+      "Image",
+      "Alpha",
+      "Depth",
+      "Noisy Image",
+      "emit",
+      "Normal",
+      "UV",
+      "Vector",
+      "Position",
+      "Deprecated",
+      "Deprecated",
+      "Shadow",
+      "Ambient Occlusion",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Object Index",
+      "Material Index",
+      "Mist",
+      "Emission",
+      "Environment",
+      "Diffuse Direct",
+      "Diffuse Indirect",
+      "Diffuse Color",
+      "Glossy Direct",
+      "Glossy Indirect",
+      "Glossy Color",
+      "Transmission Direct",
+      "Transmission Indirect",
+      "Transmission Color",
+      "Subsurface Direct"
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 0.39,
+   "peakMB": 490,
+   "freeMB": 6793
+  },
+  {
+   "step": "render",
+   "value": {
+    "seconds": 45.1,
+    "allRuns": [
+     45.1
+    ],
+    "files": {
+     "pano_cycles_4096x683_s64_dn_oneapi.png": 2305793,
+     "pano_cycles_4096x683_s64_dn_oneapi_.exr": 55993942
+    },
+    "tag": "cycles_4096x683_s64_dn_oneapi",
+    "msPerMegapixelPerSample": 251.89
+   },
+   "ok": true,
+   "seconds": 45.11,
+   "peakMB": 3867,
+   "freeMB": 5659
+  }
+ ],
+ "seconds": 59.3,
+ "peakMB": 3867
+}

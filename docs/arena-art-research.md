@@ -17,7 +17,7 @@ Companion to `docs/arena-art-plan.md`. Written 2026-10-18 on branch `anim-plan` 
 | Arena build time | 3-6 s (CPU texture generation in `textures.ts`) | `docs/BACKLOG.md` known issues |
 | Shipped page | `public/models` 18 MB, `public/anim` 8.6 MB, `public/audio` 7.1 MB, `public/fx` 4.4 MB, `dist` 40 MB | `du -sh` |
 | Tooling already present | `@gltf-transform/cli` 4.1.1 (devDependency), three r170 `meshopt_decoder.module.js`, `libs/basis/basis_transcoder.*`, `ktx-parse` | `node_modules` listing |
-| KTX encoder | `gltf-transform uastc/etc1s` need **KTX-Software** (`toktx`/`ktx` CLI). Not installed (F2 shipped WebP for that reason) | `npx gltf-transform uastc -h` |
+| KTX encoder | `gltf-transform uastc/etc1s` need **KTX-Software** (`ktx` CLI). A0: KTX-Software 5.0.0-rc2 is now installed, but gltf-transform 4.x fails with it (`--assign-oetf` renamed); `ktx create` works directly | `npx gltf-transform uastc -h`, A0 `ktx_probe` |
 | Assets already downloaded | `Assets/fx/*` (21 Unity Labs flipbook zips), `Assets/VFX/` (Kenney particle pack, SBS noise 128 + 512). No PBR surfaces, HDRIs or 3D kits yet | folder listing |
 
 ## 2. Concept art files
@@ -73,6 +73,8 @@ Sources: https://developer.blender.org/docs/release_notes/5.0/python_api/ , .../
 | glTF | only maintenance (`use_nodes` removal); no meshopt/KTX in the exporter | compress with gltf-transform after export |
 | Images | WebP wide-gamut writing | not needed |
 | Blend files | compression on save by default | we keep no .blend files anyway |
+
+**A0 probe results (2026-10-18, `docs/milestones/A0/README.md`):** oneAPI works on the Meteor Lake Arc iGPU (no env var needed, 3-4x faster than the CPU, identical output); EEVEE has no panoramic camera; the selected-to-active bake API is unchanged; the Sky Texture node in 5.0.1 still has `sun_direction` / `turbidity` / `ground_albedo` (the row above is wrong for 5.0.1); GN `Grid to Mesh` needs Threshold 0 for SDF grids.
 
 Not verified (must be probed in A0):
 - **Cycles oneAPI on this iGPU.** The 5.2 manual lists only Arc A-series and B-series (Xe-HPG) as supported oneAPI devices. 2022 dev notes say integrated GPUs "could run it" behind `CYCLES_ONEAPI_ALL_DEVICES=1`. Meteor Lake (Xe-LPG) is not listed. Plan on **CPU Cycles**; treat GPU as a bonus if the probe shows it. Also the iGPU shares RAM, so GPU rendering would not relieve memory.

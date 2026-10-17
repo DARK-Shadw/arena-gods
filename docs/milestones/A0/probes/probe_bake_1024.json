@@ -1,0 +1,86 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_bake_1024",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "px": 1024,
+  "high_level": 7,
+  "ao_samples": 128,
+  "voxel": 0.0,
+  "device": "CPU"
+ },
+ "steps": [
+  {
+   "step": "build",
+   "value": {
+    "lowTris": 108,
+    "highTris": 1769472,
+    "device": {
+     "requested": "CPU",
+     "used": "CPU",
+     "devices": []
+    },
+    "pack": "shape_method=CONCAVE"
+   },
+   "ok": true,
+   "seconds": 2.17,
+   "peakMB": 323,
+   "freeMB": 6934
+  },
+  {
+   "step": "gn_sdf_erosion",
+   "value": {
+    "tris": 62380,
+    "fillet": "ok",
+    "inputs": [
+     "Mesh",
+     "Voxel Size",
+     "Band Width"
+    ]
+   },
+   "ok": true,
+   "seconds": 0.31,
+   "peakMB": 376,
+   "freeMB": 6869
+  },
+  {
+   "step": "voxel_remesh",
+   "value": "skipped",
+   "ok": true,
+   "seconds": 0.0,
+   "peakMB": 376,
+   "freeMB": 6869
+  },
+  {
+   "step": "bake_normal_ao",
+   "value": {
+    "NORMAL": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_bake_1024\\pillar_1024_normal.png",
+     "seconds": 5.78
+    },
+    "AO": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_bake_1024\\pillar_1024_ao.png",
+     "seconds": 19.6
+    }
+   },
+   "ok": true,
+   "seconds": 25.38,
+   "peakMB": 1323,
+   "freeMB": 6428
+  },
+  {
+   "step": "export_glb",
+   "value": {
+    "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_bake_1024\\probe_pillar.glb",
+    "bytes": 1521096
+   },
+   "ok": true,
+   "seconds": 1.46,
+   "peakMB": 1323,
+   "freeMB": 6852
+  }
+ ],
+ "seconds": 29.4,
+ "peakMB": 1323
+}

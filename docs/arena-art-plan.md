@@ -1,6 +1,6 @@
 # Arena art redesign: plan
 
-Branch `anim-plan`, written 2026-10-18. Status: **plan only**, nothing built. Raw notes, machine facts, licence checks and Blender 5.0 API changes are in `docs/arena-art-research.md`.
+Branch `anim-plan`, written 2026-10-18. Status: **A0 done** (harness, calibrated concept cameras, Blender probes, job runner: `docs/milestones/A0/README.md`; corrections from A0 are marked "A0" below); A1 next. Raw notes, machine facts, licence checks and Blender 5.0 API changes are in `docs/arena-art-research.md`.
 
 **Goal (owner, top priority):** the in-game arenas must look as close as possible to the concept art `docs/concept-art/ref-3.png` ... `ref-10.png`, with Blender pushed as far as it goes. The deterministic sim, the generator (theme x layout x seed), destruction, cover, hazards, throwables, entrances and the camera must keep working.
 
@@ -19,7 +19,7 @@ Branch `anim-plan`, written 2026-10-18. Status: **plan only**, nothing built. Ra
 | Loading | Pre-baked GLB/KTX2 assets streamed per theme, prefetched from the select screen, cached by the browser; no CPU texture generation; target 1.2 s theme switch from cache |
 | Sim | Untouched, except one data row for `rootwood` in `THEME_RULES` (A17) and a frozen seed-to-theme list so old seeds keep their default arenas |
 | F4 (fire and environment FX) | Delivered by the arena sessions A19-A20, after F3 lands, using `docs/fx-plan.md` as the spec |
-| Size | 23 milestones (A0-A22), each one agent session (at most about 1 agent-day). About 30-40 h of unattended Blender bake time on top |
+| Size | 23 milestones (A0-A22), each one agent session (at most about 1 agent-day). About 10-15 h of unattended Blender time on top (A0 measured; was 30-40 h), a few hours if the iGPU renders the panoramas |
 
 Order: harness and probes, pipeline, floor, shared kit, backdrop pipeline, **hero theme**, theme kits, the other seven themes, entrances and camera sweep, F4, perf and loading, final review.
 
@@ -34,7 +34,7 @@ Coordinates in this section are screen positions in the image (0..1 from the top
 - crimson banners with a gold or bone-white sigil, torn at the bottom, plus heavy hanging chains;
 - hooded or armoured colossal statues flanking the view;
 - one huge landmark straight behind the opponent, layered against mid-ground ruins and a misty far field (waterfalls, floating rocks, cloud seas);
-- a low over-the-shoulder hero camera: the foreground fighter, back to camera, fills the right 25-35% of the frame; the opponent stands 6-9 m away near the centre.
+- a low over-the-shoulder hero camera: the foreground fighter, back to camera, fills the right 25-35% of the frame; the opponent stands 6-9 m away near the centre. (A0 calibration: the cameras are 0.6-1.5 m high, the opponent 5-8.5 m away; the per-image "Camera" estimates below are superseded by `conceptCams.ts`.)
 
 ### 1.1 ref-3: ruined colosseum under the moon arch -> "The Moon Gate"
 
@@ -201,9 +201,9 @@ Every theme milestone ships `docs/milestones/A<n>/concept/<theme>_side.jpg` (con
 
 | # | Check | Measure | Pass |
 |---|---|---|---|
-| C1 | Landmark placement and silhouette | skyline mask IoU over the top 60% of the frame (sky vs structure, threshold per image), after the preset is calibrated | >= 0.55 (>= 0.65 for the hero) |
+| C1 | Landmark placement and silhouette | skyline mask IoU over the top 60% of the frame, after the preset is calibrated. **A0:** concept sky = by-eye skyline profile per image (`tools/arena/concept_targets.json`; colour segmentation fails on painterly images), game sky = visual (frame vs sky-only frame); also `profileErr` (mean per-column skyline difference), the useful number when the concept has under ~8% sky (ref-4, ref-6, ref-10) | >= 0.55 (>= 0.65 for the hero) |
 | C2 | Palette | mean CIELAB per cell of a 3x3 grid, Delta E against the concept | median <= 12, worst cell <= 20 |
-| C3 | Warm/cool split | share of warm pixels (hue 0-50 deg, saturation > 0.4, L > 40) | within +-40% of the concept |
+| C3 | Warm/cool split | share of warm pixels (hue 345-360 and 0-50 deg, saturation > 0.4, L > 40; A0 added 345-360 for crimson); cool share reported | within +-40% of the concept |
 | C4 | Wet floor | share of bottom-third pixels brighter than L 55 (specular highlights and streaks) | within +-50% of the concept; at least 3 distinct fire streaks visible |
 | C5 | Detail density | mean Sobel magnitude per 3x3 cell (catches flat, empty areas) | each cell 0.7-1.3x the concept |
 | C6 | Dressing count in frame | braziers, banners, chains, statues, candles visible (counted by the agent on the render) | each within +-30% of the concept count (section 1) |
@@ -215,8 +215,10 @@ Every theme milestone ships `docs/milestones/A<n>/concept/<theme>_side.jpg` (con
 ### 3.3 Side-by-side comparison method and camera presets
 
 - **`src/render/arena/conceptCams.ts`**: one preset per concept image. `?concept=ref-3` (debug URL) loads the theme and layout, places two fighters in fixed stances at fixed marks, hides the HUD, sets the preset camera, freezes the director, and renders at the concept's pixel size (1672x941; ref-3 at 1793x877).
-- **`tools/shots/concept.cjs`** (copy of `shots.cjs` patterns): headless Chromium, `--q=0|1|2`, writes the render and runs **`tools/arena/concept_compare.py`** (Pillow + numpy, run with `python -I`): side-by-side, blend, metrics C1-C5 into JSON. Optional `--clip=4` writes a 4 s frame strip for C9.
-- **Calibration (A0):** solve pitch from the horizon line (`pitch = atan((y_h - 0.5) * 2 * tan(vfov/2))`), yaw so that the landmark lands at its x, height from the floor ring's ellipse ratio (minor/major = sin(depression angle) at the ring centre), then nudge by overlaying the blend image. Record the final numbers in the preset file.
+- **`tools/shots/concept.cjs`** (copy of `shots.cjs` patterns): headless Chromium, `--q=0|1|2`, writes the render and runs **`tools/arena/concept_compare.py`** (Pillow + numpy; run WITHOUT `-I`, numpy is in the user site-packages): side-by-side, blend, metrics C1-C5 + C8 into JSON, contact sheet. Optional `--clip=4` writes a 4 s frame strip for C9. **Built in A0** (`npm run arena:concept`); see `docs/milestones/A0/README.md`.
+- **Calibration (A0, done):** `tools/arena/calibrate.py` from the annotations in `tools/arena/concept_targets.json`. Correction to the method below: the line where the far floor meets the boundary is the **floor edge, not the horizon** (it sits well below eye level), and the concept cameras are **low (0.6-1.5 m)**. The solver fits camera height + pitch jointly (opponent as a ruler: feet..head on screen; our arena boundary on the concept's floor edge), yaw from the landmark x, marks by casting the annotated feet onto the floor; the foreground fighter is backed off until an upright rig's head stays in frame (the concepts draw it hunched). Re-run `calibrate.py --write` whenever the arena size changes.
+
+The table below is the planner's **starting guess, superseded**: the calibrated presets live in `src/render/arena/conceptCams.ts` (block `CALIBRATED-BEGIN`), summary in the A0 README (heights ref-3..10: 1.00, 1.52, 1.35, 0.79, 0.95, 0.93, 0.61, 0.85 m; yaws -17.4, -7.5, -7.0, -8.9, -5.4, -13.5, +11.7, +2.0).
 
 Starting presets (fighter A = foreground, back to camera; B = opponent; camera yaw 0 looks along +x; positive yaw turns towards +z, which is screen right):
 
@@ -290,7 +292,7 @@ Nothing in `src/render/arena` reads sim RNG or writes sim state. `sim:test` outp
 ### 5.1 Layout and runner
 
 - Scripts: `tools/arena/blender/`. Shared module `abake.py` imports and extends `tools/fx/blender/fxbake.py` (args, dry run, peak RAM via `GetProcessMemoryInfo`, free-RAM guard), adding: `load_cc0(id)` (from `Assets/arena-src/`), `bake_maps(low, high, maps, px)`, `export_glb(obj, path)`, `render_panorama(...)`, `log_step(name)` (RAM + seconds per step into `ram.log`).
-- Runner: `tools/arena/bake.mjs <job|all> [--force]`. One Blender process **per asset job** (process exit frees all memory), strictly sequential. Resumable: each job writes `tools/arena/_bake/<job>/done.json` with a hash of the script + inputs and is skipped when unchanged. Refuses to start below 4 GB free RAM; Cycles panorama jobs run with `--min-free-mb 2500`, pausing (not dying) when memory drops. It prints the peak RAM per job.
+- Runner (**built in A0**, Python because it needs Win32 process-memory and suspend calls): `python -I tools/arena/bake.py <job|group|all> [--force] [--list] [--dry]` (`npm run arena:bake -- ...`), jobs in `tools/arena/jobs.json`. One Blender process **per asset job** (process exit frees all memory), strictly sequential. Resumable: each job writes `tools/arena/_bake/<job>/done.json` with a hash of the script, `abake.py`/`fxbake.py`, the job definition and its inputs, and is skipped when unchanged. Waits (then skips) below 4 GB free RAM at start (GPU jobs: 6 GB); a watchdog samples Blender's RAM every 2 s into `ram.csv`, **suspends** Blender below 1.5 GB free, resumes above 2.5 GB, kills it below 0.7 GB, after 20 min paused, or after 3 min paused when the job itself is the hog. It prints the peak RAM per job and keeps `_bake/summary.json`. `abake.py` exists (A0) with `Job` (timed steps + RAM + `result.json`), `bake_maps`, `export_glb`, `cycles_device`, `pano_camera`, `compositor_outputs`; `load_cc0` is still to add (A1).
 - Never run Blender together with the dev server and a headless browser. A theme session starts the long Cycles renders in the background **and does only code and typecheck work while they run**; screenshots come after.
 - Raw CC0 downloads: `Assets/arena-src/<source>/<id>/` (outside git), fetched by `tools/arena/fetch_cc0.mjs` from the Poly Haven and ambientCG APIs (CC0, so agents may script the download) with a ledger `public/arena/credits.json`.
 - Output: `public/arena/kit/*.glb`, `public/arena/<theme>/*`, `public/arena/manifest.json`. `_bake/` and `_work/` are gitignored (add to `.gitignore` in A1).
@@ -356,14 +358,15 @@ Fallback: Poly Haven `gothic_statue` (27.7k tris) and CC0-marked Smithsonian sca
 
 Full 3D Blender scenes per theme: landmark (arch + colosseum ring, volcanic citadel, buddha cliff + islands, skull gate + camp + cliffs, snowy castle + viaduct, floating cathedral + rings, goddess + moon castle, tree-city), built from the kit, GN generators, heavy CC0 scans (cliffs, trees: render only) and the theme's HDRI + sun/moon matching `themes.ts`.
 
-Render (Cycles, CPU unless the A0 probe proves oneAPI):
+Render (Cycles; **A0 proved oneAPI works on the Arc iGPU**, 3-4x faster than the CPU, output identical, but the high layer peaks at 5.7 GB: use the GPU only with 6-7 GB free, else CPU):
 - Camera at the arena centre, 1.6 m high, **panoramic equirectangular with latitude limits** (-12 deg to +60 deg), 360 deg longitude.
 - **Three depth layers** (separate view layers with holdouts): near-mid (40-120 m: outer walls, close islands), mid (120-600 m: landmark), far (sky, mountains, clouds). Alpha per layer.
 - Passes per layer: colour (EXR half), **Depth**, and **AOVs**: `water` (waterfall/flow mask + flow speed), `emit` (lava, windows, distant fires: flicker groups in R/G/B), `cloud` (cloud-sea mask for scrolling).
 - Sizes (high tier): 8192x1365 per layer (22.7 px/deg, matching a 1080p frame at 45 deg vFOV); medium 4096x683; low 2048x341, far layer only.
 - **Hero inset:** a 4096x2048 perspective render of the landmark as framed in the concept preset, mapped onto the panorama region it covers (sharper where the camera looks most).
 - Volumetric fog and god rays: rendered **into the layers** (EEVEE volumes for speed, or Cycles biased volumes), plus separate 512 px **light-shaft and fog-bank card sequences** (EEVEE, 32 frames, looped) for the game's fog cards.
-- EEVEE fallback and preview: 8 perspective slices of 45 deg each, stitched onto a cylinder (EEVEE panoramic support is not verified). Preview every scene with EEVEE slices (about 1-2 min) before committing the long Cycles render.
+- EEVEE fallback and preview: 8 perspective slices of 45 deg each, stitched onto a cylinder (**A0: EEVEE does not support panoramic cameras**, it renders a PANO camera as plain perspective). Preview every scene with EEVEE slices (measured: 7.4 s per 1024x1365 slice, about 1.2 min for 8, 1.8 GB) before committing the long Cycles render.
+- Multilayer EXR per high layer (Image + Depth + one AOV, half float) is about 224 MB: keep in `_bake`, never commit.
 
 In the game (`backdrop.ts`): each layer is a cylinder segment mesh (256 x 32 vertices) at its layer radius, **vertices displaced by the rendered depth** (clamped, smoothed), so moving the camera inside the arena gives real parallax between layers and within the landmark. Fog is applied from the depth so the in-game height fog blends into the panorama. The AOV masks animate: UV-scrolling noise inside `water` (waterfalls flow), noise-modulated emission in `emit` (lava pulses, windows and distant fires flicker), slow offset in `cloud` (cloud sea drifts). The moon and sun discs and a slow cloud layer stay in `sky.ts` (moon sized as in section 3.1), behind the far layer.
 
@@ -379,28 +382,32 @@ In the game (`backdrop.ts`): each layer is a cylinder segment mesh (256 x 32 ver
 ### 5.8 Export, compression, LODs, instancing
 
 - Blender glTF exporter (only maintenance changes in 5.0): `export_format='GLB'`, `export_yup=True`, `export_apply=True`, custom properties as extras, no Draco.
-- `tools/arena/build_assets.mjs` (gltf-transform 4.1.1, already a devDependency): `dedup`, `weld`, `prune`, `meshopt` (geometry), textures to **KTX2** (UASTC + zstd for normals and the hero inset; ETC1S for albedo, ORM, masks, far layers) with a **WebP fallback** set; `.low` variants at half resolution. Needs KTX-Software installed (owner download 1).
+- `tools/arena/build_assets.mjs` (gltf-transform 4.x, already a devDependency): `dedup`, `weld`, `prune`, `meshopt` (geometry), textures to **KTX2** (UASTC + zstd for normals and the hero inset; ETC1S for albedo, ORM, masks, far layers) with a **WebP fallback** set; `.low` variants at half resolution. **A0 findings:** KTX-Software **5.0.0-rc2 is installed** (`ktx.exe` only, no `toktx`); gltf-transform 4.x `uastc`/`etc1s` FAIL with it (they pass `--assign-oetf`, renamed `--assign-tf` in 5.0) while exiting 0, so encode with **`ktx create` directly** (flags verified in the A0 README) and pack the `.ktx2` images with the gltf-transform API, or install KTX-Software 4.4.x. gltf-transform `webp` is broken in this install (sharp/libvips): make WebP with Pillow or Blender's exporter (`export_image_format='WEBP'`).
 - Runtime: `GLTFLoader` + `MeshoptDecoder` + `KTX2Loader` (transcoder copied to `public/basis/`), `detectSupport(renderer)`.
 - LOD: tier LODs (LOD0 on medium/high, LOD1 on low), not distance LODs, because the near field is under 40 m and the far field is panoramas.
 - Static ring modules: merged per material (existing `mergeStatic`). Many small repeated items (stakes, candles, chain links, rubble, balusters): `InstancedMesh` with `COL` proxies into `losGroup`.
 
-### 5.9 Bake time, RAM and file size estimates (CPU Cycles, Core Ultra 5 125H, 14 cores)
+### 5.9 Bake time, RAM and file size estimates (MEASURED in A0; Core Ultra 5 125H, Arc iGPU, Blender 5.0.1)
 
-| Job | Size | Time each | Peak RAM | Count | Total |
+A0 replaced the planning guesses with probe numbers (`docs/milestones/A0/README.md`; the render probe scene is a stand-in of 5,400 instanced blocks + arch + mountains, so real theme scenes with scans and volumes may take 1.5-3x). Old guess in brackets.
+
+| Job | Size | Time each (CPU / iGPU) | Peak RAM | Count | Total |
 |---|---|---|---|---|---|
-| A0 probe (bake + render + GN + export + oneAPI) | 256 px | 3 min | 1.5 GB | 1 | 3 min |
-| Procedural/scan material set (6 maps, emission bakes) | 2048 | 1-3 min | 1-1.5 GB | about 30 | 1-1.5 h |
-| High->low bake: normal | 1024 | 20-60 s | 1.5-3 GB (2-5 M tri high) | about 60 assets | |
-| AO 128 spp + curvature | 1024 | 2-5 min | same | about 60 | 3-5 h for the kit |
-| Banner cloth settle | 40x80 grid, 60 frames | 1-2 min | under 1 GB | 12 | 20 min |
-| Statue: pose + cloth 120 f + voxel remesh + bake 2048 | | 15-30 min | 3-5 GB (remesh peak; cap the voxel size by height) | 6 | 2-3 h |
-| Panorama layer, 8192x1365, 128 spp + OIDN | | 20-45 min | 3-6 GB | 3 per theme | 1-2 h per theme |
-| Hero inset 4096x2048 | | 15-30 min | 3-5 GB | 1 per theme | |
-| EEVEE shaft / fog card sequence | 512 px x 32 f | 1-3 min | about 1.4 GB | 2-3 per theme | |
-| **Per theme** | | | | | **2-4 h unattended** |
-| **Whole plan** | | | | | **about 30-40 h unattended**, spread over the sessions |
+| Procedural/scan material set (6 maps, emission bakes) | 2048 | not measured; emission bakes are 1 sample, expect well under 1 min [1-3 min] | about 1-1.5 GB | about 30 | under 30 min |
+| High->low bake: normal | 1024 | **6 s** [20-60 s] | **1.3 GB at 1.8 M tris** [1.5-3 GB] | about 60 assets | |
+| AO 128 spp + curvature | 1024 | **20 s AO** [2-5 min] | same | about 60 | **30-45 min for the kit** [3-5 h] |
+| Banner cloth settle | 40x80 grid, 60 frames | **5 s** [1-2 min] | 0.22 GB | 12 | 1-2 min |
+| Statue: pose + cloth 120 f + voxel remesh + bake 2048 | | not measured end to end; voxel remesh 1 cm on 3 m: 1.3 s, 0.43 GB | expect 1.5-3 GB for 6-8 m at 1-2 cm | 6 | under 1 h |
+| Panorama layer, 8192x1365, 128 spp + OIDN | | **13.6 min CPU / about 3.5 min iGPU** [20-45 min] | **4.7 GB CPU / 5.7 GB iGPU** [3-6 GB] | 3 per theme | 40 min CPU / 10 min iGPU per theme |
+| Same with volume fog in the layer | | about x2.5 | | | |
+| Medium layer 4096x683, 64 spp + OIDN | | 2.3 min CPU / 45 s iGPU | 2.8 / 3.9 GB | | |
+| Hero inset 4096x2048, 128 spp | | about 10.5 min CPU / about 3 min iGPU (from 2048x1024: 157 s, 2.3 GB) [15-30 min] | about 3-4 GB | 1 per theme | |
+| EEVEE shaft / fog card sequence | 512 px x 32 f | **about 1 min** (10.6 s first frame, then 1.5 s) | 1.4 GB | 2-3 per theme | |
+| EEVEE slice preview (8 x 45 deg) | 1024x1365 | about 1.2 min | 1.8 GB | 1 per scene iteration | |
+| **Per theme** | | | | | **about 1-1.5 h CPU (2-3 h with volume fog in the layers); 20-40 min on the iGPU** [2-4 h] |
+| **Whole plan** | | | | | **about 10-15 h CPU, a few hours with the iGPU** [30-40 h] |
 
-If the oneAPI probe works on the iGPU, panorama times could drop several-fold, but GPU memory comes out of the same 16 GB, so the RAM guard stays.
+oneAPI on the Arc iGPU works (A0): 3-4x faster for Cycles renders, identical output, but its memory comes out of the same 16 GB (the high layer peaked at 5.7 GB and dropped free RAM to 1.4 GB, so the runner suspended it for 13 min). GPU jobs get `startMinFreeMb: 6000` in `jobs.json`; bakes stay on the CPU (they take seconds).
 
 | Download / memory (compressed KTX2) | Low | Medium | High |
 |---|---|---|---|
@@ -414,7 +421,7 @@ Without KTX2 (WebP only), GPU memory is about 4x: the high tier would not fit. K
 
 ### 5.10 Blender 5.0 specifics the scripts must respect
 
-`BLENDER_EEVEE` engine id; set `media_type` before `file_format`; pass name `Depth` (not `Z`); compositor through `scene.compositing_node_group` and the new File Output API (`directory`, `file_name`, `file_output_items`); no Sky Texture `sun_direction/turbidity/ground_albedo` (use HDRIs and our own gradient); legacy Action API removed (pose statues from our JSON); boolean solver "FLOAT" (was "FAST"); Cycles volumes default to the new unbiased method (test "Biased" for fog layers); tiling always on (set `tile_size` 1024 to bound memory); adaptive subdivision available for high-polys; curves `resolution` now honoured (do not use hair curves for foliage). Full table: research notes section 4.
+`BLENDER_EEVEE` engine id; set `media_type` before `file_format`; pass name `Depth` (not `Z`); compositor through `scene.compositing_node_group` and the new File Output API (`directory`, `file_name`, `file_output_items`); Sky Texture: A0 found `sun_direction/turbidity/ground_albedo` still present in 5.0.1 (types `SINGLE_SCATTERING`, `MULTIPLE_SCATTERING`, `PREETHAM`, `HOSEK_WILKIE`), but keep HDRIs and our own gradient; GN `Grid to Mesh` must get Threshold 0 for SDF grids (default 0.1 gives an empty mesh); EEVEE has no panoramic camera; selected-to-active bake API unchanged; `pack_islands(shape_method='CONCAVE')` works; legacy Action API removed (pose statues from our JSON); boolean solver "FLOAT" (was "FAST"); Cycles volumes default to the new unbiased method (test "Biased" for fog layers); tiling always on (set `tile_size` 1024 to bound memory); adaptive subdivision available for high-polys; curves `resolution` now honoured (do not use hair curves for foliage). Full table: research notes section 4.
 
 ---
 
@@ -535,8 +542,8 @@ Effort is in agent sessions (1 session = at most about 1 agent-day). Every miles
 
 | # | Milestone | Deliverables | Acceptance | Effort | Depends on | Files touched |
 |---|---|---|---|---|---|---|
-| **A0** | Harness and probes (no visual change) | concept presets + `?concept=` mode; `tools/shots/concept.cjs`; `tools/arena/concept_compare.py`; Blender probe script (normal + AO bake at 256 px, Cycles panorama with latitude limits + Depth + AOV via the 5.0 compositor API, EEVEE panoramic test, GN SDF-grid nodes, glTF export, oneAPI with `CYCLES_ONEAPI_ALL_DEVICES=1`, peak RAM); KTX-Software detection; **baseline side-by-sides of the current 7 themes** | 7 baseline side-by-sides + metrics JSON; probe report with times and RAM; presets calibrated (horizon, landmark x) | 0.75 | none | new `src/render/arena/conceptCams.ts`, `tools/shots/concept.cjs`, `tools/arena/*`; small hooks in `main.ts` (URL param) |
-| **A1** | Asset pipeline + loader + data-driven dressing skeleton | `abake.py`, `bake.mjs` runner (resumable, RAM log), `fetch_cc0.mjs` + credits ledger, `build_assets.mjs` (meshopt, KTX2/WebP, `.low`), `check_budget.mjs`; runtime `assets.ts` (loaders, cache, prefetch, dispose), `art/types.ts` (`ThemeArt`), `dressKit.ts` skeleton, `?arena=legacy`; async `ensureArena`; `.gitignore` for `_bake/_work`; one test asset (tripod brazier) end to end | brazier GLB loads in game on all tiers; bounds match `PROP_BASE`/`TOP`; budget script passes; legacy path unchanged | 1 | A0 | new `src/render/arena/assets.ts`, `art/`, `dressKit.ts`; `main.ts` (`ensureArena` async), `dressing.ts` (switch), `.gitignore`, `tools/arena/*` |
+| **A0** (DONE, see `docs/milestones/A0/README.md`) | Harness and probes (no visual change) | concept presets + `?concept=` mode; `tools/shots/concept.cjs`; `tools/arena/concept_compare.py`; Blender probe script (normal + AO bake at 256 px, Cycles panorama with latitude limits + Depth + AOV via the 5.0 compositor API, EEVEE panoramic test, GN SDF-grid nodes, glTF export, oneAPI with `CYCLES_ONEAPI_ALL_DEVICES=1`, peak RAM); KTX-Software detection; **baseline side-by-sides of the current 7 themes** | 7 baseline side-by-sides + metrics JSON; probe report with times and RAM; presets calibrated (horizon, landmark x) | 0.75 | none | new `src/render/arena/conceptCams.ts`, `tools/shots/concept.cjs`, `tools/arena/*`; small hooks in `main.ts` (URL param) |
+| **A1** | Asset pipeline + loader + data-driven dressing skeleton | extend A0's `abake.py` / `bake.py` runner (`load_cc0`, asset jobs), `fetch_cc0.mjs` + credits ledger, `build_assets.mjs` (meshopt, KTX2 via `ktx create` directly + WebP via Pillow/Blender, `.low`), `check_budget.mjs`; runtime `assets.ts` (loaders, cache, prefetch, dispose), `art/types.ts` (`ThemeArt`), `dressKit.ts` skeleton, `?arena=legacy`; async `ensureArena`; `.gitignore` for `_bake/_work`; one test asset (tripod brazier) end to end | brazier GLB loads in game on all tiers; bounds match `PROP_BASE`/`TOP`; budget script passes; legacy path unchanged | 1 | A0 | new `src/render/arena/assets.ts`, `art/`, `dressKit.ts`; `main.ts` (`ensureArena` async), `dressing.ts` (switch), `.gitignore`, `tools/arena/*` |
 | **A2** | Wet floor system | floor shader (scan flagstone + wetness/puddle masks + macro mask + inlay slot), planar `REFLECT` pass with roughness mips + Fresnel, low-tier probe + streak fallback, load-time floor light map, `surfaceAt(x, z)`; Blender: 2 floor sets (blue-grey flagstone, slate slabs) + puddle masks + Moon Gate engraved ring inlay | reflection pass <= 0.8 ms medium / 1.5 ms high (timer query); floor screenshots from the ref-3 preset show moon + fire streaks; C4 measured | 1 | A1; agree the `post.ts` hook with the post owner | new `floor.ts`, `reflection.ts`, `lightmap.ts`; `post.ts` (pre-scene hook), `arenaView.ts` (floor build), `tools/arena/blender/floor_*.py` |
 | **A3** | Shared stone kit | stone trim sheet + materials; square pillar (9-slice), fluted ruin column, arch/arcade bay/broken wall, stairs/plinth/dais, balustrade + spear fence, rubble and rocks (scan-based); `COL`, `SHAFT`, `FRAC_*` | GLBs pass budgets; a kit gallery page (`tools/arena/gallery/`) renders each piece lit; normal/AO bakes artefact-free (seams checked on the sheet) | 1 | A1 | `tools/arena/blender/kit_stone*.py`, `public/arena/kit/` |
 | **A4** | Shared dressing kit | braziers (4 types), banners (cloth sim, tear masks, 8-sigil atlas) + vertex sway, chains (catenary instanced), candles, lanterns (toro, cage, paper), spikes/stakes/spike grate, bones/skulls, bell; props crate/barrel/urn/keg/chunk with `FRAC_*`; fix the `Math.random` banner phase | gallery shows all; banner sway and chain swing cost under 0.1 ms CPU; prop bounds match the sim tables | 1 | A3 | `tools/arena/blender/kit_dress*.py`, `cloth.ts`, `chains.ts`, `common.ts` (banner) |
@@ -559,7 +566,7 @@ Effort is in agent sessions (1 session = at most about 1 agent-day). Every miles
 | **A21** | Perf and loading polish | tier tuning against 6.6, LOD1 on low, instancing audit, KTX2 everywhere (WebP fallback), prefetch from the select screen, `compileAsync`, dispose on switch, optional service worker, remove the legacy dressing (`dressClassic/Nature/Forge.ts`, CPU textures) once all 8 pass, rewrite `docs/arenas.md` | per tier, per theme: frame time within 6.6 targets (timer queries), budgets script green, theme switch from cache <= 1.2 s, first-visit sizes as in 5.9 | 1 | A11-A20 | `main.ts`, `assets.ts`, `arenaView.ts`, `post.ts` (tier flags), docs |
 | **A22** | Final concept-match review | 8 side-by-sides at all tiers + 4 s clips, owner review, a tweak list applied (grade, fog, dressing counts) | owner sign-off per theme | 0.5-1 | A21 | `themes.ts`, `art/*.ts`, `fxLook.ts` |
 
-**Totals:** 23 milestones, about 22.5-23 sessions, plus about 30-40 h of unattended bakes and renders (mostly in A2-A17).
+**Totals:** 23 milestones, about 22.5-23 sessions, plus about 10-15 h of unattended bakes and renders on the CPU (A0 measured; was 30-40 h), mostly in A2-A17.
 
 **Why the Moon Gate is the hero theme:**
 1. It uses the most shared-kit elements of any image: wet floor with ring inlay, braziers, banners hung from chains, chains, hooded statues, stairs, arches, rubble, moon backlight, ground fog. Building it proves the kit for everyone else.
@@ -581,10 +588,10 @@ Runner-up: the Frostspire Keep (ref-7), which is daylight and less forgiving of 
 |---|---|---|
 | The concept images are painterly AI art with impossible light (dozens of fires, everything specular) | an exact match is impossible; endless tuning | judge by composition, palette, landmark and density (C1-C10); the owner signs off per theme |
 | Memory on the owner's PC (16 GB shared with the iGPU; 6.1 GB free at the check) | low-memory kills during Cycles panoramas or voxel remesh | one Blender per job, resumable jobs, free-RAM guard and pause, no browser during renders, voxel size capped by object height, tile size 1024 |
-| Cycles oneAPI on the Meteor Lake iGPU not supported (manual lists Arc A/B only) | CPU render times (1-2 h per theme) | plan assumes CPU; overnight queues; A0 probe tries `CYCLES_ONEAPI_ALL_DEVICES=1` |
-| EEVEE panoramic camera support unverified | no fast panorama preview | perspective-slice fallback (5.6) |
-| Bake API changes in 5.0 not listed in the excerpt read | scripts fail | A0 probe bakes before any kit work |
-| KTX-Software not installed / version mismatch with gltf-transform 4.1.1 | high tier exceeds GPU memory with WebP | owner download 1; budget script fails loudly; high falls back to 4k panoramas |
+| ~~Cycles oneAPI on the Meteor Lake iGPU not supported~~ **A0: it works** (no env var needed), 3-4x faster, but uses up to 5.7 GB of shared RAM | RAM pressure during GPU renders | GPU only with >= 6 GB free (runner start threshold), CPU otherwise; the runner suspends / kills on low RAM |
+| **A0: EEVEE has no panoramic camera** (renders perspective) | no single-shot EEVEE panorama | perspective-slice fallback (5.6), 1.2 min per 8-slice preview |
+| ~~Bake API changes in 5.0~~ A0: unchanged (normal + AO selected-to-active bakes work) | none | |
+| **A0: KTX-Software 5.0.0-rc2 installed, but gltf-transform 4.x `uastc`/`etc1s` fail with it silently** (`--assign-oetf` renamed); gltf-transform `webp` broken (sharp) | high tier exceeds GPU memory with WebP | A1 encodes with `ktx create` directly (verified) and checks tool logs, or the owner installs KTX-Software 4.4.x; WebP via Pillow / Blender |
 | Planar reflection cost on the Arc iGPU unmeasured | frame budget | A2 measures first with timer queries; medium at 1/4 res; low uses probe + cards |
 | The floor must stay flat at y = 0 (sim is 2D) | the concept's broken, uneven slabs only outside the fight ellipse | relief inside the ellipse limited to normal maps and under 2 cm geometry |
 | Instanced art is invisible to camera LOS and anchor snapping today | cameras clipping through stakes or statues; entrances on missing surfaces | `COL` proxies in `losGroup`; validator sweep in A18 |
@@ -597,6 +604,8 @@ Runner-up: the Frostspire Keep (ref-7), which is daylight and less forgiving of 
 | Session size: 23 sessions is long | fatigue, drift | the hero sign-off (A8) gates the rest; each milestone has its own README and side-by-sides |
 
 Not verified in this planning session (no renders, no browser, no Blender runs by rule): every time and size estimate in 5.9 and 6.6 (derived from F1/F2 measurements and typical Cycles throughput), the concept camera numbers (eye estimates, calibrated in A0), oneAPI and EEVEE panorama support, the exact KTX-Software version gltf-transform needs, and whether three r170's `compileAsync` gives a real gain on this driver.
+
+**Update after A0:** the 5.9 times, oneAPI, EEVEE panorama, the bake API, the KTX tooling and the concept cameras are now measured or calibrated (`docs/milestones/A0/README.md`). Still unmeasured: the 6.6 runtime budgets (A2 / A21), real theme scenes (scans, volumes) in Cycles, GPU bakes, `compileAsync`.
 
 ## 11. Open questions for the owner
 

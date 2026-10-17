@@ -1,0 +1,253 @@
+{
+ "_doc": "Arena Blender jobs for tools/arena/bake.py. Each job: id, script (Blender) or kind 'cmd' + cmd, args, env, inputs (extra files whose content invalidates done.json), note; any key of `defaults` overrides it per job. MB values are free system RAM thresholds.",
+ "blender": "C:/Program Files/Blender Foundation/Blender 5.0/blender.exe",
+ "defaults": {
+  "startMinFreeMb": 4096,
+  "startWaitMin": 10,
+  "pauseBelowMb": 1500,
+  "resumeAboveMb": 2500,
+  "killBelowMb": 700,
+  "maxPauseMin": 20,
+  "timeoutMin": 120,
+  "selfPauseMin": 3
+ },
+ "jobs": [
+  {
+   "id": "probe_env",
+   "script": "tools/arena/blender/probe_env.py",
+   "args": [],
+   "note": "A0: devices, GN SDF nodes, bake/glTF options, EEVEE pano, threads during render"
+  },
+  {
+   "id": "probe_env_oneapi",
+   "script": "tools/arena/blender/probe_env.py",
+   "args": [],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "note": "A0: same with CYCLES_ONEAPI_ALL_DEVICES=1 (iGPU)"
+  },
+  {
+   "id": "probe_bake_256",
+   "script": "tools/arena/blender/probe_bake.py",
+   "args": [
+    "--px",
+    "256",
+    "--high-level",
+    "6",
+    "--ao-samples",
+    "128",
+    "--voxel",
+    "0.01"
+   ],
+   "note": "A0: normal+AO bake 256 px, SDF erosion, voxel remesh 1 cm, GLB"
+  },
+  {
+   "id": "probe_bake_1024",
+   "script": "tools/arena/blender/probe_bake.py",
+   "args": [
+    "--px",
+    "1024",
+    "--high-level",
+    "7",
+    "--ao-samples",
+    "128",
+    "--voxel",
+    "0"
+   ],
+   "note": "A0: kit-size bake 1024 px from a ~3 M tri high"
+  },
+  {
+   "id": "ktx_probe",
+   "kind": "cmd",
+   "script": "tools/arena/ktx_probe.mjs",
+   "cmd": [
+    "node",
+    "{root}/tools/arena/ktx_probe.mjs",
+    "{out}"
+   ],
+   "inputs": [
+    "tools/arena/_bake/probe_bake_1024/probe_pillar.glb"
+   ],
+   "startMinFreeMb": 1024,
+   "note": "A0: KTX-Software + gltf-transform meshopt/uastc/etc1s/webp"
+  },
+  {
+   "id": "probe_misc",
+   "script": "tools/arena/blender/probe_misc.py",
+   "args": [
+    "--frames",
+    "60",
+    "--card-frames",
+    "8"
+   ],
+   "note": "A0: banner cloth settle 40x80 60 f, EEVEE 512 px card frames"
+  },
+  {
+   "id": "pano_quick",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "2048",
+    "--h",
+    "341",
+    "--samples",
+    "32",
+    "--repeat",
+    "2"
+   ],
+   "note": "A0: Cycles CPU equirect 2048x341 32 spp + Depth + AOV"
+  },
+  {
+   "id": "pano_quick_gpu",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "2048",
+    "--h",
+    "341",
+    "--samples",
+    "32",
+    "--device",
+    "ONEAPI",
+    "--repeat",
+    "2"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "note": "A0: same on oneAPI (falls back to CPU if no device)"
+  },
+  {
+   "id": "pano_eevee_slice",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--engine",
+    "eevee",
+    "--slice",
+    "--w",
+    "1024",
+    "--h",
+    "1365",
+    "--samples",
+    "32"
+   ],
+   "note": "A0: EEVEE 45 deg perspective slice (fallback preview), 1024x1365"
+  },
+  {
+   "id": "pano_fog_quick",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "2048",
+    "--h",
+    "341",
+    "--samples",
+    "32",
+    "--fog"
+   ],
+   "note": "A0: volume fog cost (Cycles 5.0 unbiased volumes)"
+  },
+  {
+   "id": "pano_medium",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "4096",
+    "--h",
+    "683",
+    "--samples",
+    "64",
+    "--denoise"
+   ],
+   "note": "A0: medium-tier layer 4096x683 64 spp + OIDN"
+  },
+  {
+   "id": "pano_high",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "8192",
+    "--h",
+    "1365",
+    "--samples",
+    "128",
+    "--denoise"
+   ],
+   "timeoutMin": 180,
+   "note": "A0: the plan's high-tier layer 8192x1365 128 spp + OIDN"
+  },
+  {
+   "id": "pano_medium_gpu",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "4096",
+    "--h",
+    "683",
+    "--samples",
+    "64",
+    "--denoise",
+    "--device",
+    "ONEAPI"
+   ],
+   "note": "A0: medium layer on the Arc iGPU (oneAPI)"
+  },
+  {
+   "id": "inset_hero",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--slice",
+    "--w",
+    "2048",
+    "--h",
+    "1024",
+    "--samples",
+    "128",
+    "--denoise",
+    "--tag",
+    "inset_2048x1024_s128"
+   ],
+   "note": "A0: hero-inset-like perspective render 2048x1024 128 spp (x4 for 4096x2048)"
+  },
+  {
+   "id": "pano_high_gpu",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "8192",
+    "--h",
+    "1365",
+    "--samples",
+    "128",
+    "--denoise",
+    "--device",
+    "ONEAPI"
+   ],
+   "timeoutMin": 90,
+   "startMinFreeMb": 6000,
+   "note": "A0: the high-tier layer on the Arc iGPU (oneAPI); needs about 6 GB free"
+  }
+ ],
+ "groups": {
+  "a0": [
+   "probe_env",
+   "probe_env_oneapi",
+   "probe_bake_256",
+   "probe_bake_1024",
+   "ktx_probe",
+   "probe_misc",
+   "pano_quick",
+   "pano_quick_gpu",
+   "pano_eevee_slice",
+   "pano_fog_quick",
+   "pano_medium",
+   "pano_medium_gpu",
+   "inset_hero"
+  ],
+  "a0-long": [
+   "pano_high",
+   "pano_high_gpu"
+  ]
+ }
+}

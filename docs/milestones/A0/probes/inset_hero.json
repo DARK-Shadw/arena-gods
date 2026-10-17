@@ -1,0 +1,108 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\inset_hero",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "w": 2048,
+  "h": 1024,
+  "samples": 128,
+  "denoise": true,
+  "fog": false,
+  "engine": "cycles",
+  "device": "CPU",
+  "slice": true,
+  "tile": 1024,
+  "tag": "inset_2048x1024_s128",
+  "repeat": 1
+ },
+ "steps": [
+  {
+   "step": "build_scene",
+   "value": {
+    "objects": 5420,
+    "instancedBlocks": 5403
+   },
+   "ok": true,
+   "seconds": 13.69,
+   "peakMB": 416,
+   "freeMB": 6874
+  },
+  {
+   "step": "setup",
+   "value": {
+    "device": {
+     "requested": "CPU",
+     "used": "CPU",
+     "devices": []
+    },
+    "compositor": {
+     "linked": [
+      "Image",
+      "Depth",
+      "emit"
+     ],
+     "missing": [],
+     "rlOutputs": [
+      "Image",
+      "Alpha",
+      "Depth",
+      "Noisy Image",
+      "emit",
+      "Normal",
+      "UV",
+      "Vector",
+      "Position",
+      "Deprecated",
+      "Deprecated",
+      "Shadow",
+      "Ambient Occlusion",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Object Index",
+      "Material Index",
+      "Mist",
+      "Emission",
+      "Environment",
+      "Diffuse Direct",
+      "Diffuse Indirect",
+      "Diffuse Color",
+      "Glossy Direct",
+      "Glossy Indirect",
+      "Glossy Color",
+      "Transmission Direct",
+      "Transmission Indirect",
+      "Transmission Color",
+      "Subsurface Direct"
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 0.01,
+   "peakMB": 417,
+   "freeMB": 6871
+  },
+  {
+   "step": "render",
+   "value": {
+    "seconds": 157.4,
+    "allRuns": [
+     157.4
+    ],
+    "files": {
+     "pano_inset_2048x1024_s128.png": 1734935,
+     "pano_inset_2048x1024_s128_.exr": 42006082
+    },
+    "tag": "inset_2048x1024_s128",
+    "msPerMegapixelPerSample": 586.36
+   },
+   "ok": true,
+   "seconds": 157.44,
+   "peakMB": 2255,
+   "freeMB": 6389
+  }
+ ],
+ "seconds": 171.2,
+ "peakMB": 2255
+}

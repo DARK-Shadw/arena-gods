@@ -1,0 +1,199 @@
+{
+ "ref": "ref-8",
+ "theme": "skytemple",
+ "layout": "pit",
+ "aseed": 7,
+ "quality": "1",
+ "size": [
+  1672,
+  941
+ ],
+ "checks": {
+  "C1": {
+   "value": 0.202,
+   "pass": false,
+   "rule": "sky-mask IoU >= 0.55 (top 60 %)",
+   "profileErr": 0.273,
+   "conceptSkyShare": 0.161,
+   "note": "concept mask = by-eye skyline profile; game mask = visual (frame vs sky-only frame)"
+  },
+  "C2": {
+   "median": 33.93,
+   "worst": 52.07,
+   "cells": [
+    45.3,
+    28.3,
+    19.0,
+    46.9,
+    20.9,
+    22.2,
+    52.1,
+    49.0,
+    33.9
+   ],
+   "pass": false,
+   "rule": "Delta E76 per 3x3 cell: median <= 12, worst <= 20"
+  },
+  "C3": {
+   "concept": 0.1121,
+   "game": 0.0078,
+   "ratio": 0.07,
+   "pass": false,
+   "rule": "warm share within +-40 % of the concept",
+   "coolConcept": 0.3686,
+   "coolGame": 0.4063
+  },
+  "C4": {
+   "concept": 0.1435,
+   "game": 0.8734,
+   "ratio": 6.085,
+   "streaksConcept": 34,
+   "streaksGame": 4,
+   "pass": false,
+   "rule": "bottom-third L*>55 share within +-50 %, >= 3 fire streaks"
+  },
+  "C5": {
+   "ratios": [
+    0.03,
+    0.25,
+    0.3,
+    0.14,
+    0.62,
+    0.47,
+    0.22,
+    0.32,
+    0.45
+   ],
+   "pass": false,
+   "rule": "Sobel per cell 0.7-1.3x"
+  },
+  "C6": {
+   "manual": true,
+   "conceptCounts": {
+    "braziers": 4,
+    "fires": 5,
+    "banners": 3,
+    "chains": 0,
+    "statues": 1,
+    "candles": 40
+   },
+   "rule": "dressing counts within +-30 % (count on the render)"
+  },
+  "C7": {
+   "manual": true,
+   "rule": "floor inlay visible, right style"
+  },
+  "C8": {
+   "concept": 0.797,
+   "game": 0.47,
+   "pass": true,
+   "rule": "far / mid luminance std < 0.6 (plus a fog band: by eye)"
+  },
+  "C9": {
+   "manual": true,
+   "rule": "4 s clip: waterfalls, flames, banners, particles move, no popping (concept.cjs --clip=4)"
+  },
+  "C10": {
+   "manual": true,
+   "rule": "cameraAudit readable share not worse than the A0 baseline"
+  }
+ },
+ "calibration": {
+  "horizonGame": 0.5479,
+  "landmarkTarget": 0.66,
+  "landmarkGame": 0.6601,
+  "edgeTarget": [
+   0.55,
+   0.6
+  ],
+  "A": {
+   "headTarget": [
+    0.71,
+    0.45
+   ],
+   "headGame": [
+    0.6955,
+    0.1354
+   ],
+   "boxGame": [
+    0.6178,
+    0.1902,
+    0.9195,
+    1.0346
+   ]
+  },
+  "B": {
+   "footTarget": [
+    0.485,
+    0.735
+   ],
+   "footGame": [
+    0.4844,
+    0.7344
+   ],
+   "headTarget": [
+    0.48,
+    0.39
+   ],
+   "headGame": [
+    0.4643,
+    0.3422
+   ]
+  }
+ },
+ "hist": {
+  "concept": [
+   0.1038,
+   0.0,
+   0.16844,
+   0.10903,
+   0.11941,
+   0.11644,
+   0.09492,
+   0.06351,
+   0.05717,
+   0.05462,
+   0.04171,
+   0.02242,
+   0.02539,
+   0.01082,
+   0.00516,
+   0.00716
+  ],
+  "game": [
+   0.04853,
+   0.02895,
+   0.02021,
+   0.01398,
+   0.00865,
+   0.00445,
+   0.00475,
+   0.00651,
+   0.03915,
+   0.13854,
+   0.14309,
+   0.16723,
+   0.1742,
+   0.09763,
+   0.08879,
+   0.01536
+  ],
+  "intersection": 0.314
+ },
+ "Lpct": {
+  "concept": [
+   5.8,
+   31.1,
+   73.7
+  ],
+  "game": [
+   6.5,
+   70.4,
+   91.0
+  ]
+ },
+ "frame": {
+  "calls": 155,
+  "tris": 238057
+ }
+}
