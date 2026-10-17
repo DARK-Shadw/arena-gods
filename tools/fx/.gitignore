@@ -1,0 +1,3 @@
+# bake caches (EXR frames, Mantaflow caches): regenerate with bake_all.sh, never commit
+_bake/
+_work/

@@ -1,0 +1,331 @@
+{
+ "blood_spray.low.webp": {
+  "source": "Blender bake: tools/fx/blender (metaball particles (analytic ballistic + drag, velocity-stretched ellipsoids))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "blood_spray.webp": {
+  "source": "Blender bake: tools/fx/blender (metaball particles (analytic ballistic + drag, velocity-stretched ellipsoids))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "decals.low.webp": {
+  "source": "procedural (tools/fx/make_decals.py); crack cells from Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip",
+  "licence": "CC0 1.0 (own work; SBS / ambientCG sources are CC0)",
+  "url": "tools/fx/make_decals.py; https://opengameart.org/content/noise-texture-pack",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "decals.webp": {
+  "source": "procedural (tools/fx/make_decals.py); crack cells from Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip",
+  "licence": "CC0 1.0 (own work; SBS / ambientCG sources are CC0)",
+  "url": "tools/fx/make_decals.py; https://opengameart.org/content/noise-texture-pack",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "decals_nrm.webp": {
+  "source": "procedural (tools/fx/make_decals.py); crack cells from Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip",
+  "licence": "CC0 1.0 (own work; SBS / ambientCG sources are CC0)",
+  "url": "tools/fx/make_decals.py; https://opengameart.org/content/noise-texture-pack",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "dust_puff.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise sphere), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "dust_puff.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise sphere), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "dust_ring.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise torus), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "dust_ring.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise torus), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "embers.low.webp": {
+  "source": "Blender bake: tools/fx/blender (emissive icospheres on periodic analytic paths, EEVEE motion blur)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "embers.webp": {
+  "source": "Blender bake: tools/fx/blender (emissive icospheres on periodic analytic paths, EEVEE motion blur)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "energy_swirl.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (rotating 3D noise, exact loop))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "energy_swirl.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (rotating 3D noise, exact loop))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "explosion.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise fireball, heat -> smoke))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "explosion.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise fireball, heat -> smoke))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "fire_burst.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise fireball, heat -> smoke))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "fire_burst.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (expanding noise fireball, heat -> smoke))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "fire_loop.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (4D noise, density-space loop))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "fire_loop.mv.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (4D noise, density-space loop))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "fire_loop.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (4D noise, density-space loop))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "fx_sprites.low.webp": {
+  "source": "Kenney Particle Pack 1.1 (kenney.nl), 64 sprites resampled and channel-packed",
+  "licence": "CC0 1.0 (License.txt in the pack)",
+  "url": "https://kenney.nl/assets/particle-pack",
+  "attribution": "not required (\"Credit (Kenney or www.kenney.nl) would be nice\")",
+  "notes": ""
+ },
+ "fx_sprites.webp": {
+  "source": "Kenney Particle Pack 1.1 (kenney.nl), 64 sprites resampled and channel-packed",
+  "licence": "CC0 1.0 (License.txt in the pack)",
+  "url": "https://kenney.nl/assets/particle-pack",
+  "attribution": "not required (\"Credit (Kenney or www.kenney.nl) would be nice\")",
+  "notes": ""
+ },
+ "noise_a.webp": {
+  "source": "Screaming Brain Studios, Noise Texture Pack (opengameart.org), 8 textures downscaled and channel-packed",
+  "licence": "CC0 1.0 (License.txt in the pack)",
+  "url": "https://opengameart.org/content/noise-texture-pack",
+  "attribution": "never required",
+  "notes": ""
+ },
+ "noise_b.webp": {
+  "source": "Screaming Brain Studios, Noise Texture Pack (opengameart.org), 8 textures downscaled and channel-packed",
+  "licence": "CC0 1.0 (License.txt in the pack)",
+  "url": "https://opengameart.org/content/noise-texture-pack",
+  "attribution": "never required",
+  "notes": ""
+ },
+ "smoke_wisp.low.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (4D noise, density-space loop), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "smoke_wisp.mv.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (4D noise, density-space loop), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "smoke_wisp.webp": {
+  "source": "Blender bake: tools/fx/blender (B procedural volume (4D noise, density-space loop), 3 directional light passes)",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "splash.low.webp": {
+  "source": "Blender bake: tools/fx/blender (metaball particles (analytic ballistic + drag, velocity-stretched ellipsoids))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "splash.webp": {
+  "source": "Blender bake: tools/fx/blender (metaball particles (analytic ballistic + drag, velocity-stretched ellipsoids))",
+  "licence": "CC0 1.0 (own work, Arena Gods)",
+  "url": "tools/fx/blender",
+  "attribution": "not required",
+  "notes": "baked 5.0.1 eevee"
+ },
+ "unity_candlesmoke01.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: CandleSmoke01 (CandleSmoke01_20x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_candlesmoke01.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: CandleSmoke01 (CandleSmoke01_20x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_cloud01.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Cloud01 (Cloud01_8x8.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_cloud01.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Cloud01 (Cloud01_8x8.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_explosion00.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Explosion00 (Explosion00_5x5.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_explosion00.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Explosion00 (Explosion00_5x5.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_explosion01_nofire.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Explosion01-nofire (Explosion01-nofire_5x5.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_explosion01_nofire.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Explosion01-nofire (Explosion01-nofire_5x5.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_fireball01.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: FireBall01 (FireBall01_8x8.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_fireball01.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: FireBall01 (FireBall01_8x8.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_flame02.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Flame02 (Flame02_16x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_flame02.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Flame02 (Flame02_16x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_flame03.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Flame03 (Flame03_16x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_flame03.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: Flame03 (Flame03_16x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_smallflame01.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: SmallFlame01 (SmallFlame01_16x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_smallflame01.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: SmallFlame01 (SmallFlame01_16x4.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_wispysmoke01.low.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: WispySmoke01 (WispySmoke01_8x8.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ },
+ "unity_wispysmoke01.webp": {
+  "source": "Unity Labs free VFX image sequences & flipbooks: WispySmoke01 (WispySmoke01_8x8.tga), resampled + premultiplied",
+  "licence": "CC0 1.0 (Unity blog page: \"we release some of these sequences under CC0 license\"; docs/fx-research.md [V])",
+  "url": "https://unity.com/blog/engine-platform/free-vfx-image-sequences-flipbooks",
+  "attribution": "not required",
+  "notes": ""
+ }
+}

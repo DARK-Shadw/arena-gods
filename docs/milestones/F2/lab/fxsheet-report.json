@@ -1,0 +1,132 @@
+{
+ "seed": 1,
+ "q": 2,
+ "bg": "dark",
+ "times": [
+  0.05,
+  0.15,
+  0.3,
+  0.6,
+  1
+ ],
+ "items": [
+  {
+   "key": "parry.flash",
+   "drawCalls": 29,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 30.341305651072595,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 7.4
+  },
+  {
+   "key": "@decals",
+   "drawCalls": 30,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 30.222442615242038,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 10.4
+  },
+  {
+   "key": "@dust_ring",
+   "drawCalls": 30,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 33.2183554290831,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 13.4
+  },
+  {
+   "key": "@smoke_wisp",
+   "drawCalls": 30,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 31.456593924732804,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 20
+  },
+  {
+   "key": "@unity_explosion00",
+   "drawCalls": 30,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 27.702101761298426,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23
+  },
+  {
+   "key": "composite.brazier",
+   "drawCalls": 36,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 31.96225893076299,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23
+  },
+  {
+   "key": "cat.C03",
+   "drawCalls": 30,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 28.74320668240653,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23
+  },
+  {
+   "key": "cat.E01",
+   "drawCalls": 41,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 29.87325412507163,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 29.7
+  },
+  {
+   "key": "cat.E07",
+   "drawCalls": 31,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 29.24211730830896,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 35
+  }
+ ],
+ "errors": []
+}

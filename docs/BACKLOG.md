@@ -47,6 +47,12 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - `npm run fx:check`; `tools/shots/fxprobe.cjs` measures before/after.
   - Gore default switched ON (`standard`) right after F0, on the owner's decision. Severing finishers now show by default; combat blood comes with F3.
 
+- **FX overhaul F2 (asset pipeline, atlases, FX Lab)**, on branch `anim-plan`; details in `docs/milestones/F2/README.md`, formats in `docs/fx-pipeline.md`.
+  - Headless Blender 5.0 bake scripts (`tools/fx/blender/`): fire loop, fire burst, explosion, smoke wisp (relightable), dust puff and ring (relightable), splash, blood spray, embers, energy swirl. Each one dry-runs first and logs its peak RAM.
+  - Atlas pipeline (`tools/fx/`): packer with motion vectors, pack ingestion, procedural decals, optional KTX2 encode, budget check and licence ledger (`public/fx/CREDITS.md`).
+  - Ingested: Unity Labs flipbooks (9 of 22 packs shipped), Kenney Particle Pack (64 sprite masks) and Screaming Brain noise.
+  - FX Lab at `/tools/fxlab/`: every F0 def, every atlas, a brazier composite and every catalog row.
+
 ## 2. IN PROGRESS
 - **Animation overhaul review:** the owner plays `anim-plan` and judges the feel, then it is merged to main. Repro URLs are in `docs/milestones/M4/README.md`.
 - **Voice cloning** (`tts-final/`): 68 of 227 lines generated. Resume (run in a normal terminal, ~2.5-3.5 h):
@@ -112,6 +118,11 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - Falling particles rest on the floor instead of bouncing.
   - Trails are still frame-rate dependent (F3 ribbons).
   - FX tier counts are not scaled yet.
+- FX assets (after F2):
+  - Shipped as WebP only (`toktx` is not installed), so atlases use 128-px frames, not the plan's 256-px frames. With KTX2, `pack_atlas.py --hires` can produce the 256-px frames.
+  - Unity fps and loop flags are guesses (loops come from a wrap test).
+  - The own bakes for splash and blood read as beady metaballs, and the dust ring is regular. The owner should judge them in the FX Lab.
+  - The game does not load any atlas yet. `tools/fxlab/fxAtlas.ts` is the reference loader and shader; it moves into `src/render/fx` in F3.
 - Process: the machine has had low-memory kills (dev server killed 3x); keep heavy jobs sequential; Claude Code reaps background jobs under memory pressure (or start with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`).
 
 ---
@@ -122,6 +133,12 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - Hove Audio Sword Combat FREE: license not stated in the archive; confirm.
 - Ogrebane monsters and Junkala boss music: credited as CC0 without a license file; verify.
 - Kenney packs: CC0.
+- FX textures (`public/fx/`): every file has a row in `public/fx/credits.json` / `CREDITS.md`, and `node tools/fx/check_budget.mjs` fails on a missing row. Sources:
+  - Unity Labs flipbooks: CC0, per the Unity blog page; the zips have no licence file.
+  - Kenney Particle Pack: CC0, checked in `License.txt`.
+  - Screaming Brain noise: CC0, checked in `License.txt`.
+  - Own Blender bakes and procedural decals: CC0.
+  - CGHEVEN (custom licence) is not used until the owner agrees.
 - Open Dungeons voice pack (used as clone references): license unknown, probably CC-BY/CC-BY-SA; also a consent question for cloning a real actor's voice. See `tts-final/LICENSES_NOTES.md`.
 - Chatterbox AI watermark (Perth) was stubbed out because it was broken in the local build; output has no AI watermark.
 - OmniVoice model license unverified.

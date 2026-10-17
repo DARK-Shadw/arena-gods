@@ -1,0 +1,2627 @@
+{
+ "version": 1,
+ "format": "webp",
+ "atlases": {
+  "blood_spray": {
+   "type": "flipbook",
+   "kind": "lit-fixed",
+   "grid": [
+    4,
+    4
+   ],
+   "frames": 16,
+   "fps": 35.556,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "core",
+   "hdrScale": 0.64181,
+   "pivot": [
+    0.03571428571428567,
+    0.6071428571428572
+   ],
+   "worldSize": [
+    1.4,
+    1.4
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "blood_spray.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 46554
+   },
+   "low": {
+    "file": "blood_spray.low.webp",
+    "w": 256,
+    "h": 256,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 17862
+   },
+   "notes": "Dark red, wet highlights; spray travels to screen +X: orient the card along the cut.",
+   "source": {
+    "type": "blender-bake",
+    "method": "metaball particles (analytic ballistic + drag, velocity-stretched ellipsoids)",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1165,
+    "bakeSeconds": 10,
+    "command": "-P tools/fx/blender/bake_liquid.py -- --out tools/fx/_bake/blood_spray --kind blood"
+   }
+  },
+  "decals": {
+   "type": "decals",
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "grid": [
+    4,
+    4
+   ],
+   "full": {
+    "file": "decals.webp",
+    "w": 768,
+    "h": 768,
+    "frame": 192,
+    "bytes": 122606
+   },
+   "low": {
+    "file": "decals.low.webp",
+    "w": 384,
+    "h": 384,
+    "frame": 96,
+    "bytes": 45740
+   },
+   "data": {
+    "file": "decals_nrm.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 128,
+    "bytes": 109366,
+    "colorSpace": "linear",
+    "channels": "R,G = tangent normal xy (0.5 flat, +y up); B = roughness; A = wetness"
+   },
+   "cells": {
+    "blood_splat_0": {
+     "cell": 0,
+     "rect": [
+      0,
+      0,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "blood_splat_1": {
+     "cell": 1,
+     "rect": [
+      0.25,
+      0,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "blood_splat_2": {
+     "cell": 2,
+     "rect": [
+      0.5,
+      0,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "blood_splat_3": {
+     "cell": 3,
+     "rect": [
+      0.75,
+      0,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "blood_pool": {
+     "cell": 4,
+     "rect": [
+      0,
+      0.25,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "blood_drips": {
+     "cell": 5,
+     "rect": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "scorch_0": {
+     "cell": 6,
+     "rect": [
+      0.5,
+      0.25,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "scorch_1": {
+     "cell": 7,
+     "rect": [
+      0.75,
+      0.25,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "scorch_2": {
+     "cell": 8,
+     "rect": [
+      0,
+      0.5,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "crack_0": {
+     "cell": 9,
+     "rect": [
+      0.25,
+      0.5,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip"
+    },
+    "crack_1": {
+     "cell": 10,
+     "rect": [
+      0.5,
+      0.5,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip"
+    },
+    "crack_2": {
+     "cell": 11,
+     "rect": [
+      0.75,
+      0.5,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip"
+    },
+    "crack_3": {
+     "cell": 12,
+     "rect": [
+      0,
+      0.75,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "Screaming Brain noise pack: sbs_-_noise_texture_pack_-_512x512.zip"
+    },
+    "frost": {
+     "cell": 13,
+     "rect": [
+      0.25,
+      0.75,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "mud": {
+     "cell": 14,
+     "rect": [
+      0.5,
+      0.75,
+      0.25,
+      0.25
+     ],
+     "tint": false,
+     "source": "procedural (tools/fx/make_decals.py)"
+    },
+    "footprint": {
+     "cell": 15,
+     "rect": [
+      0.75,
+      0.75,
+      0.25,
+      0.25
+     ],
+     "tint": true,
+     "source": "procedural (tools/fx/make_decals.py)"
+    }
+   },
+   "order": "cell row-major from top-left; rect = [u, v_from_top, w, h]",
+   "notes": "Floor decals, premultiplied. Footprint is grey: tint it (blood / mud / wet).",
+   "source": {
+    "type": "procedural",
+    "script": "tools/fx/make_decals.py"
+   }
+  },
+  "dust_puff": {
+   "type": "flipbook",
+   "kind": "lit3",
+   "grid": [
+    6,
+    6
+   ],
+   "frames": 36,
+   "fps": 24,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "core",
+   "hdrScale": 0.19013,
+   "pivot": [
+    0.5,
+    0.03
+   ],
+   "worldSize": [
+    2,
+    2
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "dust_puff.webp",
+    "w": 768,
+    "h": 768,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 109354
+   },
+   "low": {
+    "file": "dust_puff.low.webp",
+    "w": 384,
+    "h": 384,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 41786
+   },
+   "notes": "R/G/B = luminance lit from screen right / top / left; A = coverage. Neutral grey: tint per theme.",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (expanding noise sphere), 3 directional light passes",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1372,
+    "bakeSeconds": 157,
+    "command": "-P tools/fx/blender/bake_dust.py -- --out tools/fx/_bake/dust_puff --kind puff"
+   },
+   "lightDirs": {
+    "R": "screen right, 35deg toward camera",
+    "G": "screen top, 35deg toward camera",
+    "B": "screen left, 35deg toward camera"
+   }
+  },
+  "dust_ring": {
+   "type": "flipbook",
+   "kind": "lit3",
+   "grid": [
+    6,
+    6
+   ],
+   "frames": 36,
+   "fps": 24,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "core",
+   "hdrScale": 0.221,
+   "pivot": [
+    0.5,
+    0.18
+   ],
+   "worldSize": [
+    4.4,
+    4.4
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "dust_ring.webp",
+    "w": 768,
+    "h": 768,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 187058
+   },
+   "low": {
+    "file": "dust_ring.low.webp",
+    "w": 384,
+    "h": 384,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 66536
+   },
+   "notes": "R/G/B = luminance lit from screen right / top / left; A = coverage. Neutral grey: tint per theme.",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (expanding noise torus), 3 directional light passes",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1418,
+    "bakeSeconds": 94,
+    "command": "-P tools/fx/blender/bake_dust.py -- --out tools/fx/_bake/dust_ring --kind ring"
+   },
+   "cameraElevationDeg": 25,
+   "lightDirs": {
+    "R": "screen right, 35deg toward camera",
+    "G": "screen top, 35deg toward camera",
+    "B": "screen left, 35deg toward camera"
+   }
+  },
+  "embers": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    6,
+    6
+   ],
+   "frames": 36,
+   "fps": 24,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "core",
+   "hdrScale": 2.42773,
+   "pivot": [
+    0.5,
+    0.03
+   ],
+   "worldSize": [
+    1.8,
+    1.8
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "embers.webp",
+    "w": 576,
+    "h": 576,
+    "frame": 96,
+    "frameW": 96,
+    "frameH": 96,
+    "bytes": 33954
+   },
+   "low": {
+    "file": "embers.low.webp",
+    "w": 288,
+    "h": 288,
+    "frame": 48,
+    "frameW": 48,
+    "frameH": 48,
+    "bytes": 14866
+   },
+   "notes": "Additive (A ~ 0). Use as a column card above fires; single embers are GPU particles.",
+   "source": {
+    "type": "blender-bake",
+    "method": "emissive icospheres on periodic analytic paths, EEVEE motion blur",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1157,
+    "bakeSeconds": 18,
+    "command": "-P tools/fx/blender/bake_embers.py -- --out tools/fx/_bake/embers"
+   }
+  },
+  "energy_swirl": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 32,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "alt",
+   "hdrScale": 1.77051,
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "worldSize": [
+    1.6,
+    1.6
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "energy_swirl.webp",
+    "w": 1024,
+    "h": 1024,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 118054
+   },
+   "low": {
+    "file": "energy_swirl.low.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 47598
+   },
+   "notes": "Neutral white emission: multiply by the school colour (HDR core 8-30).",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (rotating 3D noise, exact loop)",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1396,
+    "bakeSeconds": 45,
+    "command": "-P tools/fx/blender/bake_energy.py -- --out tools/fx/_bake/energy_swirl"
+   },
+   "cameraElevationDeg": 20
+  },
+  "explosion": {
+   "type": "flipbook",
+   "kind": "emissive+smoke",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 24.615,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "alt",
+   "hdrScale": 9.69531,
+   "pivot": [
+    0.5,
+    0.03
+   ],
+   "worldSize": [
+    4,
+    4
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "explosion.webp",
+    "w": 1024,
+    "h": 1024,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 181718
+   },
+   "low": {
+    "file": "explosion.low.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 64754
+   },
+   "notes": "RGB = premultiplied emission + dark smoke lit by a fixed top-left key; A = occlusion.",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (expanding noise fireball, heat -> smoke)",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1368,
+    "bakeSeconds": 84,
+    "command": "-P tools/fx/blender/bake_fireball.py -- --out tools/fx/_bake/explosion --kind explosion"
+   }
+  },
+  "fire_burst": {
+   "type": "flipbook",
+   "kind": "emissive+smoke",
+   "grid": [
+    6,
+    6
+   ],
+   "frames": 36,
+   "fps": 30,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "alt",
+   "hdrScale": 7.33594,
+   "pivot": [
+    0.5,
+    0.03
+   ],
+   "worldSize": [
+    2,
+    2
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "fire_burst.webp",
+    "w": 768,
+    "h": 768,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 111936
+   },
+   "low": {
+    "file": "fire_burst.low.webp",
+    "w": 384,
+    "h": 384,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 39986
+   },
+   "notes": "RGB = premultiplied emission + dark smoke lit by a fixed top-left key; A = occlusion.",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (expanding noise fireball, heat -> smoke)",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1385,
+    "bakeSeconds": 55,
+    "command": "-P tools/fx/blender/bake_fireball.py -- --out tools/fx/_bake/fire_burst --kind burst"
+   }
+  },
+  "fire_loop": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 32,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "alt",
+   "hdrScale": 2.19141,
+   "pivot": [
+    0.5,
+    0.05
+   ],
+   "worldSize": [
+    2.24,
+    2.24
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "fire_loop.webp",
+    "w": 1024,
+    "h": 1024,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 143198
+   },
+   "low": {
+    "file": "fire_loop.low.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 54240
+   },
+   "notes": "RGB = premultiplied emission colour (core ~1.0, runtime applies HDR scale 8-30); A = occlusion.",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (4D noise, density-space loop)",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1402,
+    "bakeSeconds": 69,
+    "command": "-P tools/fx/blender/bake_fire_loop.py -- --out tools/fx/_bake/fire_loop"
+   },
+   "mv": {
+    "file": "fire_loop.mv.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "bytes": 99728,
+    "scale": 0.024309,
+    "colorSpace": "linear",
+    "decode": "mv = (tex.rg * 2 - 1) * scale  // UV units of ONE frame cell, frame n -> n+1",
+    "use": "c0 = tex(uv0 - mv0 * k); c1 = tex(uv1 + mv1 * (1 - k)); mix(c0, c1, k)"
+   }
+  },
+  "fx_sprites": {
+   "type": "sprites",
+   "channelPacked": true,
+   "colorSpace": "linear",
+   "grid": [
+    4,
+    4
+   ],
+   "full": {
+    "file": "fx_sprites.webp",
+    "w": 768,
+    "h": 768,
+    "frame": 192,
+    "bytes": 211616
+   },
+   "low": {
+    "file": "fx_sprites.low.webp",
+    "w": 384,
+    "h": 384,
+    "frame": 96,
+    "bytes": 67046
+   },
+   "sprites": {
+    "spark_01": {
+     "cell": 0,
+     "channel": "R",
+     "rect": [
+      0,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "spark_02": {
+     "cell": 1,
+     "channel": "R",
+     "rect": [
+      0.25,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "spark_03": {
+     "cell": 2,
+     "channel": "R",
+     "rect": [
+      0.5,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "spark_04": {
+     "cell": 3,
+     "channel": "R",
+     "rect": [
+      0.75,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "spark_05": {
+     "cell": 4,
+     "channel": "R",
+     "rect": [
+      0,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "spark_06": {
+     "cell": 5,
+     "channel": "R",
+     "rect": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "spark_07": {
+     "cell": 6,
+     "channel": "R",
+     "rect": [
+      0.5,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "flare_01": {
+     "cell": 7,
+     "channel": "R",
+     "rect": [
+      0.75,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "light_01": {
+     "cell": 8,
+     "channel": "R",
+     "rect": [
+      0,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "light_02": {
+     "cell": 9,
+     "channel": "R",
+     "rect": [
+      0.25,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "light_03": {
+     "cell": 10,
+     "channel": "R",
+     "rect": [
+      0.5,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "star_01": {
+     "cell": 11,
+     "channel": "R",
+     "rect": [
+      0.75,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "star_02": {
+     "cell": 12,
+     "channel": "R",
+     "rect": [
+      0,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "star_03": {
+     "cell": 13,
+     "channel": "R",
+     "rect": [
+      0.25,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "star_04": {
+     "cell": 14,
+     "channel": "R",
+     "rect": [
+      0.5,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "star_05": {
+     "cell": 15,
+     "channel": "R",
+     "rect": [
+      0.75,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "star_06": {
+     "cell": 0,
+     "channel": "G",
+     "rect": [
+      0,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "slash_01": {
+     "cell": 1,
+     "channel": "G",
+     "rect": [
+      0.25,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "slash_02": {
+     "cell": 2,
+     "channel": "G",
+     "rect": [
+      0.5,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "slash_03": {
+     "cell": 3,
+     "channel": "G",
+     "rect": [
+      0.75,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "slash_04": {
+     "cell": 4,
+     "channel": "G",
+     "rect": [
+      0,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_01": {
+     "cell": 5,
+     "channel": "G",
+     "rect": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_02": {
+     "cell": 6,
+     "channel": "G",
+     "rect": [
+      0.5,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_03": {
+     "cell": 7,
+     "channel": "G",
+     "rect": [
+      0.75,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_04": {
+     "cell": 8,
+     "channel": "G",
+     "rect": [
+      0,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_05": {
+     "cell": 9,
+     "channel": "G",
+     "rect": [
+      0.25,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_06": {
+     "cell": 10,
+     "channel": "G",
+     "rect": [
+      0.5,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "trace_07": {
+     "cell": 11,
+     "channel": "G",
+     "rect": [
+      0.75,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "scratch_01": {
+     "cell": 12,
+     "channel": "G",
+     "rect": [
+      0,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "scorch_01": {
+     "cell": 13,
+     "channel": "G",
+     "rect": [
+      0.25,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "scorch_02": {
+     "cell": 14,
+     "channel": "G",
+     "rect": [
+      0.5,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "scorch_03": {
+     "cell": 15,
+     "channel": "G",
+     "rect": [
+      0.75,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "circle_01": {
+     "cell": 0,
+     "channel": "B",
+     "rect": [
+      0,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "circle_02": {
+     "cell": 1,
+     "channel": "B",
+     "rect": [
+      0.25,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "circle_03": {
+     "cell": 2,
+     "channel": "B",
+     "rect": [
+      0.5,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "circle_04": {
+     "cell": 3,
+     "channel": "B",
+     "rect": [
+      0.75,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "circle_05": {
+     "cell": 4,
+     "channel": "B",
+     "rect": [
+      0,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "magic_01": {
+     "cell": 5,
+     "channel": "B",
+     "rect": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "magic_02": {
+     "cell": 6,
+     "channel": "B",
+     "rect": [
+      0.5,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "magic_03": {
+     "cell": 7,
+     "channel": "B",
+     "rect": [
+      0.75,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "magic_04": {
+     "cell": 8,
+     "channel": "B",
+     "rect": [
+      0,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "magic_05": {
+     "cell": 9,
+     "channel": "B",
+     "rect": [
+      0.25,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "twirl_01": {
+     "cell": 10,
+     "channel": "B",
+     "rect": [
+      0.5,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "twirl_02": {
+     "cell": 11,
+     "channel": "B",
+     "rect": [
+      0.75,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "twirl_03": {
+     "cell": 12,
+     "channel": "B",
+     "rect": [
+      0,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "smoke_01": {
+     "cell": 13,
+     "channel": "B",
+     "rect": [
+      0.25,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "smoke_03": {
+     "cell": 14,
+     "channel": "B",
+     "rect": [
+      0.5,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "smoke_05": {
+     "cell": 15,
+     "channel": "B",
+     "rect": [
+      0.75,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "smoke_07": {
+     "cell": 0,
+     "channel": "A",
+     "rect": [
+      0,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "flame_01": {
+     "cell": 1,
+     "channel": "A",
+     "rect": [
+      0.25,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "flame_02": {
+     "cell": 2,
+     "channel": "A",
+     "rect": [
+      0.5,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "flame_03": {
+     "cell": 3,
+     "channel": "A",
+     "rect": [
+      0.75,
+      0,
+      0.25,
+      0.25
+     ]
+    },
+    "flame_04": {
+     "cell": 4,
+     "channel": "A",
+     "rect": [
+      0,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "flame_05": {
+     "cell": 5,
+     "channel": "A",
+     "rect": [
+      0.25,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "flame_06": {
+     "cell": 6,
+     "channel": "A",
+     "rect": [
+      0.5,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "fire_01": {
+     "cell": 7,
+     "channel": "A",
+     "rect": [
+      0.75,
+      0.25,
+      0.25,
+      0.25
+     ]
+    },
+    "fire_02": {
+     "cell": 8,
+     "channel": "A",
+     "rect": [
+      0,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "muzzle_01": {
+     "cell": 9,
+     "channel": "A",
+     "rect": [
+      0.25,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "muzzle_02": {
+     "cell": 10,
+     "channel": "A",
+     "rect": [
+      0.5,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "muzzle_03": {
+     "cell": 11,
+     "channel": "A",
+     "rect": [
+      0.75,
+      0.5,
+      0.25,
+      0.25
+     ]
+    },
+    "dirt_01": {
+     "cell": 12,
+     "channel": "A",
+     "rect": [
+      0,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "dirt_02": {
+     "cell": 13,
+     "channel": "A",
+     "rect": [
+      0.25,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "dirt_03": {
+     "cell": 14,
+     "channel": "A",
+     "rect": [
+      0.5,
+      0.75,
+      0.25,
+      0.25
+     ]
+    },
+    "symbol_01": {
+     "cell": 15,
+     "channel": "A",
+     "rect": [
+      0.75,
+      0.75,
+      0.25,
+      0.25
+     ]
+    }
+   },
+   "order": "cell row-major from top-left; rect = [u, v_from_top, w, h]",
+   "notes": "Grey masks (alpha x luma) packed one per channel: sample, then dot with the channel mask. Tint + HDR scale in the shader. Lossless WebP (lossy chroma would mix channels).",
+   "source": {
+    "type": "pack",
+    "pack": "Kenney Particle Pack 1.1",
+    "file": "kenney_particle-pack.zip"
+   }
+  },
+  "noise_a": {
+   "type": "noise",
+   "channelPacked": true,
+   "colorSpace": "linear",
+   "tileable": true,
+   "full": {
+    "file": "noise_a.webp",
+    "w": 256,
+    "h": 256,
+    "bytes": 122588
+   },
+   "channels": {
+    "R": "Perlin 1",
+    "G": "Voronoi 1",
+    "B": "Streak 1",
+    "A": "Swirl 1"
+   },
+   "notes": "Tileable grey noise, one per channel (RepeatWrapping). Downscaled 512 -> 256.",
+   "source": {
+    "type": "pack",
+    "pack": "Screaming Brain Studios Noise Texture Pack",
+    "file": "sbs_-_noise_texture_pack_-_512x512.zip"
+   }
+  },
+  "noise_b": {
+   "type": "noise",
+   "channelPacked": true,
+   "colorSpace": "linear",
+   "tileable": true,
+   "full": {
+    "file": "noise_b.webp",
+    "w": 256,
+    "h": 256,
+    "bytes": 128140
+   },
+   "channels": {
+    "R": "Cracks 1",
+    "G": "Turbulence 1",
+    "B": "Melt 1",
+    "A": "Manifold 1"
+   },
+   "notes": "Tileable grey noise, one per channel (RepeatWrapping). Downscaled 512 -> 256.",
+   "source": {
+    "type": "pack",
+    "pack": "Screaming Brain Studios Noise Texture Pack",
+    "file": "sbs_-_noise_texture_pack_-_512x512.zip"
+   }
+  },
+  "smoke_wisp": {
+   "type": "flipbook",
+   "kind": "lit3",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 23.97,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "alt",
+   "hdrScale": 0.09375,
+   "pivot": [
+    0.5,
+    0.02
+   ],
+   "worldSize": [
+    2.496,
+    2.496
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "smoke_wisp.webp",
+    "w": 1024,
+    "h": 1024,
+    "frame": 128,
+    "frameW": 128,
+    "frameH": 128,
+    "bytes": 130146
+   },
+   "low": {
+    "file": "smoke_wisp.low.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 52330
+   },
+   "notes": "R/G/B = luminance lit from screen right / top / left (35 deg toward camera); A = coverage.",
+   "source": {
+    "type": "blender-bake",
+    "method": "B procedural volume (4D noise, density-space loop), 3 directional light passes",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1396,
+    "bakeSeconds": 287,
+    "command": "-P tools/fx/blender/bake_smoke_wisp.py -- --out tools/fx/_bake/smoke_wisp"
+   },
+   "lightDirs": {
+    "R": "screen right, 35deg toward camera",
+    "G": "screen top, 35deg toward camera",
+    "B": "screen left, 35deg toward camera"
+   },
+   "mv": {
+    "file": "smoke_wisp.mv.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "bytes": 112042,
+    "scale": 0.017141,
+    "colorSpace": "linear",
+    "decode": "mv = (tex.rg * 2 - 1) * scale  // UV units of ONE frame cell, frame n -> n+1",
+    "use": "c0 = tex(uv0 - mv0 * k); c1 = tex(uv1 + mv1 * (1 - k)); mix(c0, c1, k)"
+   }
+  },
+  "splash": {
+   "type": "flipbook",
+   "kind": "lit-fixed",
+   "grid": [
+    6,
+    6
+   ],
+   "frames": 36,
+   "fps": 40,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "set": "core",
+   "hdrScale": 1.31641,
+   "pivot": [
+    0.5,
+    0.04999999999999998
+   ],
+   "worldSize": [
+    1.7,
+    1.7
+   ],
+   "order": "row-major, frame 0 top-left",
+   "full": {
+    "file": "splash.webp",
+    "w": 576,
+    "h": 576,
+    "frame": 96,
+    "frameW": 96,
+    "frameH": 96,
+    "bytes": 67630
+   },
+   "low": {
+    "file": "splash.low.webp",
+    "w": 288,
+    "h": 288,
+    "frame": 48,
+    "frameW": 48,
+    "frameH": 48,
+    "bytes": 23486
+   },
+   "notes": "Neutral white-blue water; tint for mud/blood-water.",
+   "source": {
+    "type": "blender-bake",
+    "method": "metaball particles (analytic ballistic + drag, velocity-stretched ellipsoids)",
+    "blender": "5.0.1",
+    "engine": "eevee",
+    "bakePx": 256,
+    "peakRamMB": 1197,
+    "bakeSeconds": 23,
+    "command": "-P tools/fx/blender/bake_liquid.py -- --out tools/fx/_bake/splash --kind splash"
+   }
+  },
+  "unity_candlesmoke01": {
+   "type": "flipbook",
+   "kind": "lit-fixed",
+   "grid": [
+    20,
+    4
+   ],
+   "frames": 80,
+   "fps": 30,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "thin smoke above candles, torches, embers",
+   "pivot": [
+    0.5,
+    0.05
+   ],
+   "worldSize": [
+    0.478,
+    1.2
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs CandleSmoke01 (CandleSmoke01_20x4.tga, 1024x512, 20x4 of 51.2x128 px, straight alpha). fps is a guess; loop from the wrap test (score 1.19).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: CandleSmoke01",
+    "file": "CandleSmoke01-flipbooks.zip",
+    "srcSize": [
+     1024,
+     512
+    ]
+   },
+   "full": {
+    "file": "unity_candlesmoke01.webp",
+    "w": 1020,
+    "h": 512,
+    "frame": 128,
+    "frameW": 51,
+    "frameH": 128,
+    "bytes": 134270
+   },
+   "low": {
+    "file": "unity_candlesmoke01.low.webp",
+    "w": 500,
+    "h": 256,
+    "frame": 64,
+    "frameW": 25,
+    "frameH": 64,
+    "bytes": 45720
+   }
+  },
+  "unity_cloud01": {
+   "type": "flipbook",
+   "kind": "lit-fixed",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 10,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "fog card (E03)",
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "worldSize": [
+    4,
+    4
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs Cloud01 (Cloud01_8x8.tga, 1024x1024, 8x8 of 128x128 px, straight alpha). fps is a guess; loop from the wrap test (score 0.96).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: Cloud01",
+    "file": "Cloud01-flipbooks.zip",
+    "srcSize": [
+     1024,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_cloud01.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 105210
+   },
+   "low": {
+    "file": "unity_cloud01.low.webp",
+    "w": 256,
+    "h": 256,
+    "frame": 32,
+    "frameW": 32,
+    "frameH": 32,
+    "bytes": 38058
+   }
+  },
+  "unity_explosion00": {
+   "type": "flipbook",
+   "kind": "emissive+smoke",
+   "grid": [
+    5,
+    5
+   ],
+   "frames": 25,
+   "fps": 16,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "keg explosion fireball + smoke (E07)",
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "worldSize": [
+    4,
+    4
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs Explosion00 (Explosion00_5x5.tga, 1024x1024, 5x5 of 204.8x204.8 px, straight alpha). fps is a guess; loop from the wrap test (score 5.04).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: Explosion00",
+    "file": "Explosion00-flipbooks.zip",
+    "srcSize": [
+     1024,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_explosion00.webp",
+    "w": 765,
+    "h": 765,
+    "frame": 153,
+    "frameW": 153,
+    "frameH": 153,
+    "bytes": 122368
+   },
+   "low": {
+    "file": "unity_explosion00.low.webp",
+    "w": 380,
+    "h": 380,
+    "frame": 76,
+    "frameW": 76,
+    "frameH": 76,
+    "bytes": 42506
+   }
+  },
+  "unity_explosion01_nofire": {
+   "type": "flipbook",
+   "kind": "lit-fixed",
+   "grid": [
+    5,
+    5
+   ],
+   "frames": 25,
+   "fps": 16,
+   "loop": false,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "smoke / dust plume burst (C06e, E14, slams)",
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "worldSize": [
+    3,
+    3
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs Explosion01-nofire (Explosion01-nofire_5x5.tga, 1024x1024, 5x5 of 204.8x204.8 px, straight alpha). fps is a guess; loop from the wrap test (score 3.86).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: Explosion01-nofire",
+    "file": "Explosion01-nofire-flipbooks.zip",
+    "srcSize": [
+     1024,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_explosion01_nofire.webp",
+    "w": 765,
+    "h": 765,
+    "frame": 153,
+    "frameW": 153,
+    "frameH": 153,
+    "bytes": 114204
+   },
+   "low": {
+    "file": "unity_explosion01_nofire.low.webp",
+    "w": 380,
+    "h": 380,
+    "frame": 76,
+    "frameW": 76,
+    "frameH": 76,
+    "bytes": 39264
+   }
+  },
+  "unity_fireball01": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 30,
+   "loop": true,
+   "blend": "additive",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "fireball core / fire burst (ranged fire, pyre)",
+   "pivot": [
+    0.5,
+    0.5
+   ],
+   "worldSize": [
+    1.2,
+    1.2
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs FireBall01 (FireBall01_8x8.tga, 1024x1024, 8x8 of 128x128 px, none (RGB, additive on black) alpha). fps is a guess; loop from the wrap test (score 1.26). RGB only: A = 0, pure additive.",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: FireBall01",
+    "file": "FireBall01-flipbooks.zip",
+    "srcSize": [
+     1024,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_fireball01.webp",
+    "w": 512,
+    "h": 512,
+    "frame": 64,
+    "frameW": 64,
+    "frameH": 64,
+    "bytes": 47046
+   },
+   "low": {
+    "file": "unity_fireball01.low.webp",
+    "w": 256,
+    "h": 256,
+    "frame": 32,
+    "frameW": 32,
+    "frameH": 32,
+    "bytes": 19328
+   }
+  },
+  "unity_flame02": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    16,
+    4
+   ],
+   "frames": 64,
+   "fps": 30,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "brazier / large fire (E01, E06, E08)",
+   "pivot": [
+    0.5,
+    0.05
+   ],
+   "worldSize": [
+    0.75,
+    1.5
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs Flame02 (Flame02_16x4.tga, 2048x1024, 16x4 of 128x256 px, straight alpha). fps is a guess; loop from the wrap test (score 1.12).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: Flame02",
+    "file": "Flame02-flipbooks.zip",
+    "srcSize": [
+     2048,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_flame02.webp",
+    "w": 1024,
+    "h": 512,
+    "frame": 128,
+    "frameW": 64,
+    "frameH": 128,
+    "bytes": 194596
+   },
+   "low": {
+    "file": "unity_flame02.low.webp",
+    "w": 512,
+    "h": 256,
+    "frame": 64,
+    "frameW": 32,
+    "frameH": 64,
+    "bytes": 74368
+   }
+  },
+  "unity_flame03": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    16,
+    4
+   ],
+   "frames": 64,
+   "fps": 30,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "torch / small fire, burning status (ST1)",
+   "pivot": [
+    0.5,
+    0.05
+   ],
+   "worldSize": [
+    0.45,
+    0.9
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs Flame03 (Flame03_16x4.tga, 1024x512, 16x4 of 64x128 px, straight alpha). fps is a guess; loop from the wrap test (score 1.03).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: Flame03",
+    "file": "Flame03-flipbooks.zip",
+    "srcSize": [
+     1024,
+     512
+    ]
+   },
+   "full": {
+    "file": "unity_flame03.webp",
+    "w": 1024,
+    "h": 512,
+    "frame": 128,
+    "frameW": 64,
+    "frameH": 128,
+    "bytes": 194156
+   },
+   "low": {
+    "file": "unity_flame03.low.webp",
+    "w": 512,
+    "h": 256,
+    "frame": 64,
+    "frameW": 32,
+    "frameH": 64,
+    "bytes": 73210
+   }
+  },
+  "unity_smallflame01": {
+   "type": "flipbook",
+   "kind": "emissive",
+   "grid": [
+    16,
+    4
+   ],
+   "frames": 64,
+   "fps": 30,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": false,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "alt",
+   "role": "candle / lantern flame",
+   "pivot": [
+    0.5,
+    0.05
+   ],
+   "worldSize": [
+    0.25,
+    0.5
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs SmallFlame01 (SmallFlame01_16x4.tga, 2048x1024, 16x4 of 128x256 px, straight alpha). fps is a guess; loop from the wrap test (score 1.40).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: SmallFlame01",
+    "file": "SmallFlame01-flipbooks.zip",
+    "srcSize": [
+     2048,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_smallflame01.webp",
+    "w": 1024,
+    "h": 512,
+    "frame": 128,
+    "frameW": 64,
+    "frameH": 128,
+    "bytes": 239036
+   },
+   "low": {
+    "file": "unity_smallflame01.low.webp",
+    "w": 512,
+    "h": 256,
+    "frame": 64,
+    "frameW": 32,
+    "frameH": 64,
+    "bytes": 83982
+   }
+  },
+  "unity_wispysmoke01": {
+   "type": "flipbook",
+   "kind": "lit-fixed",
+   "grid": [
+    8,
+    8
+   ],
+   "frames": 64,
+   "fps": 24,
+   "loop": true,
+   "blend": "premultiplied",
+   "tint": true,
+   "colorSpace": "srgb",
+   "premultiplied": true,
+   "hdrScale": 1,
+   "set": "core",
+   "role": "rising smoke (brazier wisp, aftermath)",
+   "pivot": [
+    0.5,
+    0.05
+   ],
+   "worldSize": [
+    2.5,
+    2.5
+   ],
+   "order": "row-major, frame 0 top-left",
+   "notes": "Unity Labs WispySmoke01 (WispySmoke01_8x8.tga, 1024x1024, 8x8 of 128x128 px, straight alpha). fps is a guess; loop from the wrap test (score 1.05).",
+   "source": {
+    "type": "pack",
+    "pack": "Unity Labs VFX flipbooks: WispySmoke01",
+    "file": "WispySmoke01-flipbooks.zip",
+    "srcSize": [
+     1024,
+     1024
+    ]
+   },
+   "full": {
+    "file": "unity_wispysmoke01.webp",
+    "w": 768,
+    "h": 768,
+    "frame": 96,
+    "frameW": 96,
+    "frameH": 96,
+    "bytes": 193640
+   },
+   "low": {
+    "file": "unity_wispysmoke01.low.webp",
+    "w": 384,
+    "h": 384,
+    "frame": 48,
+    "frameW": 48,
+    "frameH": 48,
+    "bytes": 69426
+   }
+  }
+ },
+ "packs": {
+  "CandleSmoke01": {
+   "zip": "CandleSmoke01-flipbooks.zip",
+   "file": "CandleSmoke01_20x4.tga",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    20,
+    4
+   ],
+   "srcFrame": [
+    51.2,
+    128
+   ],
+   "frames": 80,
+   "alpha": "straight",
+   "zipBytes": 1673042,
+   "set": "core",
+   "why": "",
+   "role": "thin smoke above candles, torches, embers",
+   "shipFrame": [
+    51,
+    128
+   ],
+   "loopScore": 1.19
+  },
+  "Cloud01": {
+   "zip": "Cloud01-flipbooks.zip",
+   "file": "Cloud01_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 3007131,
+   "set": "core",
+   "why": "",
+   "role": "fog card (E03)",
+   "shipFrame": [
+    64,
+    64
+   ],
+   "loopScore": 0.96
+  },
+  "Cloud02": {
+   "zip": "Cloud02-flipbooks.zip",
+   "file": "Cloud02_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 3433127,
+   "set": null,
+   "why": "variant of Cloud01",
+   "role": "",
+   "shipFrame": [
+    128,
+    128
+   ],
+   "loopScore": 0.99
+  },
+  "Explosion00": {
+   "zip": "Explosion00-flipbooks.zip",
+   "file": "Explosion00_5x5.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    5,
+    5
+   ],
+   "srcFrame": [
+    204.8,
+    204.8
+   ],
+   "frames": 25,
+   "alpha": "straight",
+   "zipBytes": 3170716,
+   "set": "core",
+   "why": "",
+   "role": "keg explosion fireball + smoke (E07)",
+   "shipFrame": [
+    153,
+    153
+   ],
+   "loopScore": 5.04
+  },
+  "Explosion01": {
+   "zip": "Explosion01-flipbooks.zip",
+   "file": "Explosion01_5x5.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    5,
+    5
+   ],
+   "srcFrame": [
+    204.8,
+    204.8
+   ],
+   "frames": 25,
+   "alpha": "straight",
+   "zipBytes": 3001400,
+   "set": null,
+   "why": "near-duplicate of Explosion00",
+   "role": "",
+   "shipFrame": [
+    204,
+    204
+   ],
+   "loopScore": 6.48
+  },
+  "Explosion01-light-nofire": {
+   "zip": "Explosion01-light-nofire-flipbooks.zip",
+   "file": "Explosion01-light-nofire_5x5.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    5,
+    5
+   ],
+   "srcFrame": [
+    204.8,
+    204.8
+   ],
+   "frames": 25,
+   "alpha": "straight",
+   "zipBytes": 2630829,
+   "set": null,
+   "why": "near-duplicate of Explosion01-nofire",
+   "role": "",
+   "shipFrame": [
+    204,
+    204
+   ],
+   "loopScore": 4.91
+  },
+  "Explosion01-nofire": {
+   "zip": "Explosion01-nofire-flipbooks.zip",
+   "file": "Explosion01-nofire_5x5.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    5,
+    5
+   ],
+   "srcFrame": [
+    204.8,
+    204.8
+   ],
+   "frames": 25,
+   "alpha": "straight",
+   "zipBytes": 2666836,
+   "set": "core",
+   "why": "",
+   "role": "smoke / dust plume burst (C06e, E14, slams)",
+   "shipFrame": [
+    153,
+    153
+   ],
+   "loopScore": 3.86
+  },
+  "Explosion02": {
+   "zip": "Explosion02-flipbooks.zip",
+   "file": "Explosion02_5x5.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    5,
+    5
+   ],
+   "srcFrame": [
+    204.8,
+    204.8
+   ],
+   "frames": 25,
+   "alpha": "straight",
+   "zipBytes": 3630889,
+   "set": null,
+   "why": "near-duplicate of Explosion00",
+   "role": "",
+   "shipFrame": [
+    204,
+    204
+   ],
+   "loopScore": 8.3
+  },
+  "Explosion02HD": {
+   "zip": "Explosion02HD-flipbooks.zip",
+   "file": "Explosion02HD_5x5.tga",
+   "size": [
+    2048,
+    2048
+   ],
+   "grid": [
+    5,
+    5
+   ],
+   "srcFrame": [
+    409.6,
+    409.6
+   ],
+   "frames": 25,
+   "alpha": "straight",
+   "zipBytes": 15284536,
+   "set": null,
+   "why": "2048^2 source (16.8 MB TGA): at the WebP-only budget it would be downsized to the 1024^2 of Explosion02; revisit with KTX2",
+   "role": "",
+   "shipFrame": [
+    204,
+    204
+   ],
+   "loopScore": 6.67
+  },
+  "FireBall01": {
+   "zip": "FireBall01-flipbooks.zip",
+   "file": "FireBall01_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "none (RGB, additive on black)",
+   "zipBytes": 5891208,
+   "set": "core",
+   "why": "",
+   "role": "fireball core / fire burst (ranged fire, pyre)",
+   "shipFrame": [
+    64,
+    64
+   ],
+   "loopScore": 1.26
+  },
+  "FireBall02": {
+   "zip": "FireBall02-flipbooks.zip",
+   "file": "FireBall02_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "none (RGB, additive on black)",
+   "zipBytes": 5704761,
+   "set": null,
+   "why": "variant of FireBall01",
+   "role": "",
+   "shipFrame": [
+    128,
+    128
+   ],
+   "loopScore": 1.12
+  },
+  "FireBall03": {
+   "zip": "FireBall03-flipbooks.zip",
+   "file": "FireBall03_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "none (RGB, additive on black)",
+   "zipBytes": 5068774,
+   "set": null,
+   "why": "variant of FireBall01",
+   "role": "",
+   "shipFrame": [
+    128,
+    128
+   ],
+   "loopScore": 0.85
+  },
+  "Flame02": {
+   "zip": "Flame02-flipbooks.zip",
+   "file": "Flame02_16x4.tga",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    16,
+    4
+   ],
+   "srcFrame": [
+    128,
+    256
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 8838111,
+   "set": "core",
+   "why": "",
+   "role": "brazier / large fire (E01, E06, E08)",
+   "shipFrame": [
+    64,
+    128
+   ],
+   "loopScore": 1.12
+  },
+  "Flame03": {
+   "zip": "Flame03-flipbooks.zip",
+   "file": "Flame03_16x4.tga",
+   "size": [
+    1024,
+    512
+   ],
+   "grid": [
+    16,
+    4
+   ],
+   "srcFrame": [
+    64,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 2509590,
+   "set": "core",
+   "why": "",
+   "role": "torch / small fire, burning status (ST1)",
+   "shipFrame": [
+    64,
+    128
+   ],
+   "loopScore": 1.03
+  },
+  "Flame03-hollow": {
+   "zip": "Flame03-hollow-flipbooks.zip",
+   "file": "Flame03-hollow_16x4.tga",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    16,
+    4
+   ],
+   "srcFrame": [
+    128,
+    256
+   ],
+   "frames": 64,
+   "alpha": "none (RGB, additive on black)",
+   "zipBytes": 8984365,
+   "set": null,
+   "why": "variant of Flame03 (RGB only, 2048x1024)",
+   "role": "",
+   "shipFrame": [
+    64,
+    128
+   ],
+   "loopScore": 3.9
+  },
+  "SmallFlame01": {
+   "zip": "SmallFlame01-flipbooks.zip",
+   "file": "SmallFlame01_16x4.tga",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    16,
+    4
+   ],
+   "srcFrame": [
+    128,
+    256
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 6586502,
+   "set": "alt",
+   "why": "",
+   "role": "candle / lantern flame",
+   "shipFrame": [
+    64,
+    128
+   ],
+   "loopScore": 1.4
+  },
+  "SmallFlame01-mini": {
+   "zip": "SmallFlame01-mini-flipbooks.zip",
+   "file": "SmallFlame01-mini_16x4.tga",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    16,
+    4
+   ],
+   "srcFrame": [
+    128,
+    256
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 7082542,
+   "set": null,
+   "why": "variant of SmallFlame01",
+   "role": "",
+   "shipFrame": [
+    64,
+    128
+   ],
+   "loopScore": 1.07
+  },
+  "SmallFlame01-smaller": {
+   "zip": "SmallFlame01-smaller-flipbooks.zip",
+   "file": "SmallFlame01-smaller_16x4.tga",
+   "size": [
+    2048,
+    1024
+   ],
+   "grid": [
+    16,
+    4
+   ],
+   "srcFrame": [
+    128,
+    256
+   ],
+   "frames": 64,
+   "alpha": "premultiplied",
+   "zipBytes": 5017823,
+   "set": null,
+   "why": "variant of SmallFlame01",
+   "role": "",
+   "shipFrame": [
+    64,
+    128
+   ],
+   "loopScore": 1.26
+  },
+  "WispySmoke01": {
+   "zip": "WispySmoke01-flipbooks.zip",
+   "file": "WispySmoke01_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 4646205,
+   "set": "core",
+   "why": "",
+   "role": "rising smoke (brazier wisp, aftermath)",
+   "shipFrame": [
+    96,
+    96
+   ],
+   "loopScore": 1.05
+  },
+  "WispySmoke02": {
+   "zip": "WispySmoke02-flipbooks.zip",
+   "file": "WispySmoke02_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 5001304,
+   "set": null,
+   "why": "variant of WispySmoke01",
+   "role": "",
+   "shipFrame": [
+    128,
+    128
+   ],
+   "loopScore": 1.09
+  },
+  "WispySmoke03": {
+   "zip": "WispySmoke03-flipbooks.zip",
+   "file": "WispySmoke03_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 3626957,
+   "set": null,
+   "why": "variant of WispySmoke01",
+   "role": "",
+   "shipFrame": [
+    128,
+    128
+   ],
+   "loopScore": 1
+  },
+  "WispySmoke03b": {
+   "zip": "WispySmoke03b-flipbooks.zip",
+   "file": "WispySmoke03b_8x8.tga",
+   "size": [
+    1024,
+    1024
+   ],
+   "grid": [
+    8,
+    8
+   ],
+   "srcFrame": [
+    128,
+    128
+   ],
+   "frames": 64,
+   "alpha": "straight",
+   "zipBytes": 3180122,
+   "set": null,
+   "why": "variant of WispySmoke01",
+   "role": "",
+   "shipFrame": [
+    128,
+    128
+   ],
+   "loopScore": 1.33
+  }
+ },
+ "ktx2": {
+  "available": false,
+  "reason": "toktx not found on PATH",
+  "checked": "2026-10-17"
+ }
+}
