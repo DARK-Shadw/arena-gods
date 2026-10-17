@@ -56,14 +56,16 @@ class ParticlePool {
     geo.setAttribute('size', new THREE.BufferAttribute(this.size, 1));
     geo.setAttribute('alpha', new THREE.BufferAttribute(this.alpha, 1));
     const mat = new THREE.ShaderMaterial({
-      uniforms: { map: { value: tex }, scale: { value: 600 } },
+      uniforms: { map: { value: tex }, scale: { value: 600 }, near: { value: additive ? new THREE.Vector2(0.5, 2.2) : new THREE.Vector2(1.2, 4.5) } },
       vertexShader: `
         attribute float size; attribute float alpha; attribute vec3 color;
         varying vec3 vColor; varying float vAlpha;
-        uniform float scale;
+        uniform float scale; uniform vec2 near;
         void main(){
-          vColor = color; vAlpha = alpha;
+          vColor = color;
           vec4 mv = modelViewMatrix * vec4(position,1.0);
+          // particles right in front of the lens would cover the frame: fade them out
+          vAlpha = alpha * smoothstep(near.x, near.y, -mv.z);
           gl_PointSize = size * scale / max(0.1, -mv.z);
           gl_Position = projectionMatrix * mv;
         }`,

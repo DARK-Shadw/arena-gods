@@ -115,6 +115,7 @@ export class Arena {
   props: PropView[] = [];
   hazards: HazView[] = [];
   fireRing: THREE.Mesh;
+  private ringThrough = 0;
   private fireRingMat: THREE.MeshBasicMaterial;
   private base: { sun: number; hemi: number; fog: number; spot: number };
   private time = 0;
@@ -740,6 +741,15 @@ export class Arena {
     this.time += dt;
     shaderTime.value = this.time;
     const t = this.time;
+    if (cam && this.fireRing.visible) {
+      // a camera outside the closing ring of fire looks through its wall: thin it right down (render only)
+      const sx = this.fireRing.scale.x,
+        sz = this.fireRing.scale.z;
+      const e = (cam.position.x / sx) ** 2 + (cam.position.z / sz) ** 2;
+      const through = e > 0.92 && cam.position.y < 2.4 ? 1 : 0;
+      this.ringThrough += (through - this.ringThrough) * Math.min(1, dt * 10);
+      this.fireRingMat.opacity *= 1 - 0.8 * this.ringThrough;
+    }
     if (cam) {
       this.sky.position.copy(cam.position);
       this.camQuat.copy(cam.quaternion);

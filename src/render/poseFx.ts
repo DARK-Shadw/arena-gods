@@ -110,7 +110,8 @@ export class Inertializer {
       _q2.fromArray(this.prev2, i * 4).multiply(_q.copy(target).invert());
       if (_q2.w < 0) _q2.set(-_q2.x, -_q2.y, -_q2.z, -_q2.w);
       const xm1 = 2 * Math.atan2(_q2.x * _ax.x + _q2.y * _ax.y + _q2.z * _ax.z, _q2.w);
-      const v0 = (x0 - xm1) / Math.max(1e-3, this.lastDt);
+      // velocity of the offset; a frozen / hit-stopped previous frame (dt ~ 0) must not turn into a huge spike
+      const v0 = Math.max(-25, Math.min(25, (x0 - xm1) / Math.max(1 / 120, this.lastDt)));
       this.curves[i] = quintic(x0, v0, blend);
     }
     if (this.hips) {
@@ -119,7 +120,7 @@ export class Inertializer {
       if (x0 > 1e-4) {
         this.hAxis.copy(_v).divideScalar(x0);
         const xm1 = _v.copy(this.prev2H).sub(this.hips.position).dot(this.hAxis);
-        this.hCurve = quintic(x0, (x0 - xm1) / Math.max(1e-3, this.lastDt), blend);
+        this.hCurve = quintic(x0, Math.max(-6, Math.min(6, (x0 - xm1) / Math.max(1 / 120, this.lastDt))), blend);
       } else this.hCurve = null;
     }
     this.t = 0;

@@ -38,6 +38,7 @@ const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234'
     const v = await eval(e);
     return JSON.parse(JSON.stringify(v ?? null));
   }, expr);
+  if (opt('shot', null)) await page.screenshot({ path: opt('shot') });
   const out = opt('out', null);
   if (out) {
     fs.mkdirSync(path.dirname(out), { recursive: true });

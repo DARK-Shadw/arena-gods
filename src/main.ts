@@ -537,7 +537,7 @@ class App {
       focus = this.camera.position.distanceTo(this.rig.target);
       if (sn === 'killcam') desat = 0.35;
       // finisher freeze beat: drained colour while time holds
-      if (sn === 'finisher' && this.realT < this.director.freezeUntil) desat = 0.65;
+      if (sn === 'finisher' && this.realT < this.director.freezeUntil) desat = 0.45;
       if (sn === 'cutin') desat = 0.2;
     } else {
       // menu: slow establishing orbit
@@ -557,6 +557,8 @@ class App {
       audio.setListener(this.camera.position.x, this.camera.position.z, -fwd.z, fwd.x);
     }
     this.vfx.update(fxDt);
+    // the impact light fades in real time even while the action is frozen / slowed (else it blooms the frame white)
+    if (fxDt < realDt) this.vfx.flashLight.intensity *= Math.exp(-(realDt - fxDt) * 14);
     this.finFx.update(fxDt);
     this.arena.update(realDt, this.camera, this.renderer.domElement.height);
     audio.update(this.state === 'fight' ? this.playback.frameAt(this.playback.t).tension : 0.15);
@@ -800,7 +802,8 @@ class App {
   }
 
   private handleEvents(evs: SimEvent[], fr: Frame) {
-    const quiet = this.director.inKillSequence(this.playback.t);
+    // no drama banners over a kill sequence or a finisher (WINDED / LAST STAND would cover the scene)
+    const quiet = this.director.inKillSequence(this.playback.t) || /^(finisher|cutin)$/.test(this.director.shotName);
     const realToast = this.ui.toast.bind(this.ui);
     const toast = (m: string, s?: string, c?: string, d?: number) => {
       if (quiet) return;
@@ -921,7 +924,8 @@ class App {
           break;
         case 'last_stand':
           if (a && aDef) {
-            toast('LAST STAND', aDef.name, '#ff4a3a', 2.2);
+            // no banner over a finisher (the victim's last stand would cover the kill)
+            if (!/^(finisher|cutin)$/.test(this.director.shotName)) toast('LAST STAND', aDef.name, '#ff4a3a', 2.2);
             this.vfx.embers(a.position.clone().setY(0.3), 80, '#ff3a2a', 1.4);
             this.vfx.shockwave(a.position, '#ff3a2a', 6, 0.8);
           }
@@ -948,7 +952,7 @@ class App {
           break;
         case 'finisher_start': {
           const def = FIN_BY_ID[String(e.data?.id)];
-          if (def && aDef) toast(def.name, aDef.name, aDef.color, 2.4);
+          if (def && aDef) realToast(def.name, aDef.name, aDef.color, 2.4);
           this.ui.speedLines?.(0.45);
           this.flash = 0.12;
           audio.stinger('dread');

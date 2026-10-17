@@ -655,11 +655,31 @@ export class Director {
         const ai = F ? F.att : 0;
         const hit = chest[vi].clone();
         const fromA = chest[vi].clone().sub(chest[ai]).setY(0).normalize();
-        const side = new THREE.Vector3(-fromA.z, 0, fromA.x).multiplyScalar(this.side);
-        P.copy(hit).addScaledVector(side, 2.0).addScaledVector(fromA, -0.6);
-        P.y = Math.max(0.5, hit.y - 0.1);
+        const downed = hit.y < 0.75;
+        // beside the victim and a little beyond them, so the attacker's body is never between lens and blow;
+        // a body on the ground is seen from above (a low lens would only see the attacker's legs)
+        const at = (sgn: number, out: THREE.Vector3) => {
+          const side = new THREE.Vector3(-fromA.z, 0, fromA.x).multiplyScalar(sgn);
+          out.copy(hit).addScaledVector(side, downed ? 2.3 : 2.1).addScaledVector(fromA, 0.5);
+          out.y = downed ? 1.55 : Math.max(0.6, hit.y + 0.05);
+          return out;
+        };
+        const bad = (c: THREE.Vector3) => {
+          // attacker chest close to the sight line, or decor in the way
+          const d = hit.clone().sub(c);
+          const u = Math.max(0, Math.min(1, chest[ai].clone().sub(c).dot(d) / d.lengthSq()));
+          const near = chest[ai].distanceTo(c.clone().addScaledVector(d, u)) < 0.45 && u < 0.95;
+          return (near ? 1 : 0) + (camWorld.occluded(c, hit) ? 1 : 0);
+        };
+        if (t < 0.02) {
+          const b1 = bad(at(this.side, P)),
+            b2 = bad(at(-this.side, P));
+          if (b2 < b1) this.side *= -1;
+        }
+        at(this.side, P);
         L.copy(hit);
-        this.fov = 34;
+        if (downed) L.y = Math.max(0.25, hit.y);
+        this.fov = downed ? 38 : 34;
         break;
       }
       case 'victory': {

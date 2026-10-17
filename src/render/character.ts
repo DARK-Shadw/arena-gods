@@ -187,6 +187,7 @@ export class AnimController {
   private locoPhase = 0;
   /** true on frames where a transition started (metrics) */
   justTransitioned = false;
+  private rest: [THREE.Object3D, THREE.Quaternion, THREE.Vector3 | null][] = [];
 
   constructor(root: THREE.Object3D, clips: THREE.AnimationClip[], meta: FighterMeta, rng?: () => number) {
     this.root = root;
@@ -194,6 +195,10 @@ export class AnimController {
     this.meta = meta;
     for (const c of clips) this.clips.set(c.name, c);
     this.inert = new Inertializer(root);
+    // the mixer only writes a bone when its sampled value CHANGED (three.js PropertyMixer), so a paused /
+    // frozen clip would leave last frame's post-processing (inertial offsets, IK, springs) on the bones and
+    // it would compound every frame. Each update therefore starts from the mixer's own previous output.
+    for (const bn of this.inert.bones) this.rest.push([bn, bn.quaternion.clone(), /Hips$/.test(bn.name) ? bn.position.clone() : null]);
     this.flinch = new SpringFlinch(root, rng);
     this.phase = new PhaseMatcher(root);
     this.feet = new FootLock(root);
@@ -377,7 +382,15 @@ export class AnimController {
         l.action.time = l.time;
       } else l.action.paused = false;
     }
+    for (const [bn, q, p] of this.rest) {
+      bn.quaternion.copy(q);
+      if (p) bn.position.copy(p);
+    }
     this.mixer.update(dt);
+    for (const [bn, q, p] of this.rest) {
+      q.copy(bn.quaternion);
+      if (p) p.copy(bn.position);
+    }
     if (this.overlayPose) {
       this.overlayW += (this.overlayTarget - this.overlayW) * Math.min(1, dt * 10);
       // the overlay yields to one-shots (hits, throws...) that own the whole body
