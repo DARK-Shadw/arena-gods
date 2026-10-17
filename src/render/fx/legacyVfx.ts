@@ -26,6 +26,12 @@ import { DistortionSprites } from './distortion';
 import { LAYER } from './fxLayers';
 import { SOFTNESS } from './softDepth';
 import { HDR_SCALE } from './fxDefs';
+import { SpriteLayer, hashFloats } from './sprites';
+import { FloorDecals } from './decals';
+import { FxLights } from './lights';
+import { Ribbon } from './ribbons';
+import { Afterimages } from './afterimage';
+import type { FxAtlases } from './atlas';
 
 type V3 = { x: number; y: number; z: number };
 
@@ -84,7 +90,21 @@ export class VFX {
   softOverride: number | undefined = undefined;
   hdrOverride: number | undefined = undefined;
   readonly clock = new FxClock();
+  /** first FX light slot (compat: the old single impact light) */
   flashLight: THREE.PointLight;
+  /** F3: FX light pool (plan 2.5), textured sprite / flipbook layers, floor decals, weapon ribbons, ghosts */
+  readonly lights: FxLights;
+  readonly sprites = new Map<string, SpriteLayer>();
+  readonly decals = new FloorDecals(256);
+  readonly ribbons: Ribbon[] = [];
+  readonly ghosts = new Afterimages();
+  /** noise_a (ribbon streak noise) */
+  readonly noise = { value: null as THREE.Texture | null };
+  atlases: FxAtlases | null = null;
+  /** time the decals are evaluated at (sim time in a fight; undefined = FX time) */
+  decalTime: number | undefined = undefined;
+  /** time the ribbons are evaluated at (sim time in a fight; undefined = FX time) */
+  ribbonTime: number | undefined = undefined;
 
   private matchSeed = 1;
   private stream = new FxRng(1);
@@ -100,8 +120,6 @@ export class VFX {
   private dLastDeath = -Infinity;
   /** per piece: t0, p0 xyz, v0 xyz, spin xyz, scale xyz (13 floats) */
   private dData: Float32Array;
-  // impact light: recent flashes on the light clock (strongest decayed one drives the light)
-  private flashes: { t: number; i: number; color: THREE.Color; pos: THREE.Vector3 }[] = [];
   // live effect list (ring buffer): id hash, spawn time, seed, end time
   private liveId = new Uint32Array(LIVE_CAP);
   private liveSeed = new Uint32Array(LIVE_CAP);
@@ -154,8 +172,16 @@ export class VFX {
     this.debrisMesh.visible = false;
     this.debrisMesh.name = 'fx.debris';
     this.group.add(this.debrisMesh);
-    this.flashLight = new THREE.PointLight('#ffd0a0', 0, 9, 2);
-    this.group.add(this.flashLight);
+    this.lights = new FxLights(this.group, 3);
+    this.flashLight = this.lights.lights[0];
+    this.decals.mesh.layers.set(LAYER.WORLD);
+    this.group.add(this.decals.mesh, this.ghosts.group);
+    for (let i = 0; i < 2; i++) {
+      const r = new Ribbon(this.noise);
+      r.mesh.renderOrder = 5;
+      this.group.add(r.mesh, r.distMesh);
+      this.ribbons.push(r);
+    }
     this.applyTier();
     this.offTier = fxSettings.onChange(() => this.applyTier());
   }
@@ -164,6 +190,71 @@ export class VFX {
     const c = fxSettings.caps();
     this.add.setLimit(c.add);
     this.alpha.setLimit(c.alpha);
+    this.lights.setSlots(c.lights);
+    this.decals.setLimit(c.decals);
+    this.ghosts.setLimit(c.ghosts);
+    for (const r of this.ribbons) r.setTier(fxSettings.quality);
+    for (const [k, L] of this.sprites) {
+      L.setLimit(k === 'mask' ? c.sprites : c.flipbooks);
+      this.bindLayer(k, L);
+    }
+    this.bindStatic();
+  }
+
+  // ------------------------------------------------------------------ atlases (F3)
+  /** Use the FX atlases (game: loaded once per session). Layers get their textures as they arrive. */
+  useAtlases(a: FxAtlases | null) {
+    this.atlases = a;
+    for (const [k, L] of this.sprites) this.bindLayer(k, L);
+    this.bindStatic();
+  }
+
+  /** the sprite layer for 'mask' (fx_sprites) or a flipbook atlas id (created on first use) */
+  layer(key: string): SpriteLayer {
+    let L = this.sprites.get(key);
+    if (!L) {
+      const mask = key === 'mask';
+      const c = fxSettings.caps();
+      L = new SpriteLayer({ name: key, mode: mask ? 'mask' : 'flip', capacity: mask ? TIER_CAPS[2].sprites : TIER_CAPS[2].flipbooks, layer: LAYER.FX_ALPHA });
+      L.setLimit(mask ? c.sprites : c.flipbooks);
+      // flipbook smoke / dust first, then the mask sprites (sparks, blood) over them
+      L.mesh.renderOrder = mask ? 3 : 1;
+      this.group.add(L.mesh);
+      this.sprites.set(key, L);
+      this.bindLayer(key, L);
+    }
+    return L;
+  }
+
+  private bindLayer(key: string, L: SpriteLayer) {
+    const A = this.atlases;
+    if (!A) return;
+    const id = key === 'mask' ? 'fx_sprites' : key;
+    const q = fxSettings.quality;
+    void A.load()
+      .then(async () => {
+        if (!A.has(id)) return;
+        const e = A.entry(id);
+        if (e.type === 'flipbook') L.setEntry(e);
+        const tex = await A.tierTexture(id, q);
+        const mv = e.mv && q > 0 ? await A.texture(id, 'mv') : null;
+        if (fxSettings.quality === q) L.setTexture(tex, mv);
+      })
+      .catch((err) => console.warn('[fx] atlas', id, err));
+  }
+
+  private bindStatic() {
+    const A = this.atlases;
+    if (!A) return;
+    const q = fxSettings.quality;
+    void A.load()
+      .then(async () => {
+        const [map, nrm, noise] = await Promise.all([A.tierTexture('decals', q), A.texture('decals', 'data'), A.texture('noise_a')]);
+        if (fxSettings.quality !== q) return;
+        this.decals.setTextures(map, nrm);
+        this.noise.value = noise;
+      })
+      .catch((err) => console.warn('[fx] decal / noise atlas', err));
   }
 
   // ------------------------------------------------------------------ seeding
@@ -263,9 +354,12 @@ export class VFX {
     this.add.emit(t0, p.x, p.y, p.z, 0, 0, 0, _c.r, _c.g, _c.b, size, 0.12, 1, 0, 1.5, 0, sf);
     this.add.emit(t0, p.x, p.y, p.z, 0, 0, 0, _c.r, _c.g, _c.b, size * 0.5, 0.2, 1, 0, 0.5, 0, sf);
     // the light lives on the light clock (keeps fading during hit-stop); map the spawn onto it
-    const lt = this.clock.light - (this.clock.t - t0);
-    if (this.flashes.length >= 8) this.flashes.shift();
-    this.flashes.push({ t: lt, i: light, color: new THREE.Color(color), pos: new THREE.Vector3(p.x, p.y, p.z) });
+    if (light > 0) this.lightAt(t0, color, light, 0.21, p, 9);
+  }
+
+  /** FX light pool request (plan 2.5): peak intensity fading over ~dur seconds of real time */
+  lightAt(t0: number, color: string, intensity: number, dur: number, p: V3, radius = 9) {
+    this.lights.add(this.clock.light - (this.clock.t - t0), color, intensity, dur, p, radius);
   }
 
   dustAt(r: FxRng, t0: number, p: V3, n: number, spread = 1, color = '#9a8064') {
@@ -375,7 +469,8 @@ export class VFX {
     a.mesh.lookAt(a.to);
   }
 
-  debrisAt(r: FxRng, t0: number, p: V3, color: string, n = 10) {
+  /** scale < 1: small chips launched from p (impact chips); dust: the old dust puff with the burst */
+  debrisAt(r: FxRng, t0: number, p: V3, color: string, n = 10, scale = 1, speed = 1, dust = true) {
     _c.set(color);
     const col = this.debrisMesh.instanceColor!;
     for (let i = 0; i < n; i++) {
@@ -383,16 +478,16 @@ export class VFX {
       this.dCursor = (this.dCursor + 1) % this.debrisCap;
       const o = k * 13;
       const d = this.dData;
-      d[o + 10] = r.range(0.1, 0.35);
-      d[o + 11] = r.range(0.05, 0.12);
-      d[o + 12] = r.range(0.1, 0.4);
+      d[o + 10] = r.range(0.1, 0.35) * scale;
+      d[o + 11] = r.range(0.05, 0.12) * scale;
+      d[o + 12] = r.range(0.1, 0.4) * scale;
       d[o] = t0;
-      d[o + 1] = p.x + r.range(-0.3, 0.3);
-      d[o + 2] = 0.5 + r.range(0, 0.5);
-      d[o + 3] = p.z + r.range(-0.3, 0.3);
-      d[o + 4] = r.range(-4, 4);
-      d[o + 5] = r.range(2, 6);
-      d[o + 6] = r.range(-4, 4);
+      d[o + 1] = p.x + r.range(-0.3, 0.3) * scale;
+      d[o + 2] = scale < 1 ? Math.max(0.08, p.y) : 0.5 + r.range(0, 0.5);
+      d[o + 3] = p.z + r.range(-0.3, 0.3) * scale;
+      d[o + 4] = r.range(-4, 4) * speed;
+      d[o + 5] = r.range(2, 6) * speed;
+      d[o + 6] = r.range(-4, 4) * speed;
       d[o + 7] = r.range(-9, 9);
       d[o + 8] = r.range(-9, 9);
       d[o + 9] = r.range(-9, 9);
@@ -402,7 +497,7 @@ export class VFX {
     }
     col.needsUpdate = true;
     _v.set(p.x, 0, p.z);
-    this.dustAt(r, t0, _v, 14, 1.2);
+    if (dust) this.dustAt(r, t0, _v, 14, 1.2);
   }
 
   // ------------------------------------------------------------------ time
@@ -427,6 +522,12 @@ export class VFX {
     this.add.setTime(t);
     this.alpha.setTime(t);
     this.dist.setTime(t);
+    for (const L of this.sprites.values()) L.flush(), L.setTime(t);
+    this.decals.flush();
+    this.decals.setTime(this.decalTime ?? t);
+    const rt = this.ribbonTime ?? t;
+    for (const r of this.ribbons) r.build(rt);
+    this.ghosts.update(t);
     for (const g of this.rings) {
       if (!g.on) continue;
       const k = (t - g.t0) / g.life;
@@ -541,21 +642,8 @@ export class VFX {
   }
 
   private updateLight() {
-    const lt = this.clock.light;
-    let best = 0;
-    let latest: (typeof this.flashes)[number] | undefined;
-    for (const f of this.flashes) {
-      if (f.t > lt) continue;
-      const i = f.i * Math.exp(-(lt - f.t) * 14);
-      if (i > best) best = i;
-      if (!latest || f.t >= latest.t) latest = f;
-    }
-    // old behaviour: the newest flash sets colour/position, intensity = max(decayed, new)
-    if (latest) {
-      this.flashLight.position.copy(latest.pos);
-      this.flashLight.color.copy(latest.color);
-    }
-    this.flashLight.intensity = best < 0.01 ? 0 : best;
+    // F3: the strongest requests take the light pool's slots (lights.ts)
+    this.lights.update(this.clock.light);
   }
 
   // ------------------------------------------------------------------ housekeeping
@@ -571,8 +659,11 @@ export class VFX {
     this.dLastDeath = -Infinity;
     this.debrisMesh.count = 0;
     this.debrisMesh.visible = false;
-    this.flashes.length = 0;
-    this.flashLight.intensity = 0;
+    this.lights.clear();
+    for (const L of this.sprites.values()) L.clear();
+    this.decals.clear();
+    for (const r of this.ribbons) r.reset();
+    this.ghosts.clear();
     this.liveCount = 0;
     this.liveCursor = 0;
     this.spawns = 0;
@@ -592,18 +683,23 @@ export class VFX {
   /** Hash of the live effect list (id, spawn time, seed): the plan's seek test. */
   hash(): string {
     const t = this.clock.t;
-    let h = 0x811c9dc5;
+    // order-independent (F3): a seek replay spawns the same effects in a different order than a play-through
+    let h = 0;
     let n = 0;
     for (let j = 0; j < this.liveCount; j++) {
       const i = (this.liveCursor - this.liveCount + j + LIVE_CAP) % LIVE_CAP;
       if (!(this.liveEnd[i] > t && this.liveT0[i] <= t)) continue;
-      h = hashN(h, this.liveId[i], Math.round(this.liveT0[i] * 1e4), this.liveSeed[i]);
+      h = (h + hashN(this.liveId[i], Math.round(this.liveT0[i] * 1e4), this.liveSeed[i])) >>> 0;
       n++;
     }
     return `${n}:${h.toString(16)}`;
   }
 
-  /** Hash of the full live state: every live particle's spawn data, rings, debris (stronger than hash()). */
+  /**
+   * Hash of the full live state: every live particle's spawn data (legacy dots, sprites, flipbooks,
+   * distortion), rings, debris, decals, the light pool. Order-independent per layer (ring slots differ
+   * between a play-through and a seek replay).
+   */
   stateHash(): string {
     const t = this.clock.t;
     let h = 0x811c9dc5 >>> 0;
@@ -611,15 +707,21 @@ export class VFX {
       h ^= Math.round(x * 1e4) | 0;
       h = Math.imul(h, 16777619) >>> 0;
     };
-    this.add.hashInto(t, mix);
-    this.alpha.hashInto(t, mix);
-    this.dist.hashInto(t, mix);
-    for (const g of this.rings) if (g.on && t >= g.t0) mix(g.t0), mix(g.size), mix(g.mesh.position.x), mix(g.mesh.position.z);
+    mix(this.add.hashLive(t));
+    mix(this.alpha.hashLive(t));
+    mix(this.dist.hashLive(t));
+    for (const k of [...this.sprites.keys()].sort()) mix(this.sprites.get(k)!.hashLive(t));
+    let s = 0;
+    for (const g of this.rings) if (g.on && t >= g.t0) s = (s + hashN(Math.round(g.t0 * 1e4), Math.round(g.size * 1e4), Math.round(g.mesh.position.x * 1e4), Math.round(g.mesh.position.z * 1e4))) >>> 0;
+    mix(s);
+    s = 0;
     for (let k = 0; k < this.dHigh; k++) {
       const o = k * 13;
-      if (t - this.dData[o] >= 0 && t - this.dData[o] < DEBRIS_LIFE) for (let j = 0; j < 13; j++) mix(this.dData[o + j]);
+      if (t - this.dData[o] >= 0 && t - this.dData[o] < DEBRIS_LIFE) s = (s + hashFloats(this.dData, o, 13)) >>> 0;
     }
-    mix(this.flashLight.intensity);
+    mix(s);
+    mix(hashN(...this.decals.hash(this.decalTime ?? t).split(':').map((x) => parseInt(x, 16))));
+    mix(this.lights.peak);
     return h.toString(16);
   }
 
@@ -640,8 +742,25 @@ export class VFX {
       debris,
       dist: this.dist.alive(t),
       effects: this.liveEffects().length,
-      light: +this.flashLight.intensity.toFixed(3),
+      light: +this.lights.peak.toFixed(3),
+      lights: this.lights.lights.filter((L) => L.visible && L.intensity > 0).length,
+      sprites: this.spriteCounts(t),
+      decals: this.decals.count(this.decalTime ?? t),
+      ribbons: this.ribbons.filter((r) => r.mesh.visible).length,
+      ghosts: this.ghosts.live,
     };
+  }
+
+  /** live sprites per layer ('mask' and each flipbook atlas) */
+  spriteCounts(t = this.clock.t): Record<string, number> {
+    const o: Record<string, number> = {};
+    for (const [k, L] of this.sprites) o[k] = L.alive(t);
+    return o;
+  }
+
+  /** anything on the distortion layer at the current time (Post skips its pass otherwise) */
+  get distActive(): boolean {
+    return this.dist.active || this.ribbons.some((r) => r.distMesh.visible);
   }
 
   dispose() {
@@ -656,6 +775,10 @@ export class VFX {
     this.debrisMesh.geometry.dispose();
     (this.debrisMesh.material as THREE.Material).dispose();
     this.debrisMesh.dispose();
+    for (const L of this.sprites.values()) L.dispose();
+    this.decals.dispose();
+    for (const r of this.ribbons) r.dispose();
+    this.ghosts.dispose();
     this.group.removeFromParent();
   }
 }

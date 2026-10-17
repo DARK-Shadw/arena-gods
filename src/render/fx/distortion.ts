@@ -218,6 +218,23 @@ export class DistortionSprites {
     }
   }
 
+  /** order-independent hash of the live sprites */
+  hashLive(t: number): number {
+    let sum = 0;
+    for (let i = 0; i < this.highWater; i++) {
+      const o = i * STRIDE;
+      const age = t - this.data[o + 3];
+      if (!(age >= 0 && age < this.data[o + 4])) continue;
+      let h = 0x811c9dc5 >>> 0;
+      for (let j = 0; j < STRIDE; j++) {
+        h ^= Math.round(this.data[o + j] * 1e4) | 0;
+        h = Math.imul(h, 16777619) >>> 0;
+      }
+      sum = (sum + h) >>> 0;
+    }
+    return sum;
+  }
+
   clear() {
     this.data.fill(0);
     this.cursor = 0;

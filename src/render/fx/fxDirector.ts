@@ -2,35 +2,54 @@
  * FX director: turns the sim event stream (and observations of recorded
  * frames) into effects, on the FX clock, with seeded randomness.
  *
- *   game:  fx.frame({ events, frame, simT, simDt })   once per fight tick, before handleEvents
+ *   game:  fx.setMatch(rec, seed, world)                 new match
+ *          fx.frame({ events, frame, simT, simDt })     once per fight tick, before handleEvents
  *          fx.update(fxDt, realDt)                      once per rendered tick
- *          fx.seek(simT)                                on ?t= / debugSeekFight (clears, reseeds)
+ *          fx.seek(simT)                                on ?t= / debugSeekFight: full replay (below)
  *   lab:   createFxDirector({ scene }).spawn(id, pos, { seed, t }); fx.setTime(t) / fx.step(dt)
  *
  * What fires is data (fxDefs.ts); this file only resolves anchors, colours and
  * seeds and calls the primitives. Seeds: hash(match seed, key, effect id, layer)
  * with key = the event's index in rec.events (stable: the record is
  * deterministic), (fighter, attack id) for phase observations, (emitter,
- * fighter, tick) for continuous emitters and (projectile id, tick) for trails.
- * Nothing here reads the wall clock or an unseeded random source, and nothing writes sim data.
+ * fighter, tick) for continuous emitters, (fighter, stride) for footsteps and
+ * (projectile id, tick) for trails. Nothing here reads the wall clock or an
+ * unseeded random source, and nothing writes sim data.
+ *
+ * F3:
+ *  - spawn times are the exact sim times of what caused them (event time, tick time, stride time),
+ *    mapped onto the FX clock, so the result does not depend on the frame rate or on how a
+ *    play-through was stepped;
+ *  - anchors come from the animated bones in live play, and from recorded frame data when there are
+ *    no bones (Node tests) or during a seek replay; persistent things (decals, wounds, weapon blood,
+ *    footsteps) always use recorded frame data, so a seek rebuilds them exactly;
+ *  - seek(t) is a full replay: persistent state from every event in [0, t - REPLAY_TAIL), then every
+ *    effect, continuous emitter and footstep of the last REPLAY_TAIL seconds on recorded frames, so
+ *    long tails (smoke, debris, embers, pools) are alive at t as in a play-through. Bounded cost:
+ *    one pass over the events + REPLAY_TAIL / rec.dt director steps (fx:check measures it).
  */
 import * as THREE from 'three';
-import type { Frame, MatchRecord, MoveDef, SimEvent } from '../../sim/types';
+import type { FighterFrame, Frame, MatchRecord, MoveDef, SimEvent } from '../../sim/types';
 import { VFX } from './legacyVfx';
 import { FxRng, hashN, hashStr } from './fxRng';
 import { fxSettings, goreLevel, type GoreLevel } from './fxSettings';
-import { CONTINUOUS, DEFS, ON_ACTIVE, PROJ_TRAIL_RATE, RESOLVE, RING_FIRE_RATE, RING_HEAT_RATE, defDuration, projEnd, projTrail, type Anchor, type FxDef, type FxLayer } from './fxDefs';
+import { CONTINUOUS, DEFS, ON_ACTIVE, PROJ_TRAIL_RATE, RESOLVE, RING_FIRE_RATE, RING_HEAT_RATE, defDuration, projEnd, projTrail, type Anchor, type FxDef, type FxLayer, type FxOp, type ResolveCtx, type SpDir } from './fxDefs';
 import { fxProfiler } from './profiler';
+import { SPRITES, DECAL_CELLS, type DecalCell } from './atlas';
+import { SP_ADD, SP_FLOOR, SP_LOOP, SP_STREAK, newSpawn } from './sprites';
+import { BODY, FLOOR_DUST, HEIGHT, weaponClassOf, type FloorSurface, type Surface, type WeaponClass } from './fxSurfaces';
+import { FighterBlood } from './wounds';
+import { CLAW_CORE, TRAIL_PROFILES } from './ribbons';
 
 type V3 = { x: number; y: number; z: number };
 
-/** What the director may read from the live game (all read-only). */
+/** What the director may read from the live game (all read-only). Everything is optional: without bones the anchors come from recorded frames. */
 export interface FxWorld {
-  chest(i: number): V3;
-  head(i: number): V3;
-  cast(i: number): V3;
+  chest?(i: number): V3;
+  head?(i: number): V3;
+  cast?(i: number): V3;
   /** fighter root position (feet anchors use its x/z on the floor) */
-  feet(i: number): V3;
+  feet?(i: number): V3;
   accent(i: number): string;
   move(i: number, id: string): MoveDef | undefined;
   obstacle(i: number): { x: number; z: number } | undefined;
@@ -38,6 +57,22 @@ export interface FxWorld {
   /** ring of fire half-axes at full size */
   ring(): { rx: number; rz: number };
   isFinisher(move: string): boolean;
+  // ---- F3 (optional)
+  /** effector bone of a move ('RightHand', 'RightFoot', ...) and whether the model has a weapon tip */
+  effector?(i: number, move: string): string | undefined;
+  hasWeapon?(i: number): boolean;
+  /** model height (m) */
+  height?(i: number): number;
+  /** floor surface at a point (theme floor, water hazards) */
+  floorAt?(x: number, z: number): FloorSurface;
+  /** this frame's weapon-trail base / tip (world) and whether the attack's trail window is on */
+  trail?(i: number, base: THREE.Vector3, tip: THREE.Vector3): boolean;
+  /** this frame's blade base / tip (world) for weapon blood; false = no blade */
+  blade?(i: number, base: THREE.Vector3, tip: THREE.Vector3): boolean;
+  /** a bone of fighter i by Mixamo name without the prefix ('Spine2') */
+  bone?(i: number, name: string): THREE.Object3D | undefined;
+  /** fighter i's model (afterimage source) and its materials + world metres per model unit (wounds) */
+  fighter?(i: number): { model: THREE.Object3D; materials: THREE.Material[]; objScale: number } | undefined;
 }
 
 /** Per-spawn context: who and where. Everything optional for lab spawns. */
@@ -53,6 +88,10 @@ export interface SpawnCtx {
   ringS?: number;
   /** actor facing (rad) when there is no frame (lab) */
   facing?: number;
+  /** sim time of the cause (event, tick, stride): frame-data anchors and decal times */
+  t?: number;
+  /** lab: direction of the blow (x, z) when there are no frames */
+  dir?: { x: number; z: number };
 }
 
 export interface FxFrameInput {
@@ -74,11 +113,18 @@ export interface FxPostKicks {
 export interface FxStats {
   t: number;
   particles: { add: number; alpha: number; addCap: number; alphaCap: number };
+  /** F3: live sprites per layer ('mask' = fx_sprites, else the flipbook atlas id) */
+  sprites: Record<string, number>;
   /** live distortion sprites (F1) */
   dist: number;
   rings: number;
   arrows: number;
   debris: number;
+  decals: number;
+  ribbons: number;
+  ghosts: number;
+  wounds: [number, number];
+  lights: number;
   effects: number;
   pending: number;
   spawns: number;
@@ -86,6 +132,8 @@ export interface FxStats {
   quality: number;
   gore: GoreLevel;
   cpu: { frameMs: number; updateMs: number; frameMax: number; updateMax: number };
+  /** last seek: replayed events / director steps and its CPU ms (0 without a profiler clock) */
+  seek: { events: number; steps: number; ms: number };
 }
 
 interface Pending {
@@ -96,10 +144,26 @@ interface Pending {
   ctx: SpawnCtx;
 }
 
+/** seconds of full replay before the warm-up start on seek (the longest effect tail: debris 6 s) */
+export const REPLAY_TAIL = 6;
+/** footstep stride (m) and the speed above which strides leave dust (catalog C01) */
+const STRIDE = 1.15;
+const STEP_SPEED = 2.5;
+const WOUND_BONES = ['Spine2', 'Spine1', 'Spine', 'Spine2', 'Neck', 'LeftArm', 'RightArm', 'LeftForeArm', 'RightForeArm', 'Hips', 'LeftUpLeg', 'RightUpLeg'];
+
 const _p = new THREE.Vector3();
 const _q = new THREE.Vector3();
 const _vel = new THREE.Vector3();
+const _d = new THREE.Vector3();
+const _u = new THREE.Vector3();
+const _side = new THREE.Vector3();
+const _b0 = new THREE.Vector3();
+const _b1 = new THREE.Vector3();
+const _c = new THREE.Color();
 const _rng = new FxRng(1);
+const SP = newSpawn();
+/** scratch fighter state from recorded frames */
+const _ff = { x: 0, y: 0, z: 0, facing: 0, hp: 0 };
 
 export class FxDirector {
   readonly vfx: VFX;
@@ -112,16 +176,40 @@ export class FxDirector {
   private lastPhase = [-1, -1];
   private lastAttackId = [0, 0];
   private lastSimT = 0;
-  private proj = new Map<number, { x: number; y: number; z: number; fx: string }>();
-  private projSeen = new Set<number>();
+  /** FX clock minus sim time at the current frame (spawns are backdated by the sim lag of their cause) */
   private ownsVfx: boolean;
   /** the frame being processed (facing for streams); undefined outside frame() */
   private curFrame?: Frame;
+  /** current sim time (frame()) */
+  private simNow = 0;
+  /** FX time of the current frame's sim time (inside frame()) */
+  private fxNow = 0;
+  private inFrame = false;
+  /** seek replay in progress: anchors from recorded frames, no ribbons / ghosts */
+  private replaying = false;
+  /** replay pass 1: only persistent layers (decals, wounds, weapon blood) */
+  private persistOnly = false;
+  /** precomputed footsteps per fighter: [t, x, z, stride index] x n, and the next index */
+  private steps: Float64Array[] = [new Float64Array(0), new Float64Array(0)];
+  private stepIdx = [0, 0];
+  /** pending ghost snapshots (FX time) */
+  private ghostQ: { at: number; i: number; life: number; color: string; strength: number }[] = [];
+  /** weapon-trail profile per fighter is set per attack id */
+  private trailAttack = [-1, -1];
+  readonly blood: [FighterBlood, FighterBlood] = [new FighterBlood(), new FighterBlood()];
+  private seekStats = { events: 0, steps: 0, ms: 0 };
   gore: GoreLevel = goreLevel();
+  /** FX Lab (no world): bone and blade lookups for the dummies' wounds and weapon blood */
+  labBone?: (i: number, name: string) => THREE.Object3D | undefined;
+  labBlade?: (i: number, base: THREE.Vector3, tip: THREE.Vector3) => boolean;
 
   constructor(vfx?: VFX) {
     this.ownsVfx = !vfx;
     this.vfx = vfx ?? new VFX();
+    fxSettings.onChange(() => {
+      const c = fxSettings.caps();
+      for (const b of this.blood) b.setLimit(c.wounds);
+    });
   }
 
   // ------------------------------------------------------------------ match lifecycle
@@ -133,16 +221,91 @@ export class FxDirector {
     this.evIndex.clear();
     rec.events.forEach((e, i) => this.evIndex.set(e, i));
     this.gore = goreLevel();
+    for (let i = 0; i < 2; i++) {
+      const F = world.fighter?.(i);
+      this.blood[i] = new FighterBlood();
+      this.blood[i].setLimit(fxSettings.caps().wounds);
+      if (F) this.blood[i].attach(F.materials, F.objScale);
+      this.vfx.ghosts.setSource(i, F?.model ?? null);
+    }
+    this.buildSteps();
     this.resetState(t, 0);
   }
 
+  /** the materials and blood uniforms of fighter i (FX Lab dummies) */
+  attachBlood(i: number, materials: THREE.Material[], objScale: number) {
+    this.blood[i].attach(materials, objScale);
+  }
+
   /**
-   * Jump to sim time t (debugSeekFight / ?t=): clear every live effect, reseed,
-   * FX time := t. The game then re-runs its warm-up window at fixed steps, which
-   * re-spawns the effects of the events in that window with their original seeds.
+   * Jump to sim time `simT` (debugSeekFight / ?t=; the game then warms up from here at fixed steps).
+   * Full replay: persistent state (decals, wounds, weapon blood) from every event before
+   * simT - REPLAY_TAIL, then the last REPLAY_TAIL seconds of effects on recorded frames.
    */
   seek(simT: number) {
+    const c0 = fxProfiler.begin();
     this.resetState(simT, simT);
+    const rec = this.rec;
+    this.seekStats = { events: 0, steps: 0, ms: 0 };
+    if (!rec) return;
+    const tStart = Math.max(0, simT - REPLAY_TAIL);
+    const C = this.vfx.clock;
+    this.replaying = true;
+    try {
+      // 1. persistent state from [0, tStart]
+      this.persistOnly = true;
+      let ei = 0;
+      const ev = rec.events;
+      for (; ei < ev.length && ev[ei].t <= tStart; ei++) {
+        const e = ev[ei];
+        C.seek(e.t);
+        this.simNow = e.t;
+        this.onEvent(e, e.t);
+        this.seekStats.events++;
+      }
+      this.persistOnly = false;
+      // 2. effects whose lifetime reaches the warm-up start: replay (tStart, simT] on recorded frames
+      const fr = rec.frames;
+      let k = this.frameIndex(tStart);
+      const pre = fr[Math.max(0, k - 1)];
+      for (let i = 0; i < 2; i++) {
+        this.lastPhase[i] = pre.f[i].state === 'attack' ? pre.f[i].phase : -1;
+        this.lastAttackId[i] = pre.f[i].attackId;
+      }
+      this.lastSimT = tStart;
+      for (let i = 0; i < 2; i++) this.stepIdx[i] = this.firstStep(i, tStart);
+      while (k < fr.length && fr[k].t <= tStart) k++;
+      const evs: SimEvent[] = [];
+      for (; k < fr.length && fr[k].t <= simT; k++) {
+        const ft = fr[k].t;
+        evs.length = 0;
+        while (ei < ev.length && ev[ei].t <= ft) evs.push(ev[ei++]);
+        C.seek(ft);
+        this.firePending();
+        this.frame({ events: evs, frame: fr[k], simT: ft, simDt: rec.dt });
+        this.seekStats.steps++;
+        this.seekStats.events += evs.length;
+      }
+      evs.length = 0;
+      while (ei < ev.length && ev[ei].t <= simT) evs.push(ev[ei++]);
+      C.seek(simT);
+      this.firePending();
+      this.frame({ events: evs, frame: fr[Math.min(fr.length - 1, k)], simT, simDt: rec.dt });
+      this.seekStats.events += evs.length;
+    } finally {
+      this.replaying = false;
+      this.persistOnly = false;
+    }
+    C.seek(simT);
+    this.lastSimT = simT;
+    this.post.aberration = this.post.flash = this.post.vignette = 0;
+    this.post.grades.length = 0;
+    for (const r of this.vfx.ribbons) r.reset();
+    this.ghostQ.length = 0;
+    this.vfx.decalTime = simT;
+    this.vfx.ribbonTime = simT;
+    this.vfx.render();
+    this.seekStats.ms = +(fxProfiler.now() - c0).toFixed(3);
   }
 
   /** t: FX time; simT: the sim time continuous emitters count ticks from */
@@ -154,7 +317,15 @@ export class FxDirector {
     this.lastPhase = [-1, -1];
     this.lastAttackId = [0, 0];
     this.lastSimT = simT;
-    this.proj.clear();
+    this.simNow = simT;
+    this.trailAttack = [-1, -1];
+    this.ghostQ.length = 0;
+    for (const b of this.blood) b.clear();
+    for (let i = 0; i < 2; i++) this.stepIdx[i] = this.firstStep(i, simT);
+    if (this.rec) {
+      this.vfx.decalTime = simT;
+      this.vfx.ribbonTime = simT;
+    }
   }
 
   /** Standalone use: set the match seed, clear, FX time := t. */
@@ -167,17 +338,120 @@ export class FxDirector {
   clear() {
     this.vfx.clear();
     this.pending.length = 0;
-    this.proj.clear();
+    this.ghostQ.length = 0;
+    for (const b of this.blood) b.clear();
+  }
+
+  // ------------------------------------------------------------------ recorded frames
+  /** index of the first recorded frame at or after sim time t (frames[k].t = (k + 1) * dt) */
+  private frameIndex(t: number): number {
+    const rec = this.rec!;
+    return Math.max(0, Math.min(rec.frames.length - 1, Math.ceil(t / rec.dt - 1 - 1e-9)));
+  }
+
+  /** fighter i at sim time t from the recording (interpolated position / facing, nearest hp) into _ff */
+  private fstate(i: number, t: number) {
+    const rec = this.rec!;
+    const fr = rec.frames;
+    const x = t / rec.dt - 1;
+    const a = Math.max(0, Math.min(fr.length - 1, Math.floor(x)));
+    const b = Math.min(fr.length - 1, a + 1);
+    const k = Math.max(0, Math.min(1, x - a));
+    const A = fr[a].f[i],
+      B = fr[b].f[i];
+    _ff.x = A.x + (B.x - A.x) * k;
+    _ff.z = A.z + (B.z - A.z) * k;
+    _ff.y = A.y + (B.y - A.y) * k;
+    let d = (B.facing - A.facing) % (Math.PI * 2);
+    if (d > Math.PI) d -= Math.PI * 2;
+    if (d < -Math.PI) d += Math.PI * 2;
+    _ff.facing = A.facing + d * k;
+    _ff.hp = k < 0.5 ? A.hp : B.hp;
+    return _ff;
+  }
+
+  /** the recorded fighter frame nearest to sim time t (state, move, attack phase) */
+  private fframe(i: number, t: number): FighterFrame {
+    const rec = this.rec!;
+    const x = t / rec.dt - 1;
+    const k = Math.max(0, Math.min(rec.frames.length - 1, Math.round(x)));
+    return rec.frames[k].f[i];
+  }
+
+  private fighterId(i: number): string {
+    return this.rec?.ids[i] ?? '';
+  }
+
+  private heightOf(i: number): number {
+    return this.world?.height?.(i) ?? HEIGHT[this.fighterId(i)] ?? 1.9;
+  }
+
+  // ------------------------------------------------------------------ footsteps (C01 / C02)
+  /** Stride ticks from the recorded motion: every STRIDE metres while moving faster than STEP_SPEED. */
+  private buildSteps() {
+    const rec = this.rec;
+    if (!rec) return;
+    for (let i = 0; i < 2; i++) {
+      const out: number[] = [];
+      let s = 0;
+      let k = 0;
+      let prev = rec.frames[0].f[i];
+      for (let j = 1; j < rec.frames.length; j++) {
+        const f = rec.frames[j].f[i];
+        const sp = Math.hypot(f.vx, f.vz);
+        const moving = (f.state === 'idle' || f.state === 'block' || f.state === 'attack') && sp > STEP_SPEED && f.y < 0.05;
+        if (moving) {
+          s += Math.hypot(f.x - prev.x, f.z - prev.z);
+          if (s >= STRIDE) {
+            s -= STRIDE;
+            k++;
+            const side = k % 2 ? 1 : -1;
+            const c = Math.cos(f.facing),
+              sn = Math.sin(f.facing);
+            out.push(rec.frames[j].t, f.x + c * 0.13 * side, f.z - sn * 0.13 * side, k);
+          }
+        } else s = Math.min(s, STRIDE * 0.5);
+        prev = f;
+      }
+      this.steps[i] = Float64Array.from(out);
+    }
+  }
+
+  private firstStep(i: number, t: number): number {
+    const S = this.steps[i];
+    let n = 0;
+    while (n * 4 < S.length && S[n * 4] <= t) n++;
+    return n;
+  }
+
+  private emitSteps(t1: number) {
+    const W = this.world;
+    const on = fxSettings.caps().steps > 0;
+    for (let i = 0; i < 2; i++) {
+      const S = this.steps[i];
+      while (this.stepIdx[i] * 4 < S.length && S[this.stepIdx[i] * 4] <= t1) {
+        const o = this.stepIdx[i]++ * 4;
+        if (!on || this.persistOnly) continue;
+        const surf = W?.floorAt?.(S[o + 1], S[o + 2]) ?? 'stone';
+        const id = surf === 'snow' ? 'step.snow' : surf === 'water' ? 'step.water' : surf === 'wet' ? 'step.wet' : 'step.dust';
+        this.spawnKeyed(id, hashN(0x57e9, i, S[o + 3]), { a: i, pos: { x: S[o + 1], y: 0, z: S[o + 2] }, t: S[o] }, S[o]);
+      }
+    }
   }
 
   // ------------------------------------------------------------------ per frame
-  /** Feed one fight tick: events, attack-phase observations, continuous emitters, projectile trails. */
+  /** Feed one fight tick: events, attack-phase observations, continuous emitters, footsteps, projectile trails, weapon trails. */
   frame(inp: FxFrameInput) {
     const t0 = fxProfiler.begin();
     const W = this.world;
     const fr = inp.frame;
     this.curFrame = fr;
-    for (const e of inp.events) this.onEvent(e, fr);
+    this.simNow = inp.simT;
+    // the FX time that corresponds to this frame's sim time: the game advances the FX clock by about
+    // simDt right after frame() (tickFight -> tick -> fx.update); a seek replay has already set it
+    this.fxNow = this.vfx.clock.t + (this.replaying ? 0 : Math.max(0, inp.simDt));
+    this.inFrame = true;
+    for (const e of inp.events) this.onEvent(e, e.t);
     if (W) {
       for (let i = 0; i < 2; i++) {
         const f = fr.f[i];
@@ -185,7 +459,8 @@ export class FxDirector {
         const newAttack = f.attackId !== this.lastAttackId[i];
         if (f.state === 'attack' && mv && f.phase === 1 && (f.phase !== this.lastPhase[i] || newAttack)) {
           const key = hashN(0xac, i, f.attackId);
-          for (const rule of ON_ACTIVE) for (const id of rule(mv)) if (id) this.spawnKeyed(id, key, { a: i });
+          const ta = this.activeStart(i, f.attackId, inp.simT);
+          for (const rule of ON_ACTIVE) for (const id of rule(mv)) if (id) this.spawnKeyed(id, key, { a: i, t: ta }, ta);
         }
         this.lastPhase[i] = f.state === 'attack' ? f.phase : -1;
         this.lastAttackId[i] = f.attackId;
@@ -197,61 +472,173 @@ export class FxDirector {
     if (inp.simDt > 0 && t1 > tPrev) {
       if (W) {
         for (let i = 0; i < 2; i++) {
-          const f = fr.f[i];
-          const mv = f.moveId ? W.move(i, f.moveId) : undefined;
-          for (const c of CONTINUOUS) {
-            const id = c.when(f, mv);
-            if (id) this.ticks(id, c.rate, tPrev, t1, hashN(hashStr(c.key), i), { a: i });
-          }
+          for (const c of CONTINUOUS) this.ticksFor(c, i, tPrev, t1);
         }
       }
-      if (fr.ringS < 0.995) {
-        this.ticks('ring.fire', RING_FIRE_RATE, tPrev, t1, 0x7121, { ringS: fr.ringS });
-        if (fxSettings.caps().dist >= 2) this.ticks('ring.heat', RING_HEAT_RATE, tPrev, t1, 0x7122, { ringS: fr.ringS });
-      }
-      for (const p of fr.proj) {
-        const id = projTrail(p.fx);
-        if (id) this.ticks(id, PROJ_TRAIL_RATE, tPrev, t1, hashN(0x9e, p.id), { pos: { x: p.x, y: p.y, z: p.z } });
-      }
+      this.ringTicks(tPrev, t1, fr);
+      this.projTicks(tPrev, t1, fr);
+      this.emitSteps(t1);
     }
-    // projectiles that vanished this frame: impact sparks at their last position
-    this.projSeen.clear();
-    for (const p of fr.proj) {
-      this.projSeen.add(p.id);
-      const s = this.proj.get(p.id);
-      if (s) (s.x = p.x), (s.y = p.y), (s.z = p.z);
-      else this.proj.set(p.id, { x: p.x, y: p.y, z: p.z, fx: p.fx });
-    }
-    for (const [id, s] of this.proj) {
-      if (this.projSeen.has(id)) continue;
-      this.spawnKeyed(projEnd(s.fx), hashN(0x9f, id), { pos: s });
-      this.proj.delete(id);
-    }
-    this.lastSimT = t1;
+    this.projEnds(tPrev, t1, fr);
+    this.trails(fr, t1);
+    this.lastSimT = Math.max(this.lastSimT, t1);
+    if (this.rec) this.vfx.decalTime = t1;
     this.curFrame = undefined;
+    this.inFrame = false;
     fxProfiler.end('frame', t0);
   }
 
-  private onEvent(e: SimEvent, fr: Frame) {
-    const R = RESOLVE[e.type];
-    if (!R) return;
-    const W = this.world;
-    const ids = R(e, { isFinisher: W?.isFinisher, hazardKind: (i) => W?.hazard(i)?.kind });
-    const key = this.evIndex.get(e) ?? hashN(0xe0, Math.round(e.t * 1000), hashStr(e.type));
-    const ctx: SpawnCtx = { a: e.a, b: e.b, data: e.data as Record<string, unknown> | undefined, ringS: fr.ringS };
-    for (const id of ids) if (id) this.spawnKeyed(id, key, ctx);
+  /** sim time the attack entered its active phase (exact from the recording; else now) */
+  private activeStart(i: number, attackId: number, now: number): number {
+    const rec = this.rec;
+    if (!rec) return now;
+    let k = this.frameIndex(now);
+    const fr = rec.frames;
+    while (k > 0 && fr[k - 1].f[i].attackId === attackId && fr[k - 1].f[i].state === 'attack' && fr[k - 1].f[i].phase === 1) k--;
+    return Math.min(now, fr[k].t);
   }
 
-  /** Fixed-rate ticks on sim time in (t0, t1]: tick n spawns with seed hash(key, n). */
-  private ticks(id: string, rate: number, t0: number, t1: number, key: number, ctx: SpawnCtx) {
+  /** continuous emitter ticks in (t0, t1]: each tick checks the recorded state at its own time (step-independent) */
+  private ticksFor(c: (typeof CONTINUOUS)[number], i: number, t0: number, t1: number) {
+    const W = this.world!;
+    const n0 = Math.floor(t0 * c.rate);
+    let n1 = Math.floor(t1 * c.rate);
+    if (n1 - n0 > 64) n1 = n0 + 64;
+    const key = hashN(hashStr(c.key), i);
+    for (let n = n0 + 1; n <= n1; n++) {
+      const tt = n / c.rate;
+      const f = this.rec ? this.fframe(i, tt) : this.curFrame!.f[i];
+      const mv = f.moveId ? W.move(i, f.moveId) : undefined;
+      const id = c.when(f, mv);
+      if (id) this.spawnKeyed(id, hashN(key, n), { a: i, t: tt }, tt);
+    }
+  }
+
+  private ringTicks(t0: number, t1: number, fr: Frame) {
+    const one = (id: string, rate: number, key: number) => {
+      const n0 = Math.floor(t0 * rate);
+      let n1 = Math.floor(t1 * rate);
+      if (n1 - n0 > 64) n1 = n0 + 64;
+      for (let n = n0 + 1; n <= n1; n++) {
+        const tt = n / rate;
+        const rs = this.rec ? this.rec.frames[this.frameIndex(tt)].ringS : fr.ringS;
+        if (rs < 0.995) this.spawnKeyed(id, hashN(key, n), { ringS: rs, t: tt }, tt);
+      }
+    };
+    if (fr.ringS < 0.995 || (this.rec && this.rec.frames[this.frameIndex(t0)].ringS < 0.995)) {
+      one('ring.fire', RING_FIRE_RATE, 0x7121);
+      if (fxSettings.caps().dist >= 2) one('ring.heat', RING_HEAT_RATE, 0x7122);
+    }
+  }
+
+  /** projectile trail ticks at their recorded positions (interpolated between recorded frames) */
+  private projTicks(t0: number, t1: number, fr: Frame) {
+    const rec = this.rec;
+    const rate = PROJ_TRAIL_RATE;
     const n0 = Math.floor(t0 * rate);
     let n1 = Math.floor(t1 * rate);
-    if (n1 - n0 > 64) n1 = n0 + 64; // a large jump (paused tab) must not flood the pool
-    for (let n = n0 + 1; n <= n1; n++) this.spawnKeyed(id, hashN(key, n), ctx);
+    if (n1 - n0 > 64) n1 = n0 + 64;
+    if (!rec) {
+      for (const p of fr.proj) {
+        const id = projTrail(p.fx);
+        if (id) for (let n = n0 + 1; n <= n1; n++) this.spawnKeyed(id, hashN(hashN(0x9e, p.id), n), { pos: { x: p.x, y: p.y, z: p.z }, t: n / rate }, n / rate);
+      }
+      return;
+    }
+    for (let n = n0 + 1; n <= n1; n++) {
+      const tt = n / rate;
+      const x = tt / rec.dt - 1;
+      const a = Math.max(0, Math.min(rec.frames.length - 1, Math.floor(x)));
+      const b = Math.min(rec.frames.length - 1, a + 1);
+      const k = Math.max(0, Math.min(1, x - a));
+      const A = rec.frames[a],
+        B = rec.frames[b];
+      for (const p of A.proj) {
+        const id = projTrail(p.fx);
+        if (!id) continue;
+        const q = B.proj.find((z) => z.id === p.id) ?? p;
+        _p.set(p.x + (q.x - p.x) * k, p.y + (q.y - p.y) * k, p.z + (q.z - p.z) * k);
+        this.spawnKeyed(id, hashN(hashN(0x9e, p.id), n), { pos: { x: _p.x, y: _p.y, z: _p.z }, t: tt }, tt);
+      }
+    }
   }
 
-  private spawnKeyed(id: string, key: number, ctx: SpawnCtx) {
-    this.spawnDef(id, hashN(this.matchSeed, key, hashStr(id)), this.vfx.clock.t, ctx);
+  /** projectiles that vanished in (t0, t1]: impact sparks at their last recorded position and time */
+  private projEnds(t0: number, t1: number, fr: Frame) {
+    const rec = this.rec;
+    if (!rec) {
+      void fr;
+      return;
+    }
+    let k = this.frameIndex(t0);
+    while (k < rec.frames.length && rec.frames[k].t <= t0) k++;
+    for (; k < rec.frames.length && rec.frames[k].t <= t1; k++) {
+      if (k === 0) continue;
+      const A = rec.frames[k - 1],
+        B = rec.frames[k];
+      for (const p of A.proj) {
+        if (B.proj.some((z) => z.id === p.id)) continue;
+        this.spawnKeyed(projEnd(p.fx), hashN(0x9f, p.id), { pos: { x: p.x, y: p.y, z: p.z }, t: B.t }, B.t);
+      }
+    }
+  }
+
+  /** weapon trails: one sample per rendered frame on sim time; the profile is chosen per attack */
+  private trails(fr: Frame, simT: number) {
+    const W = this.world;
+    if (!W?.trail || this.replaying) return;
+    for (let i = 0; i < 2; i++) {
+      const R = this.vfx.ribbons[i];
+      const f = fr.f[i];
+      const on = W.trail(i, _b0, _b1);
+      if (on && f.attackId !== this.trailAttack[i]) {
+        this.trailAttack[i] = f.attackId;
+        const mv = f.moveId ? W.move(i, f.moveId) : undefined;
+        const cls = this.classOf(i, f.moveId, mv?.fx ?? '');
+        const heavy = !!mv && (mv.kind === 'heavy' || mv.kind === 'ultimate' || mv.damage >= 70);
+        const prof = mv?.fx === 'shadow' && cls !== 'claw' ? TRAIL_PROFILES.shadow : TRAIL_PROFILES[cls];
+        R.setProfile(prof, cls === 'claw' ? CLAW_CORE[this.fighterId(i)] : undefined, hashN(this.matchSeed, i, f.attackId), heavy, fxSettings.caps().dist);
+      }
+      R.push(simT, _b0, _b1, on);
+    }
+    this.vfx.ribbonTime = simT;
+  }
+
+  private classOf(i: number, move: string, fx: string): WeaponClass {
+    const W = this.world;
+    return weaponClassOf(this.fighterId(i), W?.effector?.(i, move), fx, W?.hasWeapon?.(i) ?? false);
+  }
+
+  private resolveCtx(): ResolveCtx {
+    const W = this.world;
+    return {
+      isFinisher: W?.isFinisher,
+      hazardKind: (i) => W?.hazard(i)?.kind,
+      weaponClass: (i, move, fx) => this.classOf(i, move, fx),
+      surface: (i): Surface => BODY[this.fighterId(i)] ?? 'flesh',
+      hpFrac: (i, t) => {
+        if (!this.rec) return 1;
+        const f = this.fstate(i, t);
+        const max = this.rec.frames[0].f[i].hp || 1;
+        return f.hp / max;
+      },
+      fighterId: (i) => this.fighterId(i),
+    };
+  }
+
+  private onEvent(e: SimEvent, t: number) {
+    const R = RESOLVE[e.type];
+    if (!R) return;
+    const ids = R(e, this.resolveCtx());
+    const key = this.evIndex.get(e) ?? hashN(0xe0, Math.round(e.t * 1000), hashStr(e.type));
+    const ctx: SpawnCtx = { a: e.a, b: e.b, data: e.data as Record<string, unknown> | undefined, ringS: this.rec ? this.rec.frames[this.frameIndex(t)].ringS : 1, t };
+    for (const id of ids) if (id) this.spawnKeyed(id, key, ctx, t);
+  }
+
+  /** spawn at the FX time that corresponds to sim time `simT` (backdated by how late it is processed) */
+  private spawnKeyed(id: string, key: number, ctx: SpawnCtx, simT = this.simNow) {
+    const t = (this.inFrame ? this.fxNow : this.vfx.clock.t) - Math.max(0, this.simNow - simT);
+    this.spawnDef(id, hashN(this.matchSeed, key, hashStr(id)), t, ctx);
   }
 
   /** Advance FX time and evaluate every layer; fires delayed layers that came due. */
@@ -259,8 +646,24 @@ export class FxDirector {
     const t0 = fxProfiler.begin();
     this.vfx.clock.advance(dt, realDt);
     this.firePending();
+    this.fireGhosts();
     this.vfx.render();
+    this.updateBlood();
     fxProfiler.end('update', t0);
+  }
+
+  private updateBlood() {
+    const W = this.world;
+    const t = this.vfx.clock.t;
+    for (let i = 0; i < 2; i++) {
+      const B = this.blood[i];
+      if (W?.blade ? W.blade(i, _b0, _b1) : this.labBlade?.(i, _b0, _b1)) {
+        B.bladeBase = _b0;
+        B.bladeTip = _b1;
+        B.update(t);
+        B.bladeBase = B.bladeTip = null;
+      } else B.update(t);
+    }
   }
 
   private firePending() {
@@ -270,6 +673,17 @@ export class FxDirector {
       if (p.at <= t) {
         this.pending.splice(i, 1);
         this.runLayer(p.def, p.def.layers[p.layer], p.ctx, _rng.reseed(hashN(p.seed, p.layer)), p.at);
+      } else i++;
+    }
+  }
+
+  private fireGhosts() {
+    const t = this.vfx.clock.t;
+    for (let i = 0; i < this.ghostQ.length; ) {
+      const g = this.ghostQ[i];
+      if (g.at <= t) {
+        this.ghostQ.splice(i, 1);
+        this.vfx.ghosts.snap(g.i, g.at, g.life, g.color, g.strength);
       } else i++;
     }
   }
@@ -297,8 +711,16 @@ export class FxDirector {
       if (!sub) return false;
       def = DEFS[sub] ?? def;
     }
+    if (this.persistOnly) {
+      // seek pass 1: only what persists (decals, wounds, weapon blood), at its own time, no post kicks
+      def.layers.forEach((L, i) => {
+        const k = L.op.k;
+        if (k === 'decal' || k === 'wound' || k === 'bladeBlood' || k === 'blood') this.runLayer(def!, L, ctx, _rng.reseed(hashN(seed, i)), t0 + (L.delay ?? 0));
+      });
+      return true;
+    }
     const pk = def.post;
-    if (pk) {
+    if (pk && !this.replaying) {
       const P = this.post;
       if (pk.aberration) P.aberration = Math.max(P.aberration, pk.aberration);
       if (pk.flash) P.flash = Math.max(P.flash, pk.flash);
@@ -324,12 +746,27 @@ export class FxDirector {
    * Public spawn (FX Lab, tests, game code that has a position but no event).
    * Without a world every anchor resolves to `pos` (feet anchors on the floor).
    */
-  spawn(id: string, pos: V3, o: { seed?: number; t?: number; a?: number; b?: number; accent?: string; facing?: number; data?: Record<string, unknown> } = {}): boolean {
+  spawn(id: string, pos: V3, o: { seed?: number; t?: number; a?: number; b?: number; accent?: string; facing?: number; data?: Record<string, unknown>; dir?: { x: number; z: number } } = {}): boolean {
     const seed = o.seed ?? hashN(this.matchSeed, hashStr(id), Math.round(this.vfx.clock.t * 1000));
-    return this.spawnDef(id, seed >>> 0, o.t ?? this.vfx.clock.t, { pos, a: o.a, b: o.b, accent: o.accent, facing: o.facing, data: o.data, ringS: 1 });
+    return this.spawnDef(id, seed >>> 0, o.t ?? this.vfx.clock.t, { pos, a: o.a, b: o.b, accent: o.accent, facing: o.facing, data: o.data, ringS: 1, dir: o.dir });
   }
 
-  private anchor(at: Anchor, ctx: SpawnCtx, r: FxRng, out: THREE.Vector3): THREE.Vector3 {
+  /** bones available (live play) or recorded-frame anchors (Node, seek replay) */
+  private get boneAnchors(): boolean {
+    return !this.replaying && !!this.world?.chest;
+  }
+
+  /** frame-data anchor of fighter i at sim time t */
+  private fAnchor(kind: 'chest' | 'head' | 'cast' | 'feet', i: number, t: number, out: THREE.Vector3): THREE.Vector3 {
+    const f = this.fstate(i, t);
+    const h = this.heightOf(i);
+    if (kind === 'feet') return out.set(f.x, 0, f.z);
+    if (kind === 'head') return out.set(f.x, f.y + h * 0.93, f.z);
+    if (kind === 'cast') return out.set(f.x + Math.sin(f.facing) * 0.45, f.y + h * 0.75, f.z + Math.cos(f.facing) * 0.45);
+    return out.set(f.x, f.y + h * 0.7, f.z);
+  }
+
+  private anchor(at: Anchor, ctx: SpawnCtx, r: FxRng, out: THREE.Vector3, forceFrames = false): THREE.Vector3 {
     const W = this.world;
     const a = ctx.a ?? -1,
       b = ctx.b ?? -1;
@@ -346,34 +783,45 @@ export class FxDirector {
       if (at === 'aFeet' || at === 'bFeet') out.y = 0;
       return out;
     }
-    const cp = (v: V3) => out.set(v.x, v.y, v.z);
+    const bones = this.boneAnchors && !forceFrames;
+    const fr = !bones && !!this.rec;
+    const t = ctx.t ?? this.simNow;
+    const get = (kind: 'chest' | 'head' | 'cast' | 'feet', i: number, o: THREE.Vector3): THREE.Vector3 | null => {
+      if (fr) return this.fAnchor(kind, i, t, o);
+      const fn = kind === 'chest' ? W.chest : kind === 'head' ? W.head : kind === 'cast' ? W.cast : W.feet;
+      const v = fn?.call(W, i);
+      return v ? o.set(v.x, v.y, v.z) : null;
+    };
     switch (at) {
+      // F3: contacts sit on the body surface facing the other fighter (a fixed distance from the chest),
+      // not a fraction of the gap: with long weapons the fighters stand 2-3 m apart
       case 'contact':
         if (a < 0 || b < 0) break;
-        cp(W.chest(b));
-        return out.lerp(_q.copy(W.chest(a) as THREE.Vector3), 0.25);
+        if (get('chest', b, out) && get('chest', a, _q)) return this.towards(out, _q, 0.24);
+        break;
       case 'blockContact':
       case 'parryContact':
         if (a < 0 || b < 0) break;
-        cp(W.chest(a));
-        return out.lerp(_q.copy(W.chest(b) as THREE.Vector3), at === 'blockContact' ? 0.3 : 0.35);
+        if (get('chest', a, out) && get('chest', b, _q)) return this.towards(out, _q, at === 'blockContact' ? 0.42 : 0.5);
+        break;
       case 'aChest':
-        if (a >= 0) return cp(W.chest(a));
+        if (a >= 0 && get('chest', a, out)) return out;
         break;
       case 'bChest':
-        if (b >= 0) return cp(W.chest(b));
+        if (b >= 0 && get('chest', b, out)) return out;
         break;
       case 'aHead':
-        if (a >= 0) return cp(W.head(a));
+        if (a >= 0 && get('head', a, out)) return out;
         break;
       case 'aCast':
-        if (a >= 0) return cp(W.cast(a));
+        if (a >= 0 && get('cast', a, out)) return out;
         break;
       case 'aFeet':
-        if (a >= 0) return cp(W.feet(a)).setY(0);
+        if (P && ctx.t !== undefined && !d) return out.set(P.x, 0, P.z); // footsteps carry their exact position
+        if (a >= 0 && get('feet', a, out)) return out.setY(0);
         break;
       case 'bFeet':
-        if (b >= 0) return cp(W.feet(b)).setY(0);
+        if (b >= 0 && get('feet', b, out)) return out.setY(0);
         break;
       case 'event':
         if (d && d.x !== undefined) return out.set(Number(d.x ?? 0), Number(d.y ?? 0), Number(d.z ?? 0));
@@ -399,9 +847,46 @@ export class FxDirector {
     return out.set(0, 1, 0);
   }
 
-  private color(c: string | undefined, ctx: SpawnCtx, fallback: string): string {
+  /** move `p` towards `q` on the floor plane by d metres (at most half the gap) */
+  private towards(p: THREE.Vector3, q: THREE.Vector3, d: number): THREE.Vector3 {
+    const dx = q.x - p.x,
+      dz = q.z - p.z;
+    const l = Math.hypot(dx, dz);
+    if (l < 1e-6) return p;
+    const k = Math.min(d, l * 0.5) / l;
+    p.x += dx * k;
+    p.z += dz * k;
+    return p;
+  }
+
+  /** direction of the blow on the floor plane (a -> b) from recorded frames; lab: ctx.dir or +x */
+  private hitDir(ctx: SpawnCtx, out: THREE.Vector3): THREE.Vector3 {
+    const a = ctx.a ?? -1,
+      b = ctx.b ?? -1;
+    if (this.rec && a >= 0 && b >= 0) {
+      const t = ctx.t ?? this.simNow;
+      const A = this.fstate(a, t);
+      const ax = A.x,
+        az = A.z;
+      const B = this.fstate(b, t);
+      out.set(B.x - ax, 0, B.z - az);
+      if (out.lengthSq() > 1e-8) return out.normalize();
+    }
+    if (this.rec && a >= 0) {
+      const A = this.fstate(a, ctx.t ?? this.simNow);
+      return out.set(Math.sin(A.facing), 0, Math.cos(A.facing));
+    }
+    if (ctx.dir) return out.set(ctx.dir.x, 0, ctx.dir.z).normalize();
+    return out.set(1, 0, 0);
+  }
+
+  private color(c: string | undefined, ctx: SpawnCtx, fallback: string, at?: V3): string {
     if (!c) return fallback;
     if (c[0] !== '$') return c;
+    if (c === '$floor') {
+      const s = at && this.world?.floorAt ? this.world.floorAt(at.x, at.z) : undefined;
+      return s ? FLOOR_DUST[s] : '#9a8a74';
+    }
     const i = c === '$accentB' ? ctx.b : ctx.a;
     if (this.world && i !== undefined && i >= 0) return this.world.accent(i);
     return ctx.accent ?? '#ffb060';
@@ -409,25 +894,26 @@ export class FxDirector {
 
   private runLayer(def: FxDef, L: FxLayer, ctx: SpawnCtx, r: FxRng, t: number) {
     const V = this.vfx;
-    const p = this.anchor(L.at ?? def.at, ctx, r, _p);
+    const op = L.op;
+    // persistent ops place themselves from recorded frames (seek-exact); the rest use the live anchors
+    const persistent = op.k === 'decal' || op.k === 'wound' || op.k === 'bladeBlood';
+    const p = this.anchor(L.at ?? def.at, ctx, r, _p, persistent);
     const y = L.y ?? (L.at ? undefined : def.y);
     if (y !== undefined) p.y = y;
     if (L.minY !== undefined) p.y = Math.max(L.minY, p.y);
-    const op = L.op;
     const s = fxSettings.caps().countScale;
     const N = (n: number) => (s === 1 ? n : Math.max(1, Math.round(n * s)));
-    // per-layer overrides read by the primitives (soft-particle distance, HDR multiplier)
     V.softOverride = L.soft ?? def.soft;
     V.hdrOverride = 'hdr' in op ? op.hdr : undefined;
     try {
-      this.runOp(op, ctx, r, t, p, N);
+      this.runOp(op, ctx, r, t, p, N, L, def);
     } finally {
       V.softOverride = undefined;
       V.hdrOverride = undefined;
     }
   }
 
-  private runOp(op: FxLayer['op'], ctx: SpawnCtx, r: FxRng, t: number, p: THREE.Vector3, N: (n: number) => number) {
+  private runOp(op: FxOp, ctx: SpawnCtx, r: FxRng, t: number, p: THREE.Vector3, N: (n: number) => number, L: FxLayer, def: FxDef) {
     const V = this.vfx;
     switch (op.k) {
       case 'sparks':
@@ -437,7 +923,7 @@ export class FxDirector {
         V.flashAt(r, t, p, this.color(op.color, ctx, '#fff0d0'), op.size ?? 1.2, op.light ?? 6);
         break;
       case 'dust':
-        V.dustAt(r, t, p, N(op.n), op.spread ?? 1, this.color(op.color, ctx, '#9a8064'));
+        V.dustAt(r, t, p, N(op.n), op.spread ?? 1, this.color(op.color, ctx, '#9a8064', p));
         break;
       case 'smoke':
         V.smokeAt(r, t, p, N(op.n), this.color(op.color, ctx, '#2a2230'), op.size ?? 1.2, op.rise ?? 0.8);
@@ -485,6 +971,252 @@ export class FxDirector {
       case 'ripple':
         V.rippleAt(r, t, p, op.size, op.life, op.strength ?? 1, op.tier ?? 1);
         break;
+      // ---------------- F3
+      case 'sp':
+        this.emitSprites(op, ctx, r, t, p, L, def);
+        break;
+      case 'blood':
+        this.emitBlood(op, ctx, r, t, p, L.delay ?? 0);
+        break;
+      case 'decal':
+        this.emitDecals(op, ctx, r, t, L);
+        break;
+      case 'wound': {
+        const b = ctx.b ?? -1;
+        const bone = WOUND_BONES[Math.floor(r.next() * WOUND_BONES.length)];
+        const off = { x: r.range(-0.07, 0.07), y: r.range(-0.08, 0.08), z: r.range(-0.07, 0.07) };
+        const rad = r.range(op.r[0], op.r[1]);
+        if (b >= 0) this.blood[b].add(this.world?.bone?.(b, bone) ?? this.labBone?.(b, bone) ?? null, off, rad, t, op.amt ?? 1);
+        else if (ctx.b === undefined && !this.rec) this.blood[1].add(this.labBone?.(1, bone) ?? null, off, rad, t, op.amt ?? 1); // lab: the right dummy
+        break;
+      }
+      case 'bladeBlood': {
+        const a = ctx.a ?? (this.rec ? -1 : 0);
+        if (a >= 0) this.blood[a].addBlade(t, op.amt);
+        break;
+      }
+      case 'light':
+        if (!this.persistOnly) V.lightAt(t, this.color(op.color, ctx, '#ffd0a0'), op.i, op.dur, p, op.radius ?? 8);
+        break;
+      case 'chips': {
+        const n = Math.max(1, Math.round(N(op.n) * fxSettings.caps().spriteScale));
+        V.debrisAt(r, t, p, this.color(op.color, ctx, '#7a7068', p), n, op.scale ?? 0.3, op.speed ?? 0.6, false);
+        break;
+      }
+      case 'ghost': {
+        const a = ctx.a ?? -1;
+        if (this.replaying || a < 0 || fxSettings.caps().ghosts <= 0) break;
+        const color = this.color(op.color, ctx, '#9fc0ff');
+        for (let k = 0; k < Math.min(op.n, fxSettings.caps().ghosts); k++) this.ghostQ.push({ at: t + k * op.gap, i: a, life: op.life, color, strength: op.strength ?? 1 });
+        break;
+      }
+    }
+  }
+
+  /** direction vector for 'sp' / 'blood' (consumes one rng draw for the side sign) */
+  private spDir(dir: SpDir | undefined, ctx: SpawnCtx, r: FxRng, out: THREE.Vector3): THREE.Vector3 {
+    const side = r.next() < 0.5 ? -1 : 1;
+    if (!dir || dir === 'none') return out.set(0, 0, 0);
+    if (dir === 'up') return out.set(0, 1, 0);
+    if (dir === 'down') return out.set(0, -1, 0);
+    if (dir === 'facing') {
+      const a = ctx.a ?? -1;
+      const f = this.rec && a >= 0 ? this.fstate(a, ctx.t ?? this.simNow).facing : (ctx.facing ?? 0);
+      return out.set(Math.sin(f), 0, Math.cos(f));
+    }
+    this.hitDir(ctx, out);
+    if (dir === 'hit') return out;
+    if (dir === 'back') return out.negate();
+    _side.set(-out.z, 0, out.x).multiplyScalar(side);
+    // cut: blood leaves the wound, which faces the attacker, swept along the swing and up
+    if (dir === 'cut') return out.multiplyScalar(-0.45).add(_side).setY(0.6).normalize();
+    // deflect: off to the side of the blow and up
+    return out.multiplyScalar(-0.25).add(_side).setY(0.55).normalize();
+  }
+
+  private emitSprites(op: Extract<FxOp, { k: 'sp' }>, ctx: SpawnCtx, r: FxRng, t: number, p: THREE.Vector3, L: FxLayer, def: FxDef) {
+    if (this.persistOnly) return;
+    const caps = fxSettings.caps();
+    if ((op.minQ ?? 0) > fxSettings.quality) return;
+    const flip = op.tex[0] === '@';
+    const layer = this.vfx.layer(flip ? op.tex.slice(1) : 'mask');
+    const sel = flip ? 0 : Math.max(0, SPRITES.indexOf(op.tex as (typeof SPRITES)[number]));
+    const n = op.n <= 1 ? op.n : Math.max(1, Math.round(op.n * caps.spriteScale));
+    const dir = this.spDir(op.dir, ctx, r, _d);
+    const hasDir = dir.lengthSq() > 0;
+    const cone = op.cone ?? (hasDir ? 0.3 : 1);
+    _c.set(this.color(op.color, ctx, '#ffffff', p)).multiplyScalar(op.hdr ?? 1);
+    const soft = L.soft ?? def.soft ?? (op.add ? 0.05 : flip ? 0.4 : 0.12);
+    const flags = (op.add ? SP_ADD : 0) | (op.stretch ? SP_STREAK : 0) | (op.floor ? SP_FLOOR : 0) | (op.loop ? SP_LOOP : 0);
+    const sp = op.speed ?? [0, 0];
+    const sz = op.size ?? [0.2, 0.2];
+    const life = op.life ?? [0.5, 0.5];
+    const jit = op.jitter ?? 0;
+    for (let k = 0; k < n; k++) {
+      // random unit vector, mixed with the direction by `cone`
+      _u.set(r.range(-1, 1), r.range(-1, 1), r.range(-1, 1));
+      if (_u.lengthSq() < 1e-6) _u.set(0, 1, 0);
+      _u.normalize();
+      if (hasDir) _u.lerp(dir, 1 - cone).normalize();
+      const speed = r.range(sp[0], sp[1]);
+      SP.t0 = t;
+      SP.x = p.x + (jit ? r.range(-jit, jit) : 0);
+      SP.y = p.y + (jit ? r.range(-jit, jit) * 0.3 : 0);
+      SP.z = p.z + (jit ? r.range(-jit, jit) : 0);
+      SP.vx = _u.x * speed;
+      SP.vy = _u.y * speed + (op.vy ? r.range(op.vy[0], op.vy[1]) : 0);
+      SP.vz = _u.z * speed;
+      SP.life = r.range(life[0], life[1]);
+      SP.r = _c.r;
+      SP.g = _c.g;
+      SP.b = _c.b;
+      SP.a = op.alpha ?? 1;
+      SP.drag = op.drag ?? 0;
+      SP.grav = op.grav ?? 0;
+      SP.stretch = op.stretch ?? 0;
+      SP.soft = soft;
+      SP.size0 = r.range(sz[0], sz[1]);
+      SP.size1 = SP.size0 * (op.grow ?? 1);
+      SP.rot = op.rot === false ? 0 : r.next() * Math.PI * 2;
+      SP.spin = op.spin ? r.range(-op.spin, op.spin) : 0;
+      SP.sel = flip ? (op.frame0 ? Math.floor(r.range(op.frame0[0], op.frame0[1])) : 0) : sel;
+      SP.fps = op.fps ?? -1;
+      SP.flags = flags;
+      SP.aspect = op.aspect ?? 1;
+      layer.emit(SP);
+    }
+  }
+
+  /** blood droplets: ballistic streaks; `drops` of them leave a floor decal where and when they land */
+  private emitBlood(op: Extract<FxOp, { k: 'blood' }>, ctx: SpawnCtx, r: FxRng, t: number, p: THREE.Vector3, delay: number) {
+    const caps = fxSettings.caps();
+    const layer = this.persistOnly ? null : this.vfx.layer('mask');
+    const sel = SPRITES.indexOf('circle_05');
+    // decals land from the recorded-frame contact point (exact on seek); droplets fly from the live one
+    // (the 'contact' anchor sits on the victim's front, between the chests)
+    const fp = this.rec && this.world ? this.anchor('contact', ctx, r, _q, true) : _q.copy(p);
+    const fx = fp.x,
+      fy = fp.y,
+      fz = fp.z;
+    const dir = this.spDir(op.dir ?? 'cut', ctx, r, _d);
+    _c.set(this.color(op.color, ctx, '#a0101a'));
+    const n = Math.max(1, Math.round(op.n * caps.spriteScale));
+    const drops = Math.min(op.drops ?? 0, n);
+    const dropScale = caps.decals >= 128 ? 1 : 0.5;
+    const sz = op.size ?? [0.018, 0.035];
+    const G = 9.8,
+      K = 0.8;
+    // decal times: sim time of the cause + the layer delay (fight); FX time (lab)
+    const base = ctx.t !== undefined && this.rec ? ctx.t + delay : t;
+    for (let k = 0; k < n; k++) {
+      _u.set(r.range(-1, 1), r.range(-1, 1), r.range(-1, 1)).normalize().lerp(dir, 1 - (op.cone ?? 0.45)).normalize();
+      const speed = r.range(op.speed[0], op.speed[1]);
+      const vx = _u.x * speed,
+        vy = _u.y * speed + (op.vy ? r.range(op.vy[0], op.vy[1]) : 0.6),
+        vz = _u.z * speed;
+      const size = r.range(sz[0], sz[1]);
+      // landing time (closed-form drag + gravity, bisection)
+      let lo = 0,
+        hi = 3;
+      const y0 = Math.max(0.2, fy);
+      const yAt = (tt: number) => {
+        const e = Math.exp(-K * tt);
+        const f = (1 - e) / K;
+        return y0 + vy * f - (G * (tt - f)) / K;
+      };
+      for (let it = 0; it < 22; it++) {
+        const m = (lo + hi) / 2;
+        if (yAt(m) > 0.015) lo = m;
+        else hi = m;
+      }
+      const tl = hi;
+      if (layer) {
+        SP.t0 = t;
+        SP.x = p.x;
+        SP.y = p.y;
+        SP.z = p.z;
+        SP.vx = vx;
+        SP.vy = vy;
+        SP.vz = vz;
+        SP.life = Math.min(1.4, tl + 0.05);
+        SP.r = _c.r;
+        SP.g = _c.g;
+        SP.b = _c.b;
+        SP.a = 1;
+        SP.drag = K;
+        SP.grav = G;
+        SP.stretch = 0.035;
+        SP.soft = 0.03;
+        SP.size0 = size;
+        SP.size1 = size * 0.8;
+        SP.rot = 0;
+        SP.spin = 0;
+        SP.sel = sel;
+        SP.fps = -1;
+        SP.flags = SP_STREAK;
+        SP.aspect = 0.75;
+        layer.emit(SP);
+      }
+      if (k < drops && r.next() < dropScale + 0.001) {
+        const f = (1 - Math.exp(-K * tl)) / K;
+        this.vfx.decals.emit({
+          x: fx + vx * f,
+          z: fz + vz * f,
+          rot: r.next() * Math.PI * 2,
+          size: r.range(0.06, 0.16) * (1 + size * 10),
+          t0: base + tl,
+          grow: 0.06,
+          cell: r.next() < 0.6 ? 'blood_drips' : (('blood_splat_' + Math.floor(r.next() * 4)) as DecalCell),
+          alpha: r.range(0.7, 0.95),
+          nrm: 0.4,
+          rough: 0.16,
+          blood: 1,
+        });
+      }
+    }
+  }
+
+  /** floor decals from recorded frame data (seek-exact) */
+  private emitDecals(op: Extract<FxOp, { k: 'decal' }>, ctx: SpawnCtx, r: FxRng, t: number, L: FxLayer) {
+    const n = op.n ?? 1;
+    // decal time: sim time of the cause + the layer delay (fight); FX time (lab)
+    const t0 = ctx.t !== undefined && this.rec ? ctx.t + (L.delay ?? 0) : t;
+    const dir = this.hitDir(ctx, _d);
+    const who = op.who ?? 'b';
+    const i = who === 'a' ? (ctx.a ?? -1) : who === 'b' ? (ctx.b ?? -1) : -1;
+    let bx: number, bz: number;
+    if (who === 'event' && ctx.data && ctx.data.x !== undefined) (bx = Number(ctx.data.x)), (bz = Number(ctx.data.z));
+    else if (this.rec && i >= 0) {
+      const f = this.fstate(i, (ctx.t ?? this.simNow) + (L.delay ?? 0) + (op.body ?? 0));
+      (bx = f.x), (bz = f.z);
+    } else {
+      const P = ctx.pos ?? { x: 0, y: 0, z: 0 };
+      (bx = P.x), (bz = P.z);
+      if (!this.rec && who === 'b' && ctx.b === undefined) bx += 0.95; // lab: under the right dummy
+    }
+    const cells = Array.isArray(op.cell) ? op.cell : [op.cell];
+    for (let k = 0; k < n; k++) {
+      const off = op.off ? r.range(op.off[0], op.off[1]) : 0;
+      const side = op.side ? r.range(-op.side, op.side) : 0;
+      const cell = cells[Math.floor(r.next() * cells.length)];
+      const size = r.range(op.size[0], op.size[1]);
+      const rot = op.align === 'hit' ? Math.atan2(dir.z, dir.x) + r.range(-0.35, 0.35) : r.next() * Math.PI * 2;
+      const alpha = op.alpha ? r.range(op.alpha[0], op.alpha[1]) : 0.9;
+      const aspect = op.aspect ? r.range(op.aspect[0], op.aspect[1]) : 1;
+      this.vfx.decals.emit({
+        x: bx + dir.x * off - dir.z * side,
+        z: bz + dir.z * off + dir.x * side,
+        rot,
+        size,
+        t0,
+        grow: op.grow ?? 0.08,
+        cell: DECAL_CELLS.includes(cell) ? cell : 'crack_0',
+        alpha,
+        nrm: op.nrm ?? 0.5,
+        rough: op.rough ?? 0.6,
+        blood: op.blood ? 1 : 0,
+        aspect,
+      });
     }
   }
 
@@ -513,7 +1245,9 @@ export class FxDirector {
   setTime(t: number) {
     this.vfx.clock.seek(t);
     this.firePending();
+    this.fireGhosts();
     this.vfx.render();
+    this.updateBlood();
   }
   stats(): FxStats {
     const c = this.vfx.counts();
@@ -521,10 +1255,16 @@ export class FxDirector {
     return {
       t: +this.vfx.clock.t.toFixed(4),
       particles: { add: c.add, alpha: c.alpha, addCap: c.addCap, alphaCap: c.alphaCap },
+      sprites: c.sprites,
       dist: c.dist,
       rings: c.rings,
       arrows: c.arrows,
       debris: c.debris,
+      decals: c.decals,
+      ribbons: c.ribbons,
+      ghosts: c.ghosts,
+      wounds: [this.blood[0].count, this.blood[1].count],
+      lights: c.lights,
       effects: c.effects,
       pending: this.pending.length,
       spawns: this.vfx.spawns,
@@ -532,15 +1272,24 @@ export class FxDirector {
       quality: fxSettings.quality,
       gore: this.gore,
       cpu: { frameMs: +P.avg.frame.toFixed(4), updateMs: +P.avg.update.toFixed(4), frameMax: +P.max.frame.toFixed(4), updateMax: +P.max.update.toFixed(4) },
+      seek: { ...this.seekStats },
     };
   }
   /** hash of the live effect list (id, spawn time, seed) */
   hash(): string {
     return this.vfx.hash();
   }
-  /** hash of the full live state (every particle's spawn data, rings, debris, light) */
+  /** hash of the full live state (every particle's spawn data, rings, debris, decals, light) */
   stateHash(): string {
     return this.vfx.stateHash();
+  }
+  /** hash of the persistent floor (decals visible now): identical after a play-through and a seek */
+  decalHash(t = this.vfx.decalTime ?? this.vfx.clock.t): string {
+    return this.vfx.decals.hash(t);
+  }
+  /** hash of both fighters' wounds and weapon blood */
+  bloodHash(): string {
+    return `${this.blood[0].hash().toString(16)}:${this.blood[1].hash().toString(16)}`;
   }
   liveEffects() {
     return this.vfx.liveEffects();

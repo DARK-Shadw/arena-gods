@@ -1,74 +1,11 @@
 /**
- * Weapon trails and attack telegraph decals (per FighterView), plus the old
+ * Attack telegraph decals (per FighterView), plus the old
  * `VFX` import path. Particles, rings, debris and the impact light now live in
  * `fx/` (FX director + stateless GPU particles, milestone F0); `VFX` is
  * re-exported from there so existing imports keep working.
- * Trails move into fx/ribbons.ts in F3.
+ * Weapon trails moved to fx/ribbons.ts in F3 (FX owns the ribbon; FighterView exposes trailBase / trailTip / trailOn).
  */
 import * as THREE from 'three';
-
-/** Ribbon trail following two markers (weapon base & tip). */
-export class Trail {
-  mesh: THREE.Mesh;
-  private n = 9;
-  private pts: THREE.Vector3[] = [];
-  private geo: THREE.BufferGeometry;
-  private posArr: Float32Array;
-  private alphaArr: Float32Array;
-  private mat: THREE.ShaderMaterial;
-  intensity = 0;
-
-  constructor(color: THREE.Color) {
-    this.geo = new THREE.BufferGeometry();
-    this.posArr = new Float32Array(this.n * 2 * 3);
-    this.alphaArr = new Float32Array(this.n * 2);
-    const idx: number[] = [];
-    for (let i = 0; i < this.n - 1; i++) {
-      const a = i * 2,
-        b = a + 1,
-        c = a + 2,
-        d = a + 3;
-      idx.push(a, b, c, b, d, c);
-    }
-    this.geo.setIndex(idx);
-    this.geo.setAttribute('position', new THREE.BufferAttribute(this.posArr, 3));
-    this.geo.setAttribute('alpha', new THREE.BufferAttribute(this.alphaArr, 1));
-    this.mat = new THREE.ShaderMaterial({
-      uniforms: { color: { value: color }, intensity: { value: 0 } },
-      vertexShader: `attribute float alpha; varying float vA; void main(){ vA = alpha; gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);} `,
-      fragmentShader: `uniform vec3 color; uniform float intensity; varying float vA; void main(){ gl_FragColor = vec4(color*1.3, vA*intensity*0.75); }`,
-      transparent: true,
-      depthWrite: false,
-      side: THREE.DoubleSide,
-      blending: THREE.AdditiveBlending,
-    });
-    this.mesh = new THREE.Mesh(this.geo, this.mat);
-    this.mesh.frustumCulled = false;
-    for (let i = 0; i < this.n * 2; i++) this.pts.push(new THREE.Vector3());
-  }
-
-  push(base: THREE.Vector3, tip: THREE.Vector3, active: number) {
-    // shift
-    for (let i = this.n - 1; i > 0; i--) {
-      this.pts[i * 2].copy(this.pts[(i - 1) * 2]);
-      this.pts[i * 2 + 1].copy(this.pts[(i - 1) * 2 + 1]);
-    }
-    this.pts[0].copy(base);
-    this.pts[1].copy(tip);
-    for (let i = 0; i < this.n; i++) {
-      const a = 1 - i / (this.n - 1);
-      this.posArr.set([this.pts[i * 2].x, this.pts[i * 2].y, this.pts[i * 2].z], i * 6);
-      this.posArr.set([this.pts[i * 2 + 1].x, this.pts[i * 2 + 1].y, this.pts[i * 2 + 1].z], i * 6 + 3);
-      this.alphaArr[i * 2] = 0;
-      this.alphaArr[i * 2 + 1] = a * a * 0.8;
-    }
-    this.geo.attributes.position.needsUpdate = true;
-    this.geo.attributes.alpha.needsUpdate = true;
-    this.intensity += (active - this.intensity) * 0.35;
-    this.mat.uniforms.intensity.value = this.intensity;
-    this.mesh.visible = this.intensity > 0.01;
-  }
-}
 
 /**
  * Ground decal showing an attack's reach during its windup: a bright rim at

@@ -273,6 +273,24 @@ export class GpuParticles {
     }
   }
 
+  /** order-independent hash of the live particles (sum of per-particle hashes; ring slots differ between runs) */
+  hashLive(t: number): number {
+    let sum = 0;
+    const d = this.data;
+    for (let i = 0; i < this.highWater; i++) {
+      const o = i * STRIDE;
+      const age = t - d[o + 3];
+      if (!(age >= 0 && age < d[o + 7])) continue;
+      let h = 0x811c9dc5 >>> 0;
+      for (let j = 0; j < STRIDE; j++) {
+        h ^= Math.round(d[o + j] * 1e4) | 0;
+        h = Math.imul(h, 16777619) >>> 0;
+      }
+      sum = (sum + h) >>> 0;
+    }
+    return sum;
+  }
+
   dispose() {
     this.geo.dispose();
     this.mat.dispose();

@@ -285,15 +285,20 @@ export class Arena {
     const tex = flameSprite();
     const g = new THREE.Group();
     g.position.copy(at);
-    for (let i = 0; i < 2; i++) {
+    // FX F3: a flipbook flame (Unity Labs) when the FX system provides one; the light and flicker stay here
+    const fx = Arena.fxFlame?.(size, color, this.flames.length);
+    if (fx) g.add(fx);
+    else for (let i = 0; i < 2; i++) {
       const q = new THREE.Mesh(new THREE.PlaneGeometry(size * 0.7, size), glowMat(color, 0.95, tex));
       q.position.y = size * 0.35;
       q.rotation.y = (i * Math.PI) / 2;
       g.add(q);
     }
-    const core = new THREE.Mesh(new THREE.PlaneGeometry(size * 0.35, size * 0.55), glowMat('#fff2c0', 0.9, tex));
-    core.position.y = size * 0.2;
-    g.add(core);
+    if (!fx) {
+      const core = new THREE.Mesh(new THREE.PlaneGeometry(size * 0.35, size * 0.55), glowMat('#fff2c0', 0.9, tex));
+      core.position.y = size * 0.2;
+      g.add(core);
+    }
     const entry: (typeof this.flames)[number] = { obj: g, ph: Math.random() * 10, base: 1 };
     if (light && this.lightBudget > 0) {
       this.lightBudget--;
@@ -308,6 +313,8 @@ export class Arena {
   }
   lightBudget = 7;
   drawCallsMerged = 0;
+  /** FX hook (F3, src/render/fx/flames.ts): builds the flame visual; null / unset = the old crossed quads */
+  static fxFlame?: (size: number, color: string, n: number) => THREE.Object3D | null;
 
   private addHazard(h: HazardDef) {
     const g = new THREE.Group();

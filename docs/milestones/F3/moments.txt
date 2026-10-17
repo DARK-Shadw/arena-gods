@@ -1,0 +1,13 @@
+# F3 fixed fight moments (tools/shots/f3probe.cjs strips). Later milestones re-shoot the same tuples.
+# label            a          b        seed  theme      layout aseed event[:filter]   t0  [cam dist,height,side]
+cut_flesh          gorak      vex      4242  colosseum  oval   7     hit:m=cleave     0
+cut_metal          gorak      aldric   11    forge      oval   2     hit:b=aldric     0
+heavy_hit          gorak      erika    4242  colosseum  oval   7     hit:heavy        3
+block_shield       aldric     gorak    11    forge      oval   2     block:a=aldric   0
+parry              gorak      vex      4242  colosseum  oval   7     parry            0
+dodge              aldric     gorak    11    forge      oval   2     dodge            0
+knockdown          maw        gorak    52    sakura     oval   2     knockdown        2
+kill               gorak      erika    4242  colosseum  oval   7     kill             0    5.0,1.7,1
+claw_fur           vex        fenrik   51    skytemple  oval   2     hit:b=fenrik     2
+blunt_maw          vex        maw      52    sakura     oval   2     hit:a=maw        2
+pumpkin            hollowjack gorak    53    moonlake   oval   2     hit:b=hollowjack 2

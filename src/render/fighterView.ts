@@ -9,7 +9,7 @@ import type { FighterDef, FighterFrame, MoveDef } from '../sim/types';
 import { getFighter } from '../sim/fighters';
 import { AnimController, buildSharedClip, instantiate, loadSharedClips, type AnimCat, type AnimRequest, type CharAsset, type ClipMeta } from './character';
 import { LIFT_DUR, THROW_CLIP, THROW_DUR } from '../sim/world';
-import { Telegraph, Trail } from './vfx';
+import { Telegraph } from './vfx';
 import { buildLibClip } from './animLib';
 
 /** Cutscene / manual animation input. */
@@ -40,7 +40,13 @@ export class FighterView {
   anim: AnimController;
   /** Compatibility handles used by cutscenes / camera. */
   rig: { root: THREE.Group; joints: { haL: THREE.Object3D; haR: THREE.Object3D; head: THREE.Object3D; chest: THREE.Object3D } };
-  trail: Trail;
+  /**
+   * Weapon / limb trail sample of the last update (FX owns the ribbon since F3: fx/ribbons.ts reads
+   * these through the FxWorld `trail` getter): base, tip (world) and whether the trail window is on.
+   */
+  readonly trailBase = new THREE.Vector3();
+  readonly trailTip = new THREE.Vector3();
+  trailOn = false;
   telegraph: Telegraph;
   aura: THREE.Mesh;
   private bones: Record<string, THREE.Object3D> = {};
@@ -108,7 +114,6 @@ export class FighterView {
       .catch(() => {});
     for (const mv of this.def.moves) this.moves[mv.id] = mv;
     const accent = new THREE.Color(this.ap.accent);
-    this.trail = new Trail(accent);
     this.telegraph = new Telegraph(new THREE.Color(this.def.color));
     const c = document.createElement('canvas');
     c.width = c.height = 128;
@@ -127,12 +132,31 @@ export class FighterView {
     this.aura.rotation.x = -Math.PI / 2;
     this.aura.position.y = 0.04;
     this.root.add(this.aura);
-    scene.add(this.root, this.trail.mesh, this.telegraph.mesh);
+    scene.add(this.root, this.telegraph.mesh);
   }
 
   dispose(scene: THREE.Scene) {
-    scene.remove(this.root, this.trail.mesh, this.telegraph.mesh);
+    scene.remove(this.root, this.telegraph.mesh);
     this.anim.mixer.stopAllAction();
+  }
+
+  /** the per-instance character materials (FX wounds / weapon blood patch them) */
+  get materials(): THREE.Material[] {
+    return this.mats;
+  }
+  /** a bone by Mixamo name without the prefix ('Spine2'), for FX anchors */
+  bone(name: string): THREE.Object3D | undefined {
+    return this.bones[name];
+  }
+  /** blade base / tip (world) for fighters with a weapon; false without one */
+  bladeWorld(base: THREE.Vector3, tip: THREE.Vector3): boolean {
+    if (!this.tip || !this.base) return false;
+    this.base.getWorldPosition(base);
+    this.tip.getWorldPosition(tip);
+    return true;
+  }
+  get hasWeapon(): boolean {
+    return !!this.tip;
   }
 
   get position() {
@@ -428,7 +452,9 @@ export class FighterView {
       base = (e.parent ?? e).getWorldPosition(this.tmpA).lerp(tip, 0.45);
       tip.add(this.tmpA.clone().sub(tip).multiplyScalar(-0.25));
     }
-    this.trail.push(base, tip, active ? 1 : 0);
+    this.trailBase.copy(base);
+    this.trailTip.copy(tip);
+    this.trailOn = active;
   }
 
   private applyGlow(aura: boolean) {

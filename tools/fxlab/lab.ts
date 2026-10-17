@@ -36,6 +36,8 @@ import { GORE_DEFAULT, parseGore } from '../../src/render/fx/fxSettings';
 import { instantiate, loadCharacter } from '../../src/render/character';
 import catalogMd from '../../docs/fx-catalog.md?raw';
 import { FxAtlases, flipbookAge, makeFlipbookCard, makeFlipbookMaterial, type AtlasEntry } from './fxAtlas';
+import { FxFlames, TRAIL_PROFILES } from '../../src/render/fx';
+const CLAW_CORE_LAB: [number, number, number] = [2.4, 0.25, 0.3];
 
 const $ = <T extends HTMLElement>(id: string) => document.getElementById(id) as T;
 const qs = new URLSearchParams(location.search);
@@ -101,6 +103,8 @@ let quality = Number(qs.get('q') ?? 2) as 0 | 1 | 2;
 let gore: GoreLevel = parseGore(qs.get('gore')) ?? goreLevel() ?? GORE_DEFAULT;
 const fx: FxDirector = createFxDirector({ scene, seed, quality });
 const atlases = new FxAtlases(renderer, '/fx/');
+// F3: the director's flipbook / sprite particles, decals and ribbons read the same atlases as the game
+fx.vfx.useAtlases(atlases);
 
 // ------------------------------------------------------------------ post (F1): the game's pipeline
 const post = new Post(renderer, scene, camera);
@@ -130,12 +134,34 @@ function applyLook() {
 // ------------------------------------------------------------------ dummies + brazier
 const dummies = new THREE.Group();
 scene.add(dummies);
+/** F3: dummy bones (wounds) and gorak's blade markers (weapon blood); 0 = gorak (left, the attacker), 1 = aldric (right, the victim) */
+const dummyBones: Record<string, THREE.Object3D>[] = [{}, {}];
+const dummyBlade: ({ base: THREE.Object3D; tip: THREE.Object3D } | null)[] = [null, null];
 async function loadDummies() {
-  for (const [fid, x, rot] of [['gorak', -0.95, Math.PI / 2], ['aldric', 0.95, -Math.PI / 2]] as const) {
+  for (const [i, fid, x, rot] of [[0, 'gorak', -0.95, Math.PI / 2], [1, 'aldric', 0.95, -Math.PI / 2]] as const) {
     try {
       const asset = await loadCharacter(fid);
       const model = instantiate(asset);
       model.scale.setScalar(0.01 * asset.meta.scale);
+      const mats: THREE.Material[] = [];
+      model.traverse((o) => {
+        if ((o as THREE.Bone).isBone) dummyBones[i][o.name.replace('mixamorig', '')] = o;
+        const m = o as THREE.Mesh;
+        if (m.isMesh) {
+          m.material = Array.isArray(m.material) ? m.material.map((x) => x.clone()) : (m.material as THREE.Material).clone();
+          for (const x of Array.isArray(m.material) ? m.material : [m.material]) mats.push(x);
+          m.castShadow = true;
+        }
+      });
+      fx.attachBlood(i, mats, model.scale.x);
+      const meta = asset.meta as { weaponTip?: { pos: number[]; base: number[] } };
+      if (meta.weaponTip && dummyBones[i].RightHand) {
+        const tip = new THREE.Object3D(), base = new THREE.Object3D();
+        tip.position.fromArray(meta.weaponTip.pos);
+        base.position.fromArray(meta.weaponTip.base);
+        dummyBones[i].RightHand.add(tip, base);
+        dummyBlade[i] = { base, tip };
+      }
       const root = new THREE.Group();
       root.add(model);
       root.position.set(x, 0, 0);
@@ -151,6 +177,15 @@ async function loadDummies() {
       console.warn('[fxlab] dummy', fid, e);
     }
   }
+  dummies.updateMatrixWorld(true);
+  fx.labBone = (i, name) => dummyBones[i]?.[name];
+  fx.labBlade = (i, b, t) => {
+    const B = dummyBlade[i];
+    if (!B) return false;
+    B.base.getWorldPosition(b);
+    B.tip.getWorldPosition(t);
+    return true;
+  };
 }
 
 const brazier = new THREE.Group();
@@ -327,7 +362,63 @@ function f1Items(): Item[] {
   ];
 }
 
+// ------------------------------------------------------------------ F3 items (everyday combat)
+/** weapon-trail demo: a deterministic swing (pure function of t, so the scrub is exact) */
+let trailDemo: { cls: keyof typeof TRAIL_PROFILES; heavy: boolean } | null = null;
+const _tb = new THREE.Vector3(), _tt = new THREE.Vector3();
+function trailAt(time: number) {
+  const R = fx.vfx.ribbons[0];
+  R.reset();
+  if (!trailDemo) return;
+  const P = TRAIL_PROFILES[trailDemo.cls];
+  R.setProfile(P, trailDemo.cls === 'claw' ? CLAW_CORE_LAB : undefined, seed * 7919, trailDemo.heavy, fxSettings.caps().dist);
+  // the game samples once per rendered frame on sim time; here 60 Hz frames up to t
+  for (let k = 0; k <= Math.floor(time * 60 + 1e-6); k++) {
+    const tt = Math.min(time, k / 60);
+    const u = Math.min(1, Math.max(0, (tt - 0.15) / 0.3));
+    const s = u * u * (3 - 2 * u);
+    const th = -1.9 + 3.6 * s; // a wide diagonal arc in front of the left dummy
+    const cx = -0.55, cy = 1.25, cz = 0.15;
+    const dirx = Math.cos(th), dirz = Math.sin(th);
+    _tb.set(cx + dirx * 0.25, cy + 0.25 - s * 0.45, cz + dirz * 0.25);
+    _tt.set(cx + dirx * 1.15, cy + 0.45 - s * 0.9, cz + dirz * 1.15);
+    R.push(tt, _tb, _tt, tt > 0.12 && tt < 0.5);
+  }
+}
+const flames = new FxFlames(atlases);
+function f3Items(): Item[] {
+  const G = 'F3 everyday combat';
+  const out: Item[] = [];
+  for (const cls of Object.keys(TRAIL_PROFILES) as (keyof typeof TRAIL_PROFILES)[]) {
+    if (cls === 'magic') continue;
+    for (const heavy of [false, true]) {
+      out.push({ key: `f3.trail.${cls}${heavy ? '.heavy' : ''}`, group: G + ' · trails (C04 / C05)', label: `trail: ${cls}${heavy ? ' (heavy: + air distortion)' : ''}`,
+        desc: `Weapon ribbon v2, profile '${cls}' (fx/ribbons.ts TRAIL_PROFILES): sampled on sim time at 120 Hz, so the same length at any frame rate; hot edge, smoky body, streak noise.${heavy ? ' Heavy swings add a distortion ribbon (high tier).' : ''}`,
+        parts: [{ kind: 'fn', id: 'trail', dur: 0.8, run: () => (trailDemo = { cls, heavy }) }], cam: [[-0.4, 1.5, 3.4], [-0.5, 1.1, 0]] });
+    }
+  }
+  const combo = (key: string, label: string, desc: string, ids: [string, number][], cam?: Item['cam']): Item => ({
+    key, group: G, label, desc, cam,
+    parts: [{ kind: 'fn', id: key, dur: Math.max(...ids.map(([id, t0]) => t0 + (fx.timing(id)?.duration ?? 1))) + 0.3, run: () => {
+      for (const [k, [id, t0]] of ids.entries()) fx.spawn(id, { x: 0, y: 1.25, z: 0.2 }, { seed: seed * 31 + k, t: t0, dir: { x: 1, z: 0 } });
+    } }],
+  });
+  out.push(combo('f3.blood.cut', 'blood: a cut (gore level from the side bar)', 'impact.cut.flesh + blood.cut + blood.blade on the right dummy: droplets, strands, spatter, mist, floor splat and drops, a wound, blood on the axe. Toggle gore off / standard / full.', [['impact.cut.flesh', 0], ['blood.cut', 0], ['blood.blade', 0]], [[0.6, 1.4, 2.6], [0.6, 0.9, 0]]));
+  out.push(combo('f3.blood.three', 'blood: three cuts, then the kill', 'Three cuts 0.6 s apart, then blood.kill: wounds accumulate, splats, a pool growing under the body (3 s).', [['blood.cut', 0], ['blood.blade', 0], ['blood.cut', 0.6], ['blood.blade', 0.6], ['blood.cut', 1.2], ['blood.blade', 1.2], ['kill.plain', 1.8], ['blood.kill', 1.8]], [[0.9, 1.9, 3.4], [0.6, 0.6, 0]]));
+  out.push(combo('f3.metal', 'C06a blade on metal (heavy)', 'impact.cut.metal + impact.heavy + shock.heavy: flare, spark streaks with gravity, glints, smoke wisp, light, ground dust ring, chips, crack decal.', [['impact.cut.metal', 0], ['impact.heavy', 0], ['shock.heavy', 0]]));
+  out.push(combo('f3.block', "C07 / C09 block on Aldric's shield", 'block.sparks + block.shield.', [['block.sparks', 0], ['block.shield', 0]]));
+  out.push(combo('f3.parry', 'C08 parry', 'parry.flash: anamorphic flare, spark cone, ring distortion, cool light.', [['parry.flash', 0]]));
+  out.push(combo('f3.knockdown', 'C03 knockdown / landing', 'knockdown.dust then launch.land 1.2 s later.', [['knockdown.dust', 0], ['launch.land', 1.2]], [[0, 1.6, 4.6], [0, 0.4, 0]]));
+  out.push(combo('f3.steps', 'C01 / C02 footsteps by surface', 'step.dust, step.snow, step.wet, step.water 0.3 s apart.', [['step.dust', 0], ['step.snow', 0.3], ['step.wet', 0.6], ['step.water', 0.9]], [[0, 1.0, 2.6], [0, 0.2, 0]]));
+  out.push(combo('f3.dodge', 'C10 dodge dust (afterimages: in game)', "dodge.dust: skid puffs. The ghost layer copies a fighter's pose and only shows in the game.", [['dodge.dust', 0], ['dodge.skid', 0.08], ['dodge.skid', 0.16]], [[0, 1.0, 2.8], [0, 0.3, 0]]));
+  out.push(combo('f3.pumpkin', 'C06d hit on Hollowjack', 'impact.any.pumpkin: pulp chunks, seeds, pulp spatter (never blood).', [['impact.any.pumpkin', 0]]));
+  out.push({ key: 'f3.flame', group: G, label: 'E01 (part): arena flipbook flame', desc: 'The flame the arena now builds (fx/flames.ts: Unity Flame02, looped with a per-flame phase) beside the F2 reference brazier.', cam: BRAZIER_CAM,
+    parts: [{ kind: 'brazier' }, { kind: 'fn', id: 'flame', dur: 4, run: () => { const f = flames.make(0.9, '#ff9a40', seed); f.position.set(-1.2, 1.0, -0.6); live.add(f); } }] });
+  return out;
+}
+
 function buildItems() {
+  items.push(...f3Items());
   items.push(...f1Items());
   const defIds = new Set(fx.list());
   for (const id of fx.list()) {
@@ -379,6 +470,7 @@ async function play(key: string, o: { seed?: number; q?: 0 | 1 | 2; gore?: GoreL
   if (o.q !== undefined) setQuality(o.q);
   if (o.gore) setGore(o.gore);
   current = it;
+  trailDemo = null;
   for (const c of [...live.children]) live.remove(c);
   cards.length = 0;
   fx.reset(seed, 0);
@@ -412,6 +504,8 @@ async function play(key: string, o: { seed?: number; q?: 0 | 1 | 2; gore?: GoreL
 
 function at(time: number) {
   t = Math.max(0, time);
+  trailAt(t);
+  flames.time.value = t;
   fx.setTime(t);
   for (const c of cards) (c.mesh.material as THREE.ShaderMaterial).uniforms.uAge.value = flipbookAge(c.e, t);
   for (const b of brazierParts) (b.mesh.material as THREE.ShaderMaterial).uniforms.uAge.value = flipbookAge(b.e, t + b.phase * 2);

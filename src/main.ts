@@ -18,7 +18,7 @@ import { buildReveal } from './cinematic/reveal';
 import { FighterView } from './render/fighterView';
 import { loadCharacter } from './render/character';
 import type { VFX } from './render/vfx';
-import { FxDirector, fxProfiler, fxSettings, type FxWorld } from './render/fx';
+import { FxAtlases, FxDirector, FxFlames, THEME_FLOOR, fxKeyLight, fxProfiler, fxSettings, type FloorSurface, type FxWorld } from './render/fx';
 import { Post } from './render/post';
 import { Playback } from './render/playback';
 import { CameraRig } from './camera/cameraRig';
@@ -55,6 +55,9 @@ class App {
   /** FX director (event-driven effects, seeded, on the FX clock); `vfx` is its legacy facade */
   fx = new FxDirector();
   vfx: VFX = this.fx.vfx;
+  /** F3: FX atlases (public/fx, tier-aware, loaded once per session) and the arena's flipbook flames */
+  atlases!: FxAtlases;
+  flames!: FxFlames;
   finFx!: FinisherFx;
   warp?: ContactWarp;
   /** headless audits: skip the GPU render */
@@ -120,11 +123,16 @@ class App {
     this.scene.add(this.vfx.group);
     fxProfiler.now = () => performance.now();
     fxSettings.setQuality(this.quality);
+    this.atlases = new FxAtlases(this.renderer);
+    this.vfx.useAtlases(this.atlases);
+    this.flames = new FxFlames(this.atlases);
+    this.flames.setQuality(this.quality);
+    Arena.fxFlame = (size, color, n) => this.flames.make(size, color, n);
     this.finFx = new FinisherFx(this.scene, this.vfx);
     this.scene.add(this.keyLight, this.keyLight.target, this.rimLight, this.rimLight.target);
     this.post = new Post(this.renderer, this.scene, this.camera);
     this.post.quality = this.quality;
-    this.post.distActive = () => this.vfx.dist.active;
+    this.post.distActive = () => this.vfx.distActive;
     this.ui = new UI(document.getElementById('ui')!);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enabled = false;
@@ -180,6 +188,7 @@ class App {
     }
     const t0 = performance.now();
     if (this.arena) this.arena.dispose();
+    this.flames.reset();
     this.arenaSpec = { ...spec };
     this.arena = new Arena(this.scene, this.renderer, generateArena(spec), this.quality);
     const T = THEME_DEFS[spec.theme];
@@ -416,6 +425,7 @@ class App {
         this.quality = (this.quality + 2) % 3;
         this.post.quality = this.quality;
         fxSettings.setQuality(this.quality);
+        this.flames.setQuality(this.quality);
         this.renderer.setPixelRatio(Math.min(this.quality >= 2 ? 2 : this.quality === 1 ? 1.5 : 1, window.devicePixelRatio));
         this.resize();
         const spec = this.arenaSpec;
@@ -493,6 +503,7 @@ class App {
     this.quality = q;
     this.post.quality = q;
     fxSettings.setQuality(q);
+    this.flames.setQuality(q);
     this.renderer.setPixelRatio(Math.min(q >= 2 ? 2 : q === 1 ? 1.5 : 1, window.devicePixelRatio));
     this.renderer.shadowMap.type = q >= 1 ? THREE.PCFSoftShadowMap : THREE.PCFShadowMap;
     const sm = q >= 1 ? 2048 : 1024;
@@ -568,6 +579,10 @@ class App {
     }
     // the impact light runs on real dt (keeps fading while the action is frozen / slowed, else it blooms the frame white)
     this.fx.update(fxDt, realDt);
+    // F3: flipbook flames burn on the real-time FX light clock; lit flipbooks (dust, smoke) follow the cinematic key light
+    this.flames.time.value = this.vfx.clock.light;
+    fxKeyLight.dir.copy(this.keyLight.position).sub(this.keyLight.target.position).normalize();
+    fxKeyLight.color.copy(this.keyLight.color).multiplyScalar(0.9);
     {
       const pp = this.fx.takePost();
       this.aberration = Math.max(this.aberration, pp.aberration);
@@ -803,6 +818,26 @@ class App {
       hazard: (i) => L().hazards[i],
       ring: () => ({ rx: L().rx, rz: L().rz }),
       isFinisher: (m) => !!FIN_BY_ID[m],
+      // F3
+      effector: (i, m) => this.views[i].anim.meta.clips[m]?.eff,
+      hasWeapon: (i) => this.views[i].hasWeapon,
+      height: (i) => this.views[i].height,
+      floorAt: (x, z): FloorSurface => {
+        for (const h of L().hazards) if (h.kind === 'water' && (x - h.x) ** 2 + (z - h.z) ** 2 < h.r * h.r) return 'water';
+        return THEME_FLOOR[L().theme] ?? 'stone';
+      },
+      trail: (i, base, tip) => {
+        const v = this.views[i];
+        base.copy(v.trailBase);
+        tip.copy(v.trailTip);
+        return v.trailOn;
+      },
+      blade: (i, base, tip) => this.views[i].bladeWorld(base, tip),
+      bone: (i, name) => this.views[i].bone(name),
+      fighter: (i) => {
+        const v = this.views[i];
+        return { model: v.model, materials: v.materials, objScale: v.model.scale.x };
+      },
     };
   }
 
@@ -1015,8 +1050,10 @@ class App {
     this.arena.resetProps();
     for (const e of this.rec.events) if (e.type === 'topple') this.arena.toppleDir.set(Number(e.data?.obs), { dx: Number(e.data?.dx), dz: Number(e.data?.dz) });
     this.playback.seek(Math.max(0, t - 1.5));
-    // FX: clear + reseed at the warm-up start; the warm-up below re-spawns the window's effects with their original seeds
+    // FX (F3): full replay to the warm-up start (decals, wounds, weapon blood from every earlier event;
+    // the effects of the last few seconds on recorded frames); the warm-up below continues live
     this.fx.seek(this.playback.t);
+    this.replayArenaDecals(this.playback.t);
     this.finFx.clear();
     for (const e of this.projMeshes.values()) this.scene.remove(e.mesh);
     this.projMeshes.clear();
@@ -1024,9 +1061,59 @@ class App {
     // warm up the views/director for 1.5s of sim at fixed steps
     this.stepFrames(90, 1 / 60);
   }
+  /**
+   * F3 seek: repaint the arena's own canvas decals (cracks, scorch from Arena.onEvent) for the events
+   * before t, at recorded positions; the arena's debris and shake are not replayed (they are momentary).
+   */
+  private replayArenaDecals(t: number) {
+    const D = this.arena.decals;
+    const L = this.arena.layout;
+    const pf = this.playback;
+    for (const e of this.rec.events) {
+      if (e.t > t) break;
+      const d = e.data ?? {};
+      const fp = (i: number) => pf.frameAt(e.t).f[Math.max(0, i)];
+      switch (e.type) {
+        case 'topple_impact': {
+          const o = L.obstacles[Number(d.obs)];
+          const dir = this.arena.toppleDir.get(Number(d.obs)) ?? { dx: 1, dz: 0 };
+          if (o) D.crack(o.x + dir.dx * o.h * 0.6, o.z + dir.dz * o.h * 0.6, 2.2, 9, 0.6);
+          break;
+        }
+        case 'prop_break':
+          if (d.kind === 'brazier' || d.kind === 'lantern') D.scorch(Number(d.x ?? 0), Number(d.z ?? 0), 0.9);
+          break;
+        case 'explosion':
+          D.scorch(Number(d.x), Number(d.z), 2.4);
+          break;
+        case 'chandelier_impact':
+          D.crack(Number(d.x), Number(d.z), 1.8, 8);
+          break;
+        case 'hazard_hit': {
+          const h = L.hazards[Number(d.haz)];
+          if (h?.kind === 'lava' || h?.kind === 'firepit') D.scorch(fp(e.b ?? 0).x, fp(e.b ?? 0).z, 0.6);
+          break;
+        }
+        case 'wall_slam':
+        case 'pillar_slam':
+          D.crack(fp(e.a).x, fp(e.a).z, 1.0, 5, 0.45);
+          break;
+        case 'knockdown':
+          D.crack(fp(e.a).x, fp(e.a).z, 0.8, 4, 0.3);
+          break;
+      }
+    }
+  }
   /** FX counters: live particles per layer, rings, debris, effects, CPU ms (see docs/fx-api.md). */
   fxStats() {
     return this.fx.stats();
+  }
+  /** F3: hash of the FX floor decals / of both fighters' wounds + weapon blood (seek reproducibility) */
+  fxDecalHash(t?: number) {
+    return this.fx.decalHash(t);
+  }
+  fxBloodHash() {
+    return this.fx.bloodHash();
   }
   /** Hash of the live effect list (id, spawn time, seed): same seed + time => same hash. */
   fxHash() {

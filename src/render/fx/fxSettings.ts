@@ -53,10 +53,35 @@ export function setGoreLevel(g: GoreLevel) {
  * F1: `soft` = soft-particle depth fade (needs Post's linear-depth copy), `dist` = distortion
  * sprites (0 off, 1 heavy events only = ops with tier <= 1, 2 all). Post reads the same table.
  */
-export const TIER_CAPS: Record<FxQuality, { add: number; alpha: number; rings: number; debris: number; countScale: number; soft: boolean; dist: 0 | 1 | 2 }> = {
-  0: { add: 1500, alpha: 800, rings: 12, debris: 48, countScale: 1, soft: false, dist: 0 },
-  1: { add: 3000, alpha: 1500, rings: 20, debris: 96, countScale: 1, soft: true, dist: 1 },
-  2: { add: 4096, alpha: 2048, rings: 24, debris: 128, countScale: 1, soft: true, dist: 2 },
+export interface TierCaps {
+  add: number;
+  alpha: number;
+  rings: number;
+  debris: number;
+  /** legacy (F0) primitive count scale: 1 everywhere (F0 visuals unchanged) */
+  countScale: number;
+  soft: boolean;
+  dist: 0 | 1 | 2;
+  /** F3: mask-sprite ring (sparks, blood, mist) and per-flipbook-atlas ring (dust, smoke) */
+  sprites: number;
+  flipbooks: number;
+  /** F3: count scale of the new sprite / flipbook ops (catalog: low = 50 %) */
+  spriteScale: number;
+  /** F3: persistent floor decals (plan 2.6) */
+  decals: number;
+  /** F3: FX light pool slots (plan 2.5) */
+  lights: number;
+  /** F3: afterimage ghosts per fighter */
+  ghosts: number;
+  /** F3: wound spheres per fighter */
+  wounds: number;
+  /** F3: footstep dust / splashes (0 off, 1 on) */
+  steps: 0 | 1;
+}
+export const TIER_CAPS: Record<FxQuality, TierCaps> = {
+  0: { add: 1500, alpha: 800, rings: 12, debris: 48, countScale: 1, soft: false, dist: 0, sprites: 1024, flipbooks: 40, spriteScale: 0.5, decals: 64, lights: 1, ghosts: 0, wounds: 4, steps: 0 },
+  1: { add: 3000, alpha: 1500, rings: 20, debris: 96, countScale: 1, soft: true, dist: 1, sprites: 2048, flipbooks: 96, spriteScale: 0.75, decals: 128, lights: 2, ghosts: 1, wounds: 6, steps: 1 },
+  2: { add: 4096, alpha: 2048, rings: 24, debris: 128, countScale: 1, soft: true, dist: 2, sprites: 3072, flipbooks: 160, spriteScale: 1, decals: 256, lights: 3, ghosts: 3, wounds: 8, steps: 1 },
 };
 
 type Listener = (s: typeof fxSettings) => void;

@@ -14,4 +14,14 @@ export { softDepthUniforms, SOFT_DEPTH_PARS, SOFTNESS } from './softDepth';
 export { DistortionSprites } from './distortion';
 export { THEME_LOOK, GRADE_PRESETS, type GradeDelta, type ThemeLook } from './fxLook';
 export { HDR_SCALE } from './fxDefs';
-export { type FxPostKicks } from './fxDirector';
+export { type FxPostKicks, REPLAY_TAIL } from './fxDirector';
+// F3
+export { FxAtlases, flipbookAge, makeFlipbookCard, makeFlipbookMaterial, SPRITES, DECAL_CELLS, type AtlasEntry, type AtlasManifest, type SpriteName, type DecalCell } from './atlas';
+export { SpriteLayer, fxKeyLight } from './sprites';
+export { FloorDecals } from './decals';
+export { FxLights } from './lights';
+export { Ribbon, TRAIL_PROFILES, type TrailProfile } from './ribbons';
+export { FighterBlood, injectBlood } from './wounds';
+export { Afterimages } from './afterimage';
+export { FxFlames } from './flames';
+export { BODY, WEAPON, WEAPON_HAND, HEIGHT, THEME_FLOOR, FLOOR_DUST, weaponClassOf, type WeaponClass, type Surface, type FloorSurface } from './fxSurfaces';

@@ -65,7 +65,11 @@ function patchMaterial(m: THREE.MeshStandardMaterial): FxUniforms {
     uDrain: { value: 0 },
   };
   FXU.set(m, U);
-  m.onBeforeCompile = (sh) => {
+  // FX F3: keep a patch already on the material (combat wounds / weapon blood, fx/wounds.ts): one program
+  const prev = Object.prototype.hasOwnProperty.call(m, 'onBeforeCompile') ? m.onBeforeCompile : null;
+  const prevKey = prev ? String(m.userData.fxKey ?? 'prev') : '';
+  m.onBeforeCompile = (sh, r) => {
+    prev?.call(m, sh, r);
     Object.assign(sh.uniforms, U);
     sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vFxPos;').replace('#include <begin_vertex>', '#include <begin_vertex>\nvFxPos = position;');
     sh.fragmentShader = sh.fragmentShader
@@ -110,7 +114,7 @@ float fxNoise(vec3 x){ vec3 i=floor(x); vec3 f=fract(x); f=f*f*(3.0-2.0*f);
 }`,
       );
   };
-  m.customProgramCacheKey = () => 'finfx';
+  m.customProgramCacheKey = () => 'finfx' + prevKey;
   m.needsUpdate = true;
   return U;
 }
