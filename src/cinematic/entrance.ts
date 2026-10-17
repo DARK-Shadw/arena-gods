@@ -120,7 +120,8 @@ function snapAnchors(arena: CineCtx['arena'], gate: number) {
     let ok: V3 | null = null;
     for (let x = Math.abs(W.pos[0]); x <= 7.5 && !ok; x += 0.4) {
       const path = [-2.2, -1.4, -0.7, 0, 0.7, 1.4, 2.2].map((dz) => [side * x, 0, W.pos[2] + dz] as V3);
-      if (path.every((q) => clear([q[0], 1.2, q[2]], 1.2))) ok = [side * x, W.pos[1], W.pos[2]];
+      // head room all along the vault, and real ground where the run-up starts and where it lands
+      if (path.every((q) => clear([q[0], 1.2, q[2]], 1.2)) && snap([side * x, 0, W.pos[2] - 1.0], 0.5) && snap([side * x, 0, W.pos[2] - 2.0], 0.5) && snap([side * x, 0, W.pos[2] + 1.6], 0.5)) ok = [side * x, W.pos[1], W.pos[2]];
     }
     A.lowWall = ok ? { ...W, pos: ok } : undefined;
   }
@@ -359,6 +360,29 @@ function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: Fighte
   });
 
   // ---- camera
+  const losPick = new Map<CamPose, number>();
+  let solids: THREE.Mesh[] | null = null;
+  const losRay = new THREE.Raycaster();
+  const losClear = (from: THREE.Vector3, to: THREE.Vector3) => {
+    if (!solids) {
+      solids = [];
+      const ex = new Set<THREE.Object3D>();
+      gateObj.portcullis.traverse((o) => ex.add(o));
+      ctx.arena.group.updateMatrixWorld(true);
+      ctx.arena.group.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh || ex.has(o) || (m as unknown as THREE.InstancedMesh).isInstancedMesh || o === ctx.arena.sky || o.userData.dyn) return;
+        const mat = (Array.isArray(m.material) ? m.material[0] : m.material) as THREE.Material;
+        if (mat.transparent && mat.side !== THREE.BackSide) return;
+        solids!.push(m);
+      });
+    }
+    const d = to.clone().sub(from);
+    const dist = d.length();
+    losRay.set(from, d.normalize());
+    losRay.far = Math.max(0.01, dist - 0.3);
+    return losRay.intersectObjects(solids, false).length === 0;
+  };
   const resolve = (cp: CamPose, outPos: THREE.Vector3, outLook: THREE.Vector3) => {
     // low cameras inside the arena step out of cover / props / hazard rims
     G.w(cp.pos[1] < 2.5 && cp.pos[2] > 0.3 ? pushOut(cp.pos, 0.35) : cp.pos, outPos);
@@ -388,6 +412,38 @@ function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: Fighte
       resolve(shot.to, p1, l1);
       p0.lerp(p1, e);
       l0.lerp(l1, e);
+      // real line of sight on the INTERPOLATED camera against the built geometry (decor the layout data
+      // does not know: props, brazier stands, lanterns, rubble). The chosen fallback sticks for the shot.
+      if (shot.from.pos[2] > 0.3 || shot.to.pos[2] > 0.3) {
+        const target = view.chestWorld(new THREE.Vector3());
+        const tryAt = (i: number) => {
+          const c = p0.clone();
+          if (i === 1) c.y += 1.2;
+          else if (i === 2) c.lerp(target, 0.35);
+          else if (i === 3) c.y += 2.4;
+          else if (i === 4) c.lerp(target, 0.55).setY(c.y + 0.8);
+          else if (i === 5 || i === 6) {
+            // onto the gate's axis (looking straight down the tunnel), same depth
+            const dep = (c.x - G.o.x) * G.f.x + (c.z - G.o.z) * G.f.z;
+            c.x = G.o.x + G.f.x * dep;
+            c.z = G.o.z + G.f.z * dep;
+            if (i === 6) c.y = Math.max(c.y, 1.6);
+          }
+          return c;
+        };
+        let pick = losPick.get(shot.from) ?? 0;
+        if (!losClear(tryAt(pick), target)) {
+          for (let i = 0; i < 7; i++)
+            if (losClear(tryAt(i), target)) {
+              pick = i;
+              break;
+            }
+          losPick.set(shot.from, pick);
+        }
+        p0.copy(tryAt(pick));
+        // a moved camera re-aims toward the actor so a fixed look point cannot leave them out of frame
+        if (pick !== 0) l0.lerp(target, 0.6);
+      }
       const fov = shot.from.fov + (shot.to.fov - shot.from.fov) * e;
       ctx.rig.cut(p0, l0, fov);
       ctx.rig.update(p0, l0, fov, dt);

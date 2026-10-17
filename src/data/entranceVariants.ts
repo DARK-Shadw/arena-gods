@@ -159,7 +159,7 @@ const vexPerch: EntranceVariant = {
       // takeoff off the real edge (root curve from the clip, still on the perch)
       { dur: 0.3, state: 'clip', clip: takeoff, from: 0.95, rate: 1, move: { type: 'root' }, air: true, cues: [{ at: 0.05, sfx: 'whoosh' }] },
       // the fall (as long as the real drop needs)
-      { dur: fallT, state: 'airborne', move: { type: 'lerp', to: [top[0], 0, top[2] + 0.8], ease: 'in' }, air: true },
+      { dur: fallT, state: 'airborne', move: { type: 'lerp', to: [top[0], 0, Math.max(top[2] + 0.8, 0.7)], ease: 'in' }, air: true },
       // landing: the clip's own landing, impact cue on the measured foot contact
       {
         dur: 2.45 - 1.48,
@@ -178,7 +178,7 @@ const vexPerch: EntranceVariant = {
     const cam: CamShot[] = [
       // the perch, with the structure it stands on, from inside the arena
       shot(0, T[1], [[cx, 1.0, top[2] + 8.2], [top[0], top[1] + 0.6, top[2]], 38], [[cx * 0.8, 1.1, top[2] + 7.0], [top[0], top[1] + 0.7, top[2]], 32]),
-      shot(T[1], T[3] - T[1], [[top[0] + 4.0, 1.6, top[2] + 5.8], 'actor', 52], [[top[0] + 3.6, 1.0, top[2] + 5.4], 'actor', 50]),
+      shot(T[1], T[3] - T[1], [[top[0] * 0.4, 2.6, top[2] + 7.5], 'actor', 52], [[top[0] * 0.4, 1.4, top[2] + 6.5], 'actor', 50]),
       shot(T[3], T[4] - T[3], [[top[0] + 1.5, 0.4, top[2] + 3.6], 'actor', 40], [[top[0] + 1.2, 0.35, top[2] + 3.2], 'actor', 34]),
       shot(T[4], T[5] - T[4], [[-3.0, 1.2, 9.4], 'actor', 45], [[-2.6, 1.0, 10.2], 'actor', 44]),
       shot(T[5], T[6] - T[5], [[0.9, 1.15, 9.6], 'head', 34], [[1.4, 1.0, 10.2], 'head', 38]),

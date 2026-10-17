@@ -499,7 +499,9 @@ export class Arena {
   // ------------------------------------------------------------------ runtime
   /** shared shadow/occlusion data for the camera: standing obstacles */
   standing(): { x: number; z: number; r: number; h: number }[] {
-    return this.obstacles.filter((o) => !o.fallen).map((o) => ({ x: o.def.x, z: o.def.z, r: o.def.r, h: o.def.h }));
+    // visual radius for the camera: plinths, statues, crystal clusters and lantern roofs stick out past the sim radius
+    const k = (kind: string) => (kind === 'statue' || kind === 'crystal' || kind === 'obelisk' ? 1.55 : kind === 'lantern_post' ? 1.4 : 1.2);
+    return this.obstacles.filter((o) => !o.fallen).map((o) => ({ x: o.def.x, z: o.def.z, r: o.def.r * k(o.def.kind), h: o.def.h }));
   }
   /** chandeliers still hanging (for camera avoidance) */
   hangingNow(): { x: number; y: number; z: number; r: number }[] {

@@ -761,3 +761,36 @@ Total: about 35–45 agent-days for everything. M0–M4 (about 17–21 d) delive
   - `Great_Sword_Slash_*` variants for a second greatsword user
   - `Sword_And_Shield_Death_2` / `Impact` variants
   - The remaining gaps are listed at the end of `docs/animation-catalog.md`.
+
+---
+
+## K. As built: deviations from this plan (M0 to M4, 2026-10)
+
+These are the places where implementation differs from the plan above, and why.
+
+- **M0: no converter v2.** The fighter GLBs were left as they were. Instead, a **shared animation library** holds the extra clips: `tools/anim/build-lib.ts` builds `public/anim/{core,entrance,finisher}.bin` and `index.json`, and the clips are retargeted at runtime by `src/render/animLib.ts`.
+  - Root motion is kept as a separate smoothed root curve. Hips sway stays on the hips.
+  - Mirrored clips are generated in model space and checked with forward kinematics: worst error 0.009 cm.
+  - The sim's timing table (`src/sim/anim.gen.ts`) is generated from the same data.
+- **M1: animation pipeline.** Inertialization, spring flinch and phase-matched locomotion were built as planned. Also added:
+  - a locomotion **sync group**, so blended cycles keep their feet in step
+  - **two-bone foot locking**, originally planned for M9
+- **M2: launches.** The plan did not have launches; the user asked for them. The sim owns a ballistic arc, the launch clip is warped onto it, and light spring flailing is cosmetic only.
+- **M3: entrances.** Stage anchors are declared by each theme's gate builder, then **snapped onto the built geometry with head-room checks** (`snapAnchors`). Any anchor that does not land on a real surface with room above it is dropped.
+  - All 8 entrances are beat specs.
+  - The headless validator also checks causality: a barrier event must happen with the hand, weapon or body at the barrier.
+- **M4: finishers.**
+  - Paired-clip alignment comes from `tools/anim/scenes.ts`. Mixamo re-centred most pairs, so alignment is solved from a contact spec.
+  - **Rock'n Shackle was cut.** Its clip never touches the victim's torso (closest approach 0.115 hips). **Immolation** (Ozrel's spell finisher, burn effect) replaced it.
+  - **Into the Fire** reuses the launch system: a killing knockdown launches the victim into a hazard. It is rare, about 1% of kills.
+  - **Executions on a downed victim are Gorak and Maw only.** Aldric's two-handed plunge and Hollowjack's two-fisted slam stopped 0.14 to 0.16 m short of a lying body on our rigs, so they were cut. Those fighters use Curb Stomp instead.
+  - **Contact warp** (render only, not in the plan): around each contact frame the moving role's root is warped (at most 0.7 m) and the striking limb reaches the rest of the way with two-bone IK. Paired clips were authored on other bodies, so without this hands miss by 0.2 to 0.7 m. Contacts happen only on frames where `scenes.ts` measured the effector touching the body.
+  - **Beheading** is clean on 5 of 8 rigs: Gorak, Aldric, Vex, Fenrik and Hollowjack. Ozrel's and Erika's hoods are weighted to the spine, and Maw's head is fused to his shoulders, so on those three a beheading falls back to the blade cut.
+  - Gore defaults to **off**, which plays dissolve and flash versions.
+- **Camera (M3/M4).**
+  - Shot scoring before every cut: framing, cover, the other fighter blocking the view, size.
+  - Contact-aware re-picks when a blow would land off camera.
+  - The camera rig refuses positions where the two fighters line up one behind the other.
+  - New shots: launch follow, finisher track, cut-in.
+  - A headless readability audit: `src/camera/cameraAudit.ts`.
+  - Debug: `?t=` jumps to a time, and the B key copies a reproduction URL.
