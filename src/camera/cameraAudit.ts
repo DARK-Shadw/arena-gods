@@ -182,3 +182,50 @@ export function auditMatch(app: CamAuditApp, key: string, fps = 30): CamMatchSco
   score.cutsPerMin = +((cuts / Math.max(1, score.frames / fps)) * 60).toFixed(1);
   return score;
 }
+
+/**
+ * Fast line-of-sight proxies for the live director: huge ground/backdrop meshes are dropped (they cannot sit
+ * between a camera above the floor and a fighter), and big merged static meshes (walls, stands) are split
+ * into 4 m world-space tiles so the ray's bounding-sphere test culls most triangles.
+ */
+export function rayProxies(meshes: THREE.Mesh[]): THREE.Mesh[] {
+  const out: THREE.Mesh[] = [];
+  const box = new THREE.Box3();
+  const size = new THREE.Vector3();
+  const v = new THREE.Vector3();
+  const mat = new THREE.MeshBasicMaterial({ side: THREE.DoubleSide });
+  for (const m of meshes) {
+    box.setFromObject(m).getSize(size);
+    if (Math.max(size.x, size.z) > 200) continue;
+    const g = m.geometry as THREE.BufferGeometry;
+    const tris = (g.index ? g.index.count : g.attributes.position.count) / 3;
+    if (tris < 1500) {
+      out.push(m);
+      continue;
+    }
+    const pos = g.attributes.position;
+    const idx = g.index;
+    const cells = new Map<string, number[]>();
+    const tri = [new THREE.Vector3(), new THREE.Vector3(), new THREE.Vector3()];
+    for (let t = 0; t < tris; t++) {
+      for (let k = 0; k < 3; k++) {
+        const i = idx ? idx.getX(t * 3 + k) : t * 3 + k;
+        tri[k].fromBufferAttribute(pos, i).applyMatrix4(m.matrixWorld);
+      }
+      v.copy(tri[0]).add(tri[1]).add(tri[2]).multiplyScalar(1 / 3);
+      const key = Math.floor(v.x / 4) + ',' + Math.floor(v.y / 4) + ',' + Math.floor(v.z / 4);
+      let arr = cells.get(key);
+      if (!arr) cells.set(key, (arr = []));
+      for (const p of tri) arr.push(p.x, p.y, p.z);
+    }
+    for (const arr of cells.values()) {
+      const cg = new THREE.BufferGeometry();
+      cg.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
+      cg.computeBoundingSphere();
+      const cm = new THREE.Mesh(cg, mat);
+      cm.updateMatrixWorld(true);
+      out.push(cm);
+    }
+  }
+  return out;
+}

@@ -13,7 +13,7 @@ import type { FighterDef, Frame, MatchRecord, MoveDef, SimEvent } from './sim/ty
 import { Arena } from './render/arena/arenaView';
 import { THEME_DEFS } from './render/arena/themes';
 import { camWorld } from './camera/cameraRig';
-import { solids as camSolids } from './camera/cameraAudit';
+import { solids as camSolids, rayProxies } from './camera/cameraAudit';
 import { buildReveal } from './cinematic/reveal';
 import { FighterView } from './render/fighterView';
 import { loadCharacter } from './render/character';
@@ -186,7 +186,7 @@ class App {
     camWorld.wallH = L.wallH;
     {
       this.arena.group.updateMatrixWorld(true);
-      const S = camSolids(this.arena.group, this.arena.sky);
+      const S = rayProxies(camSolids(this.arena.group, this.arena.sky));
       const ray = new THREE.Raycaster();
       const d = new THREE.Vector3();
       camWorld.occluded = (from, to) => {
