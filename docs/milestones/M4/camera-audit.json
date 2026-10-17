@@ -1,0 +1,178 @@
+{
+ "readable": 94.2,
+ "contact": 94.7,
+ "cutsPerMin": 24.2,
+ "shortShots": 17,
+ "per": [
+  "gorak-aldric#4242 colosseum/pit#7 93.6% c100% cuts21.2",
+  "maw-vex#404 colosseum/pit#7 96.2% c97% cuts22.6",
+  "erika-fenrik#101 forge/cross#11 89.9% c94% cuts23.4",
+  "ozrel-hollowjack#202 skytemple/oval#5 97.7% c97% cuts32.1",
+  "vex-gorak#303 sakura/gauntlet#9 90.8% c86% cuts27",
+  "aldric-maw#505 glacier/split#13 98.9% c100% cuts20.6",
+  "fenrik-erika#606 moonlake/pit#3 93.6% c95% cuts20.3",
+  "hollowjack-ozrel#707 desert/cross#21 92.7% c87% cuts26.4"
+ ],
+ "bad": [
+  "gorak-aldric#4242:two_shot_low 23/542",
+  "gorak-aldric#4242:hero_0 39/154",
+  "gorak-aldric#4242:react_0 43/51",
+  "gorak-aldric#4242:finisher 26/147",
+  "maw-vex#404:wide 25/68",
+  "maw-vex#404:ots_0 40/249",
+  "erika-fenrik#101:establish 26/71",
+  "erika-fenrik#101:crane_0 68/110",
+  "erika-fenrik#101:ots_0 96/356",
+  "vex-gorak#303:ots_1 84/464",
+  "vex-gorak#303:two_shot 26/382",
+  "vex-gorak#303:hero_0 21/66",
+  "fenrik-erika#606:ots_0 86/708",
+  "fenrik-erika#606:ots_1 46/403",
+  "hollowjack-ozrel#707:ots_0 21/398",
+  "hollowjack-ozrel#707:two_shot 50/610",
+  "hollowjack-ozrel#707:two_shot_low 22/491",
+  "hollowjack-ozrel#707:ots_1 36/354"
+ ],
+ "worst": [
+  [
+   {
+    "t": 50.3,
+    "why": "f0 hidden by fighter",
+    "shot": "react_0"
+   },
+   {
+    "t": 56.18,
+    "why": "f0 hidden by arena:BufferGeometry@-8.2,0.7,1.1",
+    "shot": "hero_0"
+   },
+   {
+    "t": 74.03,
+    "why": "f0 hidden by arena:BufferGeometry@-7.9,0.5,-0.6",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 81.4,
+    "why": "f1 hidden by arena:BufferGeometry@-4.3,0.4,2.0",
+    "shot": "finisher"
+   }
+  ],
+  [
+   {
+    "t": 1.6,
+    "why": "contact (hit) not visible",
+    "shot": "crane_0"
+   },
+   {
+    "t": 42.3,
+    "why": "f1 out of frame",
+    "shot": "hero_0"
+   },
+   {
+    "t": 53.37,
+    "why": "f1 hidden by fighter, fighters tiny",
+    "shot": "ots_0"
+   }
+  ],
+  [
+   {
+    "t": 10.94,
+    "why": "fighters tiny",
+    "shot": "crane_0"
+   },
+   {
+    "t": 12.27,
+    "why": "fighters tiny",
+    "shot": "crane_0"
+   },
+   {
+    "t": 21.41,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   },
+   {
+    "t": 44.05,
+    "why": "fighters tiny",
+    "shot": "crane_0"
+   }
+  ],
+  [
+   {
+    "t": 1.83,
+    "why": "contact (hit) not visible",
+    "shot": "crane_1"
+   },
+   {
+    "t": 66.71,
+    "why": "f0 out of frame",
+    "shot": "hero_0"
+   }
+  ],
+  [
+   {
+    "t": 16.11,
+    "why": "fighters tiny",
+    "shot": "ots_1"
+   },
+   {
+    "t": 22.57,
+    "why": "contact (hit) not visible",
+    "shot": "crane_1"
+   },
+   {
+    "t": 30.68,
+    "why": "f0 hidden by fighter",
+    "shot": "ots_1"
+   },
+   {
+    "t": 41.88,
+    "why": "contact (hit) not visible",
+    "shot": "wide"
+   }
+  ],
+  [],
+  [
+   {
+    "t": 4.67,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   },
+   {
+    "t": 9.07,
+    "why": "f0 hidden by fighter",
+    "shot": "ots_1"
+   },
+   {
+    "t": 33.87,
+    "why": "f1 hidden by arena:CylinderGeometry@-3.2,1.5,8.2",
+    "shot": "ots_0"
+   },
+   {
+    "t": 34.32,
+    "why": "contact (hit) not visible",
+    "shot": "ots_1"
+   }
+  ],
+  [
+   {
+    "t": 3.03,
+    "why": "contact (hit) not visible",
+    "shot": "two_shot"
+   },
+   {
+    "t": 10.88,
+    "why": "f0 hidden by arena:BufferGeometry@1.5,1.2,3.3, fighters tiny",
+    "shot": "ots_1"
+   },
+   {
+    "t": 13.94,
+    "why": "f1 hidden by arena:BufferGeometry@2.1,1.1,4.4",
+    "shot": "two_shot"
+   },
+   {
+    "t": 17.73,
+    "why": "contact (hit) not visible",
+    "shot": "track_0"
+   }
+  ]
+ ]
+}

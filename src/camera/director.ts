@@ -352,6 +352,12 @@ export class Director {
           this.hitStopUntil = realT + 0.35;
           this.freezeUntil = realT + 0.35;
           this.fin = { t0: realT, kind: String(e.data?.kind ?? 'pair'), x: Number(e.data?.x), z: Number(e.data?.z), yaw: Number(e.data?.yaw ?? 0), att: e.a, vic: e.b ?? 1 - e.a, cutAt: -1 };
+          {
+            // take the side of the pair the track is clearer from (props, rims, cover)
+            const q = this.scoreShot('finisher', inp, e.b ?? -1);
+            this.side *= -1;
+            if (this.scoreShot('finisher', inp, e.b ?? -1) < q) this.side *= -1;
+          }
           this.request('finisher', 102, 99, realT, { force: true, smoothPos: 0.35, smoothLook: 0.18 });
           this.letterbox = true;
           break;
@@ -615,14 +621,30 @@ export class Director {
         const F = this.fin;
         const t2 = inp.realT - (F?.t0 ?? s.start);
         const c = chest[0].clone().lerp(chest[1], 0.5);
-        const yaw = F ? F.yaw : Math.atan2(axis.x, axis.z);
         const kind = F?.kind ?? 'pair';
+        // spell finishers are at range: frame the live axis between the two and fit both in the frame
+        const yaw = F && kind !== 'spell' ? F.yaw : Math.atan2(axis.x, axis.z);
         const a0 = yaw + Math.PI / 2 + (this.side > 0 ? 0 : Math.PI);
-        const a = a0 + Math.min(0.9, t2 * 0.12) * this.side;
-        const r = kind === 'downed' ? 4.2 - Math.min(1, t2 * 0.2) : 3.6 + sep * 0.4 - Math.min(0.8, t2 * 0.12);
+        const a = a0 + Math.min(kind === 'spell' ? 0.35 : 0.9, t2 * 0.12) * this.side;
+        const fit = (sep / 2 + 0.9) / 0.62;
+        const r = kind === 'downed' ? 4.2 - Math.min(1, t2 * 0.2) : Math.max(fit, 3.6 + sep * 0.4 - Math.min(0.8, t2 * 0.12));
         P.set(c.x + Math.sin(a) * r, kind === 'downed' ? 2.6 - Math.min(1.4, t2 * 0.35) : 0.9 + Math.min(0.5, t2 * 0.08), c.z + Math.cos(a) * r);
         L.copy(c);
         L.y = kind === 'downed' ? 0.7 : 1.15;
+        if (kind === 'spell' && F) {
+          // a spell at range: over the caster's shoulder onto the burning victim (both read, and it stays
+          // inside the arena even when the victim is against the wall)
+          const cst = chest[F.att],
+            vic = chest[F.vic];
+          const back = cst.clone().sub(vic).setY(0).normalize();
+          const sd = new THREE.Vector3(-back.z, 0, back.x).multiplyScalar(this.side);
+          P.copy(cst).addScaledVector(back, 3.2 + Math.min(0.6, t2 * 0.15)).addScaledVector(sd, 0.75);
+          P.y = 1.9;
+          L.copy(cst).lerp(vic, 0.45);
+          L.y = 1.1;
+          this.fov = 46;
+          break;
+        }
         this.fov = 44 - Math.min(6, t2 * 1.5);
         break;
       }
@@ -700,6 +722,8 @@ export class Director {
         const y = P.y + (t.y - P.y) * u;
         if (px * px + pz * pz < (pl.r + 0.15) * (pl.r + 0.15) && y < pl.h) q *= 0.3;
       }
+      // decor and walls the layout data does not describe (trees, stands, rubble, rims)
+      if (camWorld.occluded(P, inp.chest[i]) && camWorld.occluded(P, inp.chest[i].clone().setY(inp.chest[i].y + 0.35))) q *= 0.3;
       const size = Math.abs(h.y - c.y);
       if (size < 0.06) q *= 0.6;
       // the other fighter's body in front of this one's chest

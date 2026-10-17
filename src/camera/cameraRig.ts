@@ -15,6 +15,8 @@ export const camWorld = {
   wallH: 3.2,
   /** hanging hazards (chandeliers): sphere centre + radius */
   hanging: [] as { x: number; y: number; z: number; r: number }[],
+  /** real line-of-sight test against the built arena (decor the layout data does not know); set by the app */
+  occluded: (_from: THREE.Vector3, _to: THREE.Vector3) => false,
 };
 
 /** Unity-style SmoothDamp for a scalar (critically damped). */

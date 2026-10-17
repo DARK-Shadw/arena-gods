@@ -19,7 +19,7 @@ import type { Frame, MatchRecord, SimEvent } from '../sim/types';
 export interface CamAuditApp {
   camera: THREE.PerspectiveCamera;
   views: { root: THREE.Object3D; headWorld: (o?: THREE.Vector3) => THREE.Vector3; chestWorld: (o?: THREE.Vector3) => THREE.Vector3; height: number; def: { stats: { radius: number } } }[];
-  arena: { group: THREE.Object3D; sky: THREE.Object3D };
+  arena: { group: THREE.Object3D; sky: THREE.Object3D; props?: { obj: THREE.Object3D }[]; obstacles?: { pivot: THREE.Object3D }[] };
   rec: MatchRecord;
   playback: { t: number; duration: number; frameAt: (t: number) => Frame };
   director: { shotName: string; lastCut: number };
@@ -42,7 +42,7 @@ export interface CamMatchScore {
   byShot: Record<string, { n: number; bad: number; why?: Record<string, number> }>;
 }
 
-function solids(group: THREE.Object3D, sky: THREE.Object3D): THREE.Mesh[] {
+export function solids(group: THREE.Object3D, sky: THREE.Object3D): THREE.Mesh[] {
   const out: THREE.Mesh[] = [];
   group.traverse((o) => {
     const m = o as THREE.Mesh;
@@ -104,6 +104,9 @@ export function auditMatch(app: CamAuditApp, key: string, fps = 30): CamMatchSco
   while (app.playback.t < end - dt) {
     app.stepFrames(1, dt);
     for (const v of app.views) v.root.updateMatrixWorld(true);
+    // props and toppling cover move every frame (headless: nothing renders, so bring them up to date)
+    for (const p of app.arena.props ?? []) p.obj.updateMatrixWorld(true);
+    for (const o of app.arena.obstacles ?? []) o.pivot.updateMatrixWorld(true);
     cam.updateMatrixWorld(true);
     score.frames++;
     const shot = app.director.shotName;

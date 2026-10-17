@@ -13,6 +13,7 @@ import type { FighterDef, Frame, MatchRecord, MoveDef, SimEvent } from './sim/ty
 import { Arena } from './render/arena/arenaView';
 import { THEME_DEFS } from './render/arena/themes';
 import { camWorld } from './camera/cameraRig';
+import { solids as camSolids } from './camera/cameraAudit';
 import { buildReveal } from './cinematic/reveal';
 import { FighterView } from './render/fighterView';
 import { loadCharacter } from './render/character';
@@ -183,6 +184,19 @@ class App {
     camWorld.hanging = this.arena.hangingNow();
     camWorld.boundR = (x, z) => this.arena.boundR(x, z);
     camWorld.wallH = L.wallH;
+    {
+      this.arena.group.updateMatrixWorld(true);
+      const S = camSolids(this.arena.group, this.arena.sky);
+      const ray = new THREE.Raycaster();
+      const d = new THREE.Vector3();
+      camWorld.occluded = (from, to) => {
+        d.subVectors(to, from);
+        const len = d.length();
+        ray.set(from, d.multiplyScalar(1 / Math.max(1e-6, len)));
+        ray.far = Math.max(0.01, len - 0.25);
+        return ray.intersectObjects(S, false).length > 0;
+      };
+    }
     camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: 6.2, z: h.z, r: 1.3 }));
     this.ui.setArenaLabel?.(`${T.name} · ${L.layout} · #${L.seed}`);
     console.info(`[arena] built ${spec.theme}/${spec.layout}#${spec.seed} in ${(performance.now() - t0).toFixed(0)}ms`);
