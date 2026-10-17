@@ -1147,7 +1147,7 @@ class App {
     return runPairAudit(this.scene, list);
   }
   /** Animation quality audit (see render/animAudit.ts). */
-  animAudit(pairs: [string, string][], seeds = 2, opts: { blend?: 'inertial' | 'xfade'; feet?: boolean } = {}) {
+  animAudit(pairs: [string, string][], seeds = 2, opts: { blend?: 'inertial' | 'xfade'; feet?: boolean; locoRate?: number } = {}) {
     return runAnimAudit(this.scene, pairs, seeds, opts);
   }
   /** Headless entrance validator (see cinematic/validateEntrances.ts). */

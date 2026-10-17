@@ -299,7 +299,7 @@ const hjBurst: EntranceVariant = {
   needs: (A) => A.barrier !== 'none',
   build: (c) => {
     const bz = c.A.barrierZ;
-    const runFrom = bz - Math.min(4, c.A.tunnel?.depth ?? 3);
+    const runFrom = bz - Math.min(2.6, (c.A.tunnel?.depth ?? 3) - 0.3);
     // break when the body reaches the barrier plane: run speed 5 m/s
     const tBreak = (bz - 0.3 - runFrom) / 5;
     const beats: Beat[] = [
@@ -318,7 +318,7 @@ const hjBurst: EntranceVariant = {
     hjTail(beats);
     const T = beatTimes(beats);
     const cam: CamShot[] = [
-      shot(0, T[1] + tBreak, [[1.6, 1.0, bz + 4.8], [0, 1.4, bz - 2], 40], [[1.3, 1.0, bz + 4.2], [0, 1.4, bz - 1], 38]),
+      shot(0, T[1] + tBreak, [[0.6, 1.0, bz + 4.8], [0, 1.4, bz - 2], 40], [[0.5, 1.0, bz + 4.2], [0, 1.4, bz - 1], 38]),
       shot(T[1] + tBreak, T[3] - T[1] - tBreak, [[3.0, 0.5, bz + 3.0], 'actor', 52], [[3.4, 0.6, bz + 4.6], 'actor', 50], 'out'),
       shot(T[3], T[4] - T[3], [[-2.4, 1.1, 10], 'actor', 44], [[-2.2, 1.0, 10.6], 'actor', 44]),
       shot(T[4], T[5] - T[4], [[1.0, 1.5, 10.6], 'head', 38], [[1.4, 1.3, 11.2], 'head', 40]),

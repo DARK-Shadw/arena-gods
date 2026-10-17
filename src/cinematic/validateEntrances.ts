@@ -43,7 +43,8 @@ function staticMeshes(arena: Arena, exclude: THREE.Object3D[]): THREE.Mesh[] {
     const m = o as THREE.Mesh;
     if (!m.isMesh || ex.has(o) || (m as unknown as THREE.InstancedMesh).isInstancedMesh || o === arena.sky || o.userData.dyn) return;
     const mat = (Array.isArray(m.material) ? m.material[0] : m.material) as THREE.Material & { opacity?: number };
-    if (mat.transparent && (mat.opacity ?? 1) < 0.6 && mat.side !== THREE.BackSide) return;
+    // see-through things (veils, glows, fog cards, flames) never hide anyone
+    if (mat.transparent && mat.side !== THREE.BackSide) return;
     if (!o.visible) return;
     out.push(m);
   });

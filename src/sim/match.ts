@@ -45,13 +45,13 @@ interface FinRun {
   alignT: number;
   a0: [number, number];
   v0: [number, number];
-  hitsLeft: number[];
+  hitsLeft: [number, string][];
   killAt: number;
   killed: boolean;
   // downed
   fallDur?: number;
   walk?: { from: [number, number]; to: [number, number]; t0: number; t1: number; face: number };
-  exec?: { clip: string; t: number; off: [number, number]; dur: number; start: number; from: number };
+  exec?: { clip: string; t: number; off: [number, number]; dur: number; start: number; from: number; eff?: string };
   end: number;
 }
 export { LAUNCH, launchForce } from './launch';
@@ -1524,9 +1524,9 @@ export class Match {
         x.clipRate = 0;
         x.stateT = 0;
       }
-      for (const h of F.hitsLeft.slice()) if (ct >= h) {
+      for (const h of F.hitsLeft.slice()) if (ct >= h[0]) {
         F.hitsLeft.shift();
-        this.emit('finisher_contact', att.idx, def.idx, { id: F.def.id, kind: 'hit', t: +h.toFixed(2) });
+        this.emit('finisher_contact', att.idx, def.idx, { id: F.def.id, kind: 'hit', t: +h[0].toFixed(2), eff: h[1] });
       }
       if (!F.killed && ct >= F.killAt) this.finisherKill(F, att, def);
       if (F.t >= F.end) this.endFinisher(F, att);
@@ -1570,7 +1570,7 @@ export class Match {
 
   private finisherKill(F: FinRun, att: FighterState, def: FighterState) {
     F.killed = true;
-    this.emit('finisher_contact', att.idx, def.idx, { id: F.def.id, kind: 'kill', fx: fxOf(F.def, att.def.id) });
+    this.emit('finisher_contact', att.idx, def.idx, { id: F.def.id, kind: 'kill', fx: fxOf(F.def, att.def.id), ...(F.exec?.eff ? { eff: F.exec.eff } : F.def.killEff ? { eff: F.def.killEff } : {}) });
     def.react = { x: att.x, z: att.z, sev: 3, height: 'body' };
     const keep = { clip: att.clip, t0: att.clipT0, rate: att.clipRate, st: att.stateT };
     const vKeep = { clip: def.clip, t0: def.clipT0, rate: def.clipRate, st: def.stateT };

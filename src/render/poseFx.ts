@@ -502,3 +502,33 @@ export class FootLock {
     bone.updateMatrixWorld(true);
   }
 }
+
+/** analytic two-bone IK (world space): bend `mid`, swing `up` so `end` reaches T, keep `end`'s world rotation */
+export function solveTwoBone(up: THREE.Object3D, mid: THREE.Object3D, end: THREE.Object3D, T: THREE.Vector3) {
+  const rotW = (bone: THREE.Object3D, q: THREE.Quaternion) => {
+    const pw = bone.parent!.getWorldQuaternion(new THREE.Quaternion());
+    const nw = q.clone().multiply(bone.getWorldQuaternion(new THREE.Quaternion()));
+    bone.quaternion.copy(pw.invert().multiply(nw));
+    bone.updateMatrixWorld(true);
+  };
+  const endW = end.getWorldQuaternion(new THREE.Quaternion());
+  const A = up.getWorldPosition(new THREE.Vector3()),
+    B = mid.getWorldPosition(new THREE.Vector3()),
+    C = end.getWorldPosition(new THREE.Vector3());
+  const lab = A.distanceTo(B),
+    lbc = B.distanceTo(C);
+  const d = Math.max(1e-4, Math.min(lab + lbc - 1e-4, A.distanceTo(T)));
+  const cur = Math.acos(Math.max(-1, Math.min(1, B.clone().sub(A).normalize().dot(C.clone().sub(B).normalize()))));
+  const want = Math.acos(Math.max(-1, Math.min(1, (lab * lab + lbc * lbc - d * d) / (2 * lab * lbc))));
+  const delta = Math.PI - want - cur;
+  let axis = C.clone().sub(B).cross(A.clone().sub(B));
+  if (axis.lengthSq() < 1e-10) axis = new THREE.Vector3(1, 0, 0).applyQuaternion(up.getWorldQuaternion(new THREE.Quaternion()));
+  axis.normalize();
+  if (Math.abs(delta) > 1e-5) rotW(mid, new THREE.Quaternion().setFromAxisAngle(axis, delta));
+  up.updateMatrixWorld(true);
+  const C2 = end.getWorldPosition(new THREE.Vector3());
+  rotW(up, new THREE.Quaternion().setFromUnitVectors(C2.sub(A).normalize(), T.clone().sub(A).normalize()));
+  const pw = end.parent!.getWorldQuaternion(new THREE.Quaternion());
+  end.quaternion.copy(pw.invert().multiply(endW));
+  end.updateMatrixWorld(true);
+}

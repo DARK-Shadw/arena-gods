@@ -132,6 +132,11 @@ export function setBlendMode(m: 'inertial' | 'xfade') {
   BLEND_MODE = m;
 }
 
+/** highest locomotion playback rate (stride keeps up with fast sim movement instead of skating); ?locorate= to compare */
+export let LOCO_MAX_RATE = typeof location !== 'undefined' && new URLSearchParams(location.search).get('locorate') ? Number(new URLSearchParams(location.search).get('locorate')) : 2.2;
+export function setLocoMaxRate(r: number) {
+  LOCO_MAX_RATE = r;
+}
 /** foot locking on/off (?feet=0 to compare) */
 export let FOOT_LOCK = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('feet') !== '0' : true;
 export function setFootLock(on: boolean) {
@@ -319,7 +324,7 @@ export class AnimController {
       l.target = w;
       l.weight = w;
       const clipSpeed = this.meta.clips[n]?.speed ?? 0;
-      const ts = (clipSpeed > 0.05 && n !== 'idle' ? Math.max(0.5, Math.min(2.2, sp / clipSpeed)) : 1) * (req.speedScale ?? 1);
+      const ts = (clipSpeed > 0.05 && n !== 'idle' ? Math.max(0.5, Math.min(LOCO_MAX_RATE, sp / clipSpeed)) : 1) * (req.speedScale ?? 1);
       l.action.timeScale = ts;
       if (n === 'idle' || BLEND_MODE !== 'inertial') {
         l.manual = false;

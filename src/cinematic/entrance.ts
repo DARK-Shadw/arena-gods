@@ -102,10 +102,28 @@ function snapAnchors(arena: CineCtx['arena'], gate: number) {
     const hit = ray.intersectObjects(meshes, false).find((h) => !!h.face && h.face.normal.clone().transformDirection(h.object.matrixWorld).y > 0.6);
     return hit ? [p[0], +hit.point.y.toFixed(3), p[2]] : null;
   };
+  // head room above a spot (a crouching / standing fighter must fit under whatever overhangs it)
+  const clear = (p: V3, h: number) => {
+    const w = G.w(p);
+    ray.set(new THREE.Vector3(w.x, p[1] + 0.15, w.z), new THREE.Vector3(0, 1, 0));
+    ray.far = h;
+    return ray.intersectObjects(meshes, false).length === 0;
+  };
   A.perches = A.perches.flatMap((p) => {
     const s = snap(p.pos, 0.6);
-    return s ? [{ ...p, pos: s }] : [];
+    return s && clear(s, 2.3) && clear([s[0], s[1], s[2] + 0.35], 2.3) ? [{ ...p, pos: s }] : [];
   });
+  // a low wall to vault: slide along the wall until the whole vault path has head room
+  if (A.lowWall) {
+    const W = A.lowWall;
+    const side = W.pos[0] >= 0 ? 1 : -1;
+    let ok: V3 | null = null;
+    for (let x = Math.abs(W.pos[0]); x <= 7.5 && !ok; x += 0.4) {
+      const path = [-2.2, -1.4, -0.7, 0, 0.7, 1.4, 2.2].map((dz) => [side * x, 0, W.pos[2] + dz] as V3);
+      if (path.every((q) => clear([q[0], 1.2, q[2]], 1.2))) ok = [side * x, W.pos[1], W.pos[2]];
+    }
+    A.lowWall = ok ? { ...W, pos: ok } : undefined;
+  }
   A.stands = A.stands.flatMap((p) => {
     const s = snap(p, 0.7);
     return s ? [s] : [];
@@ -348,6 +366,12 @@ function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: Fighte
     if (cp.pos[2] > 0.3) {
       const look = cp.look === 'actor' ? view.chestWorld(new THREE.Vector3()) : cp.look === 'head' ? view.headWorld(new THREE.Vector3()) : G.w(cp.look);
       resolveCamera(outPos, look, true, [view.chestWorld(new THREE.Vector3())]);
+      if (outPos.y < 2.5) {
+        const dx = outPos.x - G.o.x,
+          dz = outPos.z - G.o.z;
+        const fp = pushOut([dx * G.r.x + dz * G.r.z, outPos.y, dx * G.f.x + dz * G.f.z], 0.35);
+        G.w(fp, outPos);
+      }
     }
     if (cp.look === 'actor') view.chestWorld(outLook);
     else if (cp.look === 'head') view.headWorld(outLook);

@@ -10,6 +10,7 @@
 import * as THREE from 'three';
 import type { MatchRecord, SimEvent } from '../sim/types';
 import { FIN_BY_ID } from '../sim/finishers';
+import { solveTwoBone } from './poseFx';
 
 interface WarpView {
   root: THREE.Object3D;
@@ -27,14 +28,14 @@ const BEFORE = 0.38,
   AFTER = 0.3;
 
 export class ContactWarp {
-  private contacts: { t: number; a: number; b: number; move: 'att' | 'vic' }[] = [];
+  private contacts: { t: number; a: number; b: number; move: 'att' | 'vic'; eff?: string }[] = [];
   /** last applied offset per view (metrics) */
   last = [new THREE.Vector3(), new THREE.Vector3()];
   constructor(rec: MatchRecord) {
     let kind = 'pair';
     for (const e of rec.events) {
       if (e.type === 'finisher_start') kind = FIN_BY_ID[String(e.data?.id)]?.kind ?? 'pair';
-      if (e.type === 'finisher_contact' && e.b !== undefined && kind !== 'spell' && kind !== 'launch') this.contacts.push({ t: e.t, a: e.a, b: e.b, move: kind === 'downed' ? 'att' : 'vic' });
+      if (e.type === 'finisher_contact' && e.b !== undefined && kind !== 'spell' && kind !== 'launch') this.contacts.push({ t: e.t, a: e.a, b: e.b, move: kind === 'downed' ? 'att' : 'vic', eff: e.data?.eff ? String(e.data.eff) : undefined });
     }
   }
   get active() {
@@ -42,11 +43,12 @@ export class ContactWarp {
   }
 
   /** gap vector from the attacker's nearest effector to the victim's body surface (world) */
-  static gap(A: WarpView, V: WarpView): THREE.Vector3 {
+  static gap(A: WarpView, V: WarpView, eff?: string): THREE.Vector3 {
     let best = 9;
     const out = new THREE.Vector3();
-    const pts = EFF.map((n) => (A.model.getObjectByName('mixamorig' + n) ?? A.model).getWorldPosition(new THREE.Vector3()));
-    pts.push(A.tipWorld(new THREE.Vector3()));
+    // the measured contact effector when known (the scene's authored touch), else the nearest one
+    const pts = eff === 'tip' ? [A.tipWorld(new THREE.Vector3())] : (eff ? [eff] : EFF).map((n) => (A.model.getObjectByName('mixamorig' + n) ?? A.model).getWorldPosition(new THREE.Vector3()));
+    if (!eff) pts.push(A.tipWorld(new THREE.Vector3()));
     for (const p of pts)
       for (const [s0, s1, r] of BODY) {
         const o0 = V.model.getObjectByName('mixamorig' + s0),
@@ -78,12 +80,25 @@ export class ContactWarp {
         V = views[c.b];
       A.root.updateMatrixWorld(true);
       V.root.updateMatrixWorld(true);
-      const g = ContactWarp.gap(A, V).setY(0);
+      const g = ContactWarp.gap(A, V, c.eff).setY(0);
       if (g.length() > 0.7) g.setLength(0.7);
       const mover = c.move === 'vic' ? V : A;
       const off = c.move === 'vic' ? g.multiplyScalar(-w) : g.multiplyScalar(w);
       mover.root.position.add(off);
       mover.root.updateMatrixWorld(true);
+      // then the limb itself reaches the rest of the way (height differences between rigs): two-bone IK
+      const eff = c.eff;
+      const chain = eff && /Hand|Foot/.test(eff) ? (eff.includes('Hand') ? [eff.replace('Hand', 'Arm'), eff.replace('Hand', 'ForeArm'), eff] : [eff.replace('Foot', 'UpLeg'), eff.replace('Foot', 'Leg'), eff]) : null;
+      if (chain && w > 0.01) {
+        const bones = chain.map((n) => A.model.getObjectByName('mixamorig' + n));
+        if (bones.every(Boolean)) {
+          for (let it = 0; it < 2; it++) {
+            const g2 = ContactWarp.gap(A, V, eff);
+            const p = bones[2]!.getWorldPosition(new THREE.Vector3());
+            if (g2.length() > 0.005 && g2.length() < 0.9) solveTwoBone(bones[0]!, bones[1]!, bones[2]!, p.add(g2.multiplyScalar(w)));
+          }
+        }
+      }
       this.last[c.move === 'vic' ? c.b : c.a].copy(off);
       break;
     }

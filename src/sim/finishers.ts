@@ -31,10 +31,12 @@ export interface FinisherDef {
   /** pair: solved scene id + clip window [from, to] (seconds, scene clock = clip clock) */
   scene?: string;
   trim?: [number, number];
-  /** pair: damage contacts (clip seconds) before the kill */
-  hits?: number[];
-  /** pair: the killing contact (clip seconds) */
+  /** pair: non-lethal contacts before the kill: [clip seconds, attacker effector] - only frames where
+   * tools/anim/scenes.ts MEASURED the effector touching the victim's body */
+  hits?: [number, string][];
+  /** pair: the killing contact (clip seconds) and the attacker effector that makes it (measured) */
   kill?: number;
+  killEff?: string;
   /** downed: attacker clip per fighter ('own:<move>' uses the fighter's move clip + reach data, 'lib:<id>' a library clip) */
   exec?: Record<string, string>;
   /** finisher FX (render, filtered by the gore setting) */
@@ -47,17 +49,19 @@ export interface FinisherDef {
 }
 
 export const FINISHERS: FinisherDef[] = [
-  { id: 'shoulder_throw_stomp', name: 'SHOULDER THROW', kind: 'pair', users: ['aldric', 'hollowjack', 'fenrik', 'gorak'], scene: 'shoulder_throw', trim: [2.7, 6.3], hits: [3.3], kill: 5.03, fx: 'crush', weight: 1, maxVictimWeight: 1.6 },
-  { id: 'hell_slammer', name: 'HELL SLAMMER', kind: 'pair', users: ['maw', 'gorak', 'hollowjack'], scene: 'hell_slammer', trim: [0.9, 7.2], hits: [1.4, 2.43, 3.43], kill: 5.47, fx: 'crush', weight: 1.4, minWeight: 1.3, maxVictimWeight: 1.6 },
-  { id: 'vampire_kiss', name: "VAMPIRE'S KISS", kind: 'pair', users: ['vex'], scene: 'vampire_kiss', trim: [0.3, 4.0], hits: [1.17], kill: 1.97, fx: 'drain', weight: 2.5 },
-  { id: 'silent_blade', name: 'SILENT BLADE', kind: 'pair', users: ['vex', 'erika'], scene: 'silent_blade', trim: [2.2, 6.6], hits: [2.43], kill: 3.5, fx: 'behead', weight: 1.2 },
+  { id: 'shoulder_throw_stomp', name: 'SHOULDER THROW', kind: 'pair', users: ['aldric', 'hollowjack', 'fenrik', 'gorak'], scene: 'shoulder_throw', trim: [2.7, 6.3], hits: [], kill: 5.03, killEff: 'RightFoot', fx: 'crush', weight: 1, maxVictimWeight: 1.6 },
+  { id: 'hell_slammer', name: 'HELL SLAMMER', kind: 'pair', users: ['maw', 'gorak', 'hollowjack'], scene: 'hell_slammer', trim: [0.9, 7.2], hits: [[1.4, 'RightHand'], [2.433, 'RightHand'], [3.433, 'RightHand']], kill: 5.47, fx: 'crush', weight: 1.4, minWeight: 1.3, maxVictimWeight: 1.6 },
+  { id: 'vampire_kiss', name: "VAMPIRE'S KISS", kind: 'pair', users: ['vex'], scene: 'vampire_kiss', trim: [0.3, 4.0], hits: [[1.167, 'LeftHand']], kill: 1.97, killEff: 'RightHand', fx: 'drain', weight: 2.5 },
+  { id: 'silent_blade', name: 'SILENT BLADE', kind: 'pair', users: ['vex', 'erika'], scene: 'silent_blade', trim: [2.2, 6.6], hits: [[2.433, 'RightHand']], kill: 3.5, killEff: 'LeftHand', fx: 'behead', weight: 1.2 },
   {
     id: 'executioner',
     name: 'EXECUTIONER',
     kind: 'downed',
-    users: ['gorak', 'maw', 'hollowjack', 'aldric'],
-    exec: { gorak: 'own:skull_crack', maw: 'own:hammer_of_ages', hollowjack: 'own:harvest_slam', aldric: 'lib:Great_Sword_Casting' },
-    fx: { gorak: 'behead', maw: 'crush', hollowjack: 'crush', aldric: 'bisect' },
+    // (Aldric's two-handed plunge was cut: on a lying body its blade stops ~0.16 m short on our rigs)
+    // (Hollowjack's two-fist slam was cut too: the fists land beside a lying body, 0.16 m off)
+    users: ['gorak', 'maw'],
+    exec: { gorak: 'own:skull_crack', maw: 'own:hammer_of_ages' },
+    fx: { gorak: 'behead', maw: 'crush' },
     weight: 1.3,
   },
   { id: 'curb_stomp', name: 'CURB STOMP', kind: 'downed', users: ['gorak', 'maw', 'hollowjack', 'fenrik', 'aldric', 'vex'], exec: { '*': 'lib:Stomp' }, fx: 'crush', weight: 0.9 },
@@ -99,7 +103,7 @@ export function sceneOf(f: FinisherDef): SceneGen | undefined {
  * contact, and where the strike point is at that moment relative to the
  * attacker root (character space, metres: x left, z forward).
  */
-export function execInfo(attId: string, f: FinisherDef): { clip: string; t: number; off: [number, number]; dur: number } | null {
+export function execInfo(attId: string, f: FinisherDef): { clip: string; t: number; off: [number, number]; dur: number; eff?: string } | null {
   const ref = f.exec?.[attId] ?? f.exec?.['*'];
   if (!ref) return null;
   if (ref.startsWith('own:')) {
@@ -125,7 +129,7 @@ export function execInfo(attId: string, f: FinisherDef): { clip: string; t: numb
   // measured: where the stomping foot / plunging hand is relative to the root on that frame
   const p = d.impactPos?.[k] ?? [0.05, 0, 0.5];
   const h = HIPS_M[attId] ?? 1;
-  return { clip: id, t: imp ? imp[0] : d.dur * 0.5, off: [p[0] * h, p[2] * h], dur: d.dur };
+  return { clip: id, t: imp ? imp[0] : d.dur * 0.5, off: [p[0] * h, p[2] * h], dur: d.dur, eff: imp?.[1] };
 }
 
 /** rotate a scene-frame (x, z) offset by the scene yaw (world facing angle) */

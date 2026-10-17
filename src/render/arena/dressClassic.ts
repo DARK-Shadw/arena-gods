@@ -262,7 +262,11 @@ export function dressColosseum(a: Arena): Dressing {
           barrierH: 3.6,
           tunnel: { depth: 7, height: 3.7, floorY: 0 },
           // podium wall top (3.45 m, 0.78-1.3 m behind the boundary), beside the gate gap
-          perches: [-1, 1].map((s) => ({ id: s < 0 ? 'wall_l' : 'wall_r', pos: [s * 3.0, 3.45, 0.9 - 0.92] as V3, depth: 0.5 })),
+          // the entablature's corners over the gate (in front of the low end of the pediment), then the podium wall
+          perches: [
+            ...[-1, 1].map((s) => ({ id: s < 0 ? 'entablature_l' : 'entablature_r', pos: [s * 3.45, 6.2, -0.8] as V3, depth: 2.0 })),
+            ...[-1, 1].map((s) => ({ id: s < 0 ? 'wall_l' : 'wall_r', pos: [s * 3.0, 3.45, 0.9 - 0.92] as V3, depth: 0.5 })),
+          ],
           // crowd tiers (second row), clear of the gate's entablature (half width 3.7)
           stands: [[5.2, 4.57, 0.9 - 2.7], [-5.2, 4.57, 0.9 - 2.7]],
           wallH: 3.45,

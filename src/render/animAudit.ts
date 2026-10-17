@@ -16,7 +16,7 @@ import * as THREE from 'three';
 import { simulate } from '../sim/match';
 import { FighterView } from './fighterView';
 import { initLib } from './animLib';
-import { loadCharacter, setBlendMode, setFootLock } from './character';
+import { LOCO_MAX_RATE, loadCharacter, setBlendMode, setFootLock, setLocoMaxRate } from './character';
 import type { MatchRecord } from '../sim/types';
 
 export interface AnimAuditResult {
@@ -41,9 +41,11 @@ export interface AnimAuditResult {
 
 const JOINTS = ['Head', 'Spine2', 'LeftHand', 'RightHand', 'LeftFoot', 'RightFoot'];
 
-export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][], seeds: number, opts: { blend?: 'inertial' | 'xfade'; arenaSeed?: number; feet?: boolean } = {}): Promise<AnimAuditResult> {
+export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][], seeds: number, opts: { blend?: 'inertial' | 'xfade'; arenaSeed?: number; feet?: boolean; locoRate?: number } = {}): Promise<AnimAuditResult> {
   setBlendMode(opts.blend ?? 'inertial');
   setFootLock(opts.feet ?? true);
+  const prevRate = LOCO_MAX_RATE;
+  if (opts.locoRate) setLocoMaxRate(opts.locoRate);
   const transPeaks: number[] = [];
   const allAcc: number[] = [];
   let planted = 0,
@@ -147,6 +149,7 @@ export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][]
   const allP95 = q(allAcc, 0.95);
   setBlendMode('inertial');
   setFootLock(true);
+  setLocoMaxRate(prevRate);
   return {
     feet: opts.feet ?? true,
     blend: opts.blend ?? 'inertial',
