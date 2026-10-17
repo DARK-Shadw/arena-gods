@@ -133,6 +133,14 @@ export function setBlendMode(m: 'inertial' | 'xfade') {
 }
 
 /** highest locomotion playback rate (stride keeps up with fast sim movement instead of skating); ?locorate= to compare */
+/** speed (m/s) at which the locomotion cycle takes over fully from idle, and the slowest cycle rate (A/B: ?locofull= / ?locomin=) */
+const _q = typeof location !== 'undefined' ? new URLSearchParams(location.search) : null;
+export let LOCO_FULL_AT = Number(_q?.get('locofull') ?? 0.5);
+export let LOCO_MIN_RATE = Number(_q?.get('locomin') ?? 0.5);
+export function setLocoBlend(fullAt: number, minRate: number) {
+  LOCO_FULL_AT = fullAt;
+  LOCO_MIN_RATE = minRate;
+}
 export let LOCO_MAX_RATE = typeof location !== 'undefined' && new URLSearchParams(location.search).get('locorate') ? Number(new URLSearchParams(location.search).get('locorate')) : 2.2;
 export function setLocoMaxRate(r: number) {
   LOCO_MAX_RATE = r;
@@ -296,7 +304,7 @@ export class AnimController {
     // --- locomotion weights
     const sp = Math.hypot(req.fwd, req.side);
     const loco: Record<string, number> = { idle: 0, walk: 0, walkBack: 0, strafeL: 0, strafeR: 0, run: 0 };
-    const moving = Math.min(1, sp / 0.5);
+    const moving = Math.min(1, sp / LOCO_FULL_AT);
     loco.idle = 1 - moving;
     if (sp > 0.01) {
       const af = Math.abs(req.fwd),
@@ -324,7 +332,7 @@ export class AnimController {
       l.target = w;
       l.weight = w;
       const clipSpeed = this.meta.clips[n]?.speed ?? 0;
-      const ts = (clipSpeed > 0.05 && n !== 'idle' ? Math.max(0.5, Math.min(LOCO_MAX_RATE, sp / clipSpeed)) : 1) * (req.speedScale ?? 1);
+      const ts = (clipSpeed > 0.05 && n !== 'idle' ? Math.max(LOCO_MIN_RATE, Math.min(LOCO_MAX_RATE, sp / clipSpeed)) : 1) * (req.speedScale ?? 1);
       l.action.timeScale = ts;
       if (n === 'idle' || BLEND_MODE !== 'inertial') {
         l.manual = false;

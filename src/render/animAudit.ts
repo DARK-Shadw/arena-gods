@@ -16,7 +16,7 @@ import * as THREE from 'three';
 import { simulate } from '../sim/match';
 import { FighterView } from './fighterView';
 import { initLib } from './animLib';
-import { LOCO_MAX_RATE, loadCharacter, setBlendMode, setFootLock, setLocoMaxRate } from './character';
+import { LOCO_FULL_AT, LOCO_MAX_RATE, LOCO_MIN_RATE, loadCharacter, setBlendMode, setFootLock, setLocoBlend, setLocoMaxRate } from './character';
 import type { MatchRecord } from '../sim/types';
 
 export interface AnimAuditResult {
@@ -34,6 +34,8 @@ export interface AnimAuditResult {
   popRate: number;
   footPlanted: number;
   footSkateRatio: number;
+  skateWhileRootMoves: number;
+  skateTags: number[];
   /** ms per fighter update (mean) */
   updateMs: number;
   usage: Record<string, string[]>;
@@ -41,15 +43,19 @@ export interface AnimAuditResult {
 
 const JOINTS = ['Head', 'Spine2', 'LeftHand', 'RightHand', 'LeftFoot', 'RightFoot'];
 
-export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][], seeds: number, opts: { blend?: 'inertial' | 'xfade'; arenaSeed?: number; feet?: boolean; locoRate?: number } = {}): Promise<AnimAuditResult> {
+export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][], seeds: number, opts: { blend?: 'inertial' | 'xfade'; arenaSeed?: number; feet?: boolean; locoRate?: number; locoFull?: number; locoMin?: number } = {}): Promise<AnimAuditResult> {
   setBlendMode(opts.blend ?? 'inertial');
   setFootLock(opts.feet ?? true);
   const prevRate = LOCO_MAX_RATE;
   if (opts.locoRate) setLocoMaxRate(opts.locoRate);
+  const prevBlend = [LOCO_FULL_AT, LOCO_MIN_RATE];
+  if (opts.locoFull || opts.locoMin) setLocoBlend(opts.locoFull ?? LOCO_FULL_AT, opts.locoMin ?? LOCO_MIN_RATE);
   const transPeaks: number[] = [];
   const allAcc: number[] = [];
   let planted = 0,
     skate = 0,
+    skateRootMoving = 0,
+    skateTags = [0, 0, 0, 0],
     frames = 0,
     transitions = 0,
     matches = 0,
@@ -67,7 +73,8 @@ export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][]
       const bones = views.map((v) => JOINTS.map((j) => v.model.getObjectByName('mixamorig' + j) ?? v.model));
       const hist = views.map(() => [] as THREE.Vector3[][]);
       const footPrev = views.map(() => [new THREE.Vector3(), new THREE.Vector3()]);
-      const footS = views.map(() => [] as [number, number, number][]);
+      const footS = views.map(() => [] as [number, number, number, number, number][]);
+      const rootPrev = views.map(() => new THREE.Vector3());
       const toes = views.map((v) => ['LeftToeBase', 'RightToeBase'].map((j) => v.model.getObjectByName('mixamorig' + j) ?? v.model));
       const window = [0, 0];
       const winPeak = [0, 0];
@@ -119,10 +126,11 @@ export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][]
             if (i > 2 && (st === 'idle' || st === 'block')) {
               const sp = Math.hypot(p.x - footPrev[k][fi].x, p.z - footPrev[k][fi].z) / dt;
               const vy = Math.abs(p.y - footPrev[k][fi].y) / dt;
-              footS[k].push([p.y, sp, vy]);
+              footS[k].push([p.y, sp, vy, Math.hypot(v.root.position.x - rootPrev[k].x, v.root.position.z - rootPrev[k].z) / dt, (st === 'block' ? 1 : 0) + (Math.hypot(fr.f[k].vx, fr.f[k].vz) > 0.3 ? 2 : 0)]);
             }
             footPrev[k][fi].copy(p);
           });
+          rootPrev[k].copy(v.root.position);
         }
         frames++;
       }
@@ -130,10 +138,14 @@ export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][]
       for (const fs of footS) {
         const ys = fs.map((x) => x[0]).sort((x, y) => x - y);
         const ref = ys.length ? ys[Math.floor(ys.length * 0.1)] : 0;
-        for (const [y, sp, vy] of fs)
+        for (const [y, sp, vy, rs, tag] of fs)
           if (y < ref + 0.03 && vy < 0.25) {
             planted++;
-            if (sp > 0.35) skate++;
+            if (sp > 0.35) {
+              skate++;
+              if (rs > 0.3) skateRootMoving++;
+              skateTags[tag]++;
+            }
           }
       }
       for (const v of views) {
@@ -150,6 +162,7 @@ export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][]
   setBlendMode('inertial');
   setFootLock(true);
   setLocoMaxRate(prevRate);
+  setLocoBlend(prevBlend[0], prevBlend[1]);
   return {
     feet: opts.feet ?? true,
     blend: opts.blend ?? 'inertial',
@@ -163,6 +176,10 @@ export async function runAnimAudit(scene: THREE.Scene, pairs: [string, string][]
     popRate: +(transPeaks.filter((x) => x > allP95 * 3).length / Math.max(1, transPeaks.length)).toFixed(4),
     footPlanted: planted,
     footSkateRatio: +(skate / Math.max(1, planted)).toFixed(4),
+    /** share of skating frames where the sim root itself was moving > 0.3 m/s (the sim drags the body) */
+    skateWhileRootMoves: +(skateRootMoving / Math.max(1, skate)).toFixed(3),
+    /** skating frames by [idle no-vel, block no-vel, idle with sim velocity, block with sim velocity] */
+    skateTags,
     updateMs: +(upd / Math.max(1, updN)).toFixed(3),
     usage,
   };
