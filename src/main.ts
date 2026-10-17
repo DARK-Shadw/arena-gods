@@ -1148,8 +1148,18 @@ class App {
     const out: CamMatchScore[] = [];
     this.headless = true;
     this.manual = true;
+    // the director's cosmetic choices use Math.random: seed it per match so audits are repeatable A/B tests
+    const realRandom = Math.random;
     try {
       for (const [a, b, seed, theme, layout, aseed] of list) {
+        let st = (seed * 2654435761) >>> 0 || 1;
+        Math.random = () => {
+          st = (st + 0x6d2b79f5) >>> 0;
+          let z = st;
+          z = Math.imul(z ^ (z >>> 15), z | 1);
+          z ^= z + Math.imul(z ^ (z >>> 7), z | 61);
+          return ((z ^ (z >>> 14)) >>> 0) / 4294967296;
+        };
         await this.start({ ...this.choice, a, b, seed, skipIntro: true, arena: { theme: theme as ThemeId, layout: layout as LayoutId, seed: aseed } });
         if (this.state !== 'fight') this.beginFight();
         this.realT = 0;
@@ -1157,6 +1167,7 @@ class App {
       }
     } finally {
       this.headless = false;
+      Math.random = realRandom;
     }
     return out;
   }

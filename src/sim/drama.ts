@@ -60,7 +60,8 @@ export class Drama {
   damageMul(att: FighterState, def: FighterState): number {
     const t = this.m.t;
     let mul = 0.76 + Math.min(1.2, t / 70);
-    if (t >= ARENA.suddenDeath) mul *= 1.5;
+    // sudden death escalates (x1.5, +0.25 per second after) so no fight can stall into the time limit
+    if (t >= ARENA.suddenDeath) mul *= 1.5 + (t - ARENA.suddenDeath) * 0.25;
     if (att.lastStand) mul *= 1.15;
     return mul;
   }

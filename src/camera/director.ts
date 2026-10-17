@@ -745,7 +745,9 @@ export class Director {
       // decor and walls the layout data does not describe (trees, stands, rubble, rims)
       if (camWorld.occluded(P, inp.chest[i]) && camWorld.occluded(P, inp.chest[i].clone().setY(inp.chest[i].y + 0.35))) q *= 0.3;
       const size = Math.abs(h.y - c.y);
-      if (size < 0.06) q *= 0.6;
+      // tiny on screen does not read: as bad as a half-hidden fighter
+      if (size < 0.055) q *= 0.3;
+      else if (size < 0.07) q *= 0.75;
       // the other fighter's body in front of this one's chest
       const o = inp.chest[1 - i];
       const t = inp.chest[i];

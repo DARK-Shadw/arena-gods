@@ -19,7 +19,7 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 
 ---
 
-## 1. DONE (as of 2026-10-16)
+## 1. DONE (as of 2026-10-17)
 - Deterministic seeded fight sim with drama engine (momentum swings, comebacks, anti-stall). 8 fighters with personalities. Balance stats: ~67 s fights, win rates ~45-55%, no timeouts.
 - AI v1 (Round A): doctrines/roles, goals, opponent modelling by counts, retreat/kite/bait/punish, feints, counters. 84 moves.
 - Hit-contact fix and phantom-hit audit (reach data from real clips).
@@ -29,9 +29,17 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - Real SFX/music from packs, mixing, volume menu; subtitled dialogue system (OLD synth-quality TTS, to be replaced).
 - Determinism fix (engine math differences Node vs Chromium).
 - GitHub repo + animation research/plan/catalog (branch `anim-plan`).
+- **Animation overhaul M0 to M4** (branch `anim-plan`, not merged to main yet). Milestone docs are in `docs/milestones/M0..M4`; deviations from the plan are in `docs/animation-plan.md` §K.
+  - Shared animation library and Animation Lab.
+  - Pose pipeline: inertialization, spring flinch with hit-stop, locomotion sync groups, foot-lock IK.
+  - Sim-chosen reaction, fall, get-up, death and dodge variety; launches and knockback.
+  - Arena-aware entrances for all 8 fighters. The validator reports 638/638 clean on every theme × layout × gate.
+  - 8 finishers (Rock'n Shackle replaced by Immolation). Paired contacts all within 0.12 m, using the contact warp and limb IK.
+  - Finisher FX: bisect, behead, burn, shatter, dissolve, drain. Gore setting off/stylised/full, default off.
+  - Camera: shot scoring with real line of sight, contact-aware re-picks, finisher track and cut-in, launch follow, killcam side choice, headless readability audit, `?t=` / B-key repro URLs.
 
 ## 2. IN PROGRESS
-- **Animation overhaul M0 to M4** (branch `anim-plan`): animation lab, inertialization pipeline and hit-stop/spring flinch, reaction/death/knockdown/get-up variety, launch/knockback system, arena-aware entrances (fix Gorak cage break, Vex/Hollowjack arrival), paired-animation system + first 8 finishers, camera readability audit + shot grammar, finisher FX (cuts, burn, freeze-shatter, gore setting).
+- **Animation overhaul review:** the owner plays `anim-plan` and judges the feel, then it is merged to main. Repro URLs are in `docs/milestones/M4/README.md`.
 - **Voice cloning** (`tts-final/`): 68 of 227 lines generated. Resume (run in a normal terminal, ~2.5-3.5 h):
   `C:\Programming\FunBuilds\FunnyGuyInPc\tts-lab\envs\chatterbox\Scripts\python.exe -I C:\Programming\GameDev\Research\tts-final\scripts\run.py`
 
@@ -78,12 +86,18 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 
 ## 5. KNOWN ISSUES (from agent reports)
 - AI: kiters (Erika, Ozrel) spend only ~1/3 of time in their range band; cover use is rare (~0.6 s/match); cornered escape ~50%; heavy whiff counts may look clumsy.
-- Moves: several moves reuse the same clip (Snap Shot/Twin Shot/Heartseeker/Rain of Thorns; Skull Crack/Axe Feint); Ozrel staff not a hitbox; Erika kicks foot-only; reactions repeat visibly (until the animation overhaul).
-- Animation: borrowed clips mix styles (longbow dodges on non-archers, etc.); get-up is a floaty blend; feet slide in knockback; two-handed weapon IK approximate; one clip fails to load (`ProMeleeAxe/standing melee attack horizontal.fbx`); Maw has a white patch at the waist (model/texture).
-- Camera: fixed angles can put a backdrop object in the foreground; entrances designed for tall gates look odd at low-rim themes.
+- Moves: several moves reuse the same clip (Snap Shot/Twin Shot/Heartseeker/Rain of Thorns; Skull Crack/Axe Feint); Ozrel staff not a hitbox; Erika kicks foot-only. (Reaction repetition fixed in M2.)
+- Animation: borrowed clips mix styles (longbow dodges on non-archers, etc.); two-handed weapon IK approximate; one clip fails to load (`ProMeleeAxe/standing melee attack horizontal.fbx`); Maw has a white patch at the waist (model/texture).
+- Animation (after M4):
+  - **Foot skate** is 0.54 of planted frames. 97% of it is during walk/strafe cycles while the sim moves the fighter; rate-cap and blend-threshold A/Bs did not help. Needs stride-matched locomotion (M5/M9).
+  - Executioner is Gorak/Maw only: Aldric's and Hollowjack's executions were cut because they miss a lying body by 0.14 to 0.16 m.
+  - Behead falls back to the cut on Ozrel, Erika and Maw (rig weights).
+  - The contact warp can slide the attacker up to 0.7 m around a contact. Not judged at play speed.
+- Finishers: the Immolation over-the-shoulder camera is sometimes dominated by Ozrel's back. The Into the Fire landing in the hazard has not been looked at by eye. Real-time feel of the freeze beat, slow motion and cut-ins is unjudged.
+- Camera: readability audit 94.3% of frames, with contacts on screen 96.0%. Cross layouts are below the 95% target (forge/cross 88%, Erika's kiting gives tiny over-the-shoulder and crane shots); sakura/gauntlet is about 90% (low two-shots behind trees). Low-rim entrances are fixed (M3).
 - Arenas: 3-6 s build time at load (CPU texture gen); some textures leak when switching themes; `window.__THREE` exposed for debugging; discrete-GPU frame rates unverified (iGPU 13.5-19.5 ms/frame at high).
 - Audio: footsteps busy with fast fighters; Erika's pain grunts are pitched male grunts; Hove Base Metal/Wood files identical; synth fire/crowd/stingers still synthesized; nobody has listened to the new TTS yet; announcer lines failing ASR.
-- Sim: ring of fire reaches fighters in ~77% of matches.
+- Sim: ring of fire reaches fighters in ~77% of matches. Sudden death now escalates (×1.5, +0.25/s after 100 s) to remove the last two time-outs (grindy Vex/Aldric).
 - Process: the machine has had low-memory kills (dev server killed 3x); keep heavy jobs sequential; Claude Code reaps background jobs under memory pressure (or start with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`).
 
 ---
