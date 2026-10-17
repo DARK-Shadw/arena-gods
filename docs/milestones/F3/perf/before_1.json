@@ -1,0 +1,894 @@
+{
+ "label": "before",
+ "dist": "C:\\Users\\aswin\\AppData\\Local\\Temp\\claude\\C--Programming-GameDev-Research\\c83eeae6-6a56-477f-bd5a-e5428179abde\\scratchpad\\f3\\pre\\dist",
+ "w": 1920,
+ "h": 1080,
+ "n": 120,
+ "runs": [
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 2,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 29.386,
+     "p50": 29.2,
+     "p95": 34.5,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 22.431,
+     "p50": 22.51,
+     "p95": 25.355,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0309,
+     "updateMs": 0.0079,
+     "frameMax": 0.9,
+     "updateMax": 0.1
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 30.201,
+     "p50": 29.6,
+     "p95": 37,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 22.802,
+     "p50": 21.903,
+     "p95": 28.677,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0258,
+     "updateMs": 0.0286,
+     "frameMax": 0.9,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 645,
+      "alpha": 359,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 15.902,
+     "p50": 15.901,
+     "p95": 19.154,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.251,
+     "p50": 0.232,
+     "p95": 0.305,
+     "n": 120
+    },
+    "ao": {
+     "avg": 4.42,
+     "p50": 4.362,
+     "p95": 4.738,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.006,
+     "p50": 0.005,
+     "p95": 0.015,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.744,
+     "p50": 0.861,
+     "p95": 0.923,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.73,
+     "p50": 0.785,
+     "p95": 0.872,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 1,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 23.789,
+     "p50": 23.6,
+     "p95": 28.5,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 17.401,
+     "p50": 17.026,
+     "p95": 20.578,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0194,
+     "updateMs": 0.0137,
+     "frameMax": 0.5,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 25.013,
+     "p50": 24.9,
+     "p95": 28.3,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 18.475,
+     "p50": 18.479,
+     "p95": 21.587,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.012,
+     "updateMs": 0.021,
+     "frameMax": 1.1,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 645,
+      "alpha": 359,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 16.24,
+     "p50": 16.157,
+     "p95": 19.721,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.226,
+     "p50": 0.221,
+     "p95": 0.256,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.03,
+     "p50": 0.026,
+     "p95": 0.053,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.823,
+     "p50": 0.848,
+     "p95": 0.976,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.757,
+     "p50": 0.793,
+     "p95": 0.841,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 0,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 18.915,
+     "p50": 18.7,
+     "p95": 21.6,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 12.925,
+     "p50": 12.751,
+     "p95": 15.297,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0249,
+     "updateMs": 0.003,
+     "frameMax": 0.3,
+     "updateMax": 0.1
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 18.948,
+     "p50": 18.7,
+     "p95": 26,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 12.649,
+     "p50": 12.309,
+     "p95": 17.69,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.013,
+     "updateMs": 0.0282,
+     "frameMax": 0.3,
+     "updateMax": 0.4
+    },
+    "fxLive": {
+     "particles": {
+      "add": 645,
+      "alpha": 359,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 11.397,
+     "p50": 11.573,
+     "p95": 13.736,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.014,
+     "p50": 0.004,
+     "p95": 0.021,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.265,
+     "p50": 0.261,
+     "p95": 0.338,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.693,
+     "p50": 0.735,
+     "p95": 0.752,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "forge:ozrel-maw",
+   "q": 2,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 27.343,
+     "p50": 26.7,
+     "p95": 31.8,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 19.475,
+     "p50": 19.015,
+     "p95": 21.169,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0274,
+     "updateMs": 0.0137,
+     "frameMax": 1.2,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 0,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 25.91,
+     "p50": 25.7,
+     "p95": 30.2,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 19.101,
+     "p50": 19.032,
+     "p95": 20.839,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0395,
+     "updateMs": 0.0327,
+     "frameMax": 1.2,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 743,
+      "alpha": 376,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 12.754,
+     "p50": 12.723,
+     "p95": 13.928,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.269,
+     "p50": 0.252,
+     "p95": 0.317,
+     "n": 120
+    },
+    "ao": {
+     "avg": 4.191,
+     "p50": 4.213,
+     "p95": 4.475,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.004,
+     "p50": 0.004,
+     "p95": 0.012,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.818,
+     "p50": 0.882,
+     "p95": 0.962,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.787,
+     "p50": 0.82,
+     "p95": 0.903,
+     "n": 120
+    },
+    "dist": {
+     "avg": 0.082,
+     "p50": 0.085,
+     "p95": 0.09,
+     "n": 4
+    }
+   }
+  },
+  {
+   "fight": "forge:ozrel-maw",
+   "q": 1,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 22.594,
+     "p50": 21.7,
+     "p95": 27.1,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 14.981,
+     "p50": 14.639,
+     "p95": 16.061,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0268,
+     "updateMs": 0.0086,
+     "frameMax": 1,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 0,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 22.08,
+     "p50": 21.8,
+     "p95": 26.3,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 14.786,
+     "p50": 14.709,
+     "p95": 16.436,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0373,
+     "updateMs": 0.0294,
+     "frameMax": 1,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 743,
+      "alpha": 376,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 12.6,
+     "p50": 12.514,
+     "p95": 13.944,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.224,
+     "p50": 0.211,
+     "p95": 0.268,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.018,
+     "p50": 0.022,
+     "p95": 0.058,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.813,
+     "p50": 0.893,
+     "p95": 1.01,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.756,
+     "p50": 0.805,
+     "p95": 0.879,
+     "n": 120
+    },
+    "dist": {
+     "avg": 0.053,
+     "p50": 0.051,
+     "p95": 0.061,
+     "n": 4
+    }
+   }
+  },
+  {
+   "fight": "forge:ozrel-maw",
+   "q": 0,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 16.022,
+     "p50": 15.7,
+     "p95": 18.9,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 8.999,
+     "p50": 8.705,
+     "p95": 9.903,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0279,
+     "updateMs": 0.0095,
+     "frameMax": 1,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 0,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 15.748,
+     "p50": 15.5,
+     "p95": 18,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 9.033,
+     "p50": 8.984,
+     "p95": 9.875,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0438,
+     "updateMs": 0.0328,
+     "frameMax": 1,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 743,
+      "alpha": 376,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 7.78,
+     "p50": 7.712,
+     "p95": 8.82,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.01,
+     "p50": 0.014,
+     "p95": 0.022,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.271,
+     "p50": 0.281,
+     "p95": 0.344,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.693,
+     "p50": 0.669,
+     "p95": 0.762,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "glacier:aldric-vex",
+   "q": 2,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 39.001,
+     "p50": 38.8,
+     "p95": 44.6,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 28.972,
+     "p50": 28.56,
+     "p95": 31.478,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0383,
+     "updateMs": 0.0193,
+     "frameMax": 0.4,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 0,
+      "alpha": 14,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 32.904,
+     "p50": 34.6,
+     "p95": 41.4,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 24.341,
+     "p50": 27.305,
+     "p95": 31.038,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.016,
+     "updateMs": 0.0165,
+     "frameMax": 0.4,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 645,
+      "alpha": 387,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 22.003,
+     "p50": 21.381,
+     "p95": 26.235,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.252,
+     "p50": 0.256,
+     "p95": 0.285,
+     "n": 120
+    },
+    "ao": {
+     "avg": 4.245,
+     "p50": 4.238,
+     "p95": 4.455,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.06,
+     "p50": 0.062,
+     "p95": 0.096,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.714,
+     "p50": 0.608,
+     "p95": 0.908,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.71,
+     "p50": 0.642,
+     "p95": 0.829,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "glacier:aldric-vex",
+   "q": 1,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 34.27,
+     "p50": 34,
+     "p95": 39.4,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 24.731,
+     "p50": 24.352,
+     "p95": 28.059,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0338,
+     "updateMs": 0.0204,
+     "frameMax": 0.4,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 0,
+      "alpha": 14,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 35.441,
+     "p50": 35.1,
+     "p95": 41.4,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 26.028,
+     "p50": 25.794,
+     "p95": 29.261,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.012,
+     "updateMs": 0.0301,
+     "frameMax": 0.4,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 645,
+      "alpha": 387,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 22.372,
+     "p50": 21.872,
+     "p95": 26.168,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.195,
+     "p50": 0.213,
+     "p95": 0.25,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.106,
+     "p50": 0.11,
+     "p95": 0.162,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.795,
+     "p50": 0.88,
+     "p95": 0.968,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.734,
+     "p50": 0.787,
+     "p95": 0.834,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "glacier:aldric-vex",
+   "q": 0,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 27.432,
+     "p50": 24.5,
+     "p95": 39.7,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 17.845,
+     "p50": 16.096,
+     "p95": 24.527,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0523,
+     "updateMs": 0.0396,
+     "frameMax": 0.4,
+     "updateMax": 0.2
+    },
+    "fxLive": {
+     "particles": {
+      "add": 0,
+      "alpha": 14,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 35.837,
+     "p50": 35.4,
+     "p95": 40.9,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 22.178,
+     "p50": 21.824,
+     "p95": 25.406,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0228,
+     "updateMs": 0.0345,
+     "frameMax": 0.4,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 645,
+      "alpha": 387,
+      "addCap": 4096,
+      "alphaCap": 2048
+     }
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 20.676,
+     "p50": 20.74,
+     "p95": 23.695,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.045,
+     "p50": 0.038,
+     "p95": 0.107,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.252,
+     "p50": 0.265,
+     "p95": 0.316,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.697,
+     "p50": 0.726,
+     "p95": 0.74,
+     "n": 120
+    }
+   }
+  }
+ ]
+}

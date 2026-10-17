@@ -47,6 +47,14 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
   - `npm run fx:check`; `tools/shots/fxprobe.cjs` measures before/after.
   - Gore default switched ON (`standard`) right after F0, on the owner's decision. Severing finishers now show by default; combat blood comes with F3.
 
+- **FX overhaul F3 (everyday combat, blood, full replay)**, on branch `anim-plan`; details, measurements and filmstrips in `docs/milestones/F3/README.md`.
+  - The atlases load in the game (tier-aware); flipbook and Kenney-sprite particles are part of the director; arena braziers / torches use the Unity flame flipbooks; the keg explosion uses the Unity explosion flipbooks.
+  - Impacts by weapon class and body surface (sparks on Aldric's plate, mist and fibres on flesh, hair on Fenrik, pulp on Hollowjack), heavy-hit shockwave (dust ring, chips, crack decal), block sparks, Aldric's shield ring, parry flare, guard break, dodge dust + afterimages, knockdown / landing dust, footsteps by floor surface.
+  - Weapon trails v2 per weapon (FX-owned ribbons on sim time, frame-rate independent, air distortion on heavies); FX light pool (3 / 2 / 1 slots).
+  - Blood at gore standard (default): sprays, floor splats and drops, pools under the dead, wounds on bodies, blood on blades; off / full work. Persistent lit floor decals, seeded, capped 64 / 128 / 256.
+  - `?t=` / `debugSeekFight` now replays the whole fight's decals and wounds and the last 6 s of effects: identical to a play-through (`npm run fx:check`).
+  - Measured: FX pass 0.06-0.10 ms GPU, FX CPU 0.13-0.16 ms per fight frame (budget 2.0 / 0.6).
+
 - **FX overhaul F2 (asset pipeline, atlases, FX Lab)**, on branch `anim-plan`; details in `docs/milestones/F2/README.md`, formats in `docs/fx-pipeline.md`.
   - Headless Blender 5.0 bake scripts (`tools/fx/blender/`): fire loop, fire burst, explosion, smoke wisp (relightable), dust puff and ring (relightable), splash, blood spray, embers, energy swirl. Each one dry-runs first and logs its peak RAM.
   - Atlas pipeline (`tools/fx/`): packer with motion vectors, pack ingestion, procedural decals, optional KTX2 encode, budget check and licence ledger (`public/fx/CREDITS.md`).
@@ -121,10 +129,8 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - Audio: footsteps busy with fast fighters; Erika's pain grunts are pitched male grunts; Hove Base Metal/Wood files identical; synth fire/crowd/stingers still synthesized; nobody has listened to the new TTS yet; announcer lines failing ASR.
 - Sim: ring of fire reaches fighters in ~77% of matches. Sudden death now escalates (×1.5, +0.25/s after 100 s) to remove the last two time-outs (grindy Vex/Aldric).
 - FX (after F0):
-  - `fx.seek` rebuilds only the 1.5 s warm-up window. Smoke, ember and debris tails that started earlier are missing after a `?t=` jump; true replay comes with F3.
   - Falling particles rest on the floor instead of bouncing.
-  - Trails are still frame-rate dependent (F3 ribbons).
-  - FX tier counts are not scaled yet.
+  - (Fixed in F3: seek rebuilds long tails; trails are frame-rate independent; the new sprite ops scale with the tier.)
 - FX / post (after F1):
   - Distortion, the brighter FX (`HDR_SCALE`) and the per-theme bloom / grade were judged on stills only, not at play speed or on a real monitor.
   - GTAO now also darkens under alpha-tested foliage; FX are no longer darkened by AO.
@@ -134,8 +140,14 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - FX assets (after F2):
   - Shipped as WebP only (`toktx` is not installed), so atlases use 128-px frames, not the plan's 256-px frames. With KTX2, `pack_atlas.py --hires` can produce the 256-px frames.
   - Unity fps and loop flags are guesses (loops come from a wrap test).
-  - The own bakes for splash and blood read as beady metaballs, and the dust ring is regular. The owner should judge them in the FX Lab.
-  - The game does not load any atlas yet. `tools/fxlab/fxAtlas.ts` is the reference loader and shader; it moves into `src/render/fx` in F3.
+  - The own bakes for splash and blood read as beady metaballs and are no longer used (F3 builds blood and splashes from sprites); they still ship. The dust ring is regular.
+- FX (after F3):
+  - Blood amount, wound build-up (up to 8 per fighter), spark brightness, trail width, ghost strength and footstep frequency were judged on stills only. Owner: play at gore standard and full.
+  - Footsteps come from recorded motion (a stride every 1.15 m above 2.5 m/s), not from the visible foot plant.
+  - Not built yet: footprints through blood, bleeding drips, hit pulse (C18), Ward Pulse ripple, arrow ribbons / stuck arrows, claw-hand blood.
+  - Wounds sit on seeded bones (seek-exact), not at the exact hit point. Bisect finisher halves drop the wound patch.
+  - Afterimages and the arena's canvas crack shapes are not reproduced exactly after a seek (positions are).
+  - Owner decisions: is gore standard the right amount; keep 3 FX light slots on high (cost under ~0.5 ms, not resolved in the noise); drop the unused blood / splash bakes.
 - Process: the machine has had low-memory kills (dev server killed 3x); keep heavy jobs sequential; Claude Code reaps background jobs under memory pressure (or start with `CLAUDE_CODE_DISABLE_BG_SHELL_PRESSURE_REAP=1`).
 
 ---

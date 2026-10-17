@@ -1,0 +1,73 @@
+{
+ "mode": "seek",
+ "label": "after",
+ "dist": "C:\\Programming\\GameDev\\Research\\arena\\dist",
+ "q": 2,
+ "gore": "standard",
+ "results": [
+  {
+   "fight": "gorak-vex#4242",
+   "T": 12,
+   "seekSame": true,
+   "seekVsPlayDecals": true,
+   "seekVsPlayBlood": true,
+   "seek": {
+    "events": 26,
+    "steps": 359,
+    "ms": 6.8
+   },
+   "seekDecals": "34:d984e13b",
+   "playDecals": "34:d984e13b",
+   "playT": 11.926666666666847,
+   "liveAfterSeek": 22
+  },
+  {
+   "fight": "gorak-vex#4242",
+   "T": 24,
+   "seekSame": true,
+   "seekVsPlayDecals": true,
+   "seekVsPlayBlood": true,
+   "seek": {
+    "events": 61,
+    "steps": 360,
+    "ms": 4.5
+   },
+   "seekDecals": "57:12a847d",
+   "playDecals": "57:12a847d",
+   "playT": 23.979333333333265,
+   "liveAfterSeek": 34
+  },
+  {
+   "fight": "aldric-fenrik#77",
+   "T": 12,
+   "seekSame": true,
+   "seekVsPlayDecals": true,
+   "seekVsPlayBlood": true,
+   "seek": {
+    "events": 28,
+    "steps": 359,
+    "ms": 5.5
+   },
+   "seekDecals": "23:9af6052e",
+   "playDecals": "23:9af6052e",
+   "playT": 11.922666666666844,
+   "liveAfterSeek": 4
+  },
+  {
+   "fight": "aldric-fenrik#77",
+   "T": 24,
+   "seekSame": true,
+   "seekVsPlayDecals": true,
+   "seekVsPlayBlood": true,
+   "seek": {
+    "events": 65,
+    "steps": 360,
+    "ms": 5.9
+   },
+   "seekDecals": "41:7238417a",
+   "playDecals": "41:7238417a",
+   "playT": 24.01566666666648,
+   "liveAfterSeek": 3
+  }
+ ]
+}

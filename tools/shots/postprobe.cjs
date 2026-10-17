@@ -95,6 +95,8 @@ const PAGE = () => {
           A.fx.spawn('explosion.keg', { x: 0.6, y: 0.6, z: 0.3 }, { seed: 1000 + i });
           A.fx.spawn('impact.default.heavy', { x: -0.4, y: 1.2, z: 0 }, { seed: 2000 + i });
           if (i % 32 === 0) A.fx.spawn('kill.plain', { x: 0, y: 1.2, z: 0.5 }, { seed: 3000 + i });
+          // F3 everyday combat on top (ids unknown to a pre-F3 build spawn nothing)
+          for (const [k, id] of ['impact.cut.metal', 'impact.heavy', 'shock.heavy', 'blood.cut', 'block.sparks', 'parry.flash', 'knockdown.dust'].entries()) A.fx.spawn(id, { x: -0.2 + k * 0.1, y: 1.2, z: 0.2 }, { seed: 4000 + i * 8 + k });
         }
         const t0 = performance.now();
         A.tick(1 / 60);
@@ -114,7 +116,8 @@ const PAGE = () => {
         else for (const k of Object.keys(results)) if (k !== 'total') passes[k] = stats(results[k]);
         if (A.post.setProfiling) A.post.setProfiling(false);
       }
-      return { frame: stats(cpu), gpu: stats(results.total), passes, calls: A.renderer.info.render.calls };
+      const fs = A.fx.stats();
+      return { frame: stats(cpu), gpu: stats(results.total), passes, calls: A.renderer.info.render.calls, fxCpu: fs.cpu, fxLive: { particles: fs.particles, sprites: fs.sprites, decals: fs.decals } };
     },
   };
 };
@@ -175,7 +178,7 @@ const PAGE = () => {
         const r = { fight: `${F.theme}:${F.a}-${F.b}`, q, timer: await page.evaluate(() => __pp.hasTimer), base, stress, passes: passes.passes };
         out.runs.push(r);
         const g = (x) => (x ? `${x.avg.toFixed(2)} (p95 ${x.p95.toFixed(2)})` : 'n/a');
-        console.log(`${LABEL.padEnd(8)} ${r.fight.padEnd(28)} q${q}  gpu ${g(base.gpu)}  frame ${g(base.frame)}  calls ${base.calls}${stress ? `  | stress gpu ${g(stress.gpu)} frame ${g(stress.frame)}` : ''}`);
+        console.log(`${LABEL.padEnd(8)} ${r.fight.padEnd(28)} q${q}  gpu ${g(base.gpu)}  frame ${g(base.frame)}  calls ${base.calls}  fxcpu ${base.fxCpu.frameMs}+${base.fxCpu.updateMs}${stress ? `  | stress gpu ${g(stress.gpu)} frame ${g(stress.frame)} fxcpu ${stress.fxCpu.frameMs}+${stress.fxCpu.updateMs}` : ''}`);
         console.log('         passes ' + Object.entries(passes.passes).map(([k, v]) => `${k} ${v ? v.avg.toFixed(2) : '-'}`).join('  '));
       }
     }

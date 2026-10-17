@@ -132,3 +132,31 @@ post.setProfiling(true); post.gpuTimes();             // GPU ms per pass (timer 
 post.softEnabled / post.distEnabled                   // A/B switches (FX Lab)
 ```
 A soft card for another system: spread `softDepthUniforms` into the material's uniforms, include `SOFT_DEPTH_PARS`, pass `-mvPosition.z` in a varying, multiply alpha by `fxSoftFade(depth, softness)` and put the mesh on `LAYER.FX_ALPHA`. A plain `renderer.render` (Animation Lab) must enable the FX layers on its camera to see particles.
+
+## F3 additions (everyday combat, blood, full replay)
+
+| File | What it is |
+|---|---|
+| `atlas.ts` | `FxAtlases` (moved from the F2 lab): manifest, lazy per-tier textures (`tierTexture(id, q)`: q0 loads `.low`), KTX2 when encoded. `SPRITES` / `DECAL_CELLS`: the fx_sprites and decal cell order (particles store indices, so Node tests need no manifest). Single-card helpers for the lab. |
+| `sprites.ts` | `SpriteLayer`: stateless instanced quads, one per texture: mode `mask` (fx_sprites, a sprite index per particle) or `flip` (a flipbook atlas; frame from age or a fixed fps; motion-vector sub-frame blend when the atlas has vectors and the tier is not low, else crossfade; kinds emissive / lit3 / lit-fixed). Per particle: additive or occluding (premultiplied, one draw), card / velocity streak / floor quad, rotation + spin, growth. `fxKeyLight`: the key light that lit flipbooks and occluding sprites use. |
+| `decals.ts` | `FloorDecals`: one instanced batch on the WORLD layer, lit (`MeshStandardMaterial` patch reading `decals` + `decals_nrm`), growing (pools), blood dries darker. Kept set = the newest `limit` decals by spawn time (order-independent). `hash(t)`. |
+| `ribbons.ts` | `Ribbon` (one per fighter): 120 Hz sim-time samples interpolated between rendered frames; `TRAIL_PROFILES` per weapon class; a distortion ribbon on heavy swings (high tier). |
+| `wounds.ts` | `FighterBlood`: the fighter material patch (wound spheres on bones, blade blood capsule); `injectBlood` (GLSL); chained by `finisherFx.ts`. |
+| `lights.ts` | `FxLights`: the 3-slot light pool (1 / 2 / 3 by tier). `vfx.flashLight` = slot 0. |
+| `afterimage.ts` | `Afterimages`: skinned ghost clones (0 / 1 / 3 per fighter by tier). |
+| `flames.ts` | `FxFlames`: flipbook flames for `Arena.fxFlame` (arenaView's `flame()` hook). |
+| `fxSurfaces.ts` | DATA: body surface per fighter, weapon class per strike (`weaponClassOf`), floor surface per theme, dust colours, model heights. |
+
+**New op kinds** (`fxDefs.ts`): `sp` (sprite / flipbook particles), `blood` (droplets that leave floor drops where they land), `decal`, `wound`, `bladeBlood`, `light`, `chips`, `ghost`. Emission directions `SpDir`: `hit`, `back`, `cut`, `deflect`, `up`, `down`, `facing`, `none`, from recorded frame data.
+
+**Resolution** (`RESOLVE.hit`): `impact.<group>.<surface>` (groups cut / blunt / pierce / fire / shadow; surfaces metal / flesh / fur / cloth; any hit on Hollowjack is `impact.any.pumpkin`), plus `impact.heavy` + `shock.heavy` on heavy hits, plus `blood.cut` / `blood.cut.armor` / `blood.pierce` / `blood.blunt` and `blood.blade` by gore (`gore: {off, full}` substitution). Kills add `blood.kill` (or `blood.pool` after a finisher); knockdowns of a badly hurt fighter add `blood.down`. Blocks by Aldric add `block.shield`.
+
+**World getters** (all optional; `FxWorld`): `effector`, `hasWeapon`, `height`, `floorAt`, `trail`, `blade`, `bone`, `fighter`. Without bone getters (Node) every anchor comes from recorded frames.
+
+**Timing.** Effects spawn at the exact sim time of their cause (event, tick, stride, active-phase start), mapped onto the FX clock, so a play-through does not depend on its step size. Continuous emitters read the recorded state at each tick's own time.
+
+**Seek.** `fx.seek(t)` = full replay: persistent layers (decals, wounds, weapon blood) of every event up to `t - REPLAY_TAIL` (6 s), then every effect of the last 6 s on recorded frames. `stats().seek` = `{ events, steps, ms }`. `decalHash(t?)`, `bloodHash()`; game: `__arena.fxDecalHash(t?)`, `__arena.fxBloodHash()`.
+
+**Game wiring** (`main.ts`): `vfx.useAtlases(new FxAtlases(renderer))`, `Arena.fxFlame = (size, color, n) => flames.make(...)`, `post.distActive = () => vfx.distActive` (ribbons too), `fxKeyLight` from the cinematic key light, `flames.setQuality(q)`.
+
+**Lab** (`/tools/fxlab/`): group "F3 everyday combat" (trails per weapon, blood cut / three cuts + kill at each gore level, metal, block, parry, knockdown, footsteps, dodge, pumpkin, the arena flame); the catalog rows C01-C20 point at them. `fx.labBone` / `fx.labBlade` give the dummies wounds and weapon blood.

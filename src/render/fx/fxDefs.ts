@@ -435,7 +435,13 @@ def({
   at: 'contact',
   priority: 60,
   post: { aberration: 1, flash: 0.05, vignette: 0.12 },
-  layers: [FLARE(0.8, '#fff0dc', 9, 0.1), { op: { k: 'ripple', size: 1.4, life: 0.32, strength: 0.9 } }, LIGHT('#ffd8b0', 8, 0.16)],
+  layers: [
+    FLARE(0.8, '#fff0dc', 9, 0.1),
+    // a short soft glow around the core (the F0 white blob was 1.6 m and cartoonish; this is ~0.7 m and brief)
+    { op: { k: 'sp', tex: 'circle_05', n: 1, color: '#ffe6c8', hdr: 2.2, add: true, dir: 'none', speed: [0, 0], size: [0.7, 0.7], grow: 1.3, life: [0.12, 0.12] } },
+    { op: { k: 'ripple', size: 1.4, life: 0.32, strength: 0.9 } },
+    LIGHT('#ffd8b0', 8, 0.16),
+  ],
 });
 def({
   id: 'shock.heavy',
@@ -587,11 +593,12 @@ def({
 });
 def({
   id: 'step.water',
-  desc: 'C02 footstep in water: a splash crown and droplets',
+  desc: 'C02 footstep in water: a spray crown of droplets and a fine mist (the F2 metaball splash bake reads as beads; not used)',
   at: 'aFeet',
   priority: 12,
   layers: [
-    { op: { k: 'sp', tex: '@splash', n: 1, color: '#c8daf0', alpha: 0.85, dir: 'none', speed: [0, 0], size: [0.55, 0.65], life: [0.55, 0.6], rot: false } },
+    { op: { k: 'sp', tex: 'smoke_07', n: 1, color: '#dce8f4', alpha: 0.35, dir: 'up', cone: 0.2, speed: [0.3, 0.5], size: [0.25, 0.3], grow: 2, drag: 3, life: [0.45, 0.55] } },
+    { op: { k: 'sp', tex: 'trace_07', n: 8, color: '#d8e6f4', alpha: 0.7, hdr: 1.2, dir: 'up', cone: 0.45, speed: [1.8, 3.2], size: [0.05, 0.08], aspect: 0.3, stretch: 0.03, grav: 9, drag: 0.6, life: [0.3, 0.5] } },
     { op: { k: 'sp', tex: 'circle_05', n: 10, color: '#c8dcf0', alpha: 0.7, hdr: 1.1, dir: 'up', cone: 0.6, speed: [1.5, 3], size: [0.015, 0.028], stretch: 0.02, grav: 9, drag: 0.6, life: [0.35, 0.6] } },
   ],
 });

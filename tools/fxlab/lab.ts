@@ -269,15 +269,15 @@ const items: Item[] = [];
 
 /** Catalog row -> nearest current preview (F0 def ids and F2 atlases). Unknown ids are dropped at runtime. */
 const CATALOG_PREVIEW: Record<string, string[]> = {
-  C01: ['dodge.dust', '@dust_puff'], C02: ['@splash'], C03: ['knockdown.dust', 'launch.land', '@dust_ring'],
-  C06a: ['impact.default', '#fx_sprites'], C06b: ['impact.default', '@blood_spray'], C06c: ['impact.default.heavy', '@dust_puff'],
-  C06d: ['impact.default'], C06e: ['cover.hit', '@unity_explosion01_nofire', '@dust_ring'], C06f: ['prop.break', 'prop.hit'], C07: ['block.sparks'],
-  C08: ['parry.flash'], C10: ['dodge.trail', 'dodge.dust'], C11: ['impact.quake', '@dust_ring'], C12: ['#decals'],
-  C13: ['prop.break'], C17: ['#decals', '@blood_spray'], C19: ['guard.break'], C20: ['proj.arrow.trail', 'proj.arrow.end'],
-  C21: ['#decals'], E01: ['brazier', '@unity_flame02', '@fire_loop', '@unity_wispysmoke01', '@smoke_wisp', '@embers'], E02: ['@embers'], E06: ['ring.fire', '@unity_flame02'],
+  // F3: the everyday-combat rows preview the built effects ('>' = another lab item)
+  C01: ['>f3.steps'], C02: ['>f3.steps'], C03: ['>f3.knockdown'], C04: ['>f3.trail.axe', '>f3.trail.sword', '>f3.trail.claw', '>f3.trail.blunt'], C05: ['>f3.trail.axe.heavy'],
+  C06a: ['>f3.metal'], C06b: ['>f3.blood.cut'], C06c: ['impact.blunt.flesh', 'blood.blunt'], C06d: ['>f3.pumpkin'], C06e: ['cover.hit', 'impact.quake'], C06f: ['prop.break', 'prop.hit'], C07: ['>f3.block'],
+  C08: ['>f3.parry'], C09: ['block.shield'], C10: ['>f3.dodge'], C11: ['impact.heavy', 'shock.heavy'], C12: ['shock.heavy', 'impact.quake'],
+  C13: ['prop.break', 'shock.heavy'], C14: [], C15: ['>f3.blood.three'], C16: ['>f3.blood.cut'], C17: ['>f3.blood.three'], C18: [], C19: ['guard.break'], C20: ['proj.arrow.trail', 'proj.arrow.end', 'impact.pierce.flesh', 'blood.pierce'],
+  C21: ['#decals'], E01: ['>f3.flame', '@unity_flame02', '@fire_loop', '@unity_wispysmoke01', '@smoke_wisp', '@embers'], E02: ['@embers'], E06: ['ring.fire', '@unity_flame02'],
   E07: ['explosion.keg', '@unity_explosion00', '@explosion'], E08: ['@unity_flame03', '@fire_loop'], E03: ['@unity_cloud01'], E09: ['@fire_burst'], E10: ['@splash'], E11: ['hazard.geyser.trigger'],
   E14: ['topple.impact', '@unity_explosion01_nofire', '@dust_ring'], E15: ['chandelier.impact'], E16: ['#decals'],
-  ST1: ['hazard.burn', '@unity_flame03'], ST4: ['@blood_spray'], ST7: ['aura.buff'], ST8: ['aura.lastStand', 'lastStand.burst'], ST11: ['secondWind.burst'],
+  ST1: ['hazard.burn', '@unity_flame03'], ST4: ['blood.cut'], ST7: ['aura.buff'], ST8: ['aura.lastStand', 'lastStand.burst'], ST11: ['secondWind.burst'],
   CI6: ['finisher.kill', 'kill.finisher'], CI7: ['kill.plain'], CI8: ['@embers'],
   'Ranged fire': ['stream.fire', 'proj.fire.trail', 'proj.fire.end', '@unity_fireball01', '@fire_burst'], 'Ranged heavy fire': ['stream.pyre', 'proj.pyre.trail', '@unity_fireball01', '@unity_explosion00'],
   Nova: ['active.nova', '@fire_burst'], Arrow: ['proj.arrow.trail', 'proj.arrow.end'], Shadow: ['aura.shadow', 'proj.shadow.trail'],
@@ -309,6 +309,7 @@ function toParts(refs: string[] | undefined, defIds: Set<string>): Part[] {
     if (r === 'brazier') parts.push({ kind: 'brazier' });
     else if (r.startsWith('@')) { if (atlases.manifest?.atlases[r.slice(1)]) parts.push({ kind: 'atlas', id: r.slice(1) }); }
     else if (r.startsWith('#')) { if (atlases.manifest?.atlases[r.slice(1)]) parts.push({ kind: 'static', id: r.slice(1) }); }
+    else if (r.startsWith('>')) { const it = items.find((x) => x.key === r.slice(1)); if (it) parts.push(...it.parts); }
     else if (defIds.has(r)) parts.push({ kind: 'def', id: r });
   }
   return parts;
@@ -413,7 +414,7 @@ function f3Items(): Item[] {
   out.push(combo('f3.dodge', 'C10 dodge dust (afterimages: in game)', "dodge.dust: skid puffs. The ghost layer copies a fighter's pose and only shows in the game.", [['dodge.dust', 0], ['dodge.skid', 0.08], ['dodge.skid', 0.16]], [[0, 1.0, 2.8], [0, 0.3, 0]]));
   out.push(combo('f3.pumpkin', 'C06d hit on Hollowjack', 'impact.any.pumpkin: pulp chunks, seeds, pulp spatter (never blood).', [['impact.any.pumpkin', 0]]));
   out.push({ key: 'f3.flame', group: G, label: 'E01 (part): arena flipbook flame', desc: 'The flame the arena now builds (fx/flames.ts: Unity Flame02, looped with a per-flame phase) beside the F2 reference brazier.', cam: BRAZIER_CAM,
-    parts: [{ kind: 'brazier' }, { kind: 'fn', id: 'flame', dur: 4, run: () => { const f = flames.make(0.9, '#ff9a40', seed); f.position.set(-1.2, 1.0, -0.6); live.add(f); } }] });
+    parts: [{ kind: 'brazier' }, { kind: 'fn', id: 'flame', dur: 4, run: () => { const f = flames.make(0.9, '#ff9a40', seed); f.position.set(-3.0, 1.0, -0.9); live.add(f); } }] });
   return out;
 }
 

@@ -172,7 +172,7 @@ const FRAG = /* glsl */ `
     }
     float f = vCol.a * fxSoftFade(vDepth, vSoft);
     a *= f;
-    if (a < 0.002 && vAdd < 0.5) discard;
+    if (a < 0.002 && (vAdd < 0.5 || max(rgb.r, max(rgb.g, rgb.b)) * f < 0.002)) discard;
     gl_FragColor = vec4(rgb * f, a * (1.0 - vAdd));
   }`;
 

@@ -46,6 +46,7 @@ void main() {
   float fr = mod(uTime * uFps + uPhase * uFrames, uFrames);
   // crossfade between the last and first frame keeps the loop seamless enough (the Unity flames are not perfect loops)
   vec4 c = fbSample(uTex, uTex, 0.0, 0.0, uGrid, uFrames, fr, vUv);
+  if (c.a + c.r + c.g < 0.006) discard; // most of the card is empty: skip the blend
   vec3 rgb = mix(c.rgb, vec3(dot(c.rgb, vec3(0.3, 0.55, 0.15))) * uTint * 1.7, uRecolor) * uIntensity;
   float f = fxSoftFade(vDepth, 0.25);
   gl_FragColor = vec4(rgb * f, c.a * f);
