@@ -1,0 +1,250 @@
+[
+ {
+  "theme": "desert",
+  "layout": "oval",
+  "q": 1,
+  "a": "maw",
+  "b": "ozrel",
+  "seed": 5,
+  "aseed": 7,
+  "legacy": false,
+  "obstacle": {
+   "i": 0,
+   "kind": "statue",
+   "t": 34.4667,
+   "timp": 35.3833,
+   "dx": -0.306,
+   "dz": 0.952,
+   "x": 9.832419421866625,
+   "z": 4.2524999999999995,
+   "h": 4.998510467939195,
+   "r": 0.8483118636644214
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": {
+   "meshes": 1,
+   "visible": true,
+   "verts": 14922,
+   "tris": 12076,
+   "along": [
+    -0.69,
+    2.69
+   ],
+   "lateral": 1.32,
+   "y": [
+    -0.02,
+    1.86
+   ]
+  },
+  "pools": [
+   {
+    "verts": 66,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 155,
+   "broken": 130,
+   "sameFrame": {
+    "broken": 130,
+    "intact": 130,
+    "fracSets": 1,
+    "fracSetsVisible": 1
+   }
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\desert_oval_q1_hop.jpg",
+   "docs\\milestones\\A5\\frac\\desert_oval_q1_rest.jpg"
+  ],
+  "errors": []
+ },
+ {
+  "theme": "desert",
+  "layout": "pit",
+  "q": 2,
+  "a": "gorak",
+  "b": "erika",
+  "seed": 36,
+  "aseed": 7,
+  "legacy": false,
+  "obstacle": {
+   "i": 0,
+   "kind": "statue",
+   "t": 53.2833,
+   "timp": 54.2,
+   "dx": -0.498,
+   "dz": 0.867,
+   "x": 7.626263877332201,
+   "z": 6.452921762527267,
+   "h": 5.085051188664512,
+   "r": 0.9463913471531122
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": {
+   "meshes": 1,
+   "visible": true,
+   "verts": 14922,
+   "tris": 12076,
+   "along": [
+    -0.06,
+    6.42
+   ],
+   "lateral": 1.18,
+   "y": [
+    -0.02,
+    1.95
+   ]
+  },
+  "pools": [
+   {
+    "verts": 66,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 193,
+   "broken": 157,
+   "sameFrame": {
+    "broken": 157,
+    "intact": 157,
+    "fracSets": 1,
+    "fracSetsVisible": 1
+   }
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\desert_pit_q2_hop.jpg",
+   "docs\\milestones\\A5\\frac\\desert_pit_q2_rest.jpg"
+  ],
+  "errors": []
+ },
+ {
+  "theme": "colosseum",
+  "layout": "oval",
+  "q": 1,
+  "a": "maw",
+  "b": "ozrel",
+  "seed": 21,
+  "aseed": 3,
+  "legacy": false,
+  "obstacle": {
+   "i": 5,
+   "kind": "column",
+   "t": 18.0667,
+   "timp": 18.9833,
+   "dx": 0.987,
+   "dz": 0.158,
+   "x": 9.832419421866629,
+   "z": -4.252499999999996,
+   "h": 5.1573984078674115,
+   "r": 0.661767801932292
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": {
+   "meshes": 1,
+   "visible": true,
+   "verts": 1534,
+   "tris": 1358,
+   "along": [
+    0.29,
+    6.29
+   ],
+   "lateral": 0.85,
+   "y": [
+    -0.07,
+    1.76
+   ]
+  },
+  "pools": [
+   {
+    "verts": 330,
+    "kitMat": true
+   },
+   {
+    "verts": 60,
+    "kitMat": false
+   },
+   {
+    "verts": 66,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 193,
+   "broken": 234,
+   "sameFrame": {
+    "broken": 176,
+    "intact": 235,
+    "fracSets": 1,
+    "fracSetsVisible": 1
+   }
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\colosseum_oval_q1_hop.jpg",
+   "docs\\milestones\\A5\\frac\\colosseum_oval_q1_rest.jpg"
+  ],
+  "errors": []
+ },
+ {
+  "theme": "colosseum",
+  "layout": "cross",
+  "q": 0,
+  "a": "hollowjack",
+  "b": "ozrel",
+  "seed": 15,
+  "aseed": 3,
+  "legacy": false,
+  "obstacle": {
+   "i": 7,
+   "kind": "column",
+   "t": 24.65,
+   "timp": 25.5667,
+   "dx": 0.349,
+   "dz": -0.937,
+   "x": 8.209509729575807,
+   "z": -8.209509729575817,
+   "h": 5.2,
+   "r": 0.7
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": {
+   "meshes": 1,
+   "visible": true,
+   "verts": 1090,
+   "tris": 558,
+   "along": [
+    0.23,
+    6.92
+   ],
+   "lateral": 1.11,
+   "y": [
+    -0.12,
+    1.81
+   ]
+  },
+  "pools": [
+   {
+    "verts": 82,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 265,
+   "broken": 220,
+   "sameFrame": {
+    "broken": 220,
+    "intact": 220,
+    "fracSets": 1,
+    "fracSetsVisible": 1
+   }
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\colosseum_cross_q0_hop.jpg",
+   "docs\\milestones\\A5\\frac\\colosseum_cross_q0_rest.jpg"
+  ],
+  "errors": []
+ }
+]

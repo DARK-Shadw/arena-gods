@@ -370,10 +370,11 @@
    ],
    "inputs": [
     "tools/arena/blender/stonekit.py",
-    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json",
+    "tools/arena/blender/fracture.py"
    ],
    "timeoutMin": 40,
-   "note": "A3: square masonry pillar (ref-3), 9-slice SHAFT, FRAC 4 slices, unique 2048/1024 bake from a weathered voxel high",
+   "note": "A3: square masonry pillar (ref-3), 9-slice SHAFT, FRAC 4 slices, unique 2048/1024 bake from a weathered voxel high; A5: FRAC = fracture.py tilted rough cuts + an axial split",
    "startMinFreeMb": 2500
   },
   {
@@ -391,10 +392,11 @@
    ],
    "inputs": [
     "tools/arena/blender/stonekit.py",
-    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json",
+    "tools/arena/blender/fracture.py"
    ],
    "timeoutMin": 40,
-   "note": "A3: fluted ruin column with a broken top, 9-slice SHAFT, FRAC drums",
+   "note": "A3: fluted ruin column with a broken top, 9-slice SHAFT, FRAC drums; A5: FRAC = fracture.py tilted rough cuts + an axial split",
    "startMinFreeMb": 2500
   },
   {
@@ -998,6 +1000,96 @@
    "timeoutMin": 25,
    "note": "A4: banners (cloth-sim drape: vertical / swag / short) + 8-sigil tattered atlas (numpy) + rod",
    "startMinFreeMb": 2500
+  },
+  {
+   "id": "statue_hooded",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "statue_hooded"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/Paladin.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: hooded guardian (ref-3), Paladin base, robe/mantle/hood/sleeves, sword point-down; 2048/1024",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "statue_knight",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "statue_knight"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/Paladin.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: knight colossus (ref-7), Paladin armour, hood + cowl + back cloak, greatsword; 1024/512",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "statue_mage",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "statue_mage"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/erika-archer.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: staff saint (ref-8), Erika base, robe/hood/sleeves, ring staff; 1024/512",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "colossus_goddess",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "colossus_goddess"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/erika-archer.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: A6 backdrop source: veiled goddess (ref-9), 12 m weathered high -> colossus_goddess_hi.blend",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "colossus_seated",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "colossus_seated"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/brute.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: A6 backdrop source: hooded seated colossus (ref-5), 9 m weathered high -> colossus_seated_hi.blend",
+   "startMinFreeMb": 3000
   }
  ],
  "groups": {
@@ -1096,6 +1188,24 @@
    "kit_urn",
    "kit_chunk",
    "kit_banners"
+  ],
+  "a5": [
+   "kit_pillar_square",
+   "kit_column_ruin",
+   "statue_hooded",
+   "statue_knight",
+   "statue_mage",
+   "colossus_goddess",
+   "colossus_seated"
+  ],
+  "a5-statues": [
+   "statue_hooded",
+   "statue_knight",
+   "statue_mage"
+  ],
+  "a5-colossi": [
+   "colossus_goddess",
+   "colossus_seated"
   ]
  }
 }

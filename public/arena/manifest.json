@@ -2747,8 +2747,8 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1059892,
-      "primitives": 6,
+      "bytes": 1068748,
+      "primitives": 7,
       "textures": [
        {
         "material": "column_ruin_stone",
@@ -2777,8 +2777,8 @@
       ]
      },
      "webp": {
-      "bytes": 617592,
-      "primitives": 6,
+      "bytes": 626444,
+      "primitives": 7,
       "textures": [
        {
         "material": "column_ruin_stone",
@@ -2809,8 +2809,8 @@
     },
     "low": {
      "ktx2": {
-      "bytes": 319816,
-      "primitives": 6,
+      "bytes": 325468,
+      "primitives": 7,
       "textures": [
        {
         "material": "column_ruin_stone_low",
@@ -2839,8 +2839,8 @@
       ]
      },
      "webp": {
-      "bytes": 196104,
-      "primitives": 6,
+      "bytes": 201756,
+      "primitives": 7,
       "textures": [
        {
         "material": "column_ruin_stone_low",
@@ -3840,8 +3840,8 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 3929256,
-      "primitives": 6,
+      "bytes": 3936360,
+      "primitives": 7,
       "textures": [
        {
         "material": "pillar_square_stone",
@@ -3870,8 +3870,8 @@
       ]
      },
      "webp": {
-      "bytes": 2293192,
-      "primitives": 6,
+      "bytes": 2300292,
+      "primitives": 7,
       "textures": [
        {
         "material": "pillar_square_stone",
@@ -3902,8 +3902,8 @@
     },
     "low": {
      "ktx2": {
-      "bytes": 1086292,
-      "primitives": 6,
+      "bytes": 1092524,
+      "primitives": 7,
       "textures": [
        {
         "material": "pillar_square_stone_low",
@@ -3932,8 +3932,8 @@
       ]
      },
      "webp": {
-      "bytes": 665800,
-      "primitives": 6,
+      "bytes": 672028,
+      "primitives": 7,
       "textures": [
        {
         "material": "pillar_square_stone_low",
@@ -5012,6 +5012,459 @@
         "h": 512,
         "codec": "webp",
         "bytes": 90804
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/statue_hooded": {
+   "role": "statue",
+   "kind": "statue",
+   "contract": {
+    "r0": 0.85,
+    "height": 5,
+    "footprintR": 1.0821,
+    "plinthTop": 1.05,
+    "source": "sim statue obstacle (src/sim/arenaGen.ts THEME_RULES.desert obstacleR 0.85 / obstacleH 5.0); dressKit scales the plinth in xz by o.r / r0 and the figure uniformly by o.h / height"
+   },
+   "sources": [
+    "polyhaven/lichen_rock",
+    "mixamo/Paladin"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/statue_hooded.glb",
+     "webp": "kit/statue_hooded.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/statue_hooded.low.glb",
+     "webp": "kit/statue_hooded.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1732940,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 163002
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1074486
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 182216
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 1236848,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 284200
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 358856
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 280588
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 564792,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48304
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 298305
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 65134
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 413780,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 66980
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 110776
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 82990
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/statue_knight": {
+   "role": "statue",
+   "kind": "statue",
+   "contract": {
+    "r0": 0.85,
+    "height": 5,
+    "footprintR": 1.0821,
+    "plinthTop": 1.05,
+    "source": "sim statue obstacle (src/sim/arenaGen.ts THEME_RULES.desert obstacleR 0.85 / obstacleH 5.0); dressKit scales the plinth in xz by o.r / r0 and the figure uniformly by o.h / height"
+   },
+   "sources": [
+    "polyhaven/lichen_rock",
+    "mixamo/Paladin"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/statue_knight.glb",
+     "webp": "kit/statue_knight.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/statue_knight.low.glb",
+     "webp": "kit/statue_knight.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1749540,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 164389
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1038138
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 195239
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 1349568,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 298758
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 347322
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 351728
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 568740,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48544
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 300343
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 67657
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 428388,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 67588
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 116332
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 92274
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/statue_mage": {
+   "role": "statue",
+   "kind": "statue",
+   "contract": {
+    "r0": 0.85,
+    "height": 5,
+    "footprintR": 1.0821,
+    "plinthTop": 1.05,
+    "source": "sim statue obstacle (src/sim/arenaGen.ts THEME_RULES.desert obstacleR 0.85 / obstacleH 5.0); dressKit scales the plinth in xz by o.r / r0 and the figure uniformly by o.h / height"
+   },
+   "sources": [
+    "polyhaven/lichen_rock",
+    "mixamo/erika-archer"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/statue_mage.glb",
+     "webp": "kit/statue_mage.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/statue_mage.low.glb",
+     "webp": "kit/statue_mage.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1728968,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 164107
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1072967
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 187525
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 1242120,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 291300
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 353898
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 292572
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 559112,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48185
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 302654
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 65339
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 409316,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 67616
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 117604
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 81184
        }
       ]
      }

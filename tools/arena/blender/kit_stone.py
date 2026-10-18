@@ -13,7 +13,7 @@ without images + asset.json (tools/arena/build_assets.mjs attaches the textures)
 
 GLB layout (plan 4.2):
   KIT_<id> {id, role 'obstacle', kind, r0, footprintR, height, debris, dustTint, stretch}
-    LOD0 > <id>_lod0 (one mesh, material <id>_stone), FRAC_0..n (hidden at runtime, A5 spawns them)
+    LOD0 > <id>_lod0 (one mesh, material <id>_stone), FRAC_0..n (A5: tilted, rough fracture.py cuts; hidden, spawned along the fall line)
     LOD1 > <id>_lod1 (material <id>_stone_low), FRAC_*
     COL (hidden LOS proxy)    SHAFT {y0, y1} (empty; 9-slice band in the asset frame, metres)
 Run:  npm run arena:bake -- kit_pillar_square   (tools/arena/jobs.json, group a3)
@@ -30,6 +30,7 @@ from mathutils import Vector
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import abake  # noqa: E402
+import fracture  # noqa: E402
 import stonekit as K  # noqa: E402
 
 
@@ -246,30 +247,6 @@ def bake_lod(lod):
     return {**maps, 'normalCheck': K.normal_stats(os.path.join(job.out, maps['normal']))}
 
 
-def frac_slices(obj, cuts, lod):
-    """FRAC_k: the LOD mesh cut into horizontal slices at `cuts` (z), holes filled (render-only pieces for A5)"""
-    out = []
-    for k in range(len(cuts) - 1):
-        z0, z1 = cuts[k], cuts[k + 1]
-        bm = bmesh.new()
-        bm.from_mesh(obj.data)
-        for zc, keep_above in ((z0, True), (z1, False)):
-            if (keep_above and zc <= 1e-4) or (not keep_above and zc >= S['meta']['H'] - 1e-4):
-                continue
-            geom = bm.verts[:] + bm.edges[:] + bm.faces[:]
-            r = bmesh.ops.bisect_plane(bm, geom=geom, plane_co=(0, 0, zc), plane_no=(0, 0, 1), clear_inner=keep_above, clear_outer=not keep_above)
-            edges = [e for e in r['geom_cut'] if isinstance(e, bmesh.types.BMEdge)]
-            if edges:
-                bmesh.ops.holes_fill(bm, edges=edges, sides=0)
-        me = bpy.data.meshes.new(f'FRAC_{k}_{lod}')
-        bm.to_mesh(me)
-        bm.free()
-        o = K.link(bpy.data.objects.new(f'FRAC_{k}' if lod == 0 else f'FRAC_{k}.L1', me))
-        o.data.materials.clear()
-        out.append(o)
-    return out
-
-
 def assemble_and_export():
     m = S['meta']
     S['high'].hide_render = True
@@ -289,8 +266,12 @@ def assemble_and_export():
         e = abake.empty(f'LOD{lod}', parent=root, lod=lod)
         low.parent = e
         if m['frac']:
-            pcs = frac_slices(low, m['frac'], lod)
-            for p in pcs:
+            # A5: tilted cuts at the course / drum joints + the biggest piece split along the shaft, rough caps
+            # (fracture.py); A3 shipped plain horizontal slices
+            pcs = fracture.fracture_axis(low, m['frac'][1:-1], 200 + lod + a.seed, f'FRAC{lod}', tilt=0.22, split=1, rough=0.035 if lod == 0 else 0.025, jitter=0.06)
+            for k, p in enumerate(pcs):
+                p.name = f'FRAC_{k}' if lod == 0 else f'FRAC_{k}.L1'
+                p.data.materials.clear()
                 p.data.materials.append(bpy.data.materials[mats[lod]])
                 p.parent = e
                 p['frac'] = 1

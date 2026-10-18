@@ -136,6 +136,11 @@ export function kitObstacle(asset: KitAsset, o: Obstacle, crack: { value: number
   const H = Number(x.height) || o.h;
   const s = o.r / r0;
   const sh = asset.shaft;
+  // A5 statues: the plinth (below plinthTop) takes the sim radius in x / z, the figure scales uniformly to the sim height
+  // (exact top, never squashed); they face the arena centre (the asset's front is +z)
+  const statue = x.fit === 'statue';
+  const su = o.h / H;
+  const pTop = Number(x.plinthTop) || 0;
   const sy = sh ? 1 : s;
   const d = sh ? o.h - H : 0;
   const k = sh ? (sh[1] - sh[0] + d) / (sh[1] - sh[0]) : 1;
@@ -149,7 +154,7 @@ export function kitObstacle(asset: KitAsset, o: Obstacle, crack: { value: number
   });
   // a stable orientation per obstacle (render seed from the id): pillars are not all turned the same way
   const yaw = (new R(o.id * 977 + 13).next() * 4) | 0;
-  const rot = new THREE.Matrix4().makeRotationY((yaw * Math.PI) / 2 + (sh ? 0 : o.id * 1.3));
+  const rot = new THREE.Matrix4().makeRotationY(statue ? Math.atan2(-o.x, -o.z) : (yaw * Math.PI) / 2 + (sh ? 0 : o.id * 1.3));
   const mats = new Map<THREE.Material, THREE.Material>();
   for (const m of meshes) {
     const g = floatGeo(m.geometry);
@@ -157,6 +162,11 @@ export function kitObstacle(asset: KitAsset, o: Obstacle, crack: { value: number
     const p = g.attributes.position as THREE.BufferAttribute;
     for (let i = 0; i < p.count; i++) {
       let y = p.getY(i);
+      if (statue) {
+        const k = y < pTop ? s : su;
+        p.setXYZ(i, p.getX(i) * k, y * su, p.getZ(i) * k);
+        continue;
+      }
       if (sh) {
         if (y > sh[1]) y += d;
         else if (y > sh[0]) y = sh[0] + (y - sh[0]) * k;
@@ -194,6 +204,25 @@ export function kitObstacle(asset: KitAsset, o: Obstacle, crack: { value: number
   for (const c of [...root.children]) if (!(c as THREE.Mesh).isMesh && !c.userData.col && !c.children.length && /^LOD/.test(c.name)) root.remove(c);
   root.userData.footK = Number(x.footprintR) && r0 ? Number(x.footprintR) / r0 : undefined;
   return root;
+}
+
+/**
+ * A5: the two render-only guardian statues flanking the east gate (RingArt.guardians), as Placed entries merged with the
+ * ring: at azimuth 0 just outside the boundary (on the podium wall's coping with onWall), `side` m either side of the gate
+ * axis, facing the arena centre
+ */
+function guardians(a: Arena, pack: ArenaPack, placed: Placed[]) {
+  const GA = a.kit?.art.ring?.guardians ?? pack.art.ring?.guardians;
+  if (!GA || !pack.assets.has(GA.asset)) return;
+  const A = pack.assets.get(GA.asset)!;
+  const L = a.layout;
+  for (const side of [-1, 1]) {
+    const z = side * GA.side;
+    // the boundary x at this z (ellipse), then `offset` m further out
+    const x = L.rx * Math.sqrt(Math.max(0, 1 - (z / L.rz) ** 2)) + GA.offset;
+    const yaw = Math.atan2(-x, -z);
+    placed.push({ asset: A, m: new THREE.Matrix4().compose(new THREE.Vector3(x, GA.onWall ? L.wallH : 0, z), new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw), new THREE.Vector3(GA.scale, GA.scale, GA.scale)) });
+  }
 }
 
 // ------------------------------------------------------------------ A4 features
@@ -491,6 +520,7 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
         0.62,
       );
   }
+  guardians(a, pack, placed);
   if (!placed.length) return;
   removeLegacy(a, D, toRemove);
   const glow = candleCards(wicks, a.theme.fire);

@@ -10,7 +10,8 @@
 //   * budgets per role (BUDGET below): triangles per LOD, texture size, draw calls (primitives), file size;
 //   * texture GPU memory per tier (ETC1S ~0.5 B/px, UASTC 1 B/px, WebP decoded RGBA8 4 B/px, x4/3 mips) summed
 //     over the whole kit against the arena budget of plan 6.6 (64 / 128 / 192 MB for low / medium / high);
-//   * licences: every source in the manifest has a CC0 row in public/arena/credits.json; no stray files.
+//   * licences: every source in the manifest has a CC0 row in public/arena/credits.json (A5: or a Mixamo row for the
+//     statue bases, mixamo/<fbx>); no stray files.
 //   * A2 texture sets (role texset): carrier quad only, 3 square power-of-two textures, tileM / sizeM extras,
 //     minimum texel density per tier (TEXEL_MIN).
 import fs from 'node:fs';
@@ -42,6 +43,8 @@ const BUDGET = {
   hazard: { lod0Tris: 4000, lod1Tris: 1800, fullTex: 1024, lowTex: 512, prims: 10, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
   // A4: chain links (instanced at runtime: LINK_big, LINK_small)
   chain: { lod0Tris: 400, lod1Tris: 200, fullTex: 512, lowTex: 256, prims: 3, fullBytes: 0.6 * MB, lowBytes: 0.25 * MB },
+  // A5: posed-fighter statues (toppleable `statue` obstacles: plinth + carved figure, unique bake); FRAC_* counted separately
+  statue: { lod0Tris: 8000, lod1Tris: 3000, fullTex: 2048, lowTex: 1024, prims: 4, fullBytes: 6.0 * MB, lowBytes: 2.0 * MB, fracTris: 14000 },
   // A4: banner cloth (cloth-sim drapes + the 8-sigil atlas with tear masks in alpha) + rod
   cloth: { lod0Tris: 2500, lod1Tris: 900, fullTex: 2048, lowTex: 1024, prims: 4, fullBytes: 3.5 * MB, lowBytes: 1.2 * MB },
 };
@@ -203,7 +206,8 @@ async function main() {
     for (const s of A.sources || []) {
       const row = ledger.assets?.[s];
       if (!row) fails.push(`${id}: source ${s} missing from credits.json`);
-      else if (!/^CC0/.test(row.licence)) fails.push(`${id}: source ${s} licence ${row.licence} is not CC0`);
+      // A5: posed statues are carved from our Mixamo fighters (owner 2026-10-18: allowed; repo private; Models_HF not used)
+      else if (!/^CC0/.test(row.licence) && !(/^Mixamo/.test(row.licence) && s.startsWith('mixamo/'))) fails.push(`${id}: source ${s} licence ${row.licence} is not CC0`);
     }
     for (const [tier, byFmt] of Object.entries(A.files)) {
       for (const [fmt, file] of Object.entries(byFmt)) {
@@ -273,7 +277,7 @@ async function main() {
           else if (m.r > x.r0 * HAZARD_R_MAX + 0.005) f(`hazard visual r ${m.r.toFixed(3)} > ${HAZARD_R_MAX} x r0 ${x.r0}`);
         }
         if (A.role === 'cloth' && !m.alphaMask) f('cloth without an alphaMode MASK material (tear masks)');
-        if (A.role === 'obstacle') {
+        if (A.role === 'obstacle' || A.role === 'statue') {
           // A3: footprint vs the nominal sim radius, measured height vs extras, 9-slice band, fracture pieces
           const x = m.kit?.extras ?? {};
           if (!(x.r0 > 0)) f('obstacle: KIT_ extras r0 (nominal sim radius) missing');
@@ -282,6 +286,10 @@ async function main() {
           if (m.ymin < -0.12) f(`sinks ${(-m.ymin).toFixed(3)} m below the floor`);
           if (x.stretch === 'SHAFT' && !(m.shaft && m.shaft.y0 < m.shaft.y1 && m.shaft.y1 < m.ymax)) f('stretch SHAFT without a valid SHAFT {y0 < y1 < top} node');
           if (x.kind === 'column' && m.frac < 2) f(`only ${m.frac} FRAC_* pieces`);
+          // A5: statues fit by 'statue' (plinth xz to o.r, figure uniform to o.h) and must break into pieces when they topple
+          if (A.role === 'statue' && x.fit !== 'statue') f(`statue without fit 'statue'`);
+          if (A.role === 'statue' && !(x.plinthTop > 0 && x.plinthTop < m.ymax)) f('statue: plinthTop extra missing / above the top');
+          if (A.role === 'statue' && m.frac < 5) f(`statue with only ${m.frac} FRAC_* pieces`);
           if (B && m.fracTris > B.fracTris) f(`FRAC tris ${m.fracTris} > ${B.fracTris}`);
         }
         if (A.role === 'module') {

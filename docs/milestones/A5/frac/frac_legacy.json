@@ -1,0 +1,170 @@
+[
+ {
+  "theme": "desert",
+  "layout": "oval",
+  "q": 1,
+  "a": "maw",
+  "b": "ozrel",
+  "seed": 5,
+  "aseed": 7,
+  "legacy": true,
+  "obstacle": {
+   "i": 0,
+   "kind": "statue",
+   "t": 34.4667,
+   "timp": 35.3833,
+   "dx": -0.306,
+   "dz": 0.952,
+   "x": 9.832419421866625,
+   "z": 4.2524999999999995,
+   "h": 4.998510467939195,
+   "r": 0.8483118636644214
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": null,
+  "pools": [
+   {
+    "verts": 60,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 170,
+   "broken": 127
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\desert_oval_q1_legacy_hop.jpg",
+   "docs\\milestones\\A5\\frac\\desert_oval_q1_legacy_rest.jpg"
+  ],
+  "errors": []
+ },
+ {
+  "theme": "desert",
+  "layout": "pit",
+  "q": 2,
+  "a": "gorak",
+  "b": "erika",
+  "seed": 36,
+  "aseed": 7,
+  "legacy": true,
+  "obstacle": {
+   "i": 0,
+   "kind": "statue",
+   "t": 53.2833,
+   "timp": 54.2,
+   "dx": -0.498,
+   "dz": 0.867,
+   "x": 7.626263877332201,
+   "z": 6.452921762527267,
+   "h": 5.085051188664512,
+   "r": 0.9463913471531122
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": null,
+  "pools": [
+   {
+    "verts": 60,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 193,
+   "broken": 162
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\desert_pit_q2_legacy_hop.jpg",
+   "docs\\milestones\\A5\\frac\\desert_pit_q2_legacy_rest.jpg"
+  ],
+  "errors": []
+ },
+ {
+  "theme": "colosseum",
+  "layout": "oval",
+  "q": 1,
+  "a": "maw",
+  "b": "ozrel",
+  "seed": 21,
+  "aseed": 3,
+  "legacy": true,
+  "obstacle": {
+   "i": 5,
+   "kind": "column",
+   "t": 18.0667,
+   "timp": 18.9833,
+   "dx": 0.987,
+   "dz": 0.158,
+   "x": 9.832419421866629,
+   "z": -4.252499999999996,
+   "h": 5.1573984078674115,
+   "r": 0.661767801932292
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": null,
+  "pools": [
+   {
+    "verts": 60,
+    "kitMat": false
+   },
+   {
+    "verts": 60,
+    "kitMat": false
+   },
+   {
+    "verts": 60,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 182,
+   "broken": 154
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\colosseum_oval_q1_legacy_hop.jpg",
+   "docs\\milestones\\A5\\frac\\colosseum_oval_q1_legacy_rest.jpg"
+  ],
+  "errors": []
+ },
+ {
+  "theme": "colosseum",
+  "layout": "cross",
+  "q": 0,
+  "a": "hollowjack",
+  "b": "ozrel",
+  "seed": 15,
+  "aseed": 3,
+  "legacy": true,
+  "obstacle": {
+   "i": 7,
+   "kind": "column",
+   "t": 24.65,
+   "timp": 25.5667,
+   "dx": 0.349,
+   "dz": -0.937,
+   "x": 8.209509729575807,
+   "z": -8.209509729575817,
+   "h": 5.2,
+   "r": 0.7
+  },
+  "landed": true,
+  "intactVisible": false,
+  "frac": null,
+  "pools": [
+   {
+    "verts": 60,
+    "kitMat": false
+   }
+  ],
+  "drawCalls": {
+   "standing": 270,
+   "broken": 204
+  },
+  "shots": [
+   "docs\\milestones\\A5\\frac\\colosseum_cross_q0_legacy_hop.jpg",
+   "docs\\milestones\\A5\\frac\\colosseum_cross_q0_legacy_rest.jpg"
+  ],
+  "errors": []
+ }
+]

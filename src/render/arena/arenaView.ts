@@ -16,7 +16,7 @@ import { THEME_DEFS, type ThemeDef } from './themes';
 import { bakeEnvironment, makeSky } from './sky';
 import { ArenaFog, installHeightFog } from './fog';
 import { Ambient } from './ambient';
-import { Debris, Decals, type DebrisMat } from './debris';
+import { Debris, Decals, FracSet, type DebrisMat } from './debris';
 import { glowMat, lavaMaterial, shaderTime, waterMaterial } from './materials';
 import { merge as mergeAll, braziersGeo, chainGeo, crateGeo, drumGeo, paperLanternGeo, spikeGeo, urnGeo, barrelGeo, rockGeo } from './kit';
 import { buildDressing, type Dressing } from './dressing';
@@ -89,6 +89,8 @@ interface ObsView {
   landed: boolean;
   lastHp: number;
   axis?: THREE.Vector3;
+  /** A5: the FRAC_* pieces of a broken / landed kit obstacle (built on first need, seek-safe) */
+  frac?: FracSet | null;
 }
 interface PropView {
   obj: THREE.Object3D;
@@ -204,6 +206,7 @@ export class Arena {
     this.decals = new Decals(layout.rx, layout.rz);
     this.group.add(this.decals.mesh);
     this.group.add(this.debris.group);
+    if (kit) this.kitDebris(kit);
     this.ambient = new Ambient(T.ambient, quality);
     this.group.add(this.ambient.group);
 
@@ -1052,20 +1055,33 @@ export class Arena {
       }
       const fallT = -v - 1;
       if (!ov.def.toppleable) {
-        // A2b barricades shatter in place (debris comes from the obstacle_break event)
+        // A2b barricades shatter in place (debris comes from the obstacle_break event); A5: their kit FRAC pieces burst
+        if (ov.frac === undefined) ov.frac = this.spawnFrac(ov.mesh, 'burst', ov.def.id * 13 + 5, { speed: 0.8 });
         ov.fallen = ov.landed = true;
         ov.mesh.visible = false;
+        ov.frac?.update(t - fallT);
         continue;
       }
-      const k = Math.max(0, Math.min(1, (t - fallT) / 0.9));
+      const k = Math.max(0, Math.min(1, (t - fallT) / TOPPLE_VIS));
       if (!ov.fallen) this.startFall(ov, fallT);
       if (k < 1) {
         ov.mesh.visible = true;
+        if (ov.frac) this.dropFrac(ov);
+        ov.landed = false;
         const ang = (Math.PI / 2 - 0.06) * k * k;
         ov.pivot.setRotationFromAxisAngle(ov.axis!, ang);
-      } else if (!ov.landed) {
-        ov.landed = true;
-        ov.mesh.visible = false;
+      } else {
+        if (!ov.landed) {
+          ov.landed = true;
+          ov.mesh.visible = false;
+          // A5: the obstacle breaks on landing: its FRAC pieces start from the fallen pose and settle along the fall line
+          if (ov.frac === undefined) {
+            ov.pivot.setRotationFromAxisAngle(ov.axis!, Math.PI / 2 - 0.06);
+            const ev = this.toppleDir.get(i) ?? { dx: 1, dz: 0 };
+            ov.frac = this.spawnFrac(ov.mesh, 'lie', ov.def.id * 31 + 7, { dir: new THREE.Vector3(ev.dx, 0, ev.dz), speed: 1 });
+          }
+        }
+        ov.frac?.update(t - fallT - TOPPLE_VIS);
       }
     }
     // props
@@ -1109,6 +1125,16 @@ export class Arena {
         pv.glow.quaternion.copy(this.camQuat);
       }
     }
+    // A5: broken props' FRAC pieces (spawned by prop_break / explosion events; dropped when a seek goes back before them)
+    for (let k = this.propFracs.length - 1; k >= 0; k--) {
+      const pf = this.propFracs[k];
+      if (t < pf.t0 - 1e-3 || pf.set.finished) {
+        pf.set.dispose();
+        this.propFracs.splice(k, 1);
+        continue;
+      }
+      pf.set.update(t - pf.t0);
+    }
     // hazards
     for (let i = 0; i < this.hazards.length; i++) this.hazards[i].update(fr.haz[i] ?? 0, t, simDt);
     // A2b: burning oil from tipped braziers
@@ -1142,6 +1168,7 @@ export class Arena {
     ov.axis = new THREE.Vector3(ev.dz, 0, -ev.dx).normalize();
   }
   private unfall(ov: ObsView) {
+    this.dropFrac(ov);
     ov.fallen = false;
     ov.landed = false;
     ov.mesh.visible = true;
@@ -1151,6 +1178,62 @@ export class Arena {
   }
   /** topple directions come from the event stream (set by the app for seeks too) */
   toppleDir = new Map<number, { dx: number; dz: number }>();
+
+  // ------------------------------------------------------------------ A5: fracture sets + per-theme debris chunks
+  private propFracs: { set: FracSet; t0: number; i: number }[] = [];
+
+  /** a FracSet from an object's hidden FRAC_* meshes (kit assets), added to the arena; null when it has none (legacy) */
+  private spawnFrac(owner: THREE.Object3D, mode: 'lie' | 'burst', seed: number, opts: { dir?: THREE.Vector3; speed?: number } = {}): FracSet | null {
+    let any = false;
+    owner.traverse((o) => {
+      if (o.userData.frac && (o as THREE.Mesh).isMesh) any = true;
+    });
+    if (!any) return null;
+    const set = new FracSet(owner, mode, seed, opts);
+    for (const m of set.meshes) this.group.add(m);
+    return set;
+  }
+
+  private dropFrac(ov: ObsView) {
+    ov.frac?.dispose();
+    ov.frac = undefined;
+  }
+
+  /** A5: a breaking prop's FRAC pieces burst from where it stood (once per prop and break time) */
+  private propFrac(pv: PropView, i: number, t0: number, speed: number) {
+    if (this.propFracs.some((p) => Math.abs(p.t0 - t0) < 1e-6 && p.set.meshes.length && p.i === i)) return;
+    const set = this.spawnFrac(pv.obj, 'burst', i * 53 + 11, { speed });
+    if (set) this.propFracs.push({ set, t0, i });
+  }
+
+  /**
+   * A5: the debris pools draw kit chunk meshes in kit mode (ThemeArt.debris: debris kind -> kit asset; the most block-like
+   * FRAC piece of a LOADED asset, with the asset's baked material): stone rubble from kit/chunk, splinters from the crate,
+   * shards from the urn. Assets the layout did not load are not fetched for this (download stays as it was). One pool per
+   * debris kind as before, so the debris draw calls are unchanged.
+   */
+  private kitDebris(pack: ArenaPack) {
+    const map = pack.art.debris ?? {};
+    for (const [kind, id] of Object.entries(map) as [DebrisMat, string][]) {
+      const asset = pack.assets.get(id);
+      if (!asset) continue;
+      let best: THREE.Mesh | null = null,
+        score = -1;
+      asset.root.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh || !o.userData.frac) return;
+        m.geometry.computeBoundingBox();
+        const b = m.geometry.boundingBox!;
+        const e = [b.max.x - b.min.x, b.max.y - b.min.y, b.max.z - b.min.z].sort((p, q) => p - q);
+        const sc = e[0] / Math.max(1e-4, e[2]);
+        if (sc > score) (score = sc), (best = m);
+      });
+      const bm = best as THREE.Mesh | null;
+      // the baked material only where it is the same stuff (marble / sandstone keep their colour, take the chunk's shape)
+      const own = kind === 'stone' || kind === 'wood' || kind === 'ceramic';
+      if (bm) this.debris.setChunk(kind, bm.geometry, own ? (bm.material as THREE.Material) : undefined);
+    }
+  }
 
   /** destruction visuals for sim events; returns camera shake amount */
   onEvent(e: SimEvent, pos: (i: number) => THREE.Vector3): number {
@@ -1185,6 +1268,7 @@ export class Arena {
       }
       case 'prop_break': {
         const pv = this.props[Number(d.prop)];
+        if (pv) this.propFrac(pv, Number(d.prop), e.t, 1);
         const at = new THREE.Vector3(Number(d.x ?? pv?.obj.position.x ?? 0), Number(d.y ?? 0) + 0.4, Number(d.z ?? pv?.obj.position.z ?? 0));
         const kind = String(d.kind);
         const mat: DebrisMat = kind === 'urn' ? D.urnDebris : kind === 'lantern' ? 'paper' : kind === 'brazier' ? 'metal' : 'wood';
@@ -1194,6 +1278,8 @@ export class Arena {
       }
       case 'explosion': {
         const at = new THREE.Vector3(Number(d.x), Number(d.y), Number(d.z));
+        const pv = this.props[Number(d.prop)];
+        if (pv) this.propFrac(pv, Number(d.prop), e.t, 2.2);
         this.debris.burst('wood', at, 16, 0.15, 7);
         this.debris.burst('metal', at, 6, 0.08, 9);
         this.decals.scorch(at.x, at.z, 2.4);
@@ -1244,6 +1330,8 @@ export class Arena {
   /** reset all dynamic visuals (new match on the same arena) */
   resetProps() {
     for (let i = 0; i < this.obstacles.length; i++) this.unfall(this.obstacles[i]);
+    for (const pf of this.propFracs) pf.set.dispose();
+    this.propFracs.length = 0;
     this.toppleDir.clear();
     for (const p of this.props) {
       p.obj.visible = true;
@@ -1368,6 +1456,8 @@ export class Arena {
   }
 }
 
+/** seconds a toppling obstacle takes to reach the floor in the render (the sim lands it at TOPPLE_FALL) */
+const TOPPLE_VIS = 0.9;
 const LAVA_COL = new THREE.Color('#ff5a1a');
 /** A2b placeholder banner cloth per theme (until the art kit) */
 const BANNER_COLOR: Record<string, string> = { colosseum: '#7a1414', skytemple: '#d8c48a', sakura: '#b8202e', forge: '#3a2418', glacier: '#24426e', moonlake: '#3a2e62', desert: '#9a4818' };

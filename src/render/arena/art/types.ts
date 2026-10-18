@@ -13,6 +13,7 @@ import type { HazardKind, ObstacleKind, ThemeId } from '../../../sim/arenaGen';
 import type { RtPropKind } from '../../../sim/world';
 import type { SkyParams } from '../sky';
 import type { AmbientKind, Grade } from '../themes';
+import type { DebrisMat } from '../debris';
 
 /** id of a kit or theme asset in public/arena/manifest.json, e.g. 'kit/brazier_tripod' */
 export type AssetId = string;
@@ -98,6 +99,12 @@ export interface RingArt {
   wallBanners?: { w: number; h: number; rod?: boolean; chains?: boolean };
   /** A4: render-only dressing at the wall foot (candles, skulls, bone piles), merged; candle wicks get glow cards */
   decor?: { assets: AssetId[]; spacing: number; offset: number; skip?: number };
+  /**
+   * A5: a pair of render-only statues (kit statues, merged with the ring) flanking the east gate (azimuth 0, where every
+   * concept's hero landmark sits), `offset` m outside the boundary and `side` m either side of the gate axis, scaled
+   * uniformly (the kit statue is 5 m on its plinth), facing the arena centre; onWall stands them on the podium coping (wallH)
+   */
+  guardians?: { asset: AssetId; scale: number; offset: number; side: number; onWall?: boolean };
 }
 
 export interface GateArt {
@@ -115,7 +122,7 @@ export interface ThemeArt {
   id: ThemeId | 'default';
   /** sim props -> kit asset (authored to PROP_BASE radius / TOP height, origin at the base centre) */
   props?: Partial<Record<RtPropKind, AssetId>>;
-  /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h); a list = variants picked by obstacle id */
+  /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h, or A5 statue fit); a list = variants picked by obstacle id */
   obstacles?: Partial<Record<ObstacleKind, AssetId | AssetId[]>>;
   /** A4: hazard visuals (spike grate, chain weight, fire-jet vent, crumbling floor), scaled to the hazard radius by r0 */
   hazards?: Partial<Record<HazardKind, AssetId>>;
@@ -125,6 +132,9 @@ export interface ThemeArt {
   banners?: AssetId;
   /** A4: the chain links (kit/chain_link) for hanging chains, rod hangers and the chain-weight hazard */
   chains?: AssetId;
+  /** A5: debris kind -> kit asset whose most block-like FRAC piece (and baked material) the debris pool instances; only
+   * used when the asset is loaded anyway (no extra download) */
+  debris?: Partial<Record<DebrisMat, AssetId>>;
   floor?: FloorArt;
   ring?: RingArt;
   gates?: GateArt;

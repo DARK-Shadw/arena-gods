@@ -28,6 +28,10 @@ export const KIT_DEFAULT: ThemeArt = {
   hazards: { spikes: 'kit/spike_grate', chains: 'kit/chain_weight', flamejet: 'kit/vent_grate', crumble: 'kit/crumble' },
   banners: 'kit/banners',
   chains: 'kit/chain_link',
+  // A5: posed-fighter statues for the sim's toppling `statue` obstacles (variants by obstacle id); kit chunk / plank / shard
+  // meshes for the debris pools
+  obstacles: { statue: ['kit/statue_hooded', 'kit/statue_knight', 'kit/statue_mage'] },
+  debris: { stone: 'kit/chunk', marble: 'kit/chunk', sandstone: 'kit/chunk', wood: 'kit/crate', ceramic: 'kit/urn' },
 };
 
 /** per-theme ThemeArt files (A2: colosseum floor + Moon Gate preview; A7: colosseum for real, A11+: the others) */
@@ -36,7 +40,15 @@ const THEME_ART: Partial<Record<ThemeId, ThemeArt>> = { colosseum: COLOSSEUM_ART
 export function artFor(theme: ThemeId): ThemeArt {
   const t = THEME_ART[theme];
   if (!t) return { ...KIT_DEFAULT, id: theme };
-  const art: ThemeArt = { ...KIT_DEFAULT, ...t, props: { ...KIT_DEFAULT.props, ...t.props }, features: { ...KIT_DEFAULT.features, ...t.features }, hazards: { ...KIT_DEFAULT.hazards, ...t.hazards } };
+  const art: ThemeArt = {
+    ...KIT_DEFAULT,
+    ...t,
+    props: { ...KIT_DEFAULT.props, ...t.props },
+    features: { ...KIT_DEFAULT.features, ...t.features },
+    hazards: { ...KIT_DEFAULT.hazards, ...t.hazards },
+    obstacles: { ...KIT_DEFAULT.obstacles, ...t.obstacles },
+    debris: { ...KIT_DEFAULT.debris, ...t.debris },
+  };
   // A3: `?kitstone=0` keeps the A2 colosseum (legacy pillars and walls) on the kit floor, for before / after shots
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('kitstone') === '0') {
     delete art.obstacles;
@@ -82,6 +94,7 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
   for (const x of art.ringFlames?.assets ?? []) add(x);
   add(art.ring?.wallBraziers?.asset);
   for (const x of art.ring?.decor?.assets ?? []) add(x);
+  add(art.ring?.guardians?.asset);
   add(art.floor?.set);
   add(art.floor?.inlay);
   for (const m of art.ring?.modules ?? []) add(m.asset);

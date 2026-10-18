@@ -11,6 +11,9 @@
  * their sockets, hazards (spike grate raised, chain weight on kit links, vent, crumble) and features (banner pole with a
  * kit banner, barricade), the 8 banner cells on rods + 2 swags along swinging chains (vertex-shader sway, animated), and
  * every prop's FRAC_* breakage pieces exploded. `?still=1` freezes the sway clock (screenshots of the same pose).
+ * A5 rows: the posed-fighter statues through the game's statue fit (sim statue r 0.85, h 5.0 and a smaller / bigger one),
+ * and toppled copies of a statue and a pillar broken into their FRAC_* pieces by the runtime FracSet (debris.ts), at rest
+ * 1.6 s after landing along their fall line, exactly as the arena spawns them.
  */
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -21,6 +24,7 @@ import { kitObstacle, trimMaterial } from '../../../src/render/arena/dressKit';
 import type { ArenaPack } from '../../../src/render/arena/assets';
 import { BannerKit, swayTime } from '../../../src/render/arena/cloth';
 import { ChainKit } from '../../../src/render/arena/chains';
+import { FracSet } from '../../../src/render/arena/debris';
 
 const q = new URLSearchParams(location.search);
 const tier = q.get('tier') === 'low' ? 'low' : 'full';
@@ -138,7 +142,8 @@ async function main() {
   const ob = (id: string, kind: Obstacle['kind'], r: number, h: number, n: number): Item | null => {
     const a = loaded.get(id);
     if (!a) return null;
-    const o: Obstacle = { id: n, kind, x: 0, z: 0, r, h, hp: 200, cover: true, toppleable: true };
+    // statues face the arena centre from their position: z -1 turns them toward the gallery camera (+z)
+    const o: Obstacle = { id: n, kind, x: 0, z: kind === 'statue' ? -1 : 0, r, h, hp: 200, cover: true, toppleable: true };
     return { label: `${id.slice(4)}  r ${r} h ${h}`, obj: kitObstacle(a, o, { value: 0 }), w: Math.max(2.4, r * 3.2) };
   };
   const row1 = [ob('kit/pillar_square', 'column', 0.7, 5.0, 0), ob('kit/pillar_square', 'column', 0.6, 4.4, 1), ob('kit/pillar_square', 'column', 0.8, 5.6, 2), ob('kit/column_ruin', 'column', 0.6, 4.2, 0), ob('kit/column_ruin', 'column', 0.7, 5.2, 3), ob('kit/rubble_pile', 'rock', 0.525, 5, 0)].filter(Boolean) as Item[];
@@ -297,6 +302,40 @@ async function main() {
     }
     row7.push({ label: `${id.slice(4)} FRAC x${fr.length}`, obj: g, w: Number(a.extras.r0) > 0.5 || id.includes('banner') ? 2.6 : 1.5 });
   }
+  // ---------------- A5 rows: statues (game fit) and toppled statue / pillar broken into FRAC_* pieces (runtime FracSet)
+  const row8: Item[] = [];
+  for (const id of ids.filter((x) => role(x) === 'statue')) {
+    const it = ob(id, 'statue', 0.85, 5.0, row8.length);
+    if (it) row8.push({ ...it, w: 3.0 });
+  }
+  const big = ids.find((x) => role(x) === 'statue');
+  if (big) {
+    const it = ob(big, 'statue', 0.98, 5.1, 7);
+    if (it) row8.push({ ...it, w: 3.2 });
+  }
+  const w8 = rowZ(row8, 46, 1.2);
+  const fallen: { id: string; kind: Obstacle['kind']; r: number; h: number; x: number }[] = [];
+  if (big) fallen.push({ id: big, kind: 'statue', r: 0.85, h: 5.0, x: -7 });
+  if (loaded.has('kit/pillar_square')) fallen.push({ id: 'kit/pillar_square', kind: 'column', r: 0.7, h: 5.0, x: 1 });
+  for (const f of fallen) {
+    const o: Obstacle = { id: 3, kind: f.kind, x: 0, z: 0, r: f.r, h: f.h, hp: 200, cover: true, toppleable: true };
+    const obj = kitObstacle(loaded.get(f.id)!, o, { value: 0 });
+    const pivot = new THREE.Group();
+    pivot.position.set(f.x + f.r * 0.8, 0, 54);
+    obj.position.set(-f.r * 0.8, 0, 0);
+    pivot.add(obj);
+    pivot.setRotationFromAxisAngle(new THREE.Vector3(0, 0, -1), Math.PI / 2 - 0.06);
+    scene.add(pivot);
+    pivot.updateMatrixWorld(true);
+    const set = new FracSet(obj, 'lie', 3 * 31 + 7, { dir: new THREE.Vector3(1, 0, 0), speed: 1 });
+    for (const m of set.meshes) scene.add(m);
+    set.update(set.settle + 0.5);
+    pivot.visible = false;
+    label(`${f.id.slice(4)} toppled -> ${set.meshes.length ? 'FRAC pieces at rest' : 'no FRAC'}`, new THREE.Vector3(f.x + 2.5, -0.1, 56));
+    fire(f.x + 2.5, 1.6, 57, 0.9);
+  }
+  for (const [x, z] of [[-w8 / 3, 48.5], [w8 / 3, 48.5], [0, 48.5]]) fire(x, 1.8, z, 1);
+
   const w4 = rowZ(row4, 12, 1.0);
   const w5 = rowZ(row5, 19, 1.2);
   const w7 = rowZ(row7, 34, 1.0);
@@ -333,6 +372,10 @@ async function main() {
     { name: 'banners', pos: new THREE.Vector3(0, 3.0, 40), look: new THREE.Vector3(0, 2.8, 26) },
     { name: 'banner_close', pos: new THREE.Vector3(-3.2, 3.0, 30.5), look: new THREE.Vector3(-3.2, 2.9, 26) },
     { name: 'frac', pos: new THREE.Vector3(0, 2.4, 40.5), look: new THREE.Vector3(0, 0.5, 34) },
+    // A5
+    { name: 'statues', pos: new THREE.Vector3(0, 3.0, 57.5), look: new THREE.Vector3(0, 2.7, 46) },
+    { name: 'statue_close', pos: new THREE.Vector3(-w8 / 2 + 1.5, 3.4, 51.5), look: new THREE.Vector3(-w8 / 2 + 1.5, 3.1, 46) },
+    { name: 'toppled', pos: new THREE.Vector3(-1.5, 4.5, 63), look: new THREE.Vector3(-1.5, 0.4, 54) },
   );
   const bar = document.getElementById('views')!;
   views.forEach((v, i) => {
@@ -344,7 +387,7 @@ async function main() {
   setView(Number(q.get('view') ?? 0));
   const info = { tier, format: assets.format, assets: [...loaded.keys()], drawCalls: 0, triangles: 0 };
   (window as unknown as { __gallery: unknown }).__gallery = { ready: true, views: views.map((v) => v.name), setView, info, render: frame };
-  hud.textContent = `A3 stone kit + A4 dressing kit  |  tier ${tier}  |  textures ${assets.format}  |  ${loaded.size} assets`;
+  hud.textContent = `A3 stone kit + A4 dressing kit + A5 statues  |  tier ${tier}  |  textures ${assets.format}  |  ${loaded.size} assets`;
   // A4: animate the banner sway / chain swing (vertex shaders); ?still=1 keeps one pose for screenshots
   const still = q.get('still') === '1';
   const t0 = performance.now();
@@ -355,6 +398,7 @@ async function main() {
   };
   requestAnimationFrame(loop);
   void w5;
+  void w8;
 }
 
 function setView(i: number) {

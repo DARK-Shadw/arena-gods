@@ -37,6 +37,10 @@ export const COLOSSEUM_ART: ThemeArt = {
     wallBraziers: { asset: 'kit/brazier_wall' },
     wallBanners: { w: 1.25, h: 2.6, rod: true, chains: true },
     decor: { assets: ['kit/candles', 'kit/skull', 'kit/bone_pile', 'kit/candles'], spacing: 6.5, offset: 0.25, skip: 0.45 },
+    // A5: ref-3's two hooded guardians flanking the east gate (azimuth 0, the hero direction of the ref-3 preset), on the floor
+    // with their plinths set into the podium wall (the plinth front stays on the fight boundary; on the coping they were lost in
+    // the stands); render-only, merged with the ring (A7 moves them to the stair / dais)
+    guardians: { asset: 'kit/statue_hooded', scale: 1.4, offset: 1.2, side: 6.0 },
   },
   look: {
     sky: {
