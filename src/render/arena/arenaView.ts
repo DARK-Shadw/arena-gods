@@ -33,6 +33,13 @@ import { LAYER } from '../fx/fxLayers';
 import { THEME_FLOOR, type FloorSurface } from '../fx/fxSurfaces';
 import { swayOn, swayTime } from './cloth';
 import type { KitInstance } from './assets';
+import { gateZoneTest } from './nearField';
+
+/**
+ * A7: the hang height of every chandelier hazard (the cage's top ring), shared by the hazard builder, the camera's
+ * avoidance list (hangingNow, main.ts camWorld) and the kit chandelier assets (authored to hang from this height)
+ */
+export const CHANDELIER_H = 6.2;
 
 export interface Gate {
   angle: number;
@@ -145,6 +152,14 @@ export class Arena {
 
   /** A1: loaded kit art (assets.ts) or null = the legacy procedural dressing (always with ?arena=legacy) */
   readonly kit: ArenaPack | null;
+  /**
+   * A7: plain merged proxy meshes that are never drawn (material.visible = false) but that ray casts hit: the camera's
+   * solids() / rayProxies, the entrance validator and snapAnchors. Kit art that is drawn as an InstancedMesh or flagged
+   * userData.dyn (the wet floor, banners) puts its COL / support proxy here (plan 4.3).
+   */
+  losGroup!: THREE.Group;
+  /** A7: the invisible material of the losGroup proxies (owned by the arena) */
+  losMat!: THREE.MeshBasicMaterial;
   /** A2: the kit wet floor + its planar reflection (medium / high), light map and low-tier streak cards */
   wetFloor: WetFloor | null = null;
   reflection: PlanarReflection | null = null;
@@ -164,6 +179,15 @@ export class Arena {
     // A2: kit art may override the theme's display data (the Moon Gate night preview on the colosseum)
     const T = (this.theme = withLook(THEME_DEFS[layout.theme], kit?.art.look));
     scene.add(this.group);
+    // A7: hidden line-of-sight / support proxies (instanced or dyn art that the camera and the entrances must still see)
+    // (kit mode only: every Object3D / material takes a uuid from Math.random and ?arena=legacy must keep its random
+    // sequence for the pixel-identical gate). Front side only, like the floor it stands in for.
+    if (kit) {
+      this.losGroup = new THREE.Group();
+      this.losGroup.name = 'losGroup';
+      this.losMat = new THREE.MeshBasicMaterial({ visible: false });
+      this.group.add(this.losGroup);
+    }
 
     // ---------------- sky, environment, fog
     this.sky = makeSky(T.sky);
@@ -185,6 +209,11 @@ export class Arena {
     // ---------------- lights
     this.hemi = new THREE.HemisphereLight(T.hemi[0], T.hemi[1], T.hemi[2]);
     this.group.add(this.hemi);
+    // A7: `?lit=1` (kit mode, debug only): flat bright fill so the dark near field can be judged by shape (A8 owns the light)
+    if (kit && typeof location !== 'undefined' && new URLSearchParams(location.search).get('lit') === '1') {
+      this.hemi.intensity *= 4;
+      this.group.add(new THREE.AmbientLight('#ffffff', 1.6));
+    }
     const sun = new THREE.DirectionalLight(T.sunColor, T.sunIntensity);
     const sd = T.sky.moonSize > 0 && T.sky.sunGlow === 0 ? T.sky.moonDir : T.sky.sunDir;
     sun.position.copy(sd).multiplyScalar(60);
@@ -286,6 +315,8 @@ export class Arena {
     const asset = kit.assets.get(RF.asset);
     if (!asset && !variants.length) return;
     const L = this.layout;
+    // A7: no ring brazier inside a kit gate structure (the hero stair, the gate portals) or on a pillar
+    const blocked = gateZoneTest(this, kit);
     const circ = 2 * Math.PI * Math.sqrt((L.rx * L.rx + L.rz * L.rz) / 2);
     const spacing = circ / RF.count;
     alongEllipse(
@@ -293,6 +324,7 @@ export class Arena {
       RF.offset,
       spacing,
       (p, yaw, _a, i) => {
+        if (blocked(p)) return;
         const A = variants.length ? variants[i % variants.length]! : asset!;
         const inst = A.instantiate();
         const g = new THREE.Group();
@@ -508,7 +540,8 @@ export class Arena {
       core.position.y = size * 0.2;
       g.add(core);
     }
-    const entry: (typeof this.flames)[number] = { obj: g, ph: Math.random() * 10, base: 1, size };
+    // A7: kit mode takes a deterministic flicker phase (render seed); legacy keeps Math.random (pixel-identical gate)
+    const entry: (typeof this.flames)[number] = { obj: g, ph: this.kit ? ((this.flames.length * 7.31 + at.x * 1.7 + at.z * 2.3) % 10 + 10) % 10 : Math.random() * 10, base: 1, size };
     if (light && this.lightBudget > 0) {
       this.lightBudget--;
       const L = new THREE.PointLight(color, size * 6, size * 14, 1.6);
@@ -691,10 +724,10 @@ export class Arena {
       }
       case 'chandelier': {
         const ch = D.chandelier(h);
-        ch.position.y = 6.2; // hanging from the start (before the first frame: the entrance validator / reveal saw it on the floor)
+        ch.position.y = CHANDELIER_H; // hanging from the start (before the first frame: the entrance validator / reveal saw it on the floor)
         g.add(ch);
         const chain = new THREE.Mesh(chainGeo(14), D.mats.metal);
-        chain.position.y = 6.2 + 14;
+        chain.position.y = CHANDELIER_H + 14;
         chain.castShadow = false;
         g.add(chain);
         const shadow = new THREE.Mesh(new THREE.CircleGeometry(h.r, 32), new THREE.MeshBasicMaterial({ color: '#000000', transparent: true, opacity: 0, depthWrite: false }));
@@ -704,7 +737,7 @@ export class Arena {
         let t0 = -1;
         update = (s, t, dt) => {
           if (s === 0) {
-            ch.position.y = 6.2;
+            ch.position.y = CHANDELIER_H;
             ch.rotation.z = Math.sin(t * 0.7 + h.id) * 0.02;
             chain.visible = true;
             ch.visible = true;
@@ -716,7 +749,7 @@ export class Arena {
           } else if (s === 2) {
             if (t0 < 0) t0 = t;
             const k = Math.min(1, (t - t0) / 0.55);
-            ch.position.y = 6.2 * (1 - k * k);
+            ch.position.y = CHANDELIER_H * (1 - k * k);
             chain.visible = false;
             (shadow.material as THREE.MeshBasicMaterial).opacity = 0.35 + k * 0.3;
           } else {
@@ -979,7 +1012,7 @@ export class Arena {
   /** chandeliers still hanging (for camera avoidance) */
   hangingNow(): { x: number; y: number; z: number; r: number }[] {
     const out: { x: number; y: number; z: number; r: number }[] = [];
-    for (const h of this.hazards) if (h.def.kind === 'chandelier' && h.group.children[0]?.visible !== false) out.push({ x: h.def.x, y: 6.2, z: h.def.z, r: 1.3 });
+    for (const h of this.hazards) if (h.def.kind === 'chandelier' && h.group.children[0]?.visible !== false) out.push({ x: h.def.x, y: CHANDELIER_H, z: h.def.z, r: 1.3 });
     // A2b: chain weights (the chain and the weight's swing zone)
     for (const h of this.hazards) if (h.def.kind === 'chains') out.push({ x: h.def.x, y: CHAIN_PIVOT_H - CHAIN_LEN * 0.5, z: h.def.z, r: 1.0 });
     return out;

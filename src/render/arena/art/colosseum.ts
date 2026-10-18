@@ -38,10 +38,45 @@ export const COLOSSEUM_ART: ThemeArt = {
     wallBraziers: { asset: 'kit/brazier_wall' },
     wallBanners: { w: 1.25, h: 2.6, rod: true, chains: true },
     decor: { assets: ['kit/candles', 'kit/skull', 'kit/bone_pile', 'kit/candles'], spacing: 6.5, offset: 0.25, skip: 0.45 },
-    // A5: ref-3's two hooded guardians flanking the east gate (azimuth 0, the hero direction of the ref-3 preset), on the floor
-    // with their plinths set into the podium wall (the plinth front stays on the fight boundary; on the coping they were lost in
-    // the stands); render-only, merged with the ring (A7 moves them to the stair / dais)
-    guardians: { asset: 'kit/statue_hooded', scale: 1.4, offset: 1.2, side: 6.0 },
+    // A5 placed ref-3's two hooded guardians at the east gate here (`guardians`); A7 moved them onto plinths beside the stair
+    // (ruins.east.stair.guardians)
+    // A7: the Moon Gate near field (nearField.ts): ruined tiers instead of the stands / crowd / velarium / gallery, ref-3's tall
+    // square pillars with long banners and heavy chains, the hero stair + portal + dais + doorway at the east gate, the kit
+    // arch at the west gate, sparse hooded watchers, tier fires, the fire-cage chandelier
+    ruins: {
+      tiers: { rings: 4, depth: 1.6, rise: 0.85, base: 3.45, seg: 3.3, broken: 0.45, eastBroken: 0.8 },
+      arcade: { assets: ['kit/arcade_broken', 'kit/arcade_bay', 'kit/arcade_broken'], share: 0.45, minAz: 70 },
+      pillars: {
+        asset: 'kit/pillar_square',
+        az: [40, 64, 90, 116, 142],
+        offset: 2.1,
+        scale: 2.0,
+        height: 14,
+        banner: { w: 2.3, h: 8.6, pin: 12.2 },
+        chains: { scale: 2.6, sag: 2.4, swags: true },
+      },
+      watchers: { count: [8, 14, 18], color: '#1b1722' },
+      fires: { asset: 'kit/brazier_wall', count: 7, size: 0.75 },
+      fireCage: true,
+      east: {
+        zoneHalf: 11.2,
+        stair: {
+          portalHalf: 2.4,
+          flightOuter: 5.6,
+          steps: 16,
+          rise: 0.275,
+          run: 0.38,
+          z0: -0.9,
+          daisDepth: 6,
+          daisHalf: 7.6,
+          doorway: 'kit/arch',
+          doorwayScale: 1.25,
+          guardians: { statue: 'kit/statue_hooded', plinth: 'kit/plinth', lateral: 7.5, z: -1.9, plinthScale: 2.0, scale: 2.0 },
+          braziers: { asset: 'kit/brazier_pedestal', lateral: 10.2, z: 1.6, scale: 1.8, flame: 1.8 },
+        },
+      },
+      west: { zoneHalf: 4.6, arch: 'kit/arch', braziers: { asset: 'kit/brazier_tripod', lateral: 4.3, z: -0.3, scale: 1.0, flame: 0.95 } },
+    },
   },
   // A6: the Moon Gate test backdrop (arch blockout + ruined arcade ring + outer ruins + clouds, Cycles panorama layers);
   // A8 replaces the scene with the full one and tunes these

@@ -88,6 +88,7 @@ function snapAnchors(arena: CineCtx['arena'], gate: number) {
   if (A.snapped) return A;
   A.snapped = true;
   arena.group.updateMatrixWorld(true);
+  // A7: the arena's losGroup proxies (invisible, e.g. the kit wet floor) are plain meshes in the group: they are snapped onto too
   const meshes: THREE.Mesh[] = [];
   arena.group.traverse((o) => {
     const m = o as THREE.Mesh;

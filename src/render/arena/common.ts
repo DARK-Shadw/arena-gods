@@ -256,6 +256,7 @@ export function crowd(a: Arena, rows: { off: number; y: number }[], count: numbe
   mesh.receiveShadow = true;
   heads.receiveShadow = true;
   mesh.userData.noAO = heads.userData.noAO = true;
+  mesh.userData.crowd = heads.userData.crowd = true; // A7: the Moon Gate (kit mode) removes the crowd
   a.group.add(mesh, heads);
   a.onUpdate(() => (excite.value = a.excitement));
 }

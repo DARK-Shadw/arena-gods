@@ -106,11 +106,83 @@ export interface RingArt {
    * uniformly (the kit statue is 5 m on its plinth), facing the arena centre; onWall stands them on the podium coping (wallH)
    */
   guardians?: { asset: AssetId; scale: number; offset: number; side: number; onWall?: boolean };
+  /** A7: the Moon Gate near field (ruined tiers, pillars with banners and chains, gates, watchers) */
+  ruins?: RuinsArt;
 }
 
+/**
+ * A7: kit gates. The legacy gate builder still makes the functional parts (portcullis, tunnel, gate light, anchors);
+ * kit mode removes its decorative parts (userData.gateDeco / gateFlame) and builds these around the opening. Positions in
+ * the GATE FRAME (x lateral, y up, z metres into the arena from the boundary; everything built sits at z < 0, outside the
+ * fight ellipse), anchors are re-declared for the new geometry and still pass through snapAnchors.
+ */
 export interface GateArt {
-  /** gate asset with BARRIER, ANCHOR_*, TUNNEL nodes (plan 4.2) */
-  asset: AssetId;
+  /** gate asset with BARRIER, ANCHOR_*, TUNNEL nodes (plan 4.2; not used yet) */
+  asset?: AssetId;
+  /** plain gates (west): this arch module frames the opening (kit/arch: 3.2 m opening, the legacy tunnel stays) */
+  arch?: AssetId;
+  /** braziers flanking a plain gate */
+  braziers?: { asset: AssetId; lateral: number; z: number; scale: number; flame: number };
+  /**
+   * the hero gate (east, azimuth 0, ref-3): two stair flights rising away from the arena on either side of a central
+   * portal (the gate passage runs under a landing at the dais height), a dais behind them carrying the doorway arch
+   * (dark doorway), hooded guardians on plinths beside the flights, big pedestal braziers at the stair foot
+   */
+  stair?: {
+    /** half width of the portal block (passage 3.1 m wide inside) */
+    portalHalf: number;
+    /** lateral extent of each flight (from portalHalf to flightOuter) */
+    flightOuter: number;
+    /** steps: rise / run (m), dais height = steps x rise */
+    steps: number;
+    rise: number;
+    run: number;
+    /** frame z of the first riser (negative = outside the boundary) */
+    z0: number;
+    /** dais depth behind the flights and half width */
+    daisDepth: number;
+    daisHalf: number;
+    doorway: AssetId;
+    /** uniform scale of the doorway arch */
+    doorwayScale?: number;
+    guardians?: { statue: AssetId; plinth: AssetId; lateral: number; z: number; plinthScale: number; scale: number };
+    braziers?: { asset: AssetId; lateral: number; z: number; scale: number; flame: number };
+  };
+  /** lateral half width of the zone around this gate where the ring (walls, tiers, pillars, decor, ring braziers) stays out */
+  zoneHalf: number;
+}
+
+/**
+ * A7: the Moon Gate near field (ref-3): ruined tiers replacing the legacy stands (and the crowd, velarium and gallery), tall
+ * square pillars with long banners and heavy chains swagging between them, sparse hooded watchers, tier fires, a ruined
+ * arcade on the top tier, forecourt ground at the gates, the fire-cage chandelier.
+ */
+export interface RuinsArt {
+  /** ruined tiers behind the podium wall: `rings` steps of `depth` m, each `rise` m higher, from `base` (the podium top) */
+  tiers: { rings: number; depth: number; rise: number; base: number; seg: number; broken: number; eastBroken: number };
+  /** arcade bays on the top tier (a share of the sectors, never towards the hero gate's vista) */
+  arcade?: { assets: AssetId[]; share: number; minAz: number };
+  /** tall square pillars: azimuths (deg, 0 = east gate, both sides mirrored), offset of the centre outside the boundary */
+  pillars?: {
+    asset: AssetId;
+    az: number[];
+    offset: number;
+    scale: number;
+    height: number;
+    /** long vertical banners on the pillars' arena faces (w x h m), every n-th pillar skipped by `skip` */
+    banner?: { w: number; h: number; pin: number };
+    /** heavy chains between neighbouring pillar tops (link scale, sag m) with swag cloths under them */
+    chains?: { scale: number; sag: number; swags: boolean };
+  };
+  /** sparse hooded watchers standing on the tiers (count per quality tier low / medium / high) */
+  watchers?: { count: [number, number, number]; color: string };
+  /** small fires on the tiers (kit wall braziers) */
+  fires?: { asset: AssetId; count: number; size: number };
+  /** the fire-cage chandelier (procedural iron, hung at CHANDELIER_H) */
+  fireCage?: boolean;
+  /** east / west gate dressing */
+  east?: GateArt;
+  west?: GateArt;
 }
 
 /**

@@ -36,7 +36,7 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
       await page.waitForFunction(() => window.__arena && window.__arena.arena, null, { timeout: 120000 });
       const r = await page.evaluate(async (o) => {
         const res = await window.__arena.validateEntrances(o);
-        return { configs: res.configs, failed: res.failed, fails: res.results.filter((x) => !x.ok).map((x) => ({ theme: x.theme, layout: x.layout, gate: x.gate, fighter: x.fighter, variant: x.variant, why: x.why ?? x.reasons ?? x.fail })) };
+        return { configs: res.configs, failed: res.failed, fails: res.results.filter((x) => !x.ok).map((x) => ({ theme: x.theme, layout: x.layout, gate: x.gate, fighter: x.fighter, variant: x.variant, issues: (x.issues ?? []).slice(0, 4) })) };
       }, { fighters, themes });
       out[p || 'kit'] = r;
       console.log(`${(p || 'kit').padEnd(12)} configs ${r.configs} failed ${r.failed}`);

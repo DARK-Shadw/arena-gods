@@ -1,0 +1,165 @@
+{
+ "readable": 95.9,
+ "contact": 96.9,
+ "cutsPerMin": 21.6,
+ "shortShots": 12,
+ "per": [
+  "gorak-aldric#4242 colosseum/pit#7 99.2% c98% cuts18.7",
+  "maw-vex#404 colosseum/pit#7 98.0% c100% cuts20.5",
+  "erika-fenrik#101 forge/cross#11 94.7% c100% cuts19.1",
+  "ozrel-hollowjack#202 skytemple/oval#5 92.9% c95% cuts25.2",
+  "vex-gorak#303 sakura/gauntlet#9 94.9% c98% cuts23.4",
+  "aldric-maw#505 glacier/split#13 96.7% c97% cuts17.1",
+  "fenrik-erika#606 moonlake/pit#3 95.3% c100% cuts26.1",
+  "hollowjack-ozrel#707 desert/cross#21 93.8% c88% cuts23.1"
+ ],
+ "bad": [
+  "maw-vex#404:ots_0 22/284 {\"fighters tiny\":17,\"f1 hidden by fighter\":5}",
+  "erika-fenrik#101:establish 32/71 {\"fighters tiny\":25,\"f1 hidden by arena+fighters tiny\":6,\"f1 hidden by arena\":1}",
+  "erika-fenrik#101:ots_1 35/608 {\"fighters tiny\":2,\"f0 hidden by fighter\":31,\"f0 hidden by arena\":2}",
+  "erika-fenrik#101:two_shot 48/433 {\"f1 out of frame\":9,\"f0 hidden by fighter+f1 out of frame\":1,\"f0 out of frame\":31,\"f0 out of frame+f1 out of frame\":5,\"f1 hidden by fighter\":2}",
+  "ozrel-hollowjack#202:hero_0 28/84 {\"f1 out of frame\":8,\"f0 out of frame\":20}",
+  "ozrel-hollowjack#202:finisher 73/161 {\"f0 out of frame\":73}",
+  "vex-gorak#303:two_shot_low 81/525 {\"f0 hidden by arena\":31,\"f1 hidden by arena\":28,\"f0 hidden by arena+f1 hidden by arena\":22}",
+  "aldric-maw#505:establish 39/69 {\"fighters tiny\":39}",
+  "aldric-maw#505:two_shot 30/694 {\"f0 out of frame\":15,\"f0 out of frame+f1 out of frame\":3,\"f0 hidden by arena\":12}",
+  "fenrik-erika#606:establish 31/47 {\"fighters tiny\":31}",
+  "fenrik-erika#606:ots_0 43/660 {\"fighters tiny\":27,\"f1 hidden by fighter\":16}",
+  "fenrik-erika#606:two_shot_low 24/545 {\"f0 hidden by arena\":10,\"f1 hidden by fighter\":8,\"f1 out of frame\":1,\"f0 hidden by fighter+f1 out of frame\":1,\"f1 hidden by arena\":3,\"f0 hidden by arena+f1 hidden by arena\":1}",
+  "hollowjack-ozrel#707:ots_1 45/420 {\"f0 hidden by arena\":32,\"fighters tiny\":13}",
+  "hollowjack-ozrel#707:wide 29/119 {\"f0 out of frame\":4,\"f1 hidden by arena\":13,\"f0 hidden by arena\":12}"
+ ],
+ "worst": [
+  [
+   {
+    "t": 24.97,
+    "why": "contact (hit) not visible",
+    "shot": "crane_0"
+   },
+   {
+    "t": 51.73,
+    "why": "f1 out of frame",
+    "shot": "two_shot_low"
+   }
+  ],
+  [
+   {
+    "t": 15.54,
+    "why": "f0 out of frame, f1 out of frame",
+    "shot": "destruct"
+   },
+   {
+    "t": 38.48,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   }
+  ],
+  [
+   {
+    "t": 0.4,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 28.37,
+    "why": "f0 out of frame",
+    "shot": "two_shot"
+   }
+  ],
+  [
+   {
+    "t": 19.38,
+    "why": "contact (hit) not visible",
+    "shot": "crane_1"
+   },
+   {
+    "t": 24.3,
+    "why": "f0 out of frame",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 58.3,
+    "why": "contact (hit) not visible",
+    "shot": "hero_1"
+   },
+   {
+    "t": 58.44,
+    "why": "f1 out of frame",
+    "shot": "hero_1"
+   }
+  ],
+  [
+   {
+    "t": 7.3,
+    "why": "f0 hidden by arena:LOD0_body@-1.4,0.8,3.7",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 22.05,
+    "why": "contact (hit) not visible",
+    "shot": "crane_1"
+   },
+   {
+    "t": 31.11,
+    "why": "f1 out of frame",
+    "shot": "hero_1"
+   },
+   {
+    "t": 69.55,
+    "why": "f1 hidden by arena:LOD0_body@0.5,0.9,-4.4",
+    "shot": "two_shot_low"
+   }
+  ],
+  [
+   {
+    "t": 1.97,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 4.17,
+    "why": "contact (hit) not visible",
+    "shot": "ots_0"
+   },
+   {
+    "t": 26.11,
+    "why": "f0 out of frame",
+    "shot": "two_shot"
+   }
+  ],
+  [
+   {
+    "t": 0.43,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 4.5,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   }
+  ],
+  [
+   {
+    "t": 2.35,
+    "why": "contact (hit) not visible",
+    "shot": "ots_1"
+   },
+   {
+    "t": 2.62,
+    "why": "contact (hit) not visible",
+    "shot": "ots_1"
+   },
+   {
+    "t": 7.52,
+    "why": "f0 out of frame",
+    "shot": "destruct"
+   },
+   {
+    "t": 15.85,
+    "why": "f1 hidden by arena:statue_hooded_lod0@2.3,3.0,1.6",
+    "shot": "wide"
+   }
+  ]
+ ]
+}

@@ -22,6 +22,10 @@
  *   crumbling floor: `hazardKit`, consumed by arenaView's hazard builders), and on the ring: wall-top braziers (merged),
  *   the legacy wall banners replaced by kit banners on rods and short chains (ONE merged swaying mesh, cells by the render
  *   seed: no Math.random), and wall-foot decor (candles with glow cards, skulls, bone piles).
+ * A7: the Moon Gate NEAR FIELD (nearField.ts, RingArt.ruins): ruined tiers / pillars / banners / chains / gates / watchers /
+ *   tier fires are added to the same merged ring (trim draw call, one banner mesh, one chain builder); the ring dressing keeps
+ *   out of the kit gate zones and off the pillars (gateZoneTest); the wet floor gets an invisible support proxy in the
+ *   arena's losGroup; the chandelier becomes the iron fire cage.
  * Each later milestone moves one slot here (A5-A7 gates, A6 backdrop, A19 lights / sockets), keeping the
  * legacy builder as the fallback for slots the art leaves undefined or whose asset failed to load.
  */
@@ -40,6 +44,7 @@ import { BannerKit } from './cloth';
 import { ChainKit } from './chains';
 import type { HazardDef } from '../../sim/arenaGen';
 import { softDot } from './textures';
+import { buildNearField, fireCage, gateZoneTest, type BannerSpec, type Placed } from './nearField';
 
 export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressing): Dressing {
   // TODO(A4-A7): gates, hazards; TODO(A6): backdrop
@@ -77,6 +82,8 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
     chainKit(): ChainKit | null {
       return chainAsset ? new ChainKit(chainAsset) : null;
     },
+    // A7: the Moon Gate's iron fire cage for the chandelier hazard (legacy: the bronze ring on velarium cables)
+    chandelier: art.ring?.ruins?.fireCage ? () => fireCage(a) : D.chandelier,
     obstacle(o, crack) {
       const asset = pickObstacle(pack, o);
       if (asset) {
@@ -310,6 +317,14 @@ function buildFloor(a: Arena, pack: ArenaPack, D: Dressing): WetFloor | undefine
   }
   removeLegacy(a, D, old);
   a.group.add(wf.mesh);
+  // A7: the wet floor is drawn as a dyn mesh (no merge, own passes), so the ray casts that need a floor (entrance support,
+  // anchor snapping) get an invisible proxy of it in the losGroup (the legacy floor disc was a plain solid mesh)
+  const proxy = new THREE.Mesh(wf.mesh.geometry.clone(), a.losMat);
+  proxy.position.copy(wf.mesh.position);
+  proxy.quaternion.copy(wf.mesh.quaternion);
+  proxy.scale.copy(wf.mesh.scale);
+  proxy.name = 'losFloor';
+  a.losGroup.add(proxy);
   return wf;
 }
 
@@ -340,11 +355,6 @@ function removeLegacy(a: Arena, D: Dressing, old: THREE.Object3D[]) {
 
 // ------------------------------------------------------------------ A3 ring
 
-/** one module placement: asset + world matrix */
-interface Placed {
-  asset: KitAsset;
-  m: THREE.Matrix4;
-}
 
 /**
  * A3: the shared trim material: the kit/stone_trim texture set's material, cloned with vertex colours on (the modules'
@@ -381,6 +391,14 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
   const L = a.layout;
   const rnd = new R(L.seed * 7919 + 31);
   const placed: Placed[] = [];
+  const trimGeos: THREE.BufferGeometry[] = [];
+  const bannerList: BannerSpec[] = [];
+  const rodList: { m: THREE.Matrix4; w: number }[] = [];
+  // A7: one chain builder for the whole ring (banner hangers, the pillar chains)
+  const chains = chainAsset ? new ChainKit(chainAsset) : null;
+  // A7: ring dressing stays out of the kit gate structures (and decor off the pillars)
+  const inZone = gateZoneTest(a, pack, false);
+  const blocked = gateZoneTest(a, pack, true);
   const asset = (ids: AssetId[] | undefined, pickN: number) => {
     const ok = (ids ?? []).filter((id) => pack.assets.has(id));
     return ok.length ? pack.assets.get(ok[pickN % ok.length])! : null;
@@ -398,6 +416,7 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
       P.offset + depth / 2,
       P.spacing,
       (p, yaw) => {
+        if (inZone(p)) return;
         const nearBrazier = braziers.some((b) => Math.hypot(b.x - p.x, b.z - p.z) < 2.6);
         const nearGate = inGate(L, p, P.gateHalf + 4.5);
         const broken = !nearBrazier && !nearGate && rnd.next() < (P.brokenShare ?? 0.5) ? asset(P.broken, n) : null;
@@ -410,19 +429,17 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
     );
     toRemove.push(...podium);
   }
-  // gallery segments -> arcade bays in place (same position / yaw / base height); their caps go
+  // gallery segments -> arcade bays in place (same position / yaw / base height); their caps go. A7: with ruins the
+  // near field removes the gallery (it stood on the stands) and puts arcade bays on the ruined tiers instead
   const G = RA.gallery;
   const gallery = a.group.children.filter((o) => o.userData.ring === 'gallery');
-  if (G && gallery.length && asset(G.assets, 0)) {
-    let n = 0;
+  if (G && !RA.ruins && gallery.length && asset(G.assets, 0)) {
     for (const seg of gallery) {
       const A = asset(G.assets, (rnd.next() * 997) | 0)!;
       seg.updateMatrix();
       placed.push({ asset: A, m: seg.matrix.clone() });
-      n++;
     }
     toRemove.push(...gallery, ...a.group.children.filter((o) => o.userData.ring === 'galleryCap'));
-    void n;
   }
   // rubble clusters at the wall foot (outside the fight ellipse, off the gate lanes)
   const RB = RA.rubble;
@@ -436,44 +453,40 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
         if (rnd.next() < 0.25) return;
         const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw + rnd.range(-0.5, 0.5) + (rnd.next() < 0.5 ? Math.PI : 0));
         const sc = rnd.range(0.8, 1.15);
+        if (blocked(p)) return;
         placed.push({ asset: A, m: new THREE.Matrix4().compose(new THREE.Vector3(p.x, 0, p.z), q, new THREE.Vector3(sc, sc, sc)) });
       },
       3.5,
       0.3,
     );
   }
-  // A4: wall-top braziers: the legacy bronze stand + bowl become the kit wall brazier (the legacy flame stays at its spot)
+  // A4: wall-top braziers: the legacy bronze stand + bowl become the kit wall brazier (the legacy flame stays at its spot).
+  // A7: none inside a gate structure or on a pillar (their legacy flames are hidden there)
   const WB = RA.wallBraziers;
   if (WB && pack.assets.has(WB.asset)) {
     const A = pack.assets.get(WB.asset)!;
     const stands = a.group.children.filter((o) => o.userData.wallBrazier);
     for (const st of stands) {
       const base = new THREE.Vector3(st.position.x, st.position.y - 0.45, st.position.z);
+      if (blocked(base)) continue;
       const yaw = Math.atan2(-base.x, -base.z) + (hashInt(base.x, base.z) % 7) * 0.3;
       placed.push({ asset: A, m: new THREE.Matrix4().compose(base, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw), new THREE.Vector3(1, 1, 1)) });
     }
     toRemove.push(...stands, ...a.group.children.filter((o) => o.userData.wallBrazierBowl));
+    for (const fl of a.group.children) if (fl.userData.wallFlame && blocked(fl.position)) fl.visible = false;
   }
   // A4: wall banners (legacy: canvas-textured planes with a CPU flutter and a Math.random phase) -> kit banners on rods
   const WBn = RA.wallBanners;
   const legacyBanners = a.group.children.filter((o) => o.userData.ring === 'banner');
   if (WBn && banners && legacyBanners.length) {
-    const list: Parameters<BannerKit['merged']>[0] = [];
-    const rods: THREE.BufferGeometry[] = [];
-    const rod = WBn.rod ? banners.rod() : null;
-    const chains = WBn.chains && chainAsset ? new ChainKit(chainAsset) : null;
     legacyBanners.forEach((b, i) => {
+      if (blocked(b.position)) return;
       b.updateMatrix();
       const top = b.position.clone();
       const m = new THREE.Matrix4().compose(top, b.quaternion, new THREE.Vector3(1, 1, 1));
-      list.push({ shape: 'vertical', cell: hashInt(L.seed, i, 3) % banners.cells, w: WBn.w, h: WBn.h, m, phase: (hashInt(L.seed, i, 5) % 628) / 100 });
-      if (rod) {
-        const g = rod.geo.clone();
-        g.applyMatrix4(new THREE.Matrix4().makeScale(WBn.w / 1.0 + 0.1, 1, 1));
-        g.applyMatrix4(m);
-        rods.push(g);
-      }
-      if (chains) {
+      bannerList.push({ shape: 'vertical', cell: hashInt(L.seed, i, 3) % banners.cells, w: WBn.w, h: WBn.h, m, phase: (hashInt(L.seed, i, 5) % 628) / 100 });
+      if (WBn.rod) rodList.push({ m, w: WBn.w });
+      if (WBn.chains && chains) {
         // two short chains from the rod ends up to the wall coping
         for (const sx of [-1, 1]) {
           const end = new THREE.Vector3(sx * (WBn.w / 2 + 0.02), 0.03, 0).applyMatrix4(m);
@@ -481,21 +494,6 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
         }
       }
     });
-    const mesh = banners.merged(list);
-    if (mesh) a.group.add(mesh);
-    if (rods.length && rod) {
-      const mg = mergeGeometries(rods, false);
-      for (const g of rods) g.dispose();
-      if (mg) {
-        const rm = new THREE.Mesh(mg, rod.mat);
-        rm.castShadow = rm.receiveShadow = true;
-        rm.name = 'kitBannerRods';
-        rm.userData.sharedMat = true;
-        rm.userData.dyn = true;
-        a.group.add(rm);
-      }
-    }
-    if (chains) for (const im of chains.build('kitBannerChains')) a.group.add(im);
     toRemove.push(...legacyBanners);
   }
   // A4: wall-foot decor (candles, skulls, bone piles), merged with the rubble; candle wicks -> one glow-card mesh
@@ -512,6 +510,7 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
           if (rnd.next() < (DC.skip ?? 0.3)) return;
           const A = pack.assets.get(ok[hashInt(L.seed, i, 11) % ok.length])!;
           const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw + rnd.range(-0.8, 0.8));
+          if (blocked(p)) return;
           const m = new THREE.Matrix4().compose(new THREE.Vector3(p.x, 0, p.z), q, new THREE.Vector3(1, 1, 1));
           placed.push({ asset: A, m });
           for (const s of A.sockets) if (s.name.startsWith('SOCK_candle')) wicks.push({ p: new THREE.Vector3(...s.pos).applyMatrix4(m), size: Number(s.extras.size) || 0.08 });
@@ -521,13 +520,52 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
       );
   }
   guardians(a, pack, placed);
-  if (!placed.length) return;
+  // A7: the Moon Gate near field (ruined tiers, pillars, banners, chains, gates, watchers, tier fires)
+  if (RA.ruins) {
+    const nf = buildNearField(a, pack, RA.ruins, banners, chains, trim);
+    placed.push(...nf.placed);
+    trimGeos.push(...nf.trim);
+    bannerList.push(...nf.banners);
+    rodList.push(...nf.rods);
+    toRemove.push(...nf.remove);
+  }
+  if (!placed.length && !trimGeos.length) {
+    chains?.dispose();
+    return;
+  }
   removeLegacy(a, D, toRemove);
+  // banners (wall + pillar + swags): ONE merged swaying mesh; rods merged; chains instanced
+  if (banners && bannerList.length) {
+    const mesh = banners.merged(bannerList);
+    if (mesh) a.group.add(mesh);
+  }
+  const rod = rodList.length && banners ? banners.rod() : null;
+  if (rod) {
+    const rods: THREE.BufferGeometry[] = [];
+    for (const r of rodList) {
+      const g = rod.geo.clone();
+      g.applyMatrix4(new THREE.Matrix4().makeScale(r.w / 1.0 + 0.1, 1, 1));
+      g.applyMatrix4(r.m);
+      rods.push(g);
+    }
+    const mg = mergeGeometries(rods, false);
+    for (const g of rods) g.dispose();
+    if (mg) {
+      const rm = new THREE.Mesh(mg, rod.mat);
+      rm.castShadow = rm.receiveShadow = true;
+      rm.name = 'kitBannerRods';
+      rm.userData.sharedMat = true;
+      rm.userData.dyn = true;
+      a.group.add(rm);
+    }
+  }
+  if (chains) for (const im of chains.build('kitRingChains')) a.group.add(im);
   const glow = candleCards(wicks, a.theme.fire);
   if (glow) a.group.add(glow);
   // merge per material: trim modules -> one mesh with the trim material; textured decor -> one mesh per asset material
   const buckets = new Map<string, { mat: THREE.Material; geos: THREE.BufferGeometry[]; shadow: boolean }>();
   const iron = new THREE.MeshStandardMaterial({ color: new THREE.Color(0.035, 0.032, 0.03), metalness: 0.85, roughness: 0.55, vertexColors: true });
+  if (trimGeos.length) buckets.set('trim', { mat: trim, geos: [...trimGeos], shadow: true });
   for (const pl of placed) {
     pl.asset.root.updateMatrixWorld(true);
     pl.asset.root.traverse((o) => {
@@ -548,11 +586,31 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
         for (let i = 0; i < c.count; i++) c4.set([c.getX(i), c.getY(i), c.getZ(i), 1], i * 4);
         g.setAttribute('color', new THREE.BufferAttribute(c4, 4));
       }
-      g.applyMatrix4(new THREE.Matrix4().multiplyMatrices(pl.m, m.matrixWorld));
+      g.applyMatrix4(m.matrixWorld);
+      // A7: 9-slice stretch in the asset frame (the tall ring pillars): above y1 moves up by d, the band stretches
+      if (pl.stretch) {
+        const { y0, y1, d } = pl.stretch;
+        const k = (y1 - y0 + d) / (y1 - y0);
+        const p = g.attributes.position as THREE.BufferAttribute;
+        for (let i = 0; i < p.count; i++) {
+          const y = p.getY(i);
+          if (y > y1) p.setY(i, y + d);
+          else if (y > y0) p.setY(i, y0 + (y - y0) * k);
+        }
+      }
+      g.applyMatrix4(pl.m);
       b.geos.push(g);
     });
   }
   for (const [key, b] of buckets) {
+    // non-indexed and indexed pieces cannot merge together: index the odd ones out
+    const anyIdx = b.geos.some((g) => !!g.index);
+    if (anyIdx)
+      for (let i = 0; i < b.geos.length; i++)
+        if (!b.geos[i].index) {
+          const n = b.geos[i].attributes.position.count;
+          b.geos[i].setIndex(Array.from({ length: n }, (_, j) => j));
+        }
     const merged = mergeGeometries(b.geos, false);
     for (const g of b.geos) g.dispose();
     if (!merged) {

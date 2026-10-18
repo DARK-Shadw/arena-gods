@@ -105,6 +105,24 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
     add(R.trim);
     for (const x of [...(R.podium?.intact ?? []), ...(R.podium?.broken ?? []), ...(R.gallery?.assets ?? [])]) add(x);
     add(R.rubble?.asset);
+    // A7: the Moon Gate near field
+    const N = R.ruins;
+    if (N) {
+      for (const x of N.arcade?.assets ?? []) add(x);
+      add(N.pillars?.asset);
+      if (N.pillars?.banner) add(art.banners);
+      if (N.pillars?.chains) add(art.chains);
+      add(N.fires?.asset);
+      for (const G of [N.east, N.west]) {
+        if (!G) continue;
+        add(G.arch);
+        add(G.braziers?.asset);
+        add(G.stair?.doorway);
+        add(G.stair?.guardians?.statue);
+        add(G.stair?.guardians?.plinth);
+        add(G.stair?.braziers?.asset);
+      }
+    }
   }
   add(art.gates?.asset);
   for (const e of art.extra ?? []) add(e);

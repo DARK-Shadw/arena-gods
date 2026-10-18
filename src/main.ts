@@ -10,7 +10,7 @@ import { simulate } from './sim/match';
 import { getFighter, FIGHTERS } from './sim/fighters';
 import { CHAIN_LEN, CHAIN_PIVOT_H, generateArena, LAYOUTS, THEMES, type ArenaSpec, type LayoutId, type ThemeId } from './sim/arenaGen';
 import type { FighterDef, Frame, MatchRecord, MoveDef, SimEvent } from './sim/types';
-import { Arena } from './render/arena/arenaView';
+import { Arena, CHANDELIER_H } from './render/arena/arenaView';
 import { ArenaAssets, arenaMode, arenaTexOverride, type ArenaPack } from './render/arena/assets';
 import { tierOf } from './render/arena/art';
 import { THEME_DEFS } from './render/arena/themes';
@@ -269,7 +269,7 @@ class App {
         return ray.intersectObjects(S, false).length > 0;
       };
     }
-    camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: 6.2, z: h.z, r: 1.3 }));
+    camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: CHANDELIER_H, z: h.z, r: 1.3 }));
     // A2b: hanging chain weights (chain + swing zone) are camera obstacles too
     for (const h of L.hazards) if (h.kind === 'chains') camWorld.hanging.push({ x: h.x, y: CHAIN_PIVOT_H - CHAIN_LEN * 0.5, z: h.z, r: 1.0 });
     this.ui.setArenaLabel?.(`${T.name} · ${L.layout} · #${L.seed}`);

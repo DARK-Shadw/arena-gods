@@ -80,9 +80,10 @@ export const CONCEPT_PRESETS: ConceptPreset[] = [
 
 /** Extra game-only views per theme (no concept image): the director orbits, and A-milestones
  *  that make arenas bigger need views that scale with the layout. */
-export type ExtraView = 'counter' | 'flank' | 'overview' | 'pillar' | 'wall';
+export type ExtraView = 'counter' | 'flank' | 'overview' | 'pillar' | 'wall' | 'gate' | 'tiers' | 'westgate';
 /** A3 added `pillar` (low look at the pit's north-east pillar) and `wall` (the south ring: wall modules, arcade) */
-export const EXTRA_VIEWS: ExtraView[] = ['counter', 'flank', 'overview', 'pillar', 'wall'];
+export const EXTRA_VIEWS: ExtraView[] = ['counter', 'flank', 'overview', 'pillar', 'wall', 'gate', 'tiers', 'westgate'];
+/** A7 added gate (the hero stair / doorway from mid-arena), 	iers (the ruined tiers and pillars, south-east) and westgate */
 
 export function conceptPreset(id: string): ConceptPreset | undefined {
   return CONCEPT_PRESETS.find((p) => p.id === id);
@@ -136,6 +137,12 @@ export function applyCamPose(cam: THREE.PerspectiveCamera, c: CamPose) {
 export function extraViewPose(v: ExtraView, rx: number, rz: number): CamPose {
   if (v === 'counter') return { pos: [rx * 0.55, 1.6, 1.0], yaw: 180 + 4, pitch: 3.5, roll: 0, vfov: 43 };
   if (v === 'flank') return { pos: [0.5, 1.7, -rz * 0.62], yaw: 90, pitch: 3.0, roll: 0, vfov: 43 };
+  if (v === 'gate' || v === 'tiers' || v === 'westgate') {
+    const pos: [number, number, number] = v === 'gate' ? [-rx * 0.15, 1.6, 0] : v === 'tiers' ? [-rx * 0.1, 1.6, rz * 0.2] : [rx * 0.3, 1.6, 0];
+    const at = v === 'gate' ? new THREE.Vector3(rx + 5, 4.5, 0) : v === 'tiers' ? new THREE.Vector3(rx * 0.55, 4.5, -rz * 0.95) : new THREE.Vector3(-rx - 4, 3.5, 0);
+    const look = at.sub(new THREE.Vector3(...pos));
+    return { pos, yaw: Math.atan2(look.z, look.x) / D, pitch: Math.atan2(look.y, Math.hypot(look.x, look.z)) / D, roll: 0, vfov: 55 };
+  }
   if (v === 'pillar' || v === 'wall') {
     const pos: [number, number, number] = v === 'pillar' ? [rx * 0.12, 1.3, rz * 0.08] : [rx * 0.15, 1.5, rz * 0.35];
     const at = v === 'pillar' ? new THREE.Vector3(rx * 0.43, 2.6, rz * 0.43) : new THREE.Vector3(-rx * 0.1, 3.8, rz * 1.05);

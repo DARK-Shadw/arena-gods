@@ -42,6 +42,11 @@ export interface CamMatchScore {
   byShot: Record<string, { n: number; bad: number; why?: Record<string, number> }>;
 }
 
+/**
+ * Ray-cast solids of the arena. A7: this includes the arena's `losGroup` (a child of the arena group): invisible proxy meshes
+ * (material.visible = false, never drawn) standing in for instanced / dyn art (the kit wet floor); they are plain visible
+ * Object3Ds with an opaque material, so the filters below keep them.
+ */
 export function solids(group: THREE.Object3D, sky: THREE.Object3D): THREE.Mesh[] {
   const out: THREE.Mesh[] = [];
   group.traverse((o) => {

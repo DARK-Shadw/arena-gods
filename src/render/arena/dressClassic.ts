@@ -130,6 +130,7 @@ export function dressColosseum(a: Arena): Dressing {
   steps.push([o + 0.4, y], [o + 0.4, y + 1.2]);
   const stands = shadowed(new THREE.Mesh(sweepEllipse(L, steps, 200, 0, 0.5), stepsMat), false, true);
   stands.userData.legacyStone = true;
+  stands.userData.ring = 'stands'; // A7: kit mode replaces the stands with ruined tiers
   G.add(stands);
   // upper gallery: arcade facade (sky shows through the arches)
   const galleryOff = o + 0.8;
@@ -170,6 +171,7 @@ export function dressColosseum(a: Arena): Dressing {
     (p, yaw, ang) => {
       const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 4.2, 6), woodDark);
       mast.position.set(p.x, galleryTop + 2.0, p.z);
+      mast.userData.ring = 'velarium'; // A7: removed in kit mode
       G.add(mast);
       if (si++ % 2 === 0) return;
       // sail: quad from the mast top inward and down over the stands
@@ -188,6 +190,7 @@ export function dressColosseum(a: Arena): Dressing {
       geo.setIndex([0, 2, 1, 1, 2, 3]);
       geo.computeVertexNormals();
       const sail = new THREE.Mesh(geo, sailMat);
+      sail.userData.ring = 'velarium';
       sail.castShadow = true;
       G.add(sail);
     },
@@ -213,7 +216,9 @@ export function dressColosseum(a: Arena): Dressing {
     bowl.position.set(p.x, 4.4, p.z);
     bowl.userData.wallBrazierBowl = true; // A4: kit mode swaps stand + bowl for the kit wall brazier
     G.add(bowl);
-    G.add(a.flame(new THREE.Vector3(p.x, 4.5, p.z), 1.0, '#ffa040', false));
+    const wf = a.flame(new THREE.Vector3(p.x, 4.5, p.z), 1.0, '#ffa040', false);
+    wf.userData.wallFlame = true; // A7: hidden in kit mode where a gate structure replaces the wall
+    G.add(wf);
   }, 4, 0.3);
 
   // ---------------- gates
@@ -236,7 +241,10 @@ export function dressColosseum(a: Arena): Dressing {
       ped.position.set(0, 6.2, -1.7);
       ped.userData.legacyStone = true;
       g.add(ped);
+      // A7: every decorative gate part is flagged gateDeco (kit mode removes them; the portcullis, tunnel and light stay)
+      fac.userData.gateDeco = ent.userData.gateDeco = ped.userData.gateDeco = true;
       const shield = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 24), goldMat);
+      shield.userData.gateDeco = true;
       shield.rotation.x = Math.PI / 2;
       shield.position.set(0, 4.55, 0.1);
       g.add(shield);
@@ -244,17 +252,23 @@ export function dressColosseum(a: Arena): Dressing {
         const col = shadowed(new THREE.Mesh(columnGeo(0.32, 5.6, { capital: 'ionic', plinth: true }), marbleMat));
         col.position.set(s * 2.75, 0, 0.25);
         col.userData.legacyStone = true;
+        col.userData.gateDeco = true;
         g.add(col);
         const st = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 1.5, 6), bronzeMat);
         st.position.set(s * 1.95, 0.75, 1.2);
+        st.userData.gateDeco = true;
         g.add(st);
         const bw = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.2, 0.3, 12), bronzeMat);
         bw.position.set(s * 1.95, 1.55, 1.2);
+        bw.userData.gateDeco = true;
         g.add(bw);
-        g.add(a.flame(new THREE.Vector3(s * 1.95, 1.62, 1.2), 0.9, '#ff9a40', s > 0));
+        const gf = a.flame(new THREE.Vector3(s * 1.95, 1.62, 1.2), 0.9, '#ff9a40', s > 0);
+        gf.userData.gateFlame = true;
+        g.add(gf);
       }
       const tunnel = new THREE.Mesh(new THREE.BoxGeometry(3.1, 3.7, 7), new THREE.MeshStandardMaterial({ color: '#1a120c', roughness: 1, side: THREE.BackSide }));
       tunnel.position.set(0, 1.85, -4.2);
+      tunnel.userData.gateTunnel = true;
       g.add(tunnel);
       const port = new THREE.Group();
       for (let k = -5; k <= 5; k++) {
