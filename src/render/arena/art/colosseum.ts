@@ -21,6 +21,17 @@ export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
   floor: { set: 'floor/flagstone_bluegrey', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.35 },
   ringFlames: { asset: 'kit/brazier_tripod', count: 10, offset: 0.55, size: 0.95 },
+  // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
+  // rubble piles for the indestructible boulders; podium wall, gallery arcade and wall-foot rubble from the trim-sheet
+  // modules. A7 replaces the rest of the legacy ring (stands, gates) and places stairs / dais / statues by the east gate.
+  obstacles: { column: ['kit/pillar_square', 'kit/pillar_square', 'kit/column_ruin'], rock: 'kit/rubble_pile' },
+  ring: {
+    trim: 'kit/stone_trim',
+    podium: { intact: ['kit/wall_a', 'kit/wall_b'], broken: ['kit/wall_broken'], brokenShare: 0.5, offset: 0.9, spacing: 3.85, gateHalf: 4.6 },
+    gallery: { assets: ['kit/arcade_bay', 'kit/arcade_broken', 'kit/arcade_broken'] },
+    rubble: { asset: 'kit/rubble_scatter', spacing: 7.5, offset: 0.35 },
+    retint: [0.36, 0.37, 0.43],
+  },
   look: {
     sky: {
       sunDir: MOON,

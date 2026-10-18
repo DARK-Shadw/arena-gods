@@ -354,6 +354,294 @@
    "startMinFreeMb": 5000,
    "timeoutMin": 40,
    "note": "A2: Moon Gate engraved ritual circle (4 rings + rune band + crescents), 16 m disc, numpy SDF height -> displaced grid -> Cycles normal + AO bakes"
+  },
+  {
+   "id": "kit_pillar_square",
+   "script": "tools/arena/blender/kit_stone.py",
+   "args": [
+    "--piece",
+    "pillar_square",
+    "--px",
+    "2048",
+    "--px-low",
+    "1024",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: square masonry pillar (ref-3), 9-slice SHAFT, FRAC 4 slices, unique 2048/1024 bake from a weathered voxel high",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_column_ruin",
+   "script": "tools/arena/blender/kit_stone.py",
+   "args": [
+    "--piece",
+    "column_ruin",
+    "--px",
+    "1024",
+    "--px-low",
+    "512",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: fluted ruin column with a broken top, 9-slice SHAFT, FRAC drums",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_rubble_pile",
+   "script": "tools/arena/blender/kit_stone.py",
+   "args": [
+    "--piece",
+    "rubble_pile",
+    "--px",
+    "1024",
+    "--px-low",
+    "512",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: rubble pile (broken masonry + toppled drum) for the indestructible rock obstacle",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_stone_trim",
+   "script": "tools/arena/blender/kit_stone_trim.py",
+   "args": [
+    "--px",
+    "2048",
+    "--grid",
+    "1024",
+    "--ao-samples",
+    "64"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: stone trim sheet 2048 over 8 x 8 m (ashlar, blocks, moulding, rune frieze, rough, plain rows), numpy height -> exact normal, Cycles AO from the displaced high",
+   "startMinFreeMb": 3200
+  },
+  {
+   "id": "kit_wall_a",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "wall_a",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module wall_a (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_wall_b",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "wall_b",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module wall_b (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_wall_broken",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "wall_broken",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module wall_broken (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_arcade_bay",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "arcade_bay",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module arcade_bay (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_arcade_broken",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "arcade_broken",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module arcade_broken (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_arch",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "arch",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module arch (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_stairs",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "stairs",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module stairs (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_plinth",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "plinth",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module plinth (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_dais",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "dais",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module dais (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_balustrade",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "balustrade",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module balustrade (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_spear_fence",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "spear_fence",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module spear_fence (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_rock_prop",
+   "script": "tools/arena/blender/kit_rock.py",
+   "args": [
+    "--piece",
+    "rock_prop"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/rock_moss_set_02/meta.json"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: scan rock (Poly Haven rock_moss_set_02) fitted to PROP_BASE.rock 0.4 / TOP.rock 0.75",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_rubble_scatter",
+   "script": "tools/arena/blender/kit_rock.py",
+   "args": [
+    "--piece",
+    "rubble_scatter"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/rock_moss_set_02/meta.json"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: render-only rubble cluster (5 scan rocks + 2 weathered masonry chunks) for wall feet",
+   "startMinFreeMb": 2500
   }
  ],
  "groups": {
@@ -377,7 +665,10 @@
    "pano_high_gpu"
   ],
   "kit": [
-   "kit_brazier_tripod"
+   "kit_brazier_tripod",
+   "kit_pillar_square",
+   "kit_column_ruin",
+   "kit_rubble_pile"
   ],
   "a1": [
    "kit_brazier_tripod"
@@ -391,6 +682,38 @@
    "floor_flagstone",
    "floor_slate",
    "inlay_moongate"
+  ],
+  "a3": [
+   "kit_stone_trim",
+   "kit_pillar_square",
+   "kit_column_ruin",
+   "kit_rubble_pile",
+   "kit_wall_a",
+   "kit_wall_b",
+   "kit_wall_broken",
+   "kit_arcade_bay",
+   "kit_arcade_broken",
+   "kit_arch",
+   "kit_stairs",
+   "kit_plinth",
+   "kit_dais",
+   "kit_balustrade",
+   "kit_spear_fence",
+   "kit_rock_prop",
+   "kit_rubble_scatter"
+  ],
+  "a3-ring": [
+   "kit_wall_a",
+   "kit_wall_b",
+   "kit_wall_broken",
+   "kit_arcade_bay",
+   "kit_arcade_broken",
+   "kit_arch",
+   "kit_stairs",
+   "kit_plinth",
+   "kit_dais",
+   "kit_balustrade",
+   "kit_spear_fence"
   ]
  }
 }

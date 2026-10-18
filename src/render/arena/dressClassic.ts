@@ -106,12 +106,16 @@ export function dressColosseum(a: Arena): Dressing {
     ring.userData.floorDeco = true;
     G.add(ring);
   }
-  // curb
-  G.add(shadowed(new THREE.Mesh(sweepEllipse(L, [[0.35, 0], [0.35, 0.16], [0.42, 0.22], [0.9, 0.22]], 220, 2.4, 0.5), marbleMat)));
+  // curb (A3: flagged for the kit stone re-tint; flags never change the legacy render)
+  const curb = shadowed(new THREE.Mesh(sweepEllipse(L, [[0.35, 0], [0.35, 0.16], [0.42, 0.22], [0.9, 0.22]], 220, 2.4, 0.5), marbleMat));
+  curb.userData.legacyStone = true;
+  G.add(curb);
 
   // ---------------- podium wall + stands
   const podium = sweepEllipse(L, [[0.9, 0.22], [0.9, 3.15], [0.78, 3.22], [0.78, 3.42], [1.3, 3.45]], 220, 2.4, 0.33);
-  G.add(shadowed(new THREE.Mesh(podium, travMat)));
+  const podiumMesh = shadowed(new THREE.Mesh(podium, travMat));
+  podiumMesh.userData.ring = 'podium'; // A3: replaced by kit wall modules in kit mode
+  G.add(podiumMesh);
   const steps: [number, number][] = [[1.3, 3.45]];
   const rows: { off: number; y: number }[] = [];
   let o = 1.3,
@@ -124,7 +128,9 @@ export function dressColosseum(a: Arena): Dressing {
     rows.push({ off: o - 0.5, y });
   }
   steps.push([o + 0.4, y], [o + 0.4, y + 1.2]);
-  G.add(shadowed(new THREE.Mesh(sweepEllipse(L, steps, 200, 0, 0.5), stepsMat), false, true));
+  const stands = shadowed(new THREE.Mesh(sweepEllipse(L, steps, 200, 0, 0.5), stepsMat), false, true);
+  stands.userData.legacyStone = true;
+  G.add(stands);
   // upper gallery: arcade facade (sky shows through the arches)
   const galleryOff = o + 0.8;
   alongEllipse(
@@ -136,10 +142,12 @@ export function dressColosseum(a: Arena): Dressing {
       seg.position.set(p.x, y, p.z);
       seg.rotation.y = yaw;
       shadowed(seg, true, true);
+      seg.userData.ring = 'gallery'; // A3: replaced in place by kit arcade bays in kit mode
       G.add(seg);
       const cap = new THREE.Mesh(new THREE.BoxGeometry(3.55, 0.35, 1.2), marbleMat);
       cap.position.set(p.x, y + 6.55, p.z);
       cap.rotation.y = yaw;
+      cap.userData.ring = 'galleryCap';
       G.add(shadowed(cap));
     },
     0,
@@ -198,6 +206,7 @@ export function dressColosseum(a: Arena): Dressing {
   alongEllipse(L, 1.05, 9.5, (p) => {
     const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 0.9, 6), bronzeMat);
     stand.position.set(p.x, 3.9, p.z);
+    stand.userData.wallBrazier = true; // A3: kit walls keep an intact top under these
     G.add(stand);
     const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.22, 0.3, 12), bronzeMat);
     bowl.position.set(p.x, 4.4, p.z);
@@ -210,9 +219,11 @@ export function dressColosseum(a: Arena): Dressing {
     makeGate(a, i, 0.9, (g) => {
       const fac = shadowed(new THREE.Mesh(arcadeGeo(6.6, 5.6, 1.7, 1, 3.1, 3.7), travMat));
       fac.position.z = -0.85;
+      fac.userData.legacyStone = true;
       g.add(fac);
       const ent = shadowed(new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.6, 2.0), marbleMat));
       ent.position.set(0, 5.9, -0.8);
+      ent.userData.legacyStone = true;
       g.add(ent);
       const tri = new THREE.Shape();
       tri.moveTo(-3.7, 0);
@@ -221,6 +232,7 @@ export function dressColosseum(a: Arena): Dressing {
       tri.lineTo(-3.7, 0);
       const ped = shadowed(new THREE.Mesh(new THREE.ExtrudeGeometry(tri, { depth: 1.8, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 1 }), marbleMat));
       ped.position.set(0, 6.2, -1.7);
+      ped.userData.legacyStone = true;
       g.add(ped);
       const shield = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 24), goldMat);
       shield.rotation.x = Math.PI / 2;
@@ -229,6 +241,7 @@ export function dressColosseum(a: Arena): Dressing {
       for (const s of [-1, 1]) {
         const col = shadowed(new THREE.Mesh(columnGeo(0.32, 5.6, { capital: 'ionic', plinth: true }), marbleMat));
         col.position.set(s * 2.75, 0, 0.25);
+        col.userData.legacyStone = true;
         g.add(col);
         const st = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 1.5, 6), bronzeMat);
         st.position.set(s * 1.95, 0.75, 1.2);

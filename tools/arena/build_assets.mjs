@@ -143,7 +143,8 @@ async function buildVariant(io, A, dir, tier, fmt) {
   }
   if (fmt === 'ktx2' && texInfo.length) doc.createExtension(KHRTextureBasisu).setRequired(true);
   if (fmt === 'webp' && texInfo.length) doc.createExtension(EXTTextureWebP).setRequired(true);
-  await doc.transform(dedup(), prune({ keepLeaves: true, keepExtras: true }), meshopt({ encoder: MeshoptEncoder, level: 'medium' }));
+  // A3: modules carry UVs for the shared trim set (bound at runtime), not by their own (texture-less) material: keep them
+  await doc.transform(dedup(), prune({ keepLeaves: true, keepExtras: true, keepAttributes: A.role === 'module' }), meshopt({ encoder: MeshoptEncoder, level: 'medium' }));
   const rel = `${A.id}${tier === 'low' ? '.low' : ''}${fmt === 'webp' ? '.webp' : ''}.glb`;
   const out = path.join(PUB, rel);
   fs.mkdirSync(path.dirname(out), { recursive: true });

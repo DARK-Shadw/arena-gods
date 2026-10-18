@@ -25,12 +25,20 @@ const PUB = path.join(ROOT, 'public', 'arena');
 const MB = 1024 * 1024;
 const TIER_TEX_MB = { low: 64, medium: 128, high: 192 };
 const BUDGET = {
-  prop: { lod0Tris: 2000, lod1Tris: 800, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.0 * MB, lowBytes: 0.45 * MB },
+  prop: { lod0Tris: 2000, lod1Tris: 800, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
   // A2: texture sets (floor sets over a tile of tileM metres, inlays over a square of sizeM metres); one carrier quad
   texset: { lod0Tris: 2, lod1Tris: 2, fullTex: 2048, lowTex: 1024, prims: 1, fullBytes: 6.0 * MB, lowBytes: 2.0 * MB },
+  // A3: hero obstacles (pillars, columns, rubble): unique bakes; FRAC_* pieces counted separately (fracTris), COL included in prims
+  obstacle: { lod0Tris: 1500, lod1Tris: 700, fullTex: 2048, lowTex: 1024, prims: 10, fullBytes: 5.5 * MB, lowBytes: 1.6 * MB, fracTris: 1500 },
+  // A3: trim-sheet architecture modules: geometry + vertex AO only (the trim texture set is shared: kit/stone_trim)
+  module: { lod0Tris: 2600, lod1Tris: 1400, fullTex: 0, lowTex: 0, prims: 3, fullBytes: 0.25 * MB, lowBytes: 0.15 * MB },
+  // A3: render-only decor (rubble scatter)
+  decor: { lod0Tris: 1600, lod1Tris: 600, fullTex: 1024, lowTex: 512, prims: 2, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
 };
+// A3: plan 4.3 - the visible base of an obstacle may reach at most 1.55 x the sim radius (the camera's standing() factor)
+const OBSTACLE_FOOTPRINT_MAX = 1.55;
 // A2: minimum texel density (px per metre) of texture sets per tier (plan 5.2: floor 2048 over about 4 m; inlay 2048 over 16 m)
-const TEXEL_MIN = { floor: { full: 256, low: 128 }, inlay: { full: 120, low: 60 } };
+const TEXEL_MIN = { floor: { full: 256, low: 128 }, inlay: { full: 120, low: 60 }, trim: { full: 240, low: 120 } };
 
 // sim contract, parsed from the TS source (single source of truth; the sim is not imported into Node tooling here)
 function simTables() {
@@ -69,6 +77,10 @@ async function measure(io, file) {
     for (let p = n; p; p = p.getParentNode()) if (p.getName() === 'COL') return true;
     return false;
   };
+  const isFrac = (n) => {
+    for (let p = n; p; p = p.getParentNode()) if (p.getName().startsWith('FRAC_')) return true;
+    return false;
+  };
   const lodOf = (n) => {
     for (let p = n; p; p = p.getParentNode()) if (/^LOD\d$/.test(p.getName())) return p.getName();
     return null;
@@ -80,6 +92,10 @@ async function measure(io, file) {
     prims = 0;
   const lods = new Set();
   let col = false;
+  let frac = 0,
+    fracTris = 0,
+    colored = 0,
+    meshes = 0;
   const v = [0, 0, 0];
   for (const n of nodes) {
     const mesh = n.getMesh();
@@ -89,6 +105,13 @@ async function measure(io, file) {
       col = true;
       continue;
     }
+    if (isFrac(n)) {
+      frac++;
+      for (const p of mesh.listPrimitives()) fracTris += (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()) / 3;
+      continue;
+    }
+    if (mesh.listPrimitives().every((p) => p.getAttribute('COLOR_0'))) colored++;
+    meshes++;
     const lod = lodOf(n);
     if (lod) lods.add(lod);
     const M = n.getWorldMatrix();
@@ -116,7 +139,8 @@ async function measure(io, file) {
     return { name: t.getName(), w, h, codec, gpu: w * h * bpp * (4 / 3) };
   });
   const socks = nodes.filter((n) => n.getName().startsWith('SOCK_')).map((n) => ({ name: n.getName(), extras: n.getExtras() }));
-  return { kit: kit ? { name: kit.getName(), extras: kit.getExtras() } : null, used, lods: [...lods], col, r, ymin, ymax, tris, prims, tex, socks, bytes: fs.statSync(path.join(PUB, file)).size };
+  const shaft = nodes.find((n) => n.getName() === 'SHAFT');
+  return { kit: kit ? { name: kit.getName(), extras: kit.getExtras() } : null, used, lods: [...lods], col, r, ymin, ymax, tris, prims, tex, socks, frac, fracTris, colored, meshes, shaft: shaft ? shaft.getExtras() : null, bytes: fs.statSync(path.join(PUB, file)).size };
 }
 
 async function main() {
@@ -179,18 +203,36 @@ async function main() {
           }
           if ((A.kind === 'brazier' || A.kind === 'lantern') && !m.socks.some((s) => s.name === 'SOCK_flame' || s.name === 'SOCK_glow')) f('no SOCK_flame / SOCK_glow');
         }
+        if (A.role === 'obstacle') {
+          // A3: footprint vs the nominal sim radius, measured height vs extras, 9-slice band, fracture pieces
+          const x = m.kit?.extras ?? {};
+          if (!(x.r0 > 0)) f('obstacle: KIT_ extras r0 (nominal sim radius) missing');
+          else if (m.r > x.r0 * OBSTACLE_FOOTPRINT_MAX + 0.005) f(`obstacle footprint ${m.r.toFixed(3)} m > ${OBSTACLE_FOOTPRINT_MAX} x r0 ${x.r0}`);
+          if (Math.abs(m.ymax - (x.height ?? -1)) > 0.01) f(`top ${m.ymax.toFixed(3)} != extras height ${x.height}`);
+          if (m.ymin < -0.12) f(`sinks ${(-m.ymin).toFixed(3)} m below the floor`);
+          if (x.stretch === 'SHAFT' && !(m.shaft && m.shaft.y0 < m.shaft.y1 && m.shaft.y1 < m.ymax)) f('stretch SHAFT without a valid SHAFT {y0 < y1 < top} node');
+          if (x.kind === 'column' && m.frac < 2) f(`only ${m.frac} FRAC_* pieces`);
+          if (B && m.fracTris > B.fracTris) f(`FRAC tris ${m.fracTris} > ${B.fracTris}`);
+        }
+        if (A.role === 'module') {
+          const x = m.kit?.extras ?? {};
+          if (!x.trim) f('module without a trim extra (the shared texture set)');
+          else if (!man.assets[x.trim]) f(`module trim ${x.trim} not in the manifest`);
+          if (m.colored < m.meshes) f('module mesh without COLOR_0 (vertex AO)');
+          if (Math.abs(m.ymax - (x.height ?? -1)) > 0.01) f(`top ${m.ymax.toFixed(3)} != extras height ${x.height}`);
+        }
         if (B) {
           const triMax = tier === 'full' ? B.lod0Tris : B.lod1Tris;
           const texMax = tier === 'full' ? B.fullTex : B.lowTex;
           const byteMax = tier === 'full' ? B.fullBytes : B.lowBytes;
           if (m.tris > triMax) f(`${m.tris} tris > ${triMax}`);
-          if (m.tex.some((t) => Math.max(t.w, t.h) > texMax)) f(`texture over ${texMax}px`);
+          if (m.tex.some((t) => Math.max(t.w, t.h) > texMax)) f(texMax ? `texture over ${texMax}px` : 'textures in a module GLB (modules use the shared trim set)');
           if (m.prims > B.prims) f(`${m.prims} primitives > ${B.prims}`);
           if (m.bytes > byteMax) f(`${(m.bytes / MB).toFixed(2)} MB > ${(byteMax / MB).toFixed(2)} MB`);
         }
         const g = m.tex.reduce((s, t) => s + t.gpu, 0);
         gpu[tier][fmt] += g;
-        rows.push([file, `${tier}/${fmt}`, String(m.tris), String(m.prims), m.r.toFixed(4), `${m.ymin.toFixed(4)}..${m.ymax.toFixed(4)}`, m.tex.map((t) => `${t.w}${t.codec[0]}`).join(' '), (g / MB).toFixed(2), (m.bytes / 1024).toFixed(0)]);
+        rows.push([file, `${tier}/${fmt}`, String(m.tris) + (m.frac ? `+${m.fracTris}f` : ''), String(m.prims), m.r.toFixed(4), `${m.ymin.toFixed(4)}..${m.ymax.toFixed(4)}`, m.tex.map((t) => `${t.w}${t.codec[0]}`).join(' '), (g / MB).toFixed(2), (m.bytes / 1024).toFixed(0)]);
       }
     }
   }

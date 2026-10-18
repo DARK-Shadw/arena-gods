@@ -71,10 +71,24 @@ export interface LookArt {
 }
 
 export interface RingArt {
-  /** boundary modules placed along the ellipse (alongEllipse with arc spacing) */
-  modules: { asset: AssetId; spacing: number; offset?: number }[];
+  /** boundary modules placed along the ellipse (alongEllipse with arc spacing) (generic form, A7+) */
+  modules?: { asset: AssetId; spacing: number; offset?: number }[];
   /** visual wall height the camera clamps to (else the sim's wallH) */
   wallH?: number;
+  /** A3: the stone trim texture set the modules' 'stone_trim' material binds to (role texset, kind trim) */
+  trim?: AssetId;
+  /**
+   * A3: kit wall modules replacing the legacy podium wall (meshes flagged userData.ring 'podium'): `intact` modules keep the
+   * full coping height (wallH, under wall braziers and next to the gates, where entrance perches stand), `broken` ones
+   * elsewhere, picked by the render seed. Placed with their front face `offset` m outside the boundary.
+   */
+  podium?: { intact: AssetId[]; broken?: AssetId[]; brokenShare?: number; offset: number; spacing: number; gateHalf: number };
+  /** A3: kit arcade bays replacing the legacy gallery segments in place (userData.ring 'gallery'; caps removed) */
+  gallery?: { assets: AssetId[] };
+  /** A3: render-only rubble clusters scattered at the wall foot (outside the fight ellipse) */
+  rubble?: { asset: AssetId; spacing: number; offset: number };
+  /** A3: legacy stone left in place (stands, curb, gate facades: userData.legacyStone) re-tinted toward the kit stone */
+  retint?: [number, number, number];
 }
 
 export interface GateArt {
@@ -92,8 +106,8 @@ export interface ThemeArt {
   id: ThemeId | 'default';
   /** sim props -> kit asset (authored to PROP_BASE radius / TOP height, origin at the base centre) */
   props?: Partial<Record<RtPropKind, AssetId>>;
-  /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h) */
-  obstacles?: Partial<Record<ObstacleKind, AssetId>>;
+  /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h); a list = variants picked by obstacle id */
+  obstacles?: Partial<Record<ObstacleKind, AssetId | AssetId[]>>;
   /** hazard visual builders (A7+) */
   hazards?: Partial<Record<HazardKind, AssetId>>;
   floor?: FloorArt;

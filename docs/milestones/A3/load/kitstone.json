@@ -1,0 +1,692 @@
+[
+ {
+  "q": 0,
+  "layout": "pit",
+  "obstacles": [
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.305,
+    "top": 5.305,
+    "r": 0.7943830301181878,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.313,
+    "top": 5.313,
+    "r": 0.8011574864108114,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.278,
+    "top": 5.278,
+    "r": 0.7703502559463958,
+    "foot": 1.461
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.217,
+    "top": 5.217,
+    "r": 0.715232052853098,
+    "foot": 1.48
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.864,
+    "r": 0.5249999999999999,
+    "foot": 1.525
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.864,
+    "r": 0.5249999999999999,
+    "foot": 1.525
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.864,
+    "r": 0.5249999999999999,
+    "foot": 1.525
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "barricade",
+    "kit": null,
+    "h": 1.5,
+    "top": null,
+    "r": 0.7,
+    "foot": null
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitRing_trim",
+    "tris": 29932
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 3704
+   }
+  ],
+  "fallen": 0,
+  "drawCalls": 1,
+  "errors": []
+ },
+ {
+  "q": 0,
+  "layout": "cross",
+  "obstacles": [
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": 5.005,
+    "r": 0.5249999999999999,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.005,
+    "top": 5.005,
+    "r": 0.5249999999999999,
+    "foot": 1.461
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": null,
+    "r": 0.5249999999999999,
+    "foot": null
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.461
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": null,
+    "r": 0.5249999999999999,
+    "foot": null
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.864,
+    "r": 0.5249999999999999,
+    "foot": 1.525
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.864,
+    "r": 0.5249999999999999,
+    "foot": 1.525
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.864,
+    "r": 0.5249999999999999,
+    "foot": 1.525
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "barricade",
+    "kit": null,
+    "h": 1.5,
+    "top": null,
+    "r": 0.7,
+    "foot": null
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitRing_trim",
+    "tris": 29932
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 3704
+   }
+  ],
+  "fallen": 2,
+  "drawCalls": 1,
+  "errors": []
+ },
+ {
+  "q": 1,
+  "layout": "pit",
+  "obstacles": [
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.305,
+    "top": 5.305,
+    "r": 0.7943830301181878,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.313,
+    "top": 5.313,
+    "r": 0.8011574864108114,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.278,
+    "top": 5.278,
+    "r": 0.7703502559463958,
+    "foot": 1.426
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.217,
+    "top": 5.217,
+    "r": 0.715232052853098,
+    "foot": 1.48
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "barricade",
+    "kit": null,
+    "h": 1.5,
+    "top": null,
+    "r": 0.7,
+    "foot": null
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitRing_trim",
+    "tris": 56668
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 11296
+   }
+  ],
+  "fallen": 0,
+  "drawCalls": 1,
+  "errors": []
+ },
+ {
+  "q": 1,
+  "layout": "cross",
+  "obstacles": [
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": 5.005,
+    "r": 0.5249999999999999,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.005,
+    "top": 5.005,
+    "r": 0.5249999999999999,
+    "foot": 1.426
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": null,
+    "r": 0.5249999999999999,
+    "foot": null
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.426
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": null,
+    "r": 0.5249999999999999,
+    "foot": null
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "barricade",
+    "kit": null,
+    "h": 1.5,
+    "top": null,
+    "r": 0.7,
+    "foot": null
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitRing_trim",
+    "tris": 56668
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 11296
+   }
+  ],
+  "fallen": 2,
+  "drawCalls": 1,
+  "errors": []
+ },
+ {
+  "q": 2,
+  "layout": "pit",
+  "obstacles": [
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.305,
+    "top": 5.305,
+    "r": 0.7943830301181878,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.313,
+    "top": 5.313,
+    "r": 0.8011574864108114,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.278,
+    "top": 5.278,
+    "r": 0.7703502559463958,
+    "foot": 1.426
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.217,
+    "top": 5.217,
+    "r": 0.715232052853098,
+    "foot": 1.48
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "barricade",
+    "kit": null,
+    "h": 1.5,
+    "top": null,
+    "r": 0.7,
+    "foot": null
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitRing_trim",
+    "tris": 56668
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 11296
+   }
+  ],
+  "fallen": 0,
+  "drawCalls": 1,
+  "errors": []
+ },
+ {
+  "q": 2,
+  "layout": "cross",
+  "obstacles": [
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": 5.005,
+    "r": 0.5249999999999999,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.005,
+    "top": 5.005,
+    "r": 0.5249999999999999,
+    "foot": 1.426
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": null,
+    "r": 0.5249999999999999,
+    "foot": null
+   },
+   {
+    "kind": "column",
+    "kit": "kit/column_ruin",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.426
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.005,
+    "top": null,
+    "r": 0.5249999999999999,
+    "foot": null
+   },
+   {
+    "kind": "column",
+    "kit": "kit/pillar_square",
+    "h": 5.2,
+    "top": 5.2,
+    "r": 0.7,
+    "foot": 1.48
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rubble_pile",
+    "h": 5.005,
+    "top": 0.863,
+    "r": 0.5249999999999999,
+    "foot": 1.502
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "banner",
+    "kit": null,
+    "h": 4.6,
+    "top": null,
+    "r": 0.28,
+    "foot": null
+   },
+   {
+    "kind": "barricade",
+    "kit": null,
+    "h": 1.5,
+    "top": null,
+    "r": 0.7,
+    "foot": null
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitRing_trim",
+    "tris": 56668
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 11296
+   }
+  ],
+  "fallen": 2,
+  "drawCalls": 1,
+  "errors": []
+ }
+]

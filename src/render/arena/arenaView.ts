@@ -854,7 +854,8 @@ export class Arena {
   standing(): { x: number; z: number; r: number; h: number }[] {
     // visual radius for the camera: plinths, statues, crystal clusters and lantern roofs stick out past the sim radius
     const k = (kind: string) => (kind === 'statue' || kind === 'crystal' || kind === 'obelisk' ? 1.55 : kind === 'lantern_post' ? 1.4 : kind === 'banner' ? 2.0 : 1.2);
-    return this.obstacles.filter((o) => !o.fallen).map((o) => ({ x: o.def.x, z: o.def.z, r: o.def.r * k(o.def.kind), h: o.def.h }));
+    // A3: a kit obstacle carries its measured footprint factor (footprintR / r0, <= 1.55 by the budget gate)
+    return this.obstacles.filter((o) => !o.fallen).map((o) => ({ x: o.def.x, z: o.def.z, r: o.def.r * (Number(o.mesh.userData.footK) || k(o.def.kind)), h: o.def.h }));
   }
   /** chandeliers still hanging (for camera avoidance) */
   hangingNow(): { x: number; y: number; z: number; r: number }[] {
@@ -1229,10 +1230,17 @@ export class Arena {
   dispose() {
     this.scene.remove(this.group);
     this.group.traverse((o) => {
-      // kit asset clones share geometry / materials with the ArenaAssets cache: it disposes them (release)
-      if (o.userData.kit) return;
+      // kit asset clones share geometry / materials with the ArenaAssets cache: it disposes them (release); A3 obstacles own
+      // their stretched geometry (ownGeo) and their crack material (ownMat)
+      if (o.userData.kit) {
+        const km = o as THREE.Mesh;
+        if (o.userData.ownGeo) km.geometry?.dispose();
+        if (o.userData.ownMat) (km.material as THREE.Material)?.dispose();
+        return;
+      }
       const m = o as THREE.Mesh;
       if (m.geometry) m.geometry.dispose();
+      if (o.userData.sharedMat) return; // A3: merged kit decor drawn with the asset cache's material
       const mat = m.material as THREE.Material | THREE.Material[] | undefined;
       if (mat) for (const x of Array.isArray(mat) ? mat : [mat]) x.dispose();
     });

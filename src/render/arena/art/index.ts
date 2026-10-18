@@ -13,7 +13,7 @@ export * from './types';
 /** shared kit used by every theme unless the theme overrides a slot */
 export const KIT_DEFAULT: ThemeArt = {
   id: 'default',
-  props: { brazier: 'kit/brazier_tripod' },
+  props: { brazier: 'kit/brazier_tripod', rock: 'kit/rock_prop' },
 };
 
 /** per-theme ThemeArt files (A2: colosseum floor + Moon Gate preview; A7: colosseum for real, A11+: the others) */
@@ -23,6 +23,11 @@ export function artFor(theme: ThemeId): ThemeArt {
   const t = THEME_ART[theme];
   if (!t) return { ...KIT_DEFAULT, id: theme };
   const art: ThemeArt = { ...KIT_DEFAULT, ...t, props: { ...KIT_DEFAULT.props, ...t.props } };
+  // A3: `?kitstone=0` keeps the A2 colosseum (legacy pillars and walls) on the kit floor, for before / after shots
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('kitstone') === '0') {
+    delete art.obstacles;
+    delete art.ring;
+  }
   // A2: `?moongate=0` keeps the kit floor but drops the preview look and the decorative braziers
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('moongate') === '0') {
     delete art.look;
@@ -51,12 +56,18 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
   const add = (x?: AssetId) => x && ids.add(x);
   const has = (list: { kind: string }[] | undefined, k: string) => !layout || k === 'chunk' || !!list?.some((x) => x.kind === k);
   for (const [k, v] of Object.entries(art.props ?? {})) if (has(layout?.props, k)) add(v);
-  for (const [k, v] of Object.entries(art.obstacles ?? {})) if (has(layout?.obstacles, k)) add(v);
+  for (const [k, v] of Object.entries(art.obstacles ?? {})) if (has(layout?.obstacles, k)) for (const x of Array.isArray(v) ? v : [v]) add(x);
   for (const [k, v] of Object.entries(art.hazards ?? {})) if (has(layout?.hazards, k)) add(v);
   add(art.ringFlames?.asset);
   add(art.floor?.set);
   add(art.floor?.inlay);
   for (const m of art.ring?.modules ?? []) add(m.asset);
+  const R = art.ring;
+  if (R) {
+    add(R.trim);
+    for (const x of [...(R.podium?.intact ?? []), ...(R.podium?.broken ?? []), ...(R.gallery?.assets ?? [])]) add(x);
+    add(R.rubble?.asset);
+  }
   add(art.gates?.asset);
   for (const l of art.backdrop?.layers ?? []) add(l);
   add(art.backdrop?.inset);

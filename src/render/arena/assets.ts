@@ -48,6 +48,8 @@ export class KitAsset {
   readonly extras: Record<string, unknown>;
   readonly lod: string;
   readonly bytes: number;
+  /** A3: 9-slice band [y0, y1] (asset frame, m) of a stretchable obstacle (the SHAFT node), else null */
+  shaft: [number, number] | null = null;
   constructor(
     readonly id: AssetId,
     readonly tier: AssetTier,
@@ -71,10 +73,15 @@ export class KitAsset {
       if (o.name === 'COL' || o.userData.col) {
         o.visible = false;
         o.userData.col = true;
+      } else if (o.name.startsWith('FRAC_') || o.userData.frac) {
+        // A3: pre-fractured pieces travel with the asset hidden (A5 spawns them along the fall line)
+        o.visible = false;
+        o.userData.frac = true;
       } else if ((o as THREE.Mesh).isMesh) {
         o.castShadow = true;
         o.receiveShadow = true;
       }
+      if (o.name === 'SHAFT' && typeof o.userData.y0 === 'number') this.shaft = [o.userData.y0, o.userData.y1];
       if (o.name.startsWith('SOCK_')) {
         o.getWorldPosition(p).applyMatrix4(inv);
         const { kit: _k, ...extras } = o.userData;
