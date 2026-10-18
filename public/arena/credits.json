@@ -121,6 +121,23 @@
     "kit/vent_grate"
    ]
   },
+  "polyhaven/quarry_cloudy": {
+   "name": "Quarry Cloudy",
+   "authors": [
+    "Dimitrios Savva",
+    "Jarod Guest"
+   ],
+   "licence": "CC0-1.0",
+   "url": "https://polyhaven.com/a/quarry_cloudy",
+   "res": "8k",
+   "files": [
+    "quarry_cloudy_8k.hdr"
+   ],
+   "fetched": "2026-10-18",
+   "usedBy": [
+    "sky/moongate"
+   ]
+  },
   "polyhaven/rock_moss_set_02": {
    "name": "Rock Moss Set 02",
    "authors": [

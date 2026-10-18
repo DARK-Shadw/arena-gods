@@ -47,6 +47,8 @@ export const KTX_ARGS = {
   color: ['--format', 'R8G8B8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '128', '--generate-mipmap'],
   data: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'basis-lz', '--qlevel', '192', '--generate-mipmap'],
   linear: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'uastc', '--uastc-quality', '2', '--uastc-rdo', '--uastc-rdo-l', '1.0', '--zstd', '18', '--generate-mipmap'],
+  // A7c: the authored sky's data texture (4 independent channels: ETC1S would bleed them into each other)
+  dataA: ['--format', 'R8G8B8A8_UNORM', '--assign-tf', 'linear', '--encode', 'uastc', '--uastc-quality', '2', '--uastc-rdo', '--uastc-rdo-l', '1.0', '--zstd', '18', '--generate-mipmap'],
 };
 
 let KTX = null;
@@ -61,7 +63,7 @@ export function ktxEncode(png, dst, kind) {
   const bad = log.split(/\r?\n/).filter((l) => /error|fatal|fail|invalid|not exist|unrecognized|warning/i.test(l));
   const ok = fs.existsSync(dst) && fs.readFileSync(dst).subarray(0, 12).toString('latin1') === '«KTX 20»\r\n\u001a\n';
   if (bad.length || !ok) throw new Error(`ktx create ${path.basename(png)} (${kind}) failed (exit ${r.status}, output ${ok ? 'ok' : 'missing / not KTX2'}):\n  ${bad.join('\n  ') || log.slice(0, 400)}`);
-  return { bytes: fs.statSync(dst).size, seconds: (Date.now() - t) / 1000, codec: kind === 'linear' ? 'uastc+zstd' : 'etc1s' };
+  return { bytes: fs.statSync(dst).size, seconds: (Date.now() - t) / 1000, codec: kind === 'linear' || kind === 'dataA' ? 'uastc+zstd' : 'etc1s' };
 }
 
 export function pillow(script, ...a) {

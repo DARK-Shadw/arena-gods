@@ -6177,5 +6177,36 @@
     }
    }
   }
+ },
+ "skies": {
+  "moongate": {
+   "json": "sky/moongate/sky.json",
+   "files": [
+    "sky/moongate/sky.json",
+    "sky/moongate/q2/sky.ktx2",
+    "sky/moongate/q2/sky.webp",
+    "sky/moongate/q1/sky.ktx2",
+    "sky/moongate/q1/sky.webp",
+    "sky/moongate/q0/sky.ktx2",
+    "sky/moongate/q0/sky.webp"
+   ],
+   "sources": [
+    "polyhaven/quarry_cloudy"
+   ],
+   "tiers": {
+    "q2": {
+     "gpuMB": 10.67,
+     "downloadMB": 4.26
+    },
+    "q1": {
+     "gpuMB": 2.67,
+     "downloadMB": 1.32
+    },
+    "q0": {
+     "gpuMB": 0.67,
+     "downloadMB": 0.41
+    }
+   }
+  }
  }
 }

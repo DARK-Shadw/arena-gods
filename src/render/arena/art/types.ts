@@ -11,7 +11,7 @@
  */
 import type { HazardKind, ObstacleKind, ThemeId } from '../../../sim/arenaGen';
 import type { RtPropKind } from '../../../sim/world';
-import type { SkyParams } from '../sky';
+import type { SkyLook, SkyParams } from '../sky';
 import type { AmbientKind, Grade } from '../themes';
 import type { DebrisMat } from '../debris';
 import type { BackdropTuning } from '../backdrop';
@@ -198,6 +198,15 @@ export interface BackdropArt {
   tune?: BackdropTuning;
 }
 
+/**
+ * A7c: the authored sky (sky.ts skyTex): `id` = public/arena/sky/<id>/sky.json (tools/arena/build_sky.mjs, from
+ * tools/arena/sky/<id>.json); `look` overrides single keys of the json's lighting. `?sky=0` skips it (A/B, perf).
+ */
+export interface SkyArt {
+  id: string;
+  look?: Partial<SkyLook>;
+}
+
 export interface ThemeArt {
   id: ThemeId | 'default';
   /** sim props -> kit asset (authored to PROP_BASE radius / TOP height, origin at the base centre) */
@@ -219,6 +228,7 @@ export interface ThemeArt {
   ring?: RingArt;
   gates?: GateArt;
   backdrop?: BackdropArt;
+  sky?: SkyArt;
   /** A2: decorative boundary braziers (render only) */
   ringFlames?: RingFlamesArt;
   /** A2: display-data overrides in kit mode */

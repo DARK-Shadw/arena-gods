@@ -94,6 +94,8 @@ export interface BackdropTuning {
   proceduralCards?: boolean;
   /** A7b: baked cloud (AOV B) gain away from the moon / round it, and the falloff exponent (moon direction: setMoon) */
   cloud?: { away: number; near: number; power: number };
+  /** A7c: fade the baked cloud texels (AOV B) out, 0..1, where an authored sky (ThemeArt.sky) draws the clouds */
+  cloudHide?: number;
 }
 
 const DEG = Math.PI / 180;
@@ -130,6 +132,7 @@ uniform vec3 uTint;
 uniform float uSat;
 uniform vec3 uMoon;
 uniform vec3 uCloudK;
+uniform float uCloudHide;
 uniform vec3 uOrigin;
 uniform vec2 uAovGrid;
 uniform vec3 fogColor;
@@ -162,6 +165,8 @@ void main(){
     // clouds: a slow sway of the texture inside the cloud mask (no drift out of it); second fetch only there
     vec2 uv2 = vUv + vec2(m.b * 0.0012 * sin(uTime * 0.05 + vUv.y * 9.0 + vUv.x * 40.0), 0.0);
     c = texture2D(uMap, uv2);
+    // A7c: the authored sky carries the clouds now; the baked Cycles cloud texels fade out (tune.cloudHide)
+    c.a *= 1.0 - uCloudHide * smoothstep(0.05, 0.6, m.b);
   }
 #endif
   // fade the top rows of the band (clouds touching the latitude limit)
@@ -412,6 +417,7 @@ export class Backdrop {
             uTint: { value: new THREE.Color(...(tune.tint ?? [1, 1, 1])) },
             uSat: { value: tune.sat ?? 1 },
             uMoon: { value: new THREE.Vector3(1, 0.45, 0).normalize() },
+            uCloudHide: { value: tune.cloudHide ?? 0 },
             uCloudK: { value: new THREE.Vector3(...(tune.cloud ? [tune.cloud.away, tune.cloud.near, tune.cloud.power] : [0, 1, 1])) },
             uAovGrid: { value: new THREE.Vector2(L.def.aovSize[0] / 3, L.def.aovSize[1] / 3) },
           },

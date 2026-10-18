@@ -63,6 +63,8 @@ export function artFor(theme: ThemeId): ThemeArt {
   if (art.look?.stage && typeof location !== 'undefined' && new URLSearchParams(location.search).get('stage') === '0') art.look = { ...art.look, stage: undefined };
   // A6: `?backdrop=0` drops the baked panorama (before / after shots, perf A/B)
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('backdrop') === '0') delete art.backdrop;
+  // A7c: `?sky=0` drops the authored sky (back to the A7b storm deck: before / after shots, perf A/B)
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('sky') === '0') delete art.sky;
   // A2: `?floorset=slate_slabs` previews another floor set on a theme that has a kit floor
   const fs = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('floorset') : null;
   if (fs && art.floor && /^[a-z0-9_]+$/.test(fs)) art.floor = { ...art.floor, set: `floor/${fs}` };

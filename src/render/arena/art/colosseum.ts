@@ -96,8 +96,14 @@ export const COLOSSEUM_ART: ThemeArt = {
       proceduralCards: true,
       // A7b: the baked storm clouds: dark away from the moon, backlit round it
       cloud: { away: 0.24, near: 0.3, power: 8 },
+      // A7c: the authored sky draws the storm now; the blockout's Cycles clouds fade out
+      cloudHide: 1,
     },
   },
+  // A7c: the authored storm sky (tools/arena/sky/moongate.json -> public/arena/sky/moongate/): a Poly Haven CC0 cloud
+  // photo turned into structure / density / rim / shaft data, lit in sky.ts by the moon (glow, silver rims, dark far
+  // banks), drifting, with rare distant lightning; replaces the A7b storm deck (look.sky.storm*) when it loads
+  sky: { id: 'moongate' },
   // A7b: the real night look (light / fog / grade pass against ref-3): dark overall with strong accents, a cold moon
   // back-rim on every stone edge, warm fire pools on stone, desaturated blue-grey stone and storm cloud (warm only at the
   // fires), the sky + backdrop as the light probe, view-dependent haze, ground mist. See docs/milestones/A7b/README.md.

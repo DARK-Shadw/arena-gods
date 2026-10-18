@@ -13,7 +13,7 @@ import type { ArenaLayout, HazardDef, Obstacle, ObstacleKind } from '../../sim/a
 import { boundR, chainSwing, CHAIN_LEN, CHAIN_PIVOT_H } from '../../sim/arenaGen';
 import type { Frame, SimEvent } from '../../sim/types';
 import { THEME_DEFS, type ThemeDef } from './themes';
-import { bakeEnvironment, bakeStormTexture, makeSky } from './sky';
+import { bakeEnvironment, bakeStormTexture, lightningAt, makeSky, type SkyLook } from './sky';
 import { Backdrop } from './backdrop';
 import { ArenaFog, installHeightFog } from './fog';
 import { Ambient } from './ambient';
@@ -191,6 +191,18 @@ export class Arena {
     }
 
     // ---------------- sky, environment, fog
+    // A7c: the authored sky (kit mode, ThemeArt.sky + its loaded texture): replaces the storm deck; lit in sky.ts by the
+    // moon, drifting, with distant lightning (update()); the probe below bakes it (T.sky is withLook's own copy here)
+    if (kit?.sky && kit.art.sky && kit.art.look) {
+      const J = kit.sky.json;
+      T.sky = { ...T.sky, storm: 0, skyTex: kit.sky.tex, skyLook: { ...J.look, ...(kit.art.sky.look ?? {}) }, skyRamp: J.palette };
+      this.skyLook = T.sky.skyLook!;
+      const md = T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir;
+      this.moonAz = Math.atan2(md.z, md.x);
+      // `?skyflash=<t>` (debug): hold the lightning clock at t (e.g. 40.02, the first strike) for stills of a flash
+      const sf = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('skyflash') : null;
+      if (sf !== null && Number.isFinite(Number(sf))) this.skyFlashAt = Number(sf);
+    }
     // A7b: the kit Moon Gate's storm deck is baked once (sky.ts bakeStormTexture) and sampled by the sky and the probe
     if (kit && T.sky.storm) T.sky.stormTex = bakeStormTexture(renderer, T.sky, quality >= 1 ? 2048 : 1024, quality >= 2 ? 512 : 256);
     this.sky = makeSky(T.sky);
@@ -200,7 +212,9 @@ export class Arena {
     this.drawCallsMerged = mergeStatic(this.group);
     // A6: baked panorama layers (kit mode, when the theme art has one and it loaded); not merged (userData.dyn)
     if (kit?.backdrop && kit.art.backdrop) {
-      this.backdrop = new Backdrop(kit.backdrop, quality, kit.art.backdrop.tune);
+      // (A7c: the baked clouds fade out only when the authored sky that replaces them is drawn)
+      const tune = kit.art.backdrop.tune;
+      this.backdrop = new Backdrop(kit.backdrop, quality, this.skyLook || !tune ? tune : { ...tune, cloudHide: 0 });
       this.backdrop.setMoon(T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir);
       this.group.add(this.backdrop.group);
     }
@@ -221,7 +235,7 @@ export class Arena {
       });
     this.env = stageArt ? bakeEnvironment(renderer, T.sky, envExtras, { fog: this.fog, far: 1400 }) : bakeEnvironment(renderer, T.sky, this.dressing.envExtras);
     scene.environment = this.env;
-    scene.environmentIntensity = stageArt?.envIntensity ?? 1;
+    scene.environmentIntensity = this.envBase = stageArt?.envIntensity ?? 1;
     scene.background = null;
     scene.fog = this.fog;
 
@@ -335,6 +349,16 @@ export class Arena {
   }
   /** A7b: the kit Moon Gate stage light (moon rim, fire pools, sky fog, mist), null elsewhere */
   stage: StageLight | null = null;
+  /** A7c: the authored sky's lighting (null: no authored sky) + the lightning state (cosmetic, from match time) */
+  skyLook: SkyLook | null = null;
+  private moonAz = 0;
+  private envBase = 1;
+  private matchT = -1;
+  private matchSeen = -1e9;
+  private flashDir = new THREE.Vector3(1, 0.2, 0);
+  private skyFlashAt: number | null = null;
+  /** A7c: current lightning level 0..1 (read-only, for checks) */
+  flash = 0;
 
   /** A2: render-only braziers along the boundary (ThemeArt.ringFlames), skipping the gates */
   private addRingFlames(kit: ArenaPack) {
@@ -1113,6 +1137,9 @@ export class Arena {
   /** sync dynamic state to a playback frame (simDt for physics-like visuals) */
   applyFrame(fr: Frame, simDt: number, hands: (i: number) => THREE.Vector3 | null, facing: (i: number) => number) {
     const t = fr.t;
+    // A7c: the sky's lightning follows match time (same flashes on a replay / seek); read only, never written back
+    this.matchT = t;
+    this.matchSeen = this.time;
     // obstacles
     for (let i = 0; i < this.obstacles.length; i++) {
       const ov = this.obstacles[i];
@@ -1470,6 +1497,16 @@ export class Arena {
       this.fireRingMat.opacity *= 1 - 0.8 * this.ringThrough;
     }
     this.backdrop?.update(this.fog);
+    // A7c: distant lightning (match time in a fight, the arena clock otherwise): the sky flashes, the probe pulses lightly
+    if (this.skyLook) {
+      const L = this.skyLook;
+      const lt = this.skyFlashAt ?? (this.time - this.matchSeen < 0.5 ? this.matchT : this.time);
+      const f = (this.flash = lightningAt(lt, L.flashEvery, this.flashDir, this.moonAz));
+      const U = (this.sky.material as THREE.ShaderMaterial).uniforms;
+      (U.uSkyFlash.value as THREE.Vector4).w = f * L.flashGain;
+      (U.uSkyFlashDir.value as THREE.Vector3).copy(this.flashDir);
+      this.scene.environmentIntensity = this.envBase * (1 + L.flashEnv * f);
+    }
     if (cam) {
       this.sky.position.copy(cam.position);
       this.camQuat.copy(cam.quaternion);

@@ -1,0 +1,167 @@
+{
+ "_doc": "A7c sky spec for the Moon Gate (kit colosseum). tools/arena/sky_compose.py turns the CC0 HDRI into the cloud data texture (R structure, G density, B rim potential, A moon shafts) + per-tier PNGs + a by-eye preview from the ref-3 camera; tools/arena/build_sky.mjs encodes them (KTX2 UASTC + WebP) into public/arena/sky/<id>/ with sky.json. The `look` block is the shader's default lighting (src/render/arena/sky.ts SkyLook); ThemeArt.look.sky.skyLook overrides single keys. Angles in degrees, game azimuth (0 = +x, + toward +z).",
+ "id": "moongate",
+ "source": {
+  "asset": "polyhaven/quarry_cloudy",
+  "file": "quarry_cloudy_8k.hdr",
+  "rot": 0.45,
+  "elev0": 11.0,
+  "k": 1.25,
+  "mirror": false
+ },
+ "moon": {
+  "az": -1.7,
+  "elev": 27,
+  "diameter": 12
+ },
+ "master": [
+  8192,
+  1024
+ ],
+ "tiers": {
+  "q2": [
+   8192,
+   1024
+  ],
+  "q1": [
+   4096,
+   512
+  ],
+  "q0": [
+   2048,
+   256
+  ]
+ },
+ "features": {
+  "chromaLo": 0.1,
+  "chromaHi": 0.26,
+  "detail": 0.42,
+  "base": 0.12,
+  "contrast": 1.45,
+  "edgeBlurDeg": 0.5,
+  "thinLo": 0.1,
+  "shaftRadiusDeg": 48,
+  "shaftDecayDeg": 16,
+  "shaftEma": 0.06,
+  "shaftBlurBins": 3,
+  "dmin": 0.25,
+  "rimLo": 0.03,
+  "rimHi": 0.12
+ },
+ "palette": {
+  "ref": "docs/concept-art/ref-3.png",
+  "boxes": [
+   [
+    700,
+    30,
+    870,
+    200
+   ],
+   [
+    970,
+    20,
+    1100,
+    200
+   ],
+   [
+    1390,
+    10,
+    1530,
+    150
+   ],
+   [
+    1190,
+    60,
+    1300,
+    180
+   ],
+   [
+    1100,
+    0,
+    1180,
+    60
+   ]
+  ],
+  "stops": 6,
+  "q": [
+   0.06,
+   0.95
+  ]
+ },
+ "look": {
+  "gain": 1.0,
+  "amb": 0.17,
+  "mid": 1.1,
+  "midDeg": 15,
+  "wide": 0.22,
+  "wideDeg": 45,
+  "hot": 0.9,
+  "hotDeg": 9,
+  "rim": [
+   0.78,
+   0.8,
+   1.0
+  ],
+  "rimGain": 0.8,
+  "rimDeg": 14,
+  "gapFar": [
+   0.004,
+   0.005,
+   0.01
+  ],
+  "gapNear": [
+   0.025,
+   0.03,
+   0.07
+  ],
+  "bankH": 0.25,
+  "bankDark": 0.65,
+  "bankDens": 0.55,
+  "bankAway": 0.8,
+  "shaft": [
+   0.5,
+   0.54,
+   0.75
+  ],
+  "shaftGain": 0.25,
+  "drift": 0.0003,
+  "flash": [
+   0.75,
+   0.8,
+   1.0
+  ],
+  "flashEvery": 34,
+  "flashGain": 1.6,
+  "flashEnv": 0.25,
+  "moonOcclude": 0.85,
+  "sat": 0.75,
+  "moonColor": [
+   1.1,
+   1.13,
+   1.35
+  ]
+ },
+ "preview": {
+  "camera": {
+   "yaw": -18.5,
+   "pitch": 6.6,
+   "vfov": 44.7,
+   "size": [
+    1793,
+    877
+   ]
+  },
+  "exposure": 1.2
+ },
+ "back": {
+  "asset": "polyhaven/quarry_cloudy",
+  "file": "quarry_cloudy_8k.hdr",
+  "rot": 0.83,
+  "elev0": 14.0,
+  "k": 1.4,
+  "gain": 0.7,
+  "density": 0.9,
+  "soften": 0.35,
+  "flatten": 0.7
+ }
+}
