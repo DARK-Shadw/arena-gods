@@ -14,6 +14,7 @@ import { dressGlacier, dressMoonlake, dressSakura } from './dressNature';
 import { dressForge } from './dressForge';
 import { dressKit } from './dressKit';
 import type { KitInstance } from './assets';
+import type { ChainKit } from './chains';
 import type { WetFloor } from './floor';
 
 export interface Dressing {
@@ -36,6 +37,12 @@ export interface Dressing {
   propAsset?(kind: string): KitInstance | null;
   /** A2: the kit wet floor (floor.ts), when the theme's art has a floor set that loaded */
   wetFloor?: WetFloor;
+  /** A4: kit visual for an A2b feature obstacle (banner pole, barricade); absent / null = the arena's placeholder */
+  feature?(o: Obstacle): THREE.Object3D | null;
+  /** A4: kit asset instance for a hazard kind (spike grate, chain weight, vent, crumble), scaled to h.r; null = legacy */
+  hazardKit?(h: HazardDef): KitInstance | null;
+  /** A4: a chain-link builder (kit/chain_link), null when the theme has none loaded */
+  chainKit?(): ChainKit | null;
 }
 
 /** kit art when the arena was given a loaded pack, else (and always with ?arena=legacy) the legacy builders */

@@ -332,8 +332,12 @@ export function banner(a: Arena, color: string, trim: string, w: number, h: numb
   mesh.castShadow = true;
   mesh.userData.dyn = true;
   const basePos = (geo.attributes.position.array as Float32Array).slice();
-  const ph = Math.random() * 10;
+  // A4: the legacy phase stays Math.random() ONLY on the legacy path (?arena=legacy must stay pixel-identical: the concept
+  // harness seeds Math.random); kit mode gets a deterministic phase (render seed + build order) and replaces these banners
+  // with kit banners whose sway runs in the vertex shader (cloth.ts)
+  const ph = a.kit ? (((a.layout.seed * 7919 + a.group.children.length * 104729) % 1000) / 1000) * 10 : Math.random() * 10;
   a.onUpdate((t) => {
+    if (!mesh.parent) return; // A4: removed by the kit ring (dressKit wallBanners): no more CPU flutter
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < arr.length; i += 3) {

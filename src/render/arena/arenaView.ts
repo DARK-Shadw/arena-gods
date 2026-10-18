@@ -30,6 +30,8 @@ import { FloorLightMap } from './lightmap';
 import { LAYER_REFLECT, PlanarReflection, StreakCards, type FloorLightSource } from './reflection';
 import { LAYER } from '../fx/fxLayers';
 import { THEME_FLOOR, type FloorSurface } from '../fx/fxSurfaces';
+import { swayOn, swayTime } from './cloth';
+import type { KitInstance } from './assets';
 
 export interface Gate {
   angle: number;
@@ -268,8 +270,10 @@ export class Arena {
   /** A2: render-only braziers along the boundary (ThemeArt.ringFlames), skipping the gates */
   private addRingFlames(kit: ArenaPack) {
     const RF = kit.art.ringFlames!;
+    // A4: variants alternate along the ring (the pedestal bowls of ref-3 between tripods); their flame size is the socket's
+    const variants = (RF.assets ?? []).map((id) => kit.assets.get(id)).filter((x) => !!x);
     const asset = kit.assets.get(RF.asset);
-    if (!asset) return;
+    if (!asset && !variants.length) return;
     const L = this.layout;
     const circ = 2 * Math.PI * Math.sqrt((L.rx * L.rx + L.rz * L.rz) / 2);
     const spacing = circ / RF.count;
@@ -277,14 +281,16 @@ export class Arena {
       L,
       RF.offset,
       spacing,
-      (p, yaw) => {
-        const inst = asset.instantiate();
+      (p, yaw, _a, i) => {
+        const A = variants.length ? variants[i % variants.length]! : asset!;
+        const inst = A.instantiate();
         const g = new THREE.Group();
         g.position.set(p.x, 0, p.z);
         g.rotation.y = yaw;
         g.add(inst.obj);
         const s = inst.sockets.find((x) => x.name === 'SOCK_flame');
-        g.add(this.flame(new THREE.Vector3(0, s ? s.pos[1] : 1.2, 0), RF.size, this.theme.fire, false));
+        const size = variants.length && typeof s?.extras.size === 'number' ? s.extras.size * (RF.size / 0.9) : RF.size;
+        g.add(this.flame(new THREE.Vector3(0, s ? s.pos[1] : 1.2, 0), size, this.theme.fire, false));
         g.userData.ringFlame = true;
         this.group.add(g);
       },
@@ -398,7 +404,8 @@ export class Arena {
   private addObstacle(o: Obstacle) {
     const D = this.dressing;
     const crack = { value: 0 };
-    const mesh = o.kind === 'banner' || o.kind === 'barricade' ? this.featureMesh(o) : D.obstacle(o, crack);
+    // A4: kit feature (banner pole + kit banner, barricade) when the theme's art has one loaded, else the A2b placeholder
+    const mesh = o.kind === 'banner' || o.kind === 'barricade' ? (D.feature?.(o) ?? this.featureMesh(o)) : D.obstacle(o, crack);
     const pivot = new THREE.Group();
     pivot.position.set(o.x, 0, o.z);
     pivot.add(mesh);
@@ -428,13 +435,16 @@ export class Arena {
     }
     const pv: PropView = { obj: g, kind, gone: false, kit: inst?.asset.id };
     if (kind === 'explosive') {
-      // glowing rune band + fuse spark
-      const band = new THREE.Mesh(new THREE.TorusGeometry(0.39, 0.035, 6, 24), glowMat('#ff6a20', 0.9));
-      band.rotation.x = Math.PI / 2;
-      band.position.y = 0.5;
-      g.add(band);
+      // glowing rune band + fuse spark (A4: the kit keg has a red-painted band and a fuse: only the spark, at its SOCK_glow)
+      const sg = inst?.sockets.find((x) => x.name === 'SOCK_glow');
+      if (!sg) {
+        const band = new THREE.Mesh(new THREE.TorusGeometry(0.39, 0.035, 6, 24), glowMat('#ff6a20', 0.9));
+        band.rotation.x = Math.PI / 2;
+        band.position.y = 0.5;
+        g.add(band);
+      }
       const spark = new THREE.Mesh(new THREE.PlaneGeometry(0.5, 0.5), glowMat('#ffd080', 0, softDot()));
-      spark.position.y = 1.08;
+      spark.position.set(sg ? sg.pos[0] : 0, sg ? sg.pos[1] + 0.05 : 1.08, sg ? sg.pos[2] : 0);
       g.add(spark);
       pv.glow = spark;
     }
@@ -446,7 +456,11 @@ export class Arena {
       g.add(fl);
       pv.fire = fl;
     }
-    if (kind === 'lantern') {
+    if (kind === 'lantern' && inst) {
+      // A4: the kit stone toro: its fire box glows (emissive); a small flame at SOCK_glow (no light: budget)
+      const sg = inst.sockets.find((x) => x.name === 'SOCK_glow');
+      if (sg) g.add(this.flame(new THREE.Vector3(sg.pos[0], sg.pos[1] - 0.08, sg.pos[2]), 0.32, '#ffb060', false));
+    } else if (kind === 'lantern') {
       const paper = new THREE.Mesh(paperLanternGeo().paper, new THREE.MeshStandardMaterial({ color: '#ffe0b0', emissive: '#ff9a40', emissiveIntensity: 2.2, roughness: 0.8 }));
       g.add(paper);
     }
@@ -532,6 +546,7 @@ export class Arena {
         return;
       }
       if (h.kind === 'spikes') {
+        // (river cells keep the legacy grate: square cells)
         const grate = new THREE.Mesh(new THREE.BoxGeometry(1.3, 0.08, 1.06), D.mats.metal);
         grate.position.y = 0.04;
         grate.receiveShadow = true;
@@ -599,6 +614,24 @@ export class Arena {
         break;
       }
       case 'spikes': {
+        // A4: the kit spike grate (frame + bars; the SPIKES node rises through the bars)
+        const ki = D.hazardKit?.(h);
+        const kSp = ki ? kitNode(ki, 'SPIKES') : null;
+        if (ki && kSp) {
+          g.add(ki.obj);
+          const drop = Number(ki.asset.extras.spikeDrop) || 0.72;
+          kSp.position.y = -drop;
+          const warnK = new THREE.Mesh(new THREE.RingGeometry(h.r * 0.95, h.r * 1.08, 32), glowMat('#ff5a2a', 0));
+          warnK.rotation.x = -Math.PI / 2;
+          warnK.position.y = 0.09;
+          g.add(warnK);
+          update = (s, _t, dt) => {
+            const target = s === 2 ? 0 : s === 1 ? -drop * 0.76 : -drop;
+            kSp.position.y += (target - kSp.position.y) * Math.min(1, dt * (s === 2 ? 40 : 8));
+            (warnK.material as THREE.MeshBasicMaterial).opacity = s === 1 ? 0.6 + Math.sin(this.time * 30) * 0.3 : 0;
+          };
+          break;
+        }
         const { plate, spikes } = spikeGeo(h.r);
         const pm = new THREE.Mesh(plate, D.mats.metal);
         pm.receiveShadow = true;
@@ -687,6 +720,30 @@ export class Arena {
       }
       case 'chains': {
         // A2b: an iron weight on a chain hanging from the dark above; swings along the sim's axis (chainSwing)
+        // A4: the kit spiked weight on instanced kit links (the pendulum chain swings with its pivot group)
+        const ki = D.hazardKit?.(h);
+        const ck = ki ? D.chainKit?.() : null;
+        if (ki && ck?.ok) {
+          const sock = ki.sockets.find((x) => x.name === 'SOCK_chain');
+          const top = sock ? sock.pos[1] : 0.42;
+          ck.straight(0, CHAIN_PIVOT_H + 14, CHAIN_PIVOT_H, 0, 'big', 1.25);
+          for (const im of ck.build('hazChainUp')) g.add(im);
+          const pivotK = new THREE.Group();
+          pivotK.position.y = CHAIN_PIVOT_H;
+          g.add(pivotK);
+          ck.straight(0, 0, -CHAIN_LEN + top, 0, 'big', 1.25);
+          for (const im of ck.build('hazChain')) pivotK.add(im);
+          ki.obj.position.y = -CHAIN_LEN;
+          pivotK.add(ki.obj);
+          const axisK = new THREE.Vector3(-Math.cos(h.phase), 0, Math.sin(h.phase));
+          update = (s, t) => {
+            const neg = s > 127;
+            const tau = s === 0 ? -1 : ((neg ? s - 127 : s) - 0.5) / 40;
+            const th = tau < 0 ? Math.sin(t * 0.9 + h.id) * 0.015 : chainSwing(tau).theta * (neg ? -1 : 1);
+            pivotK.setRotationFromAxisAngle(axisK, th);
+          };
+          break;
+        }
         const metal = D.mats.metal ?? D.mats.stone;
         const up = new THREE.Mesh(chainGeo(14), metal);
         up.position.y = CHAIN_PIVOT_H + 14;
@@ -718,13 +775,18 @@ export class Arena {
       }
       case 'flamejet': {
         // A2b: a floor vent (grate) that glows, then shoots a column of fire (geyser timing)
-        const grate = new THREE.Mesh(new THREE.CylinderGeometry(h.r * 0.9, h.r, 0.08, 20), D.mats.metal ?? D.mats.stone);
-        grate.position.y = 0.04;
-        grate.receiveShadow = true;
-        g.add(grate);
+        // A4: the kit vent (scorched stone ring + iron grate); the glow disc sits under its bars
+        const ki = D.hazardKit?.(h);
+        if (ki) g.add(ki.obj);
+        else {
+          const grate = new THREE.Mesh(new THREE.CylinderGeometry(h.r * 0.9, h.r, 0.08, 20), D.mats.metal ?? D.mats.stone);
+          grate.position.y = 0.04;
+          grate.receiveShadow = true;
+          g.add(grate);
+        }
         const glow = new THREE.Mesh(new THREE.CircleGeometry(h.r * 0.75, 20), glowMat('#ff6a20', 0));
         glow.rotation.x = -Math.PI / 2;
-        glow.position.y = 0.09;
+        glow.position.y = ki ? 0.035 : 0.09;
         g.add(glow);
         const column = new THREE.Mesh(new THREE.CylinderGeometry(h.r * 0.3, h.r * 0.65, 1, 16, 1, true), glowMat('#ff8a30', 0, plumeSprite()));
         column.position.y = 0.5;
@@ -779,6 +841,17 @@ export class Arena {
         cracks.position.y = 0.035;
         cracks.userData.floor = true;
         g.add(cracks);
+        // A4: the kit crumble: heaved, cracked slabs (SLAB_*) that tilt and drop, then the broken RIM around the pit
+        const ki = D.hazardKit?.(h);
+        const kSlabs: THREE.Object3D[] = [];
+        let kRim: THREE.Object3D | null = null;
+        if (ki) {
+          g.add(ki.obj);
+          ki.obj.traverse((n) => {
+            if (/^LOD\d_SLAB_/.test(n.name)) kSlabs.push(n);
+            else if (/^LOD\d_RIM/.test(n.name)) kRim = n;
+          });
+        }
         const hole = new THREE.Mesh(blobDisc(h.r * 0.95, h.id + 21, 40), new THREE.MeshBasicMaterial({ color: '#030202' }));
         hole.position.y = 0.03;
         hole.visible = false;
@@ -801,6 +874,41 @@ export class Arena {
           sl.visible = false;
           g.add(sl);
           slabs.push(sl);
+        }
+        if (ki && kSlabs.length) {
+          // the kit slabs replace the crack decal, the legacy rim and slabs
+          cracks.visible = false;
+          const rim0 = kRim as THREE.Object3D | null;
+          const rest = kSlabs.map((n) => ({ n, p: n.position.clone(), r: n.rotation.clone(), c: slabCentre(n) }));
+          let tk = -1;
+          update = (s, t) => {
+            if (s === 0) {
+              hole.visible = false;
+              if (rim0) rim0.visible = false;
+              for (const r of rest) {
+                r.n.visible = true;
+                r.n.position.copy(r.p);
+                r.n.rotation.copy(r.r);
+              }
+              tk = -1;
+            } else if (s === 1) {
+              for (const r of rest) {
+                r.n.visible = true;
+                r.n.position.set(r.p.x + Math.sin(t * 47 + r.c.x * 9) * 0.012, r.p.y + Math.abs(Math.sin(t * 31 + r.c.z * 7)) * 0.015, r.p.z + Math.cos(t * 41 + r.c.z * 5) * 0.012);
+              }
+            } else {
+              if (tk < 0) tk = t;
+              const k = s === 2 ? Math.min(1, (t - tk) / 0.45) : 1;
+              hole.visible = true;
+              if (rim0) rim0.visible = true;
+              for (const r of rest) {
+                r.n.visible = k < 1;
+                r.n.position.set(r.p.x - r.c.x * k * 0.25, r.p.y - k * k * 1.5, r.p.z - r.c.z * k * 0.25);
+                r.n.rotation.set(r.r.x + k * r.c.z * 0.9, r.r.y, r.r.z - k * r.c.x * 0.9);
+              }
+            }
+          };
+          break;
         }
         let t0 = -1;
         update = (s, t) => {
@@ -1221,7 +1329,15 @@ export class Arena {
       if (this.streaks) this.streaks.uniforms.uFlicker.value = fl;
     }
     for (const u of this.updaters) u(t, dt);
+    // A4: banner sway / chain swing (vertex shaders): the whole CPU side is this shared clock, timed for the A4 budget
+    const s0 = performance.now();
+    swayTime.value = t;
+    swayOn.value = this.quality >= 1 ? 1 : 0;
+    this.swayStats.ms += performance.now() - s0;
+    this.swayStats.frames++;
   }
+  /** A4: CPU time spent driving the kit banner sway / chain swing (ms total, frames) */
+  swayStats = { ms: 0, frames: 0 };
 
   updateDebris(simDt: number) {
     this.debris.update(simDt);
@@ -1378,4 +1494,23 @@ function plumeSprite(): THREE.Texture {
   });
   _plume.wrapS = _plume.wrapT = THREE.RepeatWrapping;
   return _plume;
+}
+
+/** A4: a named node of a kit instance (e.g. SPIKES), whatever its LOD prefix */
+function kitNode(ki: KitInstance, name: string): THREE.Object3D | null {
+  let out: THREE.Object3D | null = null;
+  ki.obj.traverse((n) => {
+    if (!out && (n.name === name || n.name.endsWith(`_${name}`) || n.userData.node === name)) out = n;
+  });
+  return out;
+}
+
+/** A4: the horizontal centre of a crumble slab (unit-ish direction it falls towards the pit centre) */
+function slabCentre(n: THREE.Object3D): THREE.Vector3 {
+  const m = n as THREE.Mesh;
+  if (!m.geometry) return new THREE.Vector3();
+  if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+  const c = m.geometry.boundingBox!.getCenter(new THREE.Vector3());
+  const v = new THREE.Vector3(c.x, 0, c.z);
+  return v.lengthSq() > 0.04 ? v.normalize() : v.multiplyScalar(0);
 }

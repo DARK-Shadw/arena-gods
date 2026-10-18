@@ -38,11 +38,17 @@
    ],
    "fetched": "2026-10-18",
    "usedBy": [
+    "kit/banner_pole",
+    "kit/brazier_pedestal",
+    "kit/chunk",
     "kit/column_ruin",
+    "kit/crumble",
+    "kit/lantern_toro",
     "kit/pillar_square",
     "kit/rubble_pile",
     "kit/rubble_scatter",
-    "kit/stone_trim"
+    "kit/stone_trim",
+    "kit/vent_grate"
    ]
   },
   "polyhaven/metal_plate_02": {
@@ -62,7 +68,22 @@
    ],
    "fetched": "2026-10-17",
    "usedBy": [
-    "kit/brazier_tripod"
+    "kit/banner_pole",
+    "kit/barrel",
+    "kit/barricade",
+    "kit/bell",
+    "kit/brazier_pedestal",
+    "kit/brazier_pillartop",
+    "kit/brazier_tripod",
+    "kit/brazier_wall",
+    "kit/chain_link",
+    "kit/chain_weight",
+    "kit/crate",
+    "kit/keg",
+    "kit/lantern_cage",
+    "kit/lantern_paper",
+    "kit/spike_grate",
+    "kit/vent_grate"
    ]
   },
   "polyhaven/rock_moss_set_02": {
@@ -80,6 +101,40 @@
    "usedBy": [
     "kit/rock_prop",
     "kit/rubble_scatter"
+   ]
+  },
+  "polyhaven/rusty_metal_02": {
+   "name": "Rusty Metal 02",
+   "authors": [
+    "Rob Tuytel"
+   ],
+   "licence": "CC0-1.0",
+   "url": "https://polyhaven.com/a/rusty_metal_02",
+   "res": "1k",
+   "files": [
+    "rusty_metal_02_diff_1k.jpg",
+    "rusty_metal_02_rough_1k.png",
+    "rusty_metal_02_nor_gl_1k.png",
+    "rusty_metal_02_disp_1k.png",
+    "rusty_metal_02_arm_1k.png"
+   ],
+   "fetched": "2026-10-18",
+   "usedBy": [
+    "kit/banner_pole",
+    "kit/barrel",
+    "kit/barricade",
+    "kit/bell",
+    "kit/brazier_pedestal",
+    "kit/brazier_pillartop",
+    "kit/brazier_wall",
+    "kit/chain_link",
+    "kit/chain_weight",
+    "kit/crate",
+    "kit/keg",
+    "kit/lantern_cage",
+    "kit/lantern_paper",
+    "kit/spike_grate",
+    "kit/vent_grate"
    ]
   },
   "polyhaven/stone_tiles": {
@@ -100,6 +155,34 @@
    "fetched": "2026-10-17",
    "usedBy": [
     "floor/slate_slabs"
+   ]
+  },
+  "polyhaven/weathered_planks": {
+   "name": "Weathered Planks",
+   "authors": [
+    "Dario Barresi",
+    "Dimitrios Savva"
+   ],
+   "licence": "CC0-1.0",
+   "url": "https://polyhaven.com/a/weathered_planks",
+   "res": "1k",
+   "files": [
+    "weathered_planks_diff_1k.jpg",
+    "weathered_planks_rough_1k.png",
+    "weathered_planks_nor_gl_1k.png",
+    "weathered_planks_disp_1k.png",
+    "weathered_planks_arm_1k.png"
+   ],
+   "fetched": "2026-10-18",
+   "usedBy": [
+    "kit/banner_pole",
+    "kit/barrel",
+    "kit/barricade",
+    "kit/bell",
+    "kit/crate",
+    "kit/keg",
+    "kit/lantern_paper",
+    "kit/stakes"
    ]
   }
  }

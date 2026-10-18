@@ -1,0 +1,94 @@
+{
+ "ref-3": {
+  "theme": "colosseum",
+  "C1": {
+   "value": 0.363,
+   "pass": false,
+   "rule": "sky-mask IoU >= 0.65 (top 60 %)",
+   "profileErr": 0.127,
+   "conceptSkyShare": 0.203,
+   "note": "concept mask = by-eye skyline profile; game mask = visual (frame vs sky-only frame)"
+  },
+  "C2": {
+   "median": 26.93,
+   "worst": 30.37,
+   "cells": [
+    23.6,
+    19.7,
+    22.0,
+    29.7,
+    30.4,
+    29.0,
+    23.4,
+    29.2,
+    26.9
+   ],
+   "pass": false,
+   "rule": "Delta E76 per 3x3 cell: median <= 12, worst <= 20"
+  },
+  "C3": {
+   "concept": 0.0074,
+   "game": 0.0194,
+   "ratio": 2.613,
+   "pass": false,
+   "rule": "warm share within +-40 % of the concept",
+   "coolConcept": 0.712,
+   "coolGame": 0.9251
+  },
+  "C4": {
+   "concept": 0.0718,
+   "game": 0.0969,
+   "ratio": 1.35,
+   "streaksConcept": 10,
+   "streaksGame": 9,
+   "pass": true,
+   "rule": "bottom-third L*>55 share within +-50 %, >= 3 fire streaks"
+  },
+  "C5": {
+   "ratios": [
+    0.29,
+    0.71,
+    0.66,
+    0.26,
+    0.52,
+    0.73,
+    0.15,
+    0.57,
+    0.4
+   ],
+   "pass": false,
+   "rule": "Sobel per cell 0.7-1.3x"
+  },
+  "C6": {
+   "manual": true,
+   "conceptCounts": {
+    "braziers": 4,
+    "fires": 10,
+    "banners": 8,
+    "chains": 6,
+    "statues": 2,
+    "candles": 0
+   },
+   "rule": "dressing counts within +-30 % (count on the render)"
+  },
+  "C7": {
+   "manual": true,
+   "rule": "floor inlay visible, right style"
+  },
+  "C8": {
+   "concept": 1.19,
+   "game": 1.553,
+   "pass": false,
+   "rule": "far / mid luminance std < 0.6 (plus a fog band: by eye)"
+  },
+  "C9": {
+   "manual": true,
+   "rule": "4 s clip: waterfalls, flames, banners, particles move, no popping (concept.cjs --clip=4)"
+  },
+  "C10": {
+   "manual": true,
+   "rule": "cameraAudit readable share not worse than the A0 baseline"
+  },
+  "hist": 0.563
+ }
+}

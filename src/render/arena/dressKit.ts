@@ -17,7 +17,12 @@
  *              place by an arcade bay, rubble clusters sit at the wall foot, and the legacy stone left in place
  *              (stands, curb, gate facades) is re-tinted toward the kit stone. Every module instance is merged into one
  *              mesh per material (the shared trim material: one draw call for the whole ring).
- * Each later milestone moves one slot here (A4-A7 gates / hazards, A6 backdrop, A19 lights / sockets), keeping the
+ * A4: the shared DRESSING kit. Props (crate, barrel, urn, keg, chunk, toro lantern), the A2b features (banner pole with a
+ *   kit banner on its crossbar, barricade), hazard visuals (spike grate, chain weight on instanced links, fire-jet vent,
+ *   crumbling floor: `hazardKit`, consumed by arenaView's hazard builders), and on the ring: wall-top braziers (merged),
+ *   the legacy wall banners replaced by kit banners on rods and short chains (ONE merged swaying mesh, cells by the render
+ *   seed: no Math.random), and wall-foot decor (candles with glow cards, skulls, bone piles).
+ * Each later milestone moves one slot here (A5-A7 gates, A6 backdrop, A19 lights / sockets), keeping the
  * legacy builder as the fallback for slots the art leaves undefined or whose asset failed to load.
  */
 import * as THREE from 'three';
@@ -31,17 +36,47 @@ import type { Dressing } from './dressing';
 import { WetFloor } from './floor';
 import { withCrack } from './materials';
 import { R } from './noise';
+import { BannerKit } from './cloth';
+import { ChainKit } from './chains';
+import type { HazardDef } from '../../sim/arenaGen';
+import { softDot } from './textures';
 
 export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressing): Dressing {
   // TODO(A4-A7): gates, hazards; TODO(A6): backdrop
   const D = legacy(a);
   const art = pack.art;
   const wetFloor = art.floor ? buildFloor(a, pack, D) : undefined;
-  if (art.ring) buildRing(a, pack, D);
+  // A4: banner cloth + chain builders shared by the ring, the banner poles and the chain-weight hazards
+  const bannerAsset = art.banners ? pack.assets.get(art.banners) : undefined;
+  const banners = bannerAsset ? new BannerKit(bannerAsset, a.quality >= 1 ? 0.05 : 0) : null;
+  const chainAsset = art.chains ? pack.assets.get(art.chains) : undefined;
+  if (art.ring) buildRing(a, pack, D, banners, chainAsset ?? null);
   const legacyObstacle = D.obstacle;
+  const seed = a.layout.seed;
   return {
     ...D,
     wetFloor,
+    feature(o) {
+      try {
+        return kitFeature(pack, o, banners, seed);
+      } catch (e) {
+        console.warn('[arena] kit feature failed, placeholder used', o.kind, e);
+        return null;
+      }
+    },
+    hazardKit(h: HazardDef): KitInstance | null {
+      const id = art.hazards?.[h.kind];
+      const asset = id ? pack.assets.get(id) : undefined;
+      if (!asset) return null;
+      const inst = asset.instantiate();
+      // flat hazards scale in x / z by the sim radius over the asset's nominal r0; the chain weight keeps its size
+      const r0 = Number(asset.extras.r0) || h.r;
+      if (h.kind !== 'chains') inst.obj.scale.set(h.r / r0, 1, h.r / r0);
+      return inst;
+    },
+    chainKit(): ChainKit | null {
+      return chainAsset ? new ChainKit(chainAsset) : null;
+    },
     obstacle(o, crack) {
       const asset = pickObstacle(pack, o);
       if (asset) {
@@ -161,6 +196,73 @@ export function kitObstacle(asset: KitAsset, o: Obstacle, crack: { value: number
   return root;
 }
 
+// ------------------------------------------------------------------ A4 features
+
+/** a deterministic integer from a few numbers (render seed: atlas cells, decor picks) */
+export function hashInt(...n: number[]): number {
+  let h = 2166136261;
+  for (const x of n) {
+    h ^= Math.floor(x * 1000) | 0;
+    h = Math.imul(h, 16777619);
+  }
+  return h >>> 0;
+}
+
+/** A4: kit visual for an A2b feature obstacle (banner pole + cloth, barricade), facing the arena centre; null = placeholder */
+function kitFeature(pack: ArenaPack, o: Obstacle, banners: BannerKit | null, seed: number): THREE.Object3D | null {
+  const id = pack.art.features?.[o.kind];
+  const asset = id ? pack.assets.get(id) : undefined;
+  if (!asset) return null;
+  const inst = asset.instantiate();
+  const g = new THREE.Group();
+  g.add(inst.obj);
+  if (o.kind === 'banner') {
+    const s = inst.sockets.find((x) => x.name === 'SOCK_banner');
+    if (!banners || !s) return null; // the placeholder carries its own cloth: no bare poles
+    const cell = hashInt(seed, o.id, 7) % banners.cells;
+    const b = banners.banner('vertical', cell, Number(s.extras.w) || 1.1, Number(s.extras.h) || 2.6);
+    if (!b) return null;
+    b.position.set(s.pos[0], s.pos[1], s.pos[2] + 0.04);
+    g.add(b);
+  }
+  g.rotation.y = Math.atan2(-o.x, -o.z);
+  g.traverse((n) => {
+    if ((n as THREE.Mesh).isMesh && !n.userData.col) n.castShadow = n.receiveShadow = true;
+  });
+  return g;
+}
+
+/** A4: glow cards for candle wicks (two crossed additive quads per wick, merged into one static mesh) */
+function candleCards(points: { p: THREE.Vector3; size: number }[], color: string): THREE.Mesh | null {
+  if (!points.length) return null;
+  const pos: number[] = [],
+    uv: number[] = [],
+    idx: number[] = [];
+  for (const { p, size } of points) {
+    const w = size * 0.35,
+      h = size * 1.1;
+    for (const [dx, dz] of [
+      [1, 0],
+      [0, 1],
+    ]) {
+      const b = pos.length / 3;
+      pos.push(p.x - dx * w, p.y - h * 0.15, p.z - dz * w, p.x + dx * w, p.y - h * 0.15, p.z + dz * w, p.x + dx * w, p.y + h * 0.85, p.z + dz * w, p.x - dx * w, p.y + h * 0.85, p.z - dz * w);
+      uv.push(0, 0, 1, 0, 1, 1, 0, 1);
+      idx.push(b, b + 1, b + 2, b, b + 2, b + 3);
+    }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+  g.setIndex(idx);
+  g.computeBoundingSphere();
+  const m = new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color: new THREE.Color(color).multiplyScalar(2.2), map: softDot(), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide }));
+  m.name = 'kitCandleGlow';
+  m.userData.dyn = true;
+  m.renderOrder = 2;
+  return m;
+}
+
 // ------------------------------------------------------------------ A2 floor
 
 /** A2: swap the legacy floor for the kit wet floor (legacy floor kept when the set did not load or fails) */
@@ -240,7 +342,7 @@ export function trimMaterial(pack: ArenaPack, id: AssetId | undefined): THREE.Me
   return m;
 }
 
-function buildRing(a: Arena, pack: ArenaPack, D: Dressing) {
+function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | null, chainAsset: KitAsset | null) {
   const RA = pack.art.ring!;
   const trim = trimMaterial(pack, RA.trim);
   if (!trim) {
@@ -311,8 +413,88 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing) {
       0.3,
     );
   }
+  // A4: wall-top braziers: the legacy bronze stand + bowl become the kit wall brazier (the legacy flame stays at its spot)
+  const WB = RA.wallBraziers;
+  if (WB && pack.assets.has(WB.asset)) {
+    const A = pack.assets.get(WB.asset)!;
+    const stands = a.group.children.filter((o) => o.userData.wallBrazier);
+    for (const st of stands) {
+      const base = new THREE.Vector3(st.position.x, st.position.y - 0.45, st.position.z);
+      const yaw = Math.atan2(-base.x, -base.z) + (hashInt(base.x, base.z) % 7) * 0.3;
+      placed.push({ asset: A, m: new THREE.Matrix4().compose(base, new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw), new THREE.Vector3(1, 1, 1)) });
+    }
+    toRemove.push(...stands, ...a.group.children.filter((o) => o.userData.wallBrazierBowl));
+  }
+  // A4: wall banners (legacy: canvas-textured planes with a CPU flutter and a Math.random phase) -> kit banners on rods
+  const WBn = RA.wallBanners;
+  const legacyBanners = a.group.children.filter((o) => o.userData.ring === 'banner');
+  if (WBn && banners && legacyBanners.length) {
+    const list: Parameters<BannerKit['merged']>[0] = [];
+    const rods: THREE.BufferGeometry[] = [];
+    const rod = WBn.rod ? banners.rod() : null;
+    const chains = WBn.chains && chainAsset ? new ChainKit(chainAsset) : null;
+    legacyBanners.forEach((b, i) => {
+      b.updateMatrix();
+      const top = b.position.clone();
+      const m = new THREE.Matrix4().compose(top, b.quaternion, new THREE.Vector3(1, 1, 1));
+      list.push({ shape: 'vertical', cell: hashInt(L.seed, i, 3) % banners.cells, w: WBn.w, h: WBn.h, m, phase: (hashInt(L.seed, i, 5) % 628) / 100 });
+      if (rod) {
+        const g = rod.geo.clone();
+        g.applyMatrix4(new THREE.Matrix4().makeScale(WBn.w / 1.0 + 0.1, 1, 1));
+        g.applyMatrix4(m);
+        rods.push(g);
+      }
+      if (chains) {
+        // two short chains from the rod ends up to the wall coping
+        for (const sx of [-1, 1]) {
+          const end = new THREE.Vector3(sx * (WBn.w / 2 + 0.02), 0.03, 0).applyMatrix4(m);
+          chains.hang(end, new THREE.Vector3(end.x, Math.max(end.y + 0.25, a.layout.wallH + 0.05), end.z), 0, 'small', 0);
+        }
+      }
+    });
+    const mesh = banners.merged(list);
+    if (mesh) a.group.add(mesh);
+    if (rods.length && rod) {
+      const mg = mergeGeometries(rods, false);
+      for (const g of rods) g.dispose();
+      if (mg) {
+        const rm = new THREE.Mesh(mg, rod.mat);
+        rm.castShadow = rm.receiveShadow = true;
+        rm.name = 'kitBannerRods';
+        rm.userData.sharedMat = true;
+        rm.userData.dyn = true;
+        a.group.add(rm);
+      }
+    }
+    if (chains) for (const im of chains.build('kitBannerChains')) a.group.add(im);
+    toRemove.push(...legacyBanners);
+  }
+  // A4: wall-foot decor (candles, skulls, bone piles), merged with the rubble; candle wicks -> one glow-card mesh
+  const DC = RA.decor;
+  const wicks: { p: THREE.Vector3; size: number }[] = [];
+  if (DC) {
+    const ok = DC.assets.filter((id) => pack.assets.has(id));
+    if (ok.length)
+      alongEllipse(
+        L,
+        DC.offset,
+        DC.spacing,
+        (p, yaw, _a, i) => {
+          if (rnd.next() < (DC.skip ?? 0.3)) return;
+          const A = pack.assets.get(ok[hashInt(L.seed, i, 11) % ok.length])!;
+          const q = new THREE.Quaternion().setFromAxisAngle(new THREE.Vector3(0, 1, 0), yaw + rnd.range(-0.8, 0.8));
+          const m = new THREE.Matrix4().compose(new THREE.Vector3(p.x, 0, p.z), q, new THREE.Vector3(1, 1, 1));
+          placed.push({ asset: A, m });
+          for (const s of A.sockets) if (s.name.startsWith('SOCK_candle')) wicks.push({ p: new THREE.Vector3(...s.pos).applyMatrix4(m), size: Number(s.extras.size) || 0.08 });
+        },
+        4.0,
+        0.62,
+      );
+  }
   if (!placed.length) return;
   removeLegacy(a, D, toRemove);
+  const glow = candleCards(wicks, a.theme.fire);
+  if (glow) a.group.add(glow);
   // merge per material: trim modules -> one mesh with the trim material; textured decor -> one mesh per asset material
   const buckets = new Map<string, { mat: THREE.Material; geos: THREE.BufferGeometry[]; shadow: boolean }>();
   const iron = new THREE.MeshStandardMaterial({ color: new THREE.Color(0.035, 0.032, 0.03), metalness: 0.85, roughness: 0.55, vertexColors: true });

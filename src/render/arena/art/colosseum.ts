@@ -20,7 +20,8 @@ const MOON = dirFrom(27, -1.7);
 export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
   floor: { set: 'floor/flagstone_bluegrey', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.35 },
-  ringFlames: { asset: 'kit/brazier_tripod', count: 10, offset: 0.55, size: 0.95 },
+  // A4: ref-3's big bowls on stone pedestals alternate with the tripods (the pedestal flame is bigger: SOCK_flame size)
+  ringFlames: { asset: 'kit/brazier_tripod', assets: ['kit/brazier_pedestal', 'kit/brazier_tripod'], count: 10, offset: 0.55, size: 0.95 },
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
   // rubble piles for the indestructible boulders; podium wall, gallery arcade and wall-foot rubble from the trim-sheet
   // modules. A7 replaces the rest of the legacy ring (stands, gates) and places stairs / dais / statues by the east gate.
@@ -31,6 +32,11 @@ export const COLOSSEUM_ART: ThemeArt = {
     gallery: { assets: ['kit/arcade_bay', 'kit/arcade_broken', 'kit/arcade_broken'] },
     rubble: { asset: 'kit/rubble_scatter', spacing: 7.5, offset: 0.35 },
     retint: [0.36, 0.37, 0.43],
+    // A4: the shared dressing kit on the ring: kit wall braziers, the wall banners as tattered kit banners on rods and short
+    // chains (one merged swaying mesh), candles / skulls / bone piles at the wall foot
+    wallBraziers: { asset: 'kit/brazier_wall' },
+    wallBanners: { w: 1.25, h: 2.6, rod: true, chains: true },
+    decor: { assets: ['kit/candles', 'kit/skull', 'kit/bone_pile', 'kit/candles'], spacing: 6.5, offset: 0.25, skip: 0.45 },
   },
   look: {
     sky: {

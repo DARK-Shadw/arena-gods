@@ -201,6 +201,7 @@ export function dressColosseum(a: Arena): Dressing {
     const b = banner(a, i % 2 ? '#9a1f1c' : '#1f3466', '#e8c066', 1.2, 2.3, i % 2 ? 'diamond' : 'sun');
     b.position.set(p.x, 3.2, p.z);
     b.rotation.y = yaw;
+    b.userData.ring = 'banner'; // A4: kit mode replaces these with kit banners (dressKit wallBanners)
     G.add(b);
   }, 3.6, 0.5);
   alongEllipse(L, 1.05, 9.5, (p) => {
@@ -210,6 +211,7 @@ export function dressColosseum(a: Arena): Dressing {
     G.add(stand);
     const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.22, 0.3, 12), bronzeMat);
     bowl.position.set(p.x, 4.4, p.z);
+    bowl.userData.wallBrazierBowl = true; // A4: kit mode swaps stand + bowl for the kit wall brazier
     G.add(bowl);
     G.add(a.flame(new THREE.Vector3(p.x, 4.5, p.z), 1.0, '#ffa040', false));
   }, 4, 0.3);

@@ -13,7 +13,21 @@ export * from './types';
 /** shared kit used by every theme unless the theme overrides a slot */
 export const KIT_DEFAULT: ThemeArt = {
   id: 'default',
-  props: { brazier: 'kit/brazier_tripod', rock: 'kit/rock_prop' },
+  // A4: the shared dressing kit: every prop kind, the A2b features and hazards; theme files may override any slot
+  props: {
+    brazier: 'kit/brazier_tripod',
+    rock: 'kit/rock_prop',
+    crate: 'kit/crate',
+    barrel: 'kit/barrel',
+    urn: 'kit/urn',
+    explosive: 'kit/keg',
+    chunk: 'kit/chunk',
+    lantern: 'kit/lantern_toro',
+  },
+  features: { banner: 'kit/banner_pole', barricade: 'kit/barricade' },
+  hazards: { spikes: 'kit/spike_grate', chains: 'kit/chain_weight', flamejet: 'kit/vent_grate', crumble: 'kit/crumble' },
+  banners: 'kit/banners',
+  chains: 'kit/chain_link',
 };
 
 /** per-theme ThemeArt files (A2: colosseum floor + Moon Gate preview; A7: colosseum for real, A11+: the others) */
@@ -22,7 +36,7 @@ const THEME_ART: Partial<Record<ThemeId, ThemeArt>> = { colosseum: COLOSSEUM_ART
 export function artFor(theme: ThemeId): ThemeArt {
   const t = THEME_ART[theme];
   if (!t) return { ...KIT_DEFAULT, id: theme };
-  const art: ThemeArt = { ...KIT_DEFAULT, ...t, props: { ...KIT_DEFAULT.props, ...t.props } };
+  const art: ThemeArt = { ...KIT_DEFAULT, ...t, props: { ...KIT_DEFAULT.props, ...t.props }, features: { ...KIT_DEFAULT.features, ...t.features }, hazards: { ...KIT_DEFAULT.hazards, ...t.hazards } };
   // A3: `?kitstone=0` keeps the A2 colosseum (legacy pillars and walls) on the kit floor, for before / after shots
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('kitstone') === '0') {
     delete art.obstacles;
@@ -55,10 +69,19 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
   const ids = new Set<AssetId>();
   const add = (x?: AssetId) => x && ids.add(x);
   const has = (list: { kind: string }[] | undefined, k: string) => !layout || k === 'chunk' || !!list?.some((x) => x.kind === k);
+  const hasKind = (list: { kind: string }[] | undefined, k: string) => !layout || !!list?.some((x) => x.kind === k);
   for (const [k, v] of Object.entries(art.props ?? {})) if (has(layout?.props, k)) add(v);
   for (const [k, v] of Object.entries(art.obstacles ?? {})) if (has(layout?.obstacles, k)) for (const x of Array.isArray(v) ? v : [v]) add(x);
   for (const [k, v] of Object.entries(art.hazards ?? {})) if (has(layout?.hazards, k)) add(v);
+  // A4: feature obstacles; the banner cloth / chain links only when something uses them (the atlas is the biggest A4 file)
+  for (const [k, v] of Object.entries(art.features ?? {})) if (has(layout?.obstacles, k) && k !== 'chunk') add(v);
+  const ringBanners = !!art.ring?.wallBanners;
+  if (ringBanners || (art.features?.banner && hasKind(layout?.obstacles, 'banner'))) add(art.banners);
+  if ((ringBanners && art.ring?.wallBanners?.chains) || (art.hazards?.chains && hasKind(layout?.hazards, 'chains'))) add(art.chains);
   add(art.ringFlames?.asset);
+  for (const x of art.ringFlames?.assets ?? []) add(x);
+  add(art.ring?.wallBraziers?.asset);
+  for (const x of art.ring?.decor?.assets ?? []) add(x);
   add(art.floor?.set);
   add(art.floor?.inlay);
   for (const m of art.ring?.modules ?? []) add(m.asset);

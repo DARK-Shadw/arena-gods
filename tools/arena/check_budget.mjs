@@ -25,7 +25,7 @@ const PUB = path.join(ROOT, 'public', 'arena');
 const MB = 1024 * 1024;
 const TIER_TEX_MB = { low: 64, medium: 128, high: 192 };
 const BUDGET = {
-  prop: { lod0Tris: 2000, lod1Tris: 800, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
+  prop: { lod0Tris: 2000, lod1Tris: 800, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB, fracTris: 2500 },
   // A2: texture sets (floor sets over a tile of tileM metres, inlays over a square of sizeM metres); one carrier quad
   texset: { lod0Tris: 2, lod1Tris: 2, fullTex: 2048, lowTex: 1024, prims: 1, fullBytes: 6.0 * MB, lowBytes: 2.0 * MB },
   // A3: hero obstacles (pillars, columns, rubble): unique bakes; FRAC_* pieces counted separately (fracTris), COL included in prims
@@ -34,7 +34,24 @@ const BUDGET = {
   module: { lod0Tris: 2600, lod1Tris: 1400, fullTex: 0, lowTex: 0, prims: 3, fullBytes: 0.25 * MB, lowBytes: 0.15 * MB },
   // A3: render-only decor (rubble scatter)
   decor: { lod0Tris: 1600, lod1Tris: 600, fullTex: 1024, lowTex: 512, prims: 2, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
+  // A4: render-only dressing (braziers, lanterns, candles, bell, skulls, bones, stakes): one baked set + constant emissive parts
+  dress: { lod0Tris: 4000, lod1Tris: 1600, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
+  // A4: sim features (banner pole, barricade): obstacle kinds dressed by the kit; FRAC_* pieces counted separately
+  feature: { lod0Tris: 2500, lod1Tris: 1000, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB, fracTris: 2500 },
+  // A4: hazard visuals (spike grate, chain weight, fire-jet vent, crumbling floor); moving nodes (SPIKES, SLAB_*) are primitives
+  hazard: { lod0Tris: 4000, lod1Tris: 1800, fullTex: 1024, lowTex: 512, prims: 10, fullBytes: 1.4 * MB, lowBytes: 0.45 * MB },
+  // A4: chain links (instanced at runtime: LINK_big, LINK_small)
+  chain: { lod0Tris: 400, lod1Tris: 200, fullTex: 512, lowTex: 256, prims: 3, fullBytes: 0.6 * MB, lowBytes: 0.25 * MB },
+  // A4: banner cloth (cloth-sim drapes + the 8-sigil atlas with tear masks in alpha) + rod
+  cloth: { lod0Tris: 2500, lod1Tris: 900, fullTex: 2048, lowTex: 1024, prims: 4, fullBytes: 3.5 * MB, lowBytes: 1.2 * MB },
 };
+// A4: fragile props must ship breakage pieces (FRAC_*), inside the prop's contract
+const FRAGILE_KINDS = ['crate', 'barrel', 'urn', 'explosive', 'lantern'];
+// A4: hazard visuals may reach this factor of their nominal radius (r0 extra): spikes / rims / weights stick out
+const HAZARD_R_MAX = 1.5;
+// A4: required sockets / nodes per (role, kind)
+const NEED_SOCK = { 'dress|brazier': ['SOCK_flame'], 'dress|lantern': ['SOCK_glow'], 'dress|candle': ['SOCK_candle_'], 'feature|banner': ['SOCK_banner'], 'hazard|chains': ['SOCK_chain'], 'prop|explosive': ['SOCK_glow'] };
+const NEED_NODE = { 'hazard|spikes': ['SPIKES'], 'hazard|crumble': ['RIM', 'SLAB_'], 'chain|chain': ['LINK_big', 'LINK_small'], 'cloth|banner': ['BANNER_vertical', 'BANNER_swag', 'ROD'] };
 // A3: plan 4.3 - the visible base of an obstacle may reach at most 1.55 x the sim radius (the camera's standing() factor)
 const OBSTACLE_FOOTPRINT_MAX = 1.55;
 // A2: minimum texel density (px per metre) of texture sets per tier (plan 5.2: floor 2048 over about 4 m; inlay 2048 over 16 m)
@@ -50,6 +67,9 @@ function simTables() {
   const top = {};
   const tp = /const TOP\s*:[^{]*\{([^}]*)\}/.exec(world);
   for (const m of tp[1].matchAll(/(\w+):\s*([\d.]+)/g)) top[m[1]] = +m[2];
+  // A4: rubble `chunk` props have no PROP_BASE row: their radius is set where the sim spawns them (World: kind 'chunk', r: 0.38)
+  const ch = /kind: 'chunk'[^\n]*?\br: ([\d.]+)/.exec(world);
+  if (ch) base.chunk = +ch[1];
   return { base, top };
 }
 
@@ -96,20 +116,43 @@ async function measure(io, file) {
     fracTris = 0,
     colored = 0,
     meshes = 0;
+  // A4: FRAC piece bounds (props: inside the contract), radius of the visible base (y < 0.6 m: features' footprint)
+  let fracR = 0,
+    fracYmin = 1e9,
+    fracYmax = -1e9,
+    rLow = 0;
+  const names = [];
+  let alphaMask = false;
   const v = [0, 0, 0];
   for (const n of nodes) {
     const mesh = n.getMesh();
     if (!mesh) continue;
-    prims += mesh.listPrimitives().length;
+    // A4: hidden FRAC_* pieces are not draw calls of the shown asset (counted in fracTris instead)
+    if (!isFrac(n)) prims += mesh.listPrimitives().length;
     if (isCol(n)) {
       col = true;
       continue;
     }
     if (isFrac(n)) {
       frac++;
-      for (const p of mesh.listPrimitives()) fracTris += (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()) / 3;
+      const M = n.getWorldMatrix();
+      for (const p of mesh.listPrimitives()) {
+        fracTris += (p.getIndices()?.getCount() ?? p.getAttribute('POSITION').getCount()) / 3;
+        const pos = p.getAttribute('POSITION');
+        for (let i = 0; i < pos.getCount(); i++) {
+          pos.getElement(i, v);
+          const x = M[0] * v[0] + M[4] * v[1] + M[8] * v[2] + M[12];
+          const y = M[1] * v[0] + M[5] * v[1] + M[9] * v[2] + M[13];
+          const z = M[2] * v[0] + M[6] * v[1] + M[10] * v[2] + M[14];
+          fracR = Math.max(fracR, Math.hypot(x, z));
+          fracYmin = Math.min(fracYmin, y);
+          fracYmax = Math.max(fracYmax, y);
+        }
+      }
       continue;
     }
+    names.push(n.getName());
+    for (const p of mesh.listPrimitives()) if (p.getMaterial()?.getAlphaMode() === 'MASK') alphaMask = true;
     if (mesh.listPrimitives().every((p) => p.getAttribute('COLOR_0'))) colored++;
     meshes++;
     const lod = lodOf(n);
@@ -124,6 +167,7 @@ async function measure(io, file) {
         const y = M[1] * v[0] + M[5] * v[1] + M[9] * v[2] + M[13];
         const z = M[2] * v[0] + M[6] * v[1] + M[10] * v[2] + M[14];
         r = Math.max(r, Math.hypot(x, z));
+        if (y < 0.6) rLow = Math.max(rLow, Math.hypot(x, z));
         ymin = Math.min(ymin, y);
         ymax = Math.max(ymax, y);
       }
@@ -140,7 +184,7 @@ async function measure(io, file) {
   });
   const socks = nodes.filter((n) => n.getName().startsWith('SOCK_')).map((n) => ({ name: n.getName(), extras: n.getExtras() }));
   const shaft = nodes.find((n) => n.getName() === 'SHAFT');
-  return { kit: kit ? { name: kit.getName(), extras: kit.getExtras() } : null, used, lods: [...lods], col, r, ymin, ymax, tris, prims, tex, socks, frac, fracTris, colored, meshes, shaft: shaft ? shaft.getExtras() : null, bytes: fs.statSync(path.join(PUB, file)).size };
+  return { kit: kit ? { name: kit.getName(), extras: kit.getExtras() } : null, used, lods: [...lods], col, r, ymin, ymax, tris, prims, tex, socks, frac, fracTris, colored, meshes, shaft: shaft ? shaft.getExtras() : null, fracR, fracYmin, fracYmax, rLow, names, alphaMask, bytes: fs.statSync(path.join(PUB, file)).size };
 }
 
 async function main() {
@@ -202,7 +246,33 @@ async function main() {
             if (m.kit && (Math.abs((m.kit.extras.footprint ?? -1) - r0) > 1e-6 || Math.abs((m.kit.extras.height ?? -1) - h0) > 1e-6)) f(`KIT_ extras footprint/height ${m.kit.extras.footprint}/${m.kit.extras.height} != sim ${r0}/${h0}`);
           }
           if ((A.kind === 'brazier' || A.kind === 'lantern') && !m.socks.some((s) => s.name === 'SOCK_flame' || s.name === 'SOCK_glow')) f('no SOCK_flame / SOCK_glow');
+          // A4: breakage pieces of fragile props, fitted inside the same contract
+          if (FRAGILE_KINDS.includes(A.kind) && A.id !== 'kit/brazier_tripod' && m.frac < 4) f(`fragile prop with ${m.frac} FRAC_* pieces (< 4)`);
+          if (m.frac && r0 !== undefined && h0 !== undefined) {
+            if (m.fracR > r0 + 0.005) f(`FRAC pieces reach r ${m.fracR.toFixed(4)} > PROP_BASE ${r0}`);
+            if (m.fracYmin < -0.002 || m.fracYmax > h0 + 0.005) f(`FRAC pieces span y ${m.fracYmin.toFixed(4)}..${m.fracYmax.toFixed(4)} outside 0..${h0}`);
+          }
+          if (B && m.fracTris > B.fracTris) f(`FRAC tris ${m.fracTris} > ${B.fracTris}`);
         }
+        // A4: sockets / nodes the runtime needs
+        for (const sname of NEED_SOCK[`${A.role}|${A.kind}`] ?? []) if (!m.socks.some((s) => s.name.startsWith(sname))) f(`no ${sname}* socket`);
+        for (const nname of NEED_NODE[`${A.role}|${A.kind}`] ?? []) if (!m.names.some((x) => x.startsWith(nname) || x.includes(`_${nname}`))) f(`no ${nname}* node`);
+        if (A.role === 'feature') {
+          const x = m.kit?.extras ?? {};
+          if (!(x.r0 > 0) || !(x.height > 0)) f('feature: KIT_ extras r0 / height missing');
+          else {
+            if (Math.abs(m.ymax - x.height) > 0.01) f(`feature top ${m.ymax.toFixed(3)} != sim height ${x.height}`);
+            if (m.rLow > x.r0 * OBSTACLE_FOOTPRINT_MAX + 0.005) f(`feature base footprint ${m.rLow.toFixed(3)} > ${OBSTACLE_FOOTPRINT_MAX} x r0 ${x.r0}`);
+          }
+          if (m.ymin < -0.01) f(`feature sinks ${(-m.ymin).toFixed(3)} m below the floor`);
+          if (B && m.fracTris > B.fracTris) f(`FRAC tris ${m.fracTris} > ${B.fracTris}`);
+        }
+        if (A.role === 'hazard') {
+          const x = m.kit?.extras ?? {};
+          if (!(x.r0 > 0)) f('hazard: KIT_ extras r0 missing');
+          else if (m.r > x.r0 * HAZARD_R_MAX + 0.005) f(`hazard visual r ${m.r.toFixed(3)} > ${HAZARD_R_MAX} x r0 ${x.r0}`);
+        }
+        if (A.role === 'cloth' && !m.alphaMask) f('cloth without an alphaMode MASK material (tear masks)');
         if (A.role === 'obstacle') {
           // A3: footprint vs the nominal sim radius, measured height vs extras, 9-slice band, fracture pieces
           const x = m.kit?.extras ?? {};

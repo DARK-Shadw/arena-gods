@@ -40,6 +40,8 @@ const FORMATS = opt('formats', 'ktx2,webp').split(',');
 const PY = process.env.PYTHON || 'python';
 
 const KTX_ARGS = {
+  // A4: colour + alpha (banner tear masks, alphaMode MASK)
+  colorA: ['--format', 'R8G8B8A8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '128', '--generate-mipmap'],
   color: ['--format', 'R8G8B8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '128', '--generate-mipmap'],
   data: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'basis-lz', '--qlevel', '192', '--generate-mipmap'],
   linear: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'uastc', '--uastc-quality', '2', '--uastc-rdo', '--uastc-rdo-l', '1.0', '--zstd', '18', '--generate-mipmap'],
@@ -65,8 +67,10 @@ function pillow(script, ...a) {
   if (r.status !== 0 || /Traceback|Error/.test(r.stderr || '')) throw new Error(`python/Pillow failed: ${r.stderr}`);
   return (r.stdout || '').trim();
 }
-const PY_WEBP = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");im.save(sys.argv[2],"WEBP",quality=int(sys.argv[3]),method=6);print(im.size[0],im.size[1])';
-const PY_HALF = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]).convert("RGB");im=im.resize((max(1,im.size[0]//2),max(1,im.size[1]//2)),Image.LANCZOS);im.save(sys.argv[2]);print(im.size[0],im.size[1])';
+// A4: images with an alpha channel keep it (banner tear masks)
+const PY_MODE = 'im=im.convert("RGBA" if sys.argv[-1]=="A" else "RGB");';
+const PY_WEBP = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]);' + PY_MODE + 'im.save(sys.argv[2],"WEBP",quality=int(sys.argv[3]),method=6);print(im.size[0],im.size[1])';
+const PY_HALF = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]);' + PY_MODE + 'im=im.resize((max(1,im.size[0]//2),max(1,im.size[1]//2)),Image.LANCZOS);im.save(sys.argv[2]);print(im.size[0],im.size[1])';
 const pngSize = (p) => {
   const b = fs.readFileSync(p);
   return [b.readUInt32BE(16), b.readUInt32BE(20)];
@@ -82,17 +86,17 @@ function encodeImage(png, kind, fmt) {
   let info;
   if (fs.existsSync(dst) && fs.existsSync(stamp) && JSON.parse(fs.readFileSync(stamp, 'utf8')).key === key) info = JSON.parse(fs.readFileSync(stamp, 'utf8')).info;
   else {
-    info = fmt === 'ktx2' ? ktxEncode(png, dst, kind) : { bytes: (pillow(PY_WEBP, png, dst, kind === 'color' ? '90' : '95'), fs.statSync(dst).size), codec: 'webp' };
+    info = fmt === 'ktx2' ? ktxEncode(png, dst, kind) : { bytes: (pillow(PY_WEBP, png, dst, kind === 'color' || kind === 'colorA' ? '90' : '95', kind === 'colorA' ? 'A' : 'N'), fs.statSync(dst).size), codec: 'webp' };
     fs.writeFileSync(stamp, JSON.stringify({ key, info }));
   }
   const [w, h] = pngSize(png);
   return { data: fs.readFileSync(dst), mime: fmt === 'ktx2' ? 'image/ktx2' : 'image/webp', w, h, ...info };
 }
 
-function halfPng(png) {
+function halfPng(png, alpha = false) {
   fs.mkdirSync(WORK, { recursive: true });
   const dst = path.join(WORK, path.basename(png, '.png') + '_half.png');
-  if (!fs.existsSync(dst) || fs.statSync(dst).mtimeMs < fs.statSync(png).mtimeMs) pillow(PY_HALF, png, dst);
+  if (!fs.existsSync(dst) || fs.statSync(dst).mtimeMs < fs.statSync(png).mtimeMs) pillow(PY_HALF, png, dst, alpha ? 'A' : 'N');
   return dst;
 }
 
@@ -125,8 +129,11 @@ async function buildVariant(io, A, dir, tier, fmt) {
         mat.setExtension('KHR_materials_emissive_strength', emissive.createEmissiveStrength().setEmissiveStrength(spec.emissiveStrength));
       }
     }
+    // A4: alpha-tested materials (banner cloth with tear masks)
+    if (spec.alpha === 'MASK') mat.setAlphaMode('MASK').setAlphaCutoff(spec.alphaCutoff ?? 0.5);
+    if (spec.doubleSided) mat.setDoubleSided(true);
     const slots = [
-      ['baseColor', 'color', (t) => mat.setBaseColorTexture(t)],
+      ['baseColor', spec.alpha ? 'colorA' : 'color', (t) => mat.setBaseColorTexture(t)],
       ['normal', 'linear', (t) => mat.setNormalTexture(t)],
       ['orm', 'data', (t) => (mat.setOcclusionTexture(t), mat.setMetallicRoughnessTexture(t))],
     ];
@@ -134,7 +141,7 @@ async function buildVariant(io, A, dir, tier, fmt) {
       if (!spec[key]) continue;
       let png = path.join(dir, spec[key]);
       // a low tier that shares the full set gets it at half size
-      if (tier === 'low' && !A.lods.LOD1.ownTextures && A.lods.LOD0.materials.includes(mat.getName())) png = halfPng(png);
+      if (tier === 'low' && !A.lods.LOD1.ownTextures && A.lods.LOD0.materials.includes(mat.getName())) png = halfPng(png, kind === 'colorA');
       const e = encodeImage(png, kind, fmt);
       const tex = doc.createTexture(`${mat.getName()}_${key}`).setImage(e.data).setMimeType(e.mime).setURI(`${mat.getName()}_${key}.${fmt}`);
       set(tex);

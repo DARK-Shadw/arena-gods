@@ -7,6 +7,10 @@
  * Rows: obstacles (pillar at its nominal 5 m and stretched to 4.4 / 5.6 m by the SHAFT band, ruin column, rubble pile),
  * architecture modules (trim sheet), small pieces (props, decor, the brazier), and the trim sheet itself on a 2 x 1
  * tiled wall (the U wrap seam runs down the middle).
+ * A4 rows (the shared dressing kit): braziers / lanterns / candles / bell / bones / stakes with flame cards and lights at
+ * their sockets, hazards (spike grate raised, chain weight on kit links, vent, crumble) and features (banner pole with a
+ * kit banner, barricade), the 8 banner cells on rods + 2 swags along swinging chains (vertex-shader sway, animated), and
+ * every prop's FRAC_* breakage pieces exploded. `?still=1` freezes the sway clock (screenshots of the same pose).
  */
 import * as THREE from 'three';
 import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
@@ -15,6 +19,8 @@ import type { Obstacle } from '../../../src/sim/arenaGen';
 import { ArenaAssets, type KitAsset } from '../../../src/render/arena/assets';
 import { kitObstacle, trimMaterial } from '../../../src/render/arena/dressKit';
 import type { ArenaPack } from '../../../src/render/arena/assets';
+import { BannerKit, swayTime } from '../../../src/render/arena/cloth';
+import { ChainKit } from '../../../src/render/arena/chains';
 
 const q = new URLSearchParams(location.search);
 const tier = q.get('tier') === 'low' ? 'low' : 'full';
@@ -148,6 +154,154 @@ async function main() {
     const o = inst(id);
     if (o) row3.push({ label: id.slice(4), obj: o, w: role(id) === 'decor' ? 2.6 : 1.4 });
   }
+  // ---------------- A4 rows
+  const flameTex = (() => {
+    const c = document.createElement('canvas');
+    c.width = c.height = 64;
+    const g = c.getContext('2d')!;
+    const grd = g.createRadialGradient(32, 40, 2, 32, 36, 30);
+    grd.addColorStop(0, 'rgba(255,240,200,1)');
+    grd.addColorStop(0.35, 'rgba(255,150,60,0.8)');
+    grd.addColorStop(1, 'rgba(255,80,20,0)');
+    g.fillStyle = grd;
+    g.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(c);
+  })();
+  const flameMat = new THREE.MeshBasicMaterial({ map: flameTex, transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, side: THREE.DoubleSide });
+  /** flame card + light at a socket (the game uses the FX flipbook flame; this is only a stand-in) */
+  const lightSockets = (o: THREE.Object3D, id: string) => {
+    const a = loaded.get(id)!;
+    for (const sk of a.sockets) {
+      const p = new THREE.Vector3(...sk.pos);
+      if (sk.name === 'SOCK_flame' || sk.name.startsWith('SOCK_candle')) {
+        const size = Number(sk.extras.size) || 0.9;
+        for (const r of [0, Math.PI / 2]) {
+          const q = new THREE.Mesh(new THREE.PlaneGeometry(size * 0.6, size), flameMat);
+          q.position.set(p.x, p.y + size * 0.4, p.z);
+          q.rotation.y = r;
+          o.add(q);
+        }
+        if (sk.name === 'SOCK_flame') {
+          const l = new THREE.PointLight('#ff8a3a', 6 * size, 6, 1.7);
+          l.position.set(p.x, p.y + 0.3, p.z);
+          o.add(l);
+        }
+      } else if (sk.name === 'SOCK_glow') {
+        const l = new THREE.PointLight(String(sk.extras.color ?? '#ffb060'), 1.5, Number(sk.extras.radius) || 2, 1.8);
+        l.position.copy(p);
+        o.add(l);
+      }
+    }
+    return o;
+  };
+  const instA4 = (id: string, y = 0) => {
+    const o = inst(id);
+    if (!o) return null;
+    const g = new THREE.Group();
+    o.position.y = y;
+    g.add(lightSockets(o, id));
+    return g;
+  };
+  // row 4: dressing (braziers, lanterns, candles, bell, bones, stakes); hanging pieces at 2.4 m
+  const row4: Item[] = [];
+  for (const id of ids.filter((x) => role(x) === 'dress' || x === 'kit/brazier_tripod' || x === 'kit/lantern_toro')) {
+    const hang = Number(loaded.get(id)?.extras.hang) > 0;
+    const o = instA4(id, hang ? 2.4 : 0);
+    if (o) row4.push({ label: id.slice(4), obj: o, w: id.includes('pedestal') || id.includes('stakes') ? 2.4 : id.includes('bell') ? 1.8 : 1.3 });
+  }
+  // row 5: hazards (spike grate with the spikes up, chain weight on kit links, vent, crumble) + features
+  const row5: Item[] = [];
+  const bannerAsset = loaded.get('kit/banners');
+  const banners = bannerAsset ? new BannerKit(bannerAsset, 0.05) : null;
+  const chainAsset = loaded.get('kit/chain_link');
+  for (const id of ids.filter((x) => role(x) === 'hazard' || role(x) === 'feature')) {
+    const o = inst(id);
+    if (!o) continue;
+    const g = new THREE.Group();
+    g.add(o);
+    const x = loaded.get(id)!;
+    if (x.extras.kind === 'chains' && chainAsset) {
+      o.position.y = 1.0;
+      const ck = new ChainKit(chainAsset);
+      const top = x.socket('SOCK_chain')?.pos[1] ?? 0.42;
+      ck.straight(0, 4.2, 1.0 + top, 0, 'big', 1.25);
+      for (const im of ck.build()) g.add(im);
+    }
+    if (x.extras.kind === 'banner' && banners) {
+      const sk = x.socket('SOCK_banner');
+      const b = sk ? banners.banner('vertical', 0, Number(sk.extras.w) || 1.1, Number(sk.extras.h) || 2.6) : null;
+      if (b && sk) {
+        b.position.set(sk.pos[0], sk.pos[1], sk.pos[2] + 0.04);
+        g.add(b);
+      }
+    }
+    row5.push({ label: `${id.slice(4)} (${role(id)})`, obj: g, w: x.extras.kind === 'crumble' ? 4.2 : x.extras.kind === 'banner' ? 1.8 : 2.4 });
+  }
+  // row 6: banners: the 8 vertical cells on rods hung from a beam + 2 swags along swinging chains between posts
+  const bannerRow = new THREE.Group();
+  if (banners) {
+    for (let k = 0; k < 8; k++) {
+      const b = banners.banner('vertical', k, 1.2, 3.2, true);
+      if (b) {
+        b.position.set((k - 3.5) * 1.6, 4.4, 0);
+        bannerRow.add(b);
+      }
+    }
+    const beam = new THREE.Mesh(new THREE.BoxGeometry(13.6, 0.18, 0.18), new THREE.MeshStandardMaterial({ color: '#1c1714', roughness: 0.8 }));
+    beam.position.set(0, 4.52, 0);
+    bannerRow.add(beam);
+    if (chainAsset) {
+      const ck = new ChainKit(chainAsset);
+      for (let s = 0; s < 2; s++) {
+        const x0 = (s - 1) * 5.6 + 0.4;
+        const a = new THREE.Vector3(x0, 4.2, 3.2),
+          b = new THREE.Vector3(x0 + 4.8, 4.2, 3.2);
+        ck.hang(a, b, 0.9, 'big', 0.12);
+        const sw = banners.banner('swag', s, 2.4, 1.1);
+        if (sw) {
+          sw.position.set(x0 + 2.4, 3.55, 3.2);
+          bannerRow.add(sw);
+        }
+        for (const px of [a.x, b.x]) {
+          const post = new THREE.Mesh(new THREE.BoxGeometry(0.25, 4.3, 0.25), beam.material);
+          post.position.set(px, 2.15, 3.2);
+          bannerRow.add(post);
+        }
+      }
+      for (const im of ck.build()) bannerRow.add(im);
+    }
+    bannerRow.position.set(0, 0, 26);
+    scene.add(bannerRow);
+    label('kit/banners: 8 sigil cells (claw, sun, moon, skull, eye, flame, swords, rune ring) + 2 swags on kit chains', new THREE.Vector3(0, -0.1, 30));
+  }
+  // row 7: FRAC_* pieces of every prop / feature, exploded (render-only debris for A5)
+  const row7: Item[] = [];
+  for (const id of ids.filter((x) => role(x) === 'prop' || role(x) === 'feature')) {
+    const a = loaded.get(id)!;
+    const fr: THREE.Mesh[] = [];
+    a.root.traverse((n) => {
+      if (n.userData.frac && (n as THREE.Mesh).isMesh) fr.push(n as THREE.Mesh);
+    });
+    if (!fr.length) continue;
+    const g = new THREE.Group();
+    a.root.updateMatrixWorld(true);
+    for (const m of fr) {
+      const c = m.clone();
+      c.visible = true;
+      m.geometry.computeBoundingBox();
+      const ctr = m.geometry.boundingBox!.getCenter(new THREE.Vector3());
+      m.matrixWorld.decompose(c.position, c.quaternion, c.scale);
+      c.position.add(new THREE.Vector3(ctr.x * 1.8, ctr.y * 0.35 + 0.05, ctr.z * 1.8));
+      c.castShadow = true;
+      g.add(c);
+    }
+    row7.push({ label: `${id.slice(4)} FRAC x${fr.length}`, obj: g, w: Number(a.extras.r0) > 0.5 || id.includes('banner') ? 2.6 : 1.5 });
+  }
+  const w4 = rowZ(row4, 12, 1.0);
+  const w5 = rowZ(row5, 19, 1.2);
+  const w7 = rowZ(row7, 34, 1.0);
+  for (const [x, z] of [[-w4 / 3, 14.5], [w4 / 3, 14.5], [0, 14.5], [-w5 / 3, 21.5], [w5 / 3, 21.5], [0, 21.5], [-5, 29], [5, 29], [-w7 / 4, 36], [w7 / 4, 36]]) fire(x, 1.8, z, 0.8);
+
   const w1 = rowZ(row1, 0, 1.6);
   const w2 = rowZ(row2, -9, 1.2);
   const w3 = rowZ(row3, 6, 1.4);
@@ -172,6 +326,13 @@ async function main() {
     { name: 'small', pos: new THREE.Vector3(0, 2.6, 13), look: new THREE.Vector3(0, 0.5, 6) },
     { name: 'trim', pos: new THREE.Vector3(0, 4.1, -2.5), look: new THREE.Vector3(0, 4.05, -18) },
     { name: 'pillar_close', pos: new THREE.Vector3(-row1.length * 1.75 + 1.6, 1.8, 4.2), look: new THREE.Vector3(-row1.length * 1.75 + 1.4, 2.0, 0) },
+    // A4
+    { name: 'dress_l', pos: new THREE.Vector3(-w4 / 4, 2.6, 18.5), look: new THREE.Vector3(-w4 / 4, 1.1, 12) },
+    { name: 'dress_r', pos: new THREE.Vector3(w4 / 4, 2.6, 18.5), look: new THREE.Vector3(w4 / 4, 1.1, 12) },
+    { name: 'hazards', pos: new THREE.Vector3(0, 5.5, 13.0), look: new THREE.Vector3(0, 0.6, 19.5) },
+    { name: 'banners', pos: new THREE.Vector3(0, 3.0, 40), look: new THREE.Vector3(0, 2.8, 26) },
+    { name: 'banner_close', pos: new THREE.Vector3(-3.2, 3.0, 30.5), look: new THREE.Vector3(-3.2, 2.9, 26) },
+    { name: 'frac', pos: new THREE.Vector3(0, 2.4, 40.5), look: new THREE.Vector3(0, 0.5, 34) },
   );
   const bar = document.getElementById('views')!;
   views.forEach((v, i) => {
@@ -183,7 +344,17 @@ async function main() {
   setView(Number(q.get('view') ?? 0));
   const info = { tier, format: assets.format, assets: [...loaded.keys()], drawCalls: 0, triangles: 0 };
   (window as unknown as { __gallery: unknown }).__gallery = { ready: true, views: views.map((v) => v.name), setView, info, render: frame };
-  hud.textContent = `A3 shared stone kit  |  tier ${tier}  |  textures ${assets.format}  |  ${loaded.size} assets`;
+  hud.textContent = `A3 stone kit + A4 dressing kit  |  tier ${tier}  |  textures ${assets.format}  |  ${loaded.size} assets`;
+  // A4: animate the banner sway / chain swing (vertex shaders); ?still=1 keeps one pose for screenshots
+  const still = q.get('still') === '1';
+  const t0 = performance.now();
+  const loop = () => {
+    swayTime.value = still ? 1.7 : (performance.now() - t0) / 1000;
+    frame();
+    requestAnimationFrame(loop);
+  };
+  requestAnimationFrame(loop);
+  void w5;
 }
 
 function setView(i: number) {

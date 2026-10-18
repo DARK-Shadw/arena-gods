@@ -40,6 +40,8 @@ export interface FloorArt {
  */
 export interface RingFlamesArt {
   asset: AssetId;
+  /** A4: alternate between these brazier assets along the ring (else `asset` everywhere) */
+  assets?: AssetId[];
   count: number;
   /** offset outside the fight ellipse (m, + = outward) */
   offset: number;
@@ -89,6 +91,13 @@ export interface RingArt {
   rubble?: { asset: AssetId; spacing: number; offset: number };
   /** A3: legacy stone left in place (stands, curb, gate facades: userData.legacyStone) re-tinted toward the kit stone */
   retint?: [number, number, number];
+  /** A4: the legacy wall-top brazier stands (userData.wallBrazier / wallBrazierBowl) become this kit brazier (merged statics) */
+  wallBraziers?: { asset: AssetId };
+  /** A4: the legacy wall banners (userData.ring 'banner', Math.random sway phase) become kit banners hung from a rod on two
+   * short chains, all merged into one swaying mesh; w / h in metres, cells picked by the render seed */
+  wallBanners?: { w: number; h: number; rod?: boolean; chains?: boolean };
+  /** A4: render-only dressing at the wall foot (candles, skulls, bone piles), merged; candle wicks get glow cards */
+  decor?: { assets: AssetId[]; spacing: number; offset: number; skip?: number };
 }
 
 export interface GateArt {
@@ -108,8 +117,14 @@ export interface ThemeArt {
   props?: Partial<Record<RtPropKind, AssetId>>;
   /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h); a list = variants picked by obstacle id */
   obstacles?: Partial<Record<ObstacleKind, AssetId | AssetId[]>>;
-  /** hazard visual builders (A7+) */
+  /** A4: hazard visuals (spike grate, chain weight, fire-jet vent, crumbling floor), scaled to the hazard radius by r0 */
   hazards?: Partial<Record<HazardKind, AssetId>>;
+  /** A4: the A2b feature obstacles (banner pole, barricade) */
+  features?: Partial<Record<ObstacleKind, AssetId>>;
+  /** A4: the banner cloth asset (kit/banners: drapes + sigil atlas) used by banner poles and ring banners */
+  banners?: AssetId;
+  /** A4: the chain links (kit/chain_link) for hanging chains, rod hangers and the chain-weight hazard */
+  chains?: AssetId;
   floor?: FloorArt;
   ring?: RingArt;
   gates?: GateArt;

@@ -642,6 +642,362 @@
    "timeoutMin": 20,
    "note": "A3: render-only rubble cluster (5 scan rocks + 2 weathered masonry chunks) for wall feet",
    "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_brazier_pedestal",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "brazier_pedestal"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece brazier_pedestal (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_brazier_wall",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "brazier_wall"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece brazier_wall (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_brazier_pillartop",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "brazier_pillartop"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece brazier_pillartop (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_lantern_toro",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "lantern_toro"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece lantern_toro (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_lantern_cage",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "lantern_cage"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece lantern_cage (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_lantern_paper",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "lantern_paper"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece lantern_paper (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_candles",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "candles"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece candles (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_bell",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "bell"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece bell (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_skull",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "skull"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece skull (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_bone_pile",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "bone_pile"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece bone_pile (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_stakes",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "stakes"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece stakes (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_spike_grate",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "spike_grate"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece spike_grate (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_chain_weight",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "chain_weight"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece chain_weight (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_vent_grate",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "vent_grate"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece vent_grate (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_crumble",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "crumble"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece crumble (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_chain_link",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "chain_link"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece chain_link (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_banner_pole",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "banner_pole"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece banner_pole (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_barricade",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "barricade"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece barricade (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_crate",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "crate"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece crate (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_barrel",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "barrel"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece barrel (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_keg",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "keg"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece keg (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_urn",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "urn"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece urn (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_chunk",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "chunk"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece chunk (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_banners",
+   "script": "tools/arena/blender/kit_banner.py",
+   "args": [],
+   "inputs": [
+    "tools/arena/blender/dresskit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: banners (cloth-sim drape: vertical / swag / short) + 8-sigil tattered atlas (numpy) + rod",
+   "startMinFreeMb": 2500
   }
  ],
  "groups": {
@@ -714,6 +1070,32 @@
    "kit_dais",
    "kit_balustrade",
    "kit_spear_fence"
+  ],
+  "a4": [
+   "kit_brazier_pedestal",
+   "kit_brazier_wall",
+   "kit_brazier_pillartop",
+   "kit_lantern_toro",
+   "kit_lantern_cage",
+   "kit_lantern_paper",
+   "kit_candles",
+   "kit_bell",
+   "kit_skull",
+   "kit_bone_pile",
+   "kit_stakes",
+   "kit_spike_grate",
+   "kit_chain_weight",
+   "kit_vent_grate",
+   "kit_crumble",
+   "kit_chain_link",
+   "kit_banner_pole",
+   "kit_barricade",
+   "kit_crate",
+   "kit_barrel",
+   "kit_keg",
+   "kit_urn",
+   "kit_chunk",
+   "kit_banners"
   ]
  }
 }

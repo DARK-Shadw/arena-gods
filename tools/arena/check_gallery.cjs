@@ -34,7 +34,7 @@ const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234'
       const errors = [];
       page.on('pageerror', (e) => errors.push(e.message));
       page.on('console', (m) => m.type() === 'error' && errors.push(m.text().slice(0, 300)));
-      await page.goto(`${url}tools/arena/gallery/index.html?tier=${tier}`);
+      await page.goto(`${url}tools/arena/gallery/index.html?tier=${tier}&still=1`);
       await page.waitForFunction(() => window.__gallery && window.__gallery.ready, null, { timeout: 180000 });
       const views = await page.evaluate(() => window.__gallery.views);
       for (let i = 0; i < views.length; i++) {
