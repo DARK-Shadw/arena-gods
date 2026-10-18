@@ -11,6 +11,8 @@
 //   * texture GPU memory per tier (ETC1S ~0.5 B/px, UASTC 1 B/px, WebP decoded RGBA8 4 B/px, x4/3 mips) summed
 //     over the whole kit against the arena budget of plan 6.6 (64 / 128 / 192 MB for low / medium / high);
 //   * licences: every source in the manifest has a CC0 row in public/arena/credits.json; no stray files.
+//   * A2 texture sets (role texset): carrier quad only, 3 square power-of-two textures, tileM / sizeM extras,
+//     minimum texel density per tier (TEXEL_MIN).
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +26,11 @@ const MB = 1024 * 1024;
 const TIER_TEX_MB = { low: 64, medium: 128, high: 192 };
 const BUDGET = {
   prop: { lod0Tris: 2000, lod1Tris: 800, fullTex: 1024, lowTex: 512, prims: 4, fullBytes: 1.0 * MB, lowBytes: 0.45 * MB },
+  // A2: texture sets (floor sets over a tile of tileM metres, inlays over a square of sizeM metres); one carrier quad
+  texset: { lod0Tris: 2, lod1Tris: 2, fullTex: 2048, lowTex: 1024, prims: 1, fullBytes: 6.0 * MB, lowBytes: 2.0 * MB },
 };
+// A2: minimum texel density (px per metre) of texture sets per tier (plan 5.2: floor 2048 over about 4 m; inlay 2048 over 16 m)
+const TEXEL_MIN = { floor: { full: 256, low: 128 }, inlay: { full: 120, low: 60 } };
 
 // sim contract, parsed from the TS source (single source of truth; the sim is not imported into Node tooling here)
 function simTables() {
@@ -143,8 +149,21 @@ async function main() {
         const lod = tier === 'full' ? 'LOD0' : 'LOD1';
         if (!m.kit) f('no KIT_ root node');
         else if (!m.kit.extras?.role) f('KIT_ root has no role extra');
-        if (m.lods.length !== 1 || m.lods[0] !== lod) f(`expected only ${lod}, found ${m.lods.join(',') || 'none'}`);
-        if (!m.col) f('no COL proxy');
+        if (A.role === 'texset') {
+          // carrier GLB: no LODs / COL; a tiling (floor) or sized (inlay) square set with power-of-two textures
+          const x = m.kit?.extras ?? {};
+          const span = A.kind === 'floor' ? x.tileM : x.sizeM;
+          if (!(span > 0)) f(`texset ${A.kind}: KIT_ extras ${A.kind === 'floor' ? 'tileM' : 'sizeM'} missing`);
+          if (m.tex.length !== 3) f(`texset: ${m.tex.length} textures (expected baseColor, normal, orm)`);
+          for (const t of m.tex) {
+            if (t.w !== t.h || (t.w & (t.w - 1)) !== 0) f(`texset texture ${t.name} ${t.w}x${t.h} is not square power-of-two (tiling / mips)`);
+            const need = TEXEL_MIN[A.kind]?.[tier];
+            if (span > 0 && need && t.w / span < need) f(`texset texture ${t.name}: ${(t.w / span).toFixed(0)} px/m < ${need} px/m`);
+          }
+        } else {
+          if (m.lods.length !== 1 || m.lods[0] !== lod) f(`expected only ${lod}, found ${m.lods.join(',') || 'none'}`);
+          if (!m.col) f('no COL proxy');
+        }
         if (!m.used.includes('EXT_meshopt_compression')) f('not meshopt-compressed');
         if (m.tex.length && !m.used.includes(fmt === 'ktx2' ? 'KHR_texture_basisu' : 'EXT_texture_webp')) f(`textures without the ${fmt} extension`);
         if (fmt === 'webp' ? m.tex.some((t) => t.codec !== 'webp') : m.tex.some((t) => !['etc1s', 'uastc'].includes(t.codec))) f('texture format does not match the variant');

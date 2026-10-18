@@ -244,6 +244,116 @@
    ],
    "timeoutMin": 30,
    "note": "A1: tripod brazier prop (PROP_BASE r 0.45, TOP 1.2), LOD0 1024 + LOD1 512 bakes, raw GLB + asset.json"
+  },
+  {
+   "id": "floor_flagstone",
+   "script": "tools/arena/blender/floor_set.py",
+   "args": [
+    "--name",
+    "flagstone_bluegrey",
+    "--cc0",
+    "polyhaven/large_grey_tiles",
+    "--tile-m",
+    "4.2",
+    "--px",
+    "2048",
+    "--grid",
+    "384",
+    "--disp-m",
+    "0.035",
+    "--device",
+    "ONEAPI",
+    "--sat",
+    "0.28",
+    "--tint",
+    "0.78,0.86,1.0",
+    "--gain",
+    "0.62",
+    "--joint-dark",
+    "0.8",
+    "--cracks",
+    "0.5",
+    "--crack-cells",
+    "14",
+    "--seed",
+    "7"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/large_grey_tiles/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A2: blue-grey flagstone floor set (Moon Gate, ref-3) from Poly Haven large_grey_tiles: graded albedo, scan normal + cracks, ORM with Cycles AO (3x3 tile bake) + dry roughness + water rank"
+  },
+  {
+   "id": "floor_slate",
+   "script": "tools/arena/blender/floor_set.py",
+   "args": [
+    "--name",
+    "slate_slabs",
+    "--cc0",
+    "polyhaven/stone_tiles",
+    "--tile-m",
+    "5.0",
+    "--px",
+    "2048",
+    "--grid",
+    "384",
+    "--disp-m",
+    "0.03",
+    "--device",
+    "ONEAPI",
+    "--sat",
+    "0.18",
+    "--tint",
+    "0.86,0.9,0.98",
+    "--gain",
+    "0.5",
+    "--joint-lo",
+    "0.04",
+    "--joint-hi",
+    "0.16",
+    "--joint-dark",
+    "0.9",
+    "--cracks",
+    "0.35",
+    "--crack-cells",
+    "10",
+    "--seed",
+    "19"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/stone_tiles/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A2: dark slate slab floor set (Molten Citadel ref-4 and others) from Poly Haven stone_tiles"
+  },
+  {
+   "id": "inlay_moongate",
+   "script": "tools/arena/blender/inlay_moongate.py",
+   "args": [
+    "--px",
+    "2048",
+    "--grid",
+    "1280",
+    "--ao-samples",
+    "96",
+    "--device",
+    "ONEAPI"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A2: Moon Gate engraved ritual circle (4 rings + rune band + crescents), 16 m disc, numpy SDF height -> displaced grid -> Cycles normal + AO bakes"
   }
  ],
  "groups": {
@@ -271,6 +381,16 @@
   ],
   "a1": [
    "kit_brazier_tripod"
+  ],
+  "floor": [
+   "floor_flagstone",
+   "floor_slate",
+   "inlay_moongate"
+  ],
+  "a2": [
+   "floor_flagstone",
+   "floor_slate",
+   "inlay_moongate"
   ]
  }
 }

@@ -108,6 +108,9 @@ export function floorDisc(L: ArenaLayout, pad: number, tile: number, mat: THREE.
   g.computeVertexNormals();
   const m = new THREE.Mesh(g, mat);
   m.receiveShadow = true;
+  // A2: the kit wet floor (dressKit.ts) replaces meshes flagged floor / floorDeco
+  m.userData.floor = true;
+  m.userData.floorPad = pad;
   return m;
 }
 

@@ -1,0 +1,113 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\inlay_moongate",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "name": "inlay_moongate",
+  "size_m": 16.0,
+  "px": 2048,
+  "grid": 1280,
+  "ao_samples": 96,
+  "device": "ONEAPI",
+  "seed": 3,
+  "depth": 0.012,
+  "preview": 640
+ },
+ "steps": [
+  {
+   "step": "pattern",
+   "value": {
+    "grooveShare": 0.04383444786071777,
+    "maxDepthM": 0.011297653429210186
+   },
+   "ok": true,
+   "seconds": 4.85,
+   "peakMB": 547,
+   "freeMB": 7012
+  },
+  {
+   "step": "build_high",
+   "value": {
+    "highTris": 3276800,
+    "device": {
+     "requested": "ONEAPI",
+     "used": "ONEAPI",
+     "devices": [
+      {
+       "name": "Intel Core Ultra 5 125H",
+       "type": "CPU",
+       "use": false
+      },
+      {
+       "name": "Intel(R) Arc(TM) Graphics",
+       "type": "ONEAPI",
+       "use": true
+      }
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 3.63,
+   "peakMB": 2037,
+   "freeMB": 6749
+  },
+  {
+   "step": "bake",
+   "value": {
+    "NORMAL": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\inlay_moongate\\inlay_moongate_normal.png",
+     "seconds": 8.02
+    },
+    "AO": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\inlay_moongate\\inlay_moongate_ao.png",
+     "seconds": 19.06
+    }
+   },
+   "ok": true,
+   "seconds": 27.08,
+   "peakMB": 4181,
+   "freeMB": 5588
+  },
+  {
+   "step": "compose",
+   "value": {
+    "baseColor": "inlay_moongate_basecolor.png",
+    "normal": "inlay_moongate_normal.png",
+    "orm": "inlay_moongate_orm.png",
+    "aoMeanInGrooves": 0.9771264791488647
+   },
+   "ok": true,
+   "seconds": 1.35,
+   "peakMB": 4181,
+   "freeMB": 5791
+  },
+  {
+   "step": "export",
+   "value": {
+    "glb": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\inlay_moongate\\inlay_moongate_raw.glb",
+     "bytes": 1396
+    }
+   },
+   "ok": true,
+   "seconds": 0.4,
+   "peakMB": 4181,
+   "freeMB": 6413
+  },
+  {
+   "step": "preview",
+   "value": {
+    "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\inlay_moongate\\inlay_moongate_preview.png",
+    "device": "ONEAPI"
+   },
+   "ok": true,
+   "seconds": 8.52,
+   "peakMB": 4181,
+   "freeMB": 5915
+  }
+ ],
+ "seconds": 45.9,
+ "peakMB": 4181,
+ "failed": []
+}

@@ -38,6 +38,8 @@ export interface ThemeDef {
   rim: string;
   /** colour of gate / accent lights */
   accent: string;
+  /** A2: fxLook.ts THEME_LOOK row to use instead of `id` (kit-mode look overrides) */
+  lookId?: string;
 }
 
 const C = (c: string) => new THREE.Color(c);

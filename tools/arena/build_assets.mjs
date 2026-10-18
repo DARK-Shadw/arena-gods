@@ -1,6 +1,8 @@
 // Arena asset build (arena art plan 5.8, milestone A1): Blender job outputs -> shipped GLBs + manifest.
 //   node tools/arena/build_assets.mjs [jobId ...] [--formats=ktx2,webp] [--keep-work]
 //   npm run arena:assets
+// A2: role 'texset' (floor_set.py, inlay_moongate.py): texture-only assets shipped as a carrier GLB (one TEXSET quad +
+// one material holding baseColor / normal / orm), so they reuse this pipeline, the loader and the WebP fallback.
 // Input: every tools/arena/_bake/<job>/asset.json (written by the kit jobs, e.g. kit_brazier.py) with its
 // raw GLB (geometry + named materials, no images) and the baked PNG sets per material.
 // Per asset, 2 tiers x 2 texture formats = 4 GLBs in public/arena/<id>[.low][.webp].glb:
@@ -103,8 +105,10 @@ function disposeTree(n) {
 
 async function buildVariant(io, A, dir, tier, fmt) {
   const doc = await io.read(path.join(dir, A.glb));
-  const drop = tier === 'full' ? 'LOD1' : 'LOD0';
-  for (const n of doc.getRoot().listNodes()) if (n.getName() === drop) disposeTree(n);
+  // A2: texture sets (role 'texset': floor sets, inlays) are one TEXSET quad carrying a material, the same node
+  // for both tiers (low = the set at half size); kit assets drop the other tier's LOD node
+  const drop = A.role === 'texset' ? null : tier === 'full' ? 'LOD1' : 'LOD0';
+  for (const n of doc.getRoot().listNodes()) if (drop && n.getName() === drop) disposeTree(n);
   const texInfo = [];
   const lodMats = new Set(A.lods[tier === 'full' ? 'LOD0' : 'LOD1'].materials);
   let emissive = null;
@@ -163,7 +167,7 @@ async function main() {
     const dir = path.join(BAKE, j);
     const A = JSON.parse(fs.readFileSync(path.join(dir, 'asset.json'), 'utf8'));
     A.lods.LOD1.ownTextures ??= A.lods.LOD1.materials.some((m) => !A.lods.LOD0.materials.includes(m) && A.materials[m]?.baseColor);
-    const entry = { role: A.role, kind: A.kind, contract: A.contract, sources: A.sources, files: {}, stats: {} };
+    const entry = { role: A.role, kind: A.kind, contract: A.contract, texset: A.texset, sources: A.sources, files: {}, stats: {} };
     for (const tier of ['full', 'low']) {
       entry.files[tier] = {};
       entry.stats[tier] = {};

@@ -23,6 +23,13 @@ import { buildDressing, type Dressing } from './dressing';
 import type { ArenaPack } from './assets';
 import { canvasTexture, softDot } from './textures';
 import { R } from './noise';
+import { alongEllipse } from './common';
+import { withLook } from './art';
+import type { WetFloor } from './floor';
+import { FloorLightMap } from './lightmap';
+import { LAYER_REFLECT, PlanarReflection, StreakCards, type FloorLightSource } from './reflection';
+import { LAYER } from '../fx/fxLayers';
+import { THEME_FLOOR, type FloorSurface } from '../fx/fxSurfaces';
 
 export interface Gate {
   angle: number;
@@ -125,12 +132,19 @@ export class Arena {
   private scene: THREE.Scene;
   private propMats: Record<string, THREE.Material> = {};
   private propGeos: Record<string, THREE.BufferGeometry> = {};
-  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number }[] = [];
+  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number }[] = [];
   private updaters: ((t: number, dt: number) => void)[] = [];
   private lastFrameT = -1;
 
   /** A1: loaded kit art (assets.ts) or null = the legacy procedural dressing (always with ?arena=legacy) */
   readonly kit: ArenaPack | null;
+  /** A2: the kit wet floor + its planar reflection (medium / high), light map and low-tier streak cards */
+  wetFloor: WetFloor | null = null;
+  reflection: PlanarReflection | null = null;
+  lightMap: FloorLightMap | null = null;
+  streaks: StreakCards | null = null;
+  private floorSrc: FloorLightSource[] = [];
+  private streakSrc: FloorLightSource[] = [];
 
   constructor(scene: THREE.Scene, renderer: THREE.WebGLRenderer, layout: ArenaLayout, quality = 2, kit: ArenaPack | null = null) {
     installHeightFog();
@@ -138,7 +152,8 @@ export class Arena {
     this.layout = layout;
     this.quality = quality;
     this.kit = kit;
-    const T = (this.theme = THEME_DEFS[layout.theme]);
+    // A2: kit art may override the theme's display data (the Moon Gate night preview on the colosseum)
+    const T = (this.theme = withLook(THEME_DEFS[layout.theme], kit?.art.look));
     scene.add(this.group);
 
     // ---------------- sky, environment, fog
@@ -219,6 +234,87 @@ export class Arena {
     this.fireRing.visible = false;
     this.fireRing.userData.dyn = true;
     this.group.add(this.fireRing);
+
+    // ---------------- A2: decorative boundary braziers, wet floor (reflection, light map, streaks)
+    if (kit?.art.ringFlames) this.addRingFlames(kit);
+    this.wetFloor = this.dressing.wetFloor ?? null;
+    if (this.wetFloor) {
+      const F = this.wetFloor;
+      this.reflection = new PlanarReflection();
+      F.attachReflection(this.reflection.uniforms);
+      this.lightMap = new FloorLightMap(F.halfW, F.halfD);
+      F.attachLightMap(this.lightMap);
+      // streak cards: the low tier's only fire reflections, and an accent over the planar reflection on medium /
+      // high (plan 6.1 table: "low tier + accents everywhere"); the planar pass alone leaves fires dim after Fresnel
+      {
+        this.streaks = new StreakCards();
+        const U = this.streaks.uniforms;
+        U.uGain.value = quality <= 0 ? 1 : STREAK_ACCENT;
+        U.uOrm.value = F.uniforms.uFOrm.value as THREE.Texture;
+        U.uTile.value = F.tileM;
+        U.uWater.value = Math.min(0.9, (F.uniforms.uFPuddle.value as number) * 1.6);
+        this.group.add(this.streaks.mesh);
+      }
+      this.tagReflect();
+      F.readWater(renderer);
+    }
+  }
+
+  /** A2: render-only braziers along the boundary (ThemeArt.ringFlames), skipping the gates */
+  private addRingFlames(kit: ArenaPack) {
+    const RF = kit.art.ringFlames!;
+    const asset = kit.assets.get(RF.asset);
+    if (!asset) return;
+    const L = this.layout;
+    const circ = 2 * Math.PI * Math.sqrt((L.rx * L.rx + L.rz * L.rz) / 2);
+    const spacing = circ / RF.count;
+    alongEllipse(
+      L,
+      RF.offset,
+      spacing,
+      (p, yaw) => {
+        const inst = asset.instantiate();
+        const g = new THREE.Group();
+        g.position.set(p.x, 0, p.z);
+        g.rotation.y = yaw;
+        g.add(inst.obj);
+        const s = inst.sockets.find((x) => x.name === 'SOCK_flame');
+        g.add(this.flame(new THREE.Vector3(0, s ? s.pos[1] : 1.2, 0), RF.size, this.theme.fire, false));
+        g.userData.ringFlame = true;
+        this.group.add(g);
+      },
+      2.7,
+      0.5,
+    );
+  }
+
+  /**
+   * A2: what the planar reflection renders (reflection.ts LAYER_REFLECT): the sky, every tall mesh of the
+   * dressing (walls, stands, gates, obstacles, props: world bounding box above 0.7 m), the ring of fire and the
+   * arena's flame cards. Instanced meshes (crowds: many triangles, small in the reflection) stay out. Floor, decals, debris, streak cards and particles stay out.
+   */
+  private tagReflect() {
+    const box = new THREE.Box3();
+    const skip = new Set<THREE.Object3D>([this.decals.mesh, this.debris.group, this.ambient.group]);
+    if (this.wetFloor) skip.add(this.wetFloor.mesh);
+    if (this.streaks) skip.add(this.streaks.mesh);
+    this.group.updateMatrixWorld(true);
+    const visit = (o: THREE.Object3D) => {
+      if (skip.has(o) || o.userData.floor) return;
+      const m = o as THREE.Mesh;
+      if (m.isMesh) {
+        if (o.layers.isEnabled(LAYER.FX_ALPHA) || o.layers.isEnabled(LAYER.FX_ADD)) o.layers.enable(LAYER_REFLECT);
+        else if (!(m as unknown as THREE.InstancedMesh).isInstancedMesh) {
+          if (!m.geometry.boundingBox) m.geometry.computeBoundingBox();
+          box.copy(m.geometry.boundingBox!).applyMatrix4(m.matrixWorld);
+          if (box.max.y > 0.7) o.layers.enable(LAYER_REFLECT);
+        }
+      }
+      for (const c of o.children) visit(c);
+    };
+    visit(this.group);
+    this.sky.layers.enable(LAYER_REFLECT);
+    this.fireRing.layers.enable(LAYER_REFLECT);
   }
 
   // ------------------------------------------------------------------ builders
@@ -315,7 +411,7 @@ export class Arena {
       core.position.y = size * 0.2;
       g.add(core);
     }
-    const entry: (typeof this.flames)[number] = { obj: g, ph: Math.random() * 10, base: 1 };
+    const entry: (typeof this.flames)[number] = { obj: g, ph: Math.random() * 10, base: 1, size };
     if (light && this.lightBudget > 0) {
       this.lightBudget--;
       const L = new THREE.PointLight(color, size * 6, size * 14, 1.6);
@@ -535,6 +631,66 @@ export class Arena {
   }
   boundR(x: number, z: number) {
     return boundR(this.layout, x, z);
+  }
+
+  /**
+   * A2: what the floor is at (x, z) for footstep / splash FX (A20): water hazards, then the kit wet floor's water /
+   * wet test (the shader's own maths on the CPU), else the theme's default surface (fxSurfaces THEME_FLOOR).
+   */
+  surfaceAt(x: number, z: number): FloorSurface {
+    for (const h of this.layout.hazards) {
+      if ((h.kind === 'water' || h.kind === 'lava') && Math.hypot(x - h.x, z - h.z) < h.r) return h.kind === 'water' ? 'water' : 'ash';
+    }
+    if (this.wetFloor) return this.wetFloor.surfaceAt(x, z);
+    return THEME_FLOOR[this.layout.theme] ?? 'stone';
+  }
+
+  /**
+   * A2: per-frame floor work that needs the renderer, called from Post's pre-scene hook (post.ts `preScene`,
+   * timer 'reflect'): the light map (only when a source moved), the streak cards (low) and the planar reflection
+   * (medium / high). `size` = the scene target in pixels, `quality` = the post tier.
+   */
+  preRender(r: THREE.WebGLRenderer, cam: THREE.PerspectiveCamera, size: THREE.Vector2, quality: number) {
+    if (!this.wetFloor) return;
+    this.collectFloorSources();
+    this.lightMap?.update(r, this.floorSrc);
+    this.streaks?.set(this.streakSrc);
+    this.reflection?.render(r, this.scene, cam, size, quality);
+  }
+
+  private _wp = new THREE.Vector3();
+  private _fireCol = new THREE.Color();
+  private _moonCol = new THREE.Color();
+  /** flames (light map: only those without a real light) and lava pools as floor light sources */
+  private collectFloorSources() {
+    const lm = this.floorSrc,
+      st = this.streakSrc;
+    lm.length = 0;
+    st.length = 0;
+    const live = (o: THREE.Object3D) => {
+      for (let p: THREE.Object3D | null = o; p; p = p.parent) if (!p.visible) return false;
+      return true;
+    };
+    this._fireCol.set(this.theme.fire);
+    for (const f of this.flames) {
+      if (!live(f.obj)) continue;
+      f.obj.getWorldPosition(this._wp);
+      const s: FloorLightSource = { x: this._wp.x, y: this._wp.y + f.size * 0.35, z: this._wp.z, size: f.size, color: this._fireCol, power: 1.9 * f.size };
+      st.push(s);
+      if (!f.light) lm.push(s);
+    }
+    // night themes: a long broken moon path toward the moon's azimuth (the concepts' moonlit streak; the real
+    // mirror image of a moon 27 deg up falls below a low camera's frame, the concepts paint it as a glossy path)
+    const S = this.theme.sky;
+    if (this.streaks && S.moonSize > 0 && S.sunGlow === 0 && S.moonDir.y > 0.05) {
+      const hz = Math.hypot(S.moonDir.x, S.moonDir.z) || 1;
+      const cp = this.sky.position; // = the camera (update())
+      st.push({ x: cp.x + (S.moonDir.x / hz) * 40, y: 3, z: cp.z + (S.moonDir.z / hz) * 40, size: 4, color: this._moonCol.copy(S.moonColor).multiplyScalar(1 / Math.max(1e-3, S.moonColor.r)), power: MOON_PATH, len: 3, wid: 1 });
+    }
+    for (const h of this.hazards) {
+      if (h.def.kind !== 'lava') continue;
+      lm.push({ x: h.def.x, y: 0.5, z: h.def.z, size: h.def.r * 1.5, color: LAVA_COL, power: 0.6 * h.def.r * h.def.r });
+    }
   }
 
   /** sync dynamic state to a playback frame (simDt for physics-like visuals) */
@@ -784,6 +940,12 @@ export class Arena {
       f.obj.scale.set(1, k, 1);
       if (f.light && f.li) f.light.intensity = f.li * k;
     }
+    // A2: one global flicker for the floor light map and the streak cards (plan 6.2)
+    if (this.wetFloor) {
+      const fl = 0.9 + Math.sin(t * 11.3) * 0.06 + Math.sin(t * 23.7 + 1.3) * 0.04;
+      this.wetFloor.setLightGain(fl);
+      if (this.streaks) this.streaks.uniforms.uFlicker.value = fl;
+    }
     for (const u of this.updaters) u(t, dt);
   }
 
@@ -803,8 +965,17 @@ export class Arena {
     });
     this.env.dispose();
     if (this.scene.environment === this.env) this.scene.environment = null;
+    this.wetFloor?.dispose();
+    this.reflection?.dispose();
+    this.lightMap?.dispose();
   }
 }
+
+const LAVA_COL = new THREE.Color('#ff5a1a');
+/** A2: streak-card gain on medium / high, where the planar reflection carries most of the image */
+const STREAK_ACCENT = 0.6;
+/** A2: moon-path streak brightness (before the streak gain) */
+const MOON_PATH = 0.6;
 
 // ------------------------------------------------------------------ small helpers
 /**

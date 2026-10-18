@@ -1,0 +1,350 @@
+{
+ "label": "before",
+ "dist": "C:\\Users\\aswin\\AppData\\Local\\Temp\\claude\\C--Programming-GameDev-Research\\c83eeae6-6a56-477f-bd5a-e5428179abde\\scratchpad\\dist_before",
+ "w": 1920,
+ "h": 1080,
+ "n": 120,
+ "runs": [
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 2,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 19.452,
+     "p50": 19.2,
+     "p95": 24.3,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 14.924,
+     "p50": 14.842,
+     "p95": 18.799,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0402,
+     "updateMs": 0.0556,
+     "frameMax": 2.1,
+     "updateMax": 0.7
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 1,
+      "mask": 1,
+      "dust_ring": 0
+     },
+     "decals": 48
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 16.119,
+     "p50": 15.5,
+     "p95": 19.4,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 11.653,
+     "p50": 11.06,
+     "p95": 13.218,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0399,
+     "updateMs": 0.1345,
+     "frameMax": 2.1,
+     "updateMax": 0.7
+    },
+    "fxLive": {
+     "particles": {
+      "add": 313,
+      "alpha": 70,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 45,
+      "mask": 427,
+      "dust_ring": 22,
+      "unity_explosion00": 12,
+      "unity_wispysmoke01": 7,
+      "unity_explosion01_nofire": 28
+     },
+     "decals": 131
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 8.813,
+     "p50": 8.545,
+     "p95": 10.768,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.183,
+     "p50": 0.167,
+     "p95": 0.278,
+     "n": 120
+    },
+    "ao": {
+     "avg": 2.119,
+     "p50": 2.044,
+     "p95": 2.364,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.012,
+     "p50": 0.01,
+     "p95": 0.022,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.466,
+     "p50": 0.448,
+     "p95": 0.538,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.487,
+     "p50": 0.48,
+     "p95": 0.519,
+     "n": 120
+    },
+    "dist": {
+     "avg": 0.046,
+     "p50": 0.023,
+     "p95": 0.079,
+     "n": 25
+    }
+   }
+  },
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 1,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 21.927,
+     "p50": 21.8,
+     "p95": 25.1,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 16.566,
+     "p50": 16.331,
+     "p95": 18.541,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0388,
+     "updateMs": 0.0521,
+     "frameMax": 0.9,
+     "updateMax": 0.7
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 1,
+      "mask": 1,
+      "dust_ring": 0
+     },
+     "decals": 48
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 21,
+     "p50": 20.8,
+     "p95": 24.3,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 16.08,
+     "p50": 15.932,
+     "p95": 18.525,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0399,
+     "updateMs": 0.1389,
+     "frameMax": 0.9,
+     "updateMax": 0.7
+    },
+    "fxLive": {
+     "particles": {
+      "add": 313,
+      "alpha": 70,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 36,
+      "mask": 324,
+      "dust_ring": 22,
+      "unity_explosion00": 12,
+      "unity_wispysmoke01": 7,
+      "unity_explosion01_nofire": 28
+     },
+     "decals": 99
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 15.338,
+     "p50": 15.034,
+     "p95": 18.068,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.154,
+     "p50": 0.152,
+     "p95": 0.204,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.059,
+     "p50": 0.058,
+     "p95": 0.073,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.603,
+     "p50": 0.588,
+     "p95": 0.693,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.64,
+     "p50": 0.633,
+     "p95": 0.678,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 0,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 15.219,
+     "p50": 15.1,
+     "p95": 17.8,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 10.383,
+     "p50": 10.186,
+     "p95": 12.449,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0201,
+     "updateMs": 0.0435,
+     "frameMax": 0.7,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 0,
+      "mask": 1,
+      "dust_ring": 0
+     },
+     "decals": 36
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 15.568,
+     "p50": 15.3,
+     "p95": 18.3,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 10.592,
+     "p50": 10.359,
+     "p95": 12.697,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.023,
+     "updateMs": 0.0884,
+     "frameMax": 0.7,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 313,
+      "alpha": 70,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 6,
+      "mask": 211,
+      "dust_ring": 22,
+      "unity_explosion00": 12,
+      "unity_explosion01_nofire": 14
+     },
+     "decals": 51
+    }
+   },
+   "passes": {
+    "scene": {
+     "avg": 9.388,
+     "p50": 9.054,
+     "p95": 11.082,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.043,
+     "p50": 0.036,
+     "p95": 0.062,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.201,
+     "p50": 0.188,
+     "p95": 0.283,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.651,
+     "p50": 0.641,
+     "p95": 0.769,
+     "n": 120
+    }
+   }
+  }
+ ]
+}

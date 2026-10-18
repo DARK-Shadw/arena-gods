@@ -1,6 +1,7 @@
 /**
  * Post-processing (F1 rewrite of the EffectComposer chain; plan §2.2, §2.4, §2.6).
  *
+ *   0 reflect   (A2) pre-scene hook `preScene`: the arena's planar floor reflection + light map    [med, high]
  *   1 scene     WORLD layer -> sceneRT (HDR, DepthTexture = THE shared scene depth, optional MSAA)
  *   2 depth     shared depth -> half-res RGBA16F: A = linear depth (soft particles, distortion),
  *               RGB = normals rebuilt from depth for GTAO                            [med, high]
@@ -401,6 +402,12 @@ export class Post {
   distActive: () => boolean = () => true;
   /** the scene colour + shared depth target (read-only for other systems) */
   readonly sceneRT: THREE.WebGLRenderTarget;
+  /**
+   * A2 (arena art plan 6.1): called at the start of render(), before the scene pass, with the scene target size
+   * and the tier (the arena renders its planar floor reflection here). GPU time under the 'reflect' timer key.
+   */
+  preScene: ((r: THREE.WebGLRenderer, cam: THREE.PerspectiveCamera, size: THREE.Vector2, quality: number) => void) | null = null;
+  private _preSize = new THREE.Vector2();
 
   private renderer: THREE.WebGLRenderer;
   private scene: THREE.Scene;
@@ -718,6 +725,14 @@ export class Post {
     const mask = cam.layers.mask;
     const S = this.sceneRT;
     r.autoClear = false;
+
+    // 0 pre-scene work (A2: planar floor reflection), before the shared depth / scene pass
+    if (this.preScene) {
+      tm.begin('reflect');
+      this.preScene(r, cam, this._preSize.set(S.width, S.height), this.q);
+      tm.end();
+      cam.layers.mask = mask;
+    }
 
     // 1 opaque world -> scene target (+ shared depth)
     tm.begin('scene');

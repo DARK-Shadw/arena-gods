@@ -1,0 +1,86 @@
+[
+ {
+  "kitFloor": true,
+  "theme": "The Gilded Colosseum",
+  "look": "moonlake",
+  "surfaceGrid": {
+   "n": 7603,
+   "water": 0.368,
+   "wet": 0.632
+  },
+  "reflection": {
+   "on": 0,
+   "frames": 0,
+   "size": null
+  },
+  "lightMap": {
+   "renders": 1,
+   "ms": 10.3
+  },
+  "streaks": 29,
+  "sources": 26,
+  "callsFrame": 186,
+  "callsNoReflect": 186,
+  "q": 0,
+  "extra": "",
+  "errors": []
+ },
+ {
+  "kitFloor": true,
+  "theme": "The Gilded Colosseum",
+  "look": "moonlake",
+  "surfaceGrid": {
+   "n": 7603,
+   "water": 0.369,
+   "wet": 0.631
+  },
+  "reflection": {
+   "on": 1,
+   "frames": 2,
+   "size": [
+    628,
+    129
+   ]
+  },
+  "lightMap": {
+   "renders": 1,
+   "ms": 2.6
+  },
+  "streaks": 29,
+  "sources": 26,
+  "callsFrame": 271,
+  "callsNoReflect": 189,
+  "q": 1,
+  "extra": "",
+  "errors": []
+ },
+ {
+  "kitFloor": true,
+  "theme": "The Gilded Colosseum",
+  "look": "moonlake",
+  "surfaceGrid": {
+   "n": 7603,
+   "water": 0.369,
+   "wet": 0.631
+  },
+  "reflection": {
+   "on": 1,
+   "frames": 2,
+   "size": [
+    807,
+    174
+   ]
+  },
+  "lightMap": {
+   "renders": 1,
+   "ms": 2.6
+  },
+  "streaks": 29,
+  "sources": 26,
+  "callsFrame": 275,
+  "callsNoReflect": 192,
+  "q": 2,
+  "extra": "",
+  "errors": []
+ }
+]

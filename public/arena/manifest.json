@@ -2,6 +2,456 @@
  "_doc": "Arena art manifest (tools/arena/build_assets.mjs). files[tier][format] relative to /arena/. tier full = LOD0 (medium/high), low = LOD1 (low). Loaded by src/render/arena/assets.ts.",
  "version": 1,
  "assets": {
+  "floor/flagstone_bluegrey": {
+   "role": "texset",
+   "kind": "floor",
+   "texset": {
+    "tileM": 4.2,
+    "px": 2048,
+    "channels": {
+     "orm": "R occlusion, G dry roughness, B water rank (uniform 0..1)"
+    }
+   },
+   "sources": [
+    "polyhaven/large_grey_tiles"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "floor/flagstone_bluegrey.glb",
+     "webp": "floor/flagstone_bluegrey.webp.glb"
+    },
+    "low": {
+     "ktx2": "floor/flagstone_bluegrey.low.glb",
+     "webp": "floor/flagstone_bluegrey.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 4526588,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 624799
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 3471902
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 426633
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 2455924,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 806828
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1143526
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 502328
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 1108396,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 161974
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 802550
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 140620
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 611148,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 224404
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 251532
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 131972
+       }
+      ]
+     }
+    }
+   }
+  },
+  "floor/inlay_moongate": {
+   "role": "texset",
+   "kind": "inlay",
+   "texset": {
+    "sizeM": 16,
+    "px": 2048,
+    "style": "engraved",
+    "channels": {
+     "baseColor": "albedo multiplier",
+     "orm": "R occlusion, G roughness hint, B groove mask"
+    }
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "floor/inlay_moongate.glb",
+     "webp": "floor/inlay_moongate.webp.glb"
+    },
+    "low": {
+     "ktx2": "floor/inlay_moongate.low.glb",
+     "webp": "floor/inlay_moongate.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 748072,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 98298
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 524203
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 122364
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 549984,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 75682
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 214814
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 256296
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 300120,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 42088
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 199566
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 55266
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 206244,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 33408
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 66024
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 103626
+       }
+      ]
+     }
+    }
+   }
+  },
+  "floor/slate_slabs": {
+   "role": "texset",
+   "kind": "floor",
+   "texset": {
+    "tileM": 5,
+    "px": 2048,
+    "channels": {
+     "orm": "R occlusion, G dry roughness, B water rank (uniform 0..1)"
+    }
+   },
+   "sources": [
+    "polyhaven/stone_tiles"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "floor/slate_slabs.glb",
+     "webp": "floor/slate_slabs.webp.glb"
+    },
+    "low": {
+     "ktx2": "floor/slate_slabs.low.glb",
+     "webp": "floor/slate_slabs.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 5689572,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 584620
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 4444777
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 656961
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 3759452,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1172716
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1893988
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 689552
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 1409980,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 151897
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1050456
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 204418
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 765092,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 215206
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 374712
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 171992
+       }
+      ]
+     }
+    }
+   }
+  },
   "kit/brazier_tripod": {
    "role": "prop",
    "kind": "brazier",

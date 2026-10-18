@@ -4,7 +4,9 @@
  * sim's `brazier` prop, used by every theme that spawns braziers (today: forge).
  */
 import type { ArenaLayout, ThemeId } from '../../../sim/arenaGen';
-import type { AssetId, ThemeArt } from './types';
+import type { AssetId, LookArt, ThemeArt } from './types';
+import type { ThemeDef } from '../themes';
+import { COLOSSEUM_ART } from './colosseum';
 
 export * from './types';
 
@@ -14,13 +16,29 @@ export const KIT_DEFAULT: ThemeArt = {
   props: { brazier: 'kit/brazier_tripod' },
 };
 
-/** per-theme ThemeArt files (A7: colosseum, A11+: the others) */
-const THEME_ART: Partial<Record<ThemeId, ThemeArt>> = {};
+/** per-theme ThemeArt files (A2: colosseum floor + Moon Gate preview; A7: colosseum for real, A11+: the others) */
+const THEME_ART: Partial<Record<ThemeId, ThemeArt>> = { colosseum: COLOSSEUM_ART };
 
 export function artFor(theme: ThemeId): ThemeArt {
   const t = THEME_ART[theme];
   if (!t) return { ...KIT_DEFAULT, id: theme };
-  return { ...KIT_DEFAULT, ...t, props: { ...KIT_DEFAULT.props, ...t.props } };
+  const art: ThemeArt = { ...KIT_DEFAULT, ...t, props: { ...KIT_DEFAULT.props, ...t.props } };
+  // A2: `?moongate=0` keeps the kit floor but drops the preview look and the decorative braziers
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('moongate') === '0') {
+    delete art.look;
+    delete art.ringFlames;
+  }
+  // A2: `?floorset=slate_slabs` previews another floor set on a theme that has a kit floor
+  const fs = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('floorset') : null;
+  if (fs && art.floor && /^[a-z0-9_]+$/.test(fs)) art.floor = { ...art.floor, set: `floor/${fs}` };
+  return art;
+}
+
+/** A2: the theme's display data with the kit art's look overrides (a new object; THEME_DEFS stays untouched) */
+export function withLook(T: ThemeDef, look?: LookArt): ThemeDef {
+  if (!look) return T;
+  const { sky, lookId, ...rest } = look;
+  return { ...T, ...rest, sky: { ...T.sky, ...(sky ?? {}) }, lookId: lookId ?? T.lookId };
 }
 
 /**
@@ -35,6 +53,7 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
   for (const [k, v] of Object.entries(art.props ?? {})) if (has(layout?.props, k)) add(v);
   for (const [k, v] of Object.entries(art.obstacles ?? {})) if (has(layout?.obstacles, k)) add(v);
   for (const [k, v] of Object.entries(art.hazards ?? {})) if (has(layout?.hazards, k)) add(v);
+  add(art.ringFlames?.asset);
   add(art.floor?.set);
   add(art.floor?.inlay);
   for (const m of art.ring?.modules ?? []) add(m.asset);

@@ -97,11 +97,13 @@ export function dressColosseum(a: Arena): Dressing {
   med.rotation.x = -Math.PI / 2;
   med.position.y = 0.012;
   med.receiveShadow = true;
+  med.userData.floorDeco = true; // A2: replaced by the kit wet floor's inlay
   G.add(med);
   for (const [r0, w] of [[2.6, 0.12], [1.15, 0.06]] as [number, number][]) {
     const ring = new THREE.Mesh(new THREE.RingGeometry(r0, r0 + w, 96), goldMat);
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.016;
+    ring.userData.floorDeco = true;
     G.add(ring);
   }
   // curb

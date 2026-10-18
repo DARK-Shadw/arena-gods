@@ -14,6 +14,7 @@ import { Arena } from './render/arena/arenaView';
 import { ArenaAssets, arenaMode, arenaTexOverride, type ArenaPack } from './render/arena/assets';
 import { tierOf } from './render/arena/art';
 import { THEME_DEFS } from './render/arena/themes';
+import { LAYER_REFLECT_HI } from './render/arena/reflection';
 import { camWorld } from './camera/cameraRig';
 import { solids as camSolids, rayProxies } from './camera/cameraAudit';
 import { buildReveal } from './cinematic/reveal';
@@ -147,6 +148,8 @@ class App {
     this.post = new Post(this.renderer, this.scene, this.camera);
     this.post.quality = this.quality;
     this.post.distActive = () => this.vfx.distActive;
+    // A2: the arena's planar floor reflection + floor light map run before the scene pass
+    this.post.preScene = (r, cam, size, q) => this.arena?.preRender(r, cam, size, q);
     this.ui = new UI(document.getElementById('ui')!);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enabled = false;
@@ -242,9 +245,10 @@ class App {
     this.arenaQuality = this.quality;
     this.arena = new Arena(this.scene, this.renderer, layout, this.quality, pack);
     if (pack) this.arenaAssets.release(pack);
-    const T = THEME_DEFS[spec.theme];
+    // A2: the arena's theme (kit art may override the display data, e.g. the Moon Gate preview)
+    const T = this.arena.theme;
     this.renderer.toneMappingExposure = T.exposure;
-    this.post.setLook({ id: T.id, bloom: T.bloom, grade: T.grade, godrays: T.godrays, sunDir: T.sky.sunDir, rayColor: T.sunColor });
+    this.post.setLook({ id: T.lookId ?? T.id, bloom: T.bloom, grade: T.grade, godrays: T.godrays, sunDir: T.sky.sunDir, rayColor: T.sunColor });
     this.keyLight.color.set(T.key);
     this.rimLight.color.set(T.rim);
     const L = this.arena.layout;
@@ -324,6 +328,11 @@ class App {
     this.defs = [getFighter(c.a), getFighter(c.b)];
     for (const v of this.views) v.dispose(this.scene);
     this.views = [new FighterView(c.a, assets[0], this.scene), new FighterView(c.b, assets[1], this.scene)];
+    // A2: fighters are mirrored in the wet floor on the high tier (reflection.ts LAYER_REFLECT_HI)
+    for (const v of this.views) {
+      markReflectHi(v.root);
+      void Promise.resolve(v.ready).then(() => markReflectHi(v.root));
+    }
     this.playback = new Playback(this.rec);
     this.warp = new ContactWarp(this.rec);
     this.director = new Director(this.rig, this.rec);
@@ -1505,5 +1514,16 @@ class App {
 
 const app = new App();
 (window as unknown as { __arena: App }).__arena = app;
+
+/** A2: opaque fighter meshes join the high-tier reflection layer */
+function markReflectHi(root: THREE.Object3D) {
+  root.traverse((o) => {
+    const m = o as THREE.Mesh;
+    if (!m.isMesh) return;
+    const mat = m.material as THREE.Material | THREE.Material[];
+    if (Array.isArray(mat) ? mat.some((x) => x.transparent) : mat.transparent) return;
+    o.layers.enable(LAYER_REFLECT_HI);
+  });
+}
 (window as unknown as { __audio: typeof audio }).__audio = audio;
 (window as unknown as { __THREE: typeof THREE }).__THREE = THREE;

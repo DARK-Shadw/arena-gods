@@ -1,0 +1,126 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\floor_slate",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "name": "slate_slabs",
+  "cc0": "polyhaven/stone_tiles",
+  "tile_m": 5.0,
+  "px": 2048,
+  "grid": 384,
+  "disp_m": 0.03,
+  "ao_samples": 96,
+  "device": "ONEAPI",
+  "seed": 19,
+  "sat": 0.18,
+  "tint": "0.86,0.9,0.98",
+  "gain": 0.5,
+  "contrast": 1.15,
+  "joint_lo": 0.04,
+  "joint_hi": 0.16,
+  "joint_dark": 0.9,
+  "cracks": 0.35,
+  "crack_cells": 10,
+  "crack_dark": 0.7,
+  "rough_lo": 0.62,
+  "rough_hi": 0.92,
+  "preview": 640
+ },
+ "steps": [
+  {
+   "step": "synth",
+   "value": {
+    "heightRangeM": 0.03,
+    "jointShare": 0.0884091854095459,
+    "crackShare": 0.0019130706787109375,
+    "albedoMeanSrgb": 0.20563004910945892
+   },
+   "ok": true,
+   "seconds": 9.07,
+   "peakMB": 1163,
+   "freeMB": 6563
+  },
+  {
+   "step": "build_high",
+   "value": {
+    "highTris": 2654208,
+    "device": {
+     "requested": "ONEAPI",
+     "used": "ONEAPI",
+     "devices": [
+      {
+       "name": "Intel Core Ultra 5 125H",
+       "type": "CPU",
+       "use": false
+      },
+      {
+       "name": "Intel(R) Arc(TM) Graphics",
+       "type": "ONEAPI",
+       "use": true
+      }
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 3.43,
+   "peakMB": 1855,
+   "freeMB": 6731
+  },
+  {
+   "step": "bake_ao",
+   "value": {
+    "AO": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\floor_slate\\slate_slabs_ao.png",
+     "seconds": 23.29
+    }
+   },
+   "ok": true,
+   "seconds": 23.29,
+   "peakMB": 3947,
+   "freeMB": 5903
+  },
+  {
+   "step": "compose",
+   "value": {
+    "baseColor": "slate_slabs_basecolor.png",
+    "normal": "slate_slabs_normal.png",
+    "orm": "slate_slabs_orm.png",
+    "aoMean": 0.9890498518943787,
+    "albedoMeanSrgb": 0.20514708757400513
+   },
+   "ok": true,
+   "seconds": 2.3,
+   "peakMB": 3947,
+   "freeMB": 5911
+  },
+  {
+   "step": "export",
+   "value": {
+    "glb": {
+     "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\floor_slate\\slate_slabs_raw.glb",
+     "bytes": 1400
+    },
+    "asset": "asset.json"
+   },
+   "ok": true,
+   "seconds": 0.4,
+   "peakMB": 3947,
+   "freeMB": 6551
+  },
+  {
+   "step": "preview",
+   "value": {
+    "path": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\floor_slate\\slate_slabs_preview.png",
+    "device": "ONEAPI"
+   },
+   "ok": true,
+   "seconds": 6.73,
+   "peakMB": 3947,
+   "freeMB": 6000
+  }
+ ],
+ "seconds": 45.3,
+ "peakMB": 3947,
+ "failed": []
+}

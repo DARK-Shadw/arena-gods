@@ -14,6 +14,7 @@ import { dressGlacier, dressMoonlake, dressSakura } from './dressNature';
 import { dressForge } from './dressForge';
 import { dressKit } from './dressKit';
 import type { KitInstance } from './assets';
+import type { WetFloor } from './floor';
 
 export interface Dressing {
   mats: Record<string, THREE.Material>;
@@ -33,6 +34,8 @@ export interface Dressing {
   spot?: number;
   /** A1: a baked kit asset for a prop kind (dressKit.ts); absent / null = the legacy procedural prop */
   propAsset?(kind: string): KitInstance | null;
+  /** A2: the kit wet floor (floor.ts), when the theme's art has a floor set that loaded */
+  wetFloor?: WetFloor;
 }
 
 /** kit art when the arena was given a loaded pack, else (and always with ?arena=legacy) the legacy builders */
