@@ -110,6 +110,9 @@ Status key: DONE | IN PROGRESS | PLANNED | IDEA | ISSUE (known problem)
 - **Shareable demo** (hosted build) to get friends' feedback ASAP.
 
 ---
+- **Owner feedback 2026-10-18 (watched 10+ live fights): finishers, kill variety, environment use.** Seen: only 2 finishers in 10+ fights, both Shoulder Throw; never a cut-through-mesh kill; environment interaction rare (one prop pickup and throw).
+  - Cause (code, not measured): `tryFinisher` in `src/sim/match.ts` fires on a lethal blow with p = 0.16 + pride*0.22 (+0.08 tense, -0.12 lopsided), clamped 0.05..0.6; then only finishers whose user/weight/space/hazard/knockdown conditions fit are candidates. Shoulder Throw has the loosest conditions (4 users). Only 8 finishers exist. Prop grabbing is one of ~14 AI goals with a small weight that decays x0.8 per pickup (`src/sim/ai.ts`).
+  - TODO: (a) raise the finisher rate and widen conditions so every fighter has at least 2 usable finishers (the 12 missing finishers, anim leftovers); measure finishers per fight with a sim counter. (b) Killing-blow rule: sharp weapon = severing cut (gore setting respected), blunt = ragdoll launch, finisher = the special case; the owner's mental model. (c) Raise prop pick-up/throw and environment use: the sim milestone after A2 (interactables) plus AI v2 spacing/environment tactics; add per-fight counters (pickups, throws, hazard kills) to `sim:test` output and set targets.
 
 ## 4. IDEAS (not committed)
 - Seed-VC / speech-to-speech voice conversion for hero lines (human performs, tool re-voices) for real Shadow-of-Mordor acting.
