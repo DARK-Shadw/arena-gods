@@ -220,6 +220,9 @@ export class SoundDirector {
           if (kind === 'lava' || kind === 'firepit') audio.fire(true);
           else if (kind === 'spikes') audio.play('hit_blade', { pos: b ? this.pos(b) : undefined, hitNow: true, rate: 0.85 });
           else if (kind === 'geyser') audio.play('whoosh_heavy', { pos: b ? this.pos(b) : undefined, rate: 0.6 });
+          else if (kind === 'flamejet' || kind === 'oil') audio.fire(true);
+          else if (kind === 'chains') audio.play('hit_blunt', { pos: b ? this.pos(b) : undefined, hitNow: true, rate: 0.6 });
+          else if (kind === 'crumble') audio.play('body_thud', { pos: b ? this.pos(b) : undefined, hitNow: true, rate: 0.7 });
           if (b) this.pain(e.b!, b, true);
           audio.gasp();
           break;
@@ -228,8 +231,26 @@ export class SoundDirector {
           const kind = String(e.data?.kind ?? '');
           if (kind === 'spikes') audio.play('clang', { rate: 1.4, vol: 0.4 });
           else if (kind === 'geyser') audio.play('whoosh_light', { rate: 0.5, vol: 0.5 });
+          else if (kind === 'chains') audio.play('clang', { rate: 0.7, vol: 0.5 });
+          else if (kind === 'flamejet') audio.fire(false);
+          else if (kind === 'crumble') audio.play('stone_slam', { rate: 1.4, vol: 0.4 });
           break;
         }
+        // A2b interactables
+        case 'brazier_tip':
+          audio.play('wall_slam', { pos: { x: Number(e.data?.x ?? 0), z: Number(e.data?.z ?? 0) }, hitNow: true, rate: 1.2, vol: 0.6 });
+          audio.fire(true);
+          audio.cheer(0.8);
+          break;
+        case 'obstacle_break':
+          audio.play('wood_break', { pos: { x: Number(e.data?.x ?? 0), z: Number(e.data?.z ?? 0) }, hitNow: true, rate: 0.75, vol: 1.1 });
+          audio.cheer(0.7);
+          break;
+        case 'floor_collapse':
+          audio.play('stone_slam', { pos: { x: Number(e.data?.x ?? 0), z: Number(e.data?.z ?? 0) }, hitNow: true, rate: 0.45, vol: 1.1 });
+          audio.boom(0.9);
+          audio.gasp();
+          break;
         case 'chandelier_fall':
           audio.play('clang', { rate: 0.55, vol: 0.7 });
           audio.gasp();

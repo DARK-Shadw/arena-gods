@@ -6,4 +6,13 @@ audio-src/
 Thumbs.db
 test-results/
 .vite/
+tools/anim/_scratch/
+
+# arena art pipeline (A0): Blender job outputs, local tools, raw harness renders
+tools/arena/_bake/
+tools/arena/_work/
+tools/bin/
+tools/arena/__pycache__/
+tools/arena/blender/__pycache__/
+docs/milestones/*/concept/game/
 arena-itch.zip

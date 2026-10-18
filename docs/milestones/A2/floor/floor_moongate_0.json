@@ -1,0 +1,31 @@
+[
+ {
+  "kitFloor": true,
+  "theme": "The Gilded Colosseum",
+  "look": null,
+  "surfaceGrid": {
+   "n": 7603,
+   "water": 0.369,
+   "wet": 0.631
+  },
+  "reflection": {
+   "on": 1,
+   "frames": 3,
+   "size": [
+    628,
+    129
+   ]
+  },
+  "lightMap": {
+   "renders": 1,
+   "ms": 27.6
+  },
+  "streaks": 19,
+  "sources": 17,
+  "callsFrame": 223,
+  "callsNoReflect": 156,
+  "q": 1,
+  "extra": "&moongate=0",
+  "errors": []
+ }
+]

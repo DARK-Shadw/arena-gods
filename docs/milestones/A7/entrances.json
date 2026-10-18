@@ -1,0 +1,12 @@
+{
+ "kit": {
+  "configs": 95,
+  "failed": 0,
+  "fails": []
+ },
+ "arena=legacy": {
+  "configs": 98,
+  "failed": 0,
+  "fails": []
+ }
+}

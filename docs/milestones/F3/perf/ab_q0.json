@@ -1,0 +1,111 @@
+{
+ "q": 0,
+ "n": 60,
+ "rounds": 4,
+ "results": [
+  {
+   "fight": "colosseum:gorak-vex@40",
+   "config": "F3 (3 lights, decals)",
+   "scene": 17.367,
+   "fx": 2.241,
+   "decals": 50,
+   "rounds": [
+    18.46,
+    17.367,
+    16.993,
+    16.42
+   ]
+  },
+  {
+   "fight": "colosseum:gorak-vex@40",
+   "config": "1 light, decals",
+   "scene": 17.268,
+   "fx": 2.323,
+   "decals": 50,
+   "rounds": [
+    17.316,
+    16.503,
+    17.268,
+    16.603
+   ]
+  },
+  {
+   "fight": "colosseum:gorak-vex@40",
+   "config": "3 lights, no decals",
+   "scene": 17.376,
+   "fx": 2.265,
+   "decals": 50,
+   "rounds": [
+    17.762,
+    16.757,
+    17.121,
+    17.376
+   ]
+  },
+  {
+   "fight": "colosseum:gorak-vex@40",
+   "config": "1 light, no decals",
+   "scene": 16.993,
+   "fx": 2.38,
+   "decals": 50,
+   "rounds": [
+    16.993,
+    15.853,
+    17.549,
+    16.522
+   ]
+  },
+  {
+   "fight": "glacier:aldric-vex@30",
+   "config": "F3 (3 lights, decals)",
+   "scene": 18.342,
+   "fx": 0.004,
+   "decals": 19,
+   "rounds": [
+    19.459,
+    17.839,
+    18.342,
+    18.246
+   ]
+  },
+  {
+   "fight": "glacier:aldric-vex@30",
+   "config": "1 light, decals",
+   "scene": 18.053,
+   "fx": 0.004,
+   "decals": 19,
+   "rounds": [
+    17.794,
+    17.92,
+    18.197,
+    18.053
+   ]
+  },
+  {
+   "fight": "glacier:aldric-vex@30",
+   "config": "3 lights, no decals",
+   "scene": 18.294,
+   "fx": 0.004,
+   "decals": 19,
+   "rounds": [
+    17.854,
+    18.294,
+    18.279,
+    18.297
+   ]
+  },
+  {
+   "fight": "glacier:aldric-vex@30",
+   "config": "1 light, no decals",
+   "scene": 17.76,
+   "fx": 0.004,
+   "decals": 19,
+   "rounds": [
+    17.76,
+    17.229,
+    17.671,
+    18.031
+   ]
+  }
+ ]
+}

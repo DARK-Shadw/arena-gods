@@ -1,0 +1,6181 @@
+{
+ "_doc": "Arena art manifest (tools/arena/build_assets.mjs). files[tier][format] relative to /arena/. tier full = LOD0 (medium/high), low = LOD1 (low). Loaded by src/render/arena/assets.ts.",
+ "version": 1,
+ "assets": {
+  "floor/flagstone_bluegrey": {
+   "role": "texset",
+   "kind": "floor",
+   "texset": {
+    "tileM": 4.2,
+    "px": 2048,
+    "channels": {
+     "orm": "R occlusion, G dry roughness, B water rank (uniform 0..1)"
+    }
+   },
+   "sources": [
+    "polyhaven/large_grey_tiles"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "floor/flagstone_bluegrey.glb",
+     "webp": "floor/flagstone_bluegrey.webp.glb"
+    },
+    "low": {
+     "ktx2": "floor/flagstone_bluegrey.low.glb",
+     "webp": "floor/flagstone_bluegrey.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 4526588,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 624799
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 3471902
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 426633
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 2455924,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 806828
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1143526
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 502328
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 1108396,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 161974
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 802550
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 140620
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 611148,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 224404
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 251532
+       },
+       {
+        "material": "floor_flagstone_bluegrey",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 131972
+       }
+      ]
+     }
+    }
+   }
+  },
+  "floor/inlay_moongate": {
+   "role": "texset",
+   "kind": "inlay",
+   "texset": {
+    "sizeM": 16,
+    "px": 2048,
+    "style": "engraved",
+    "channels": {
+     "baseColor": "albedo multiplier",
+     "orm": "R occlusion, G roughness hint, B groove mask"
+    }
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "floor/inlay_moongate.glb",
+     "webp": "floor/inlay_moongate.webp.glb"
+    },
+    "low": {
+     "ktx2": "floor/inlay_moongate.low.glb",
+     "webp": "floor/inlay_moongate.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 748072,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 98298
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 524203
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 122364
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 549984,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 75682
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 214814
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 256296
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 300120,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 42088
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 199566
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 55266
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 206244,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 33408
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 66024
+       },
+       {
+        "material": "floor_inlay_moongate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 103626
+       }
+      ]
+     }
+    }
+   }
+  },
+  "floor/slate_slabs": {
+   "role": "texset",
+   "kind": "floor",
+   "texset": {
+    "tileM": 5,
+    "px": 2048,
+    "channels": {
+     "orm": "R occlusion, G dry roughness, B water rank (uniform 0..1)"
+    }
+   },
+   "sources": [
+    "polyhaven/stone_tiles"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "floor/slate_slabs.glb",
+     "webp": "floor/slate_slabs.webp.glb"
+    },
+    "low": {
+     "ktx2": "floor/slate_slabs.low.glb",
+     "webp": "floor/slate_slabs.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 5689572,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 584620
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 4444777
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 656961
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 3759452,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1172716
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1893988
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 689552
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 1409980,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 151897
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1050456
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 204418
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 765092,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "floor_slate_slabs",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 215206
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 374712
+       },
+       {
+        "material": "floor_slate_slabs",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 171992
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/arcade_bay": {
+   "role": "module",
+   "kind": "arcade",
+   "contract": {
+    "width": 3.5,
+    "depth": 0.9,
+    "height": 6.3956,
+    "bounds": [
+     [
+      -1.75,
+      -0.44999998807907104,
+      0
+     ],
+     [
+      1.75,
+      0.44999998807907104,
+      6.395569324493408
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/arcade_bay.glb",
+     "webp": "kit/arcade_bay.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/arcade_bay.low.glb",
+     "webp": "kit/arcade_bay.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 21944,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 21944,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 15932,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 15932,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/arcade_broken": {
+   "role": "module",
+   "kind": "arcade",
+   "contract": {
+    "width": 3.5,
+    "depth": 0.9,
+    "height": 5.49,
+    "bounds": [
+     [
+      -1.75,
+      -0.44999998807907104,
+      0
+     ],
+     [
+      1.75,
+      0.44999998807907104,
+      5.489954948425293
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/arcade_broken.glb",
+     "webp": "kit/arcade_broken.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/arcade_broken.low.glb",
+     "webp": "kit/arcade_broken.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 17912,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 17912,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 13632,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 13632,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/arch": {
+   "role": "module",
+   "kind": "arch",
+   "contract": {
+    "width": 6.6,
+    "depth": 1.6,
+    "height": 7.4944,
+    "bounds": [
+     [
+      -3.299999952316284,
+      -0.800000011920929,
+      0
+     ],
+     [
+      3.299999952316284,
+      0.800000011920929,
+      7.494412899017334
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/arch.glb",
+     "webp": "kit/arch.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/arch.low.glb",
+     "webp": "kit/arch.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 40368,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 40368,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 22484,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 22484,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/balustrade": {
+   "role": "module",
+   "kind": "balustrade",
+   "contract": {
+    "width": 2,
+    "depth": 0.42,
+    "height": 1.08,
+    "bounds": [
+     [
+      -1,
+      -0.20999999344348907,
+      0
+     ],
+     [
+      1,
+      0.20999999344348907,
+      1.0800000429153442
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/balustrade.glb",
+     "webp": "kit/balustrade.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/balustrade.low.glb",
+     "webp": "kit/balustrade.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 50268,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 50268,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 21640,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 21640,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/banner_pole": {
+   "role": "feature",
+   "kind": "banner",
+   "sources": [
+    "polyhaven/lichen_rock",
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/banner_pole.glb",
+     "webp": "kit/banner_pole.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/banner_pole.low.glb",
+     "webp": "kit/banner_pole.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 548212,
+      "primitives": 5,
+      "textures": [
+       {
+        "material": "banner_pole",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 73325
+       },
+       {
+        "material": "banner_pole",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 337017
+       },
+       {
+        "material": "banner_pole",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 104757
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 337192,
+      "primitives": 5,
+      "textures": [
+       {
+        "material": "banner_pole",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 63678
+       },
+       {
+        "material": "banner_pole",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 124756
+       },
+       {
+        "material": "banner_pole",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 115658
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 225012,
+      "primitives": 5,
+      "textures": [
+       {
+        "material": "banner_pole_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 30004
+       },
+       {
+        "material": "banner_pole_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 121285
+       },
+       {
+        "material": "banner_pole_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 45935
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 140000,
+      "primitives": 5,
+      "textures": [
+       {
+        "material": "banner_pole_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 23806
+       },
+       {
+        "material": "banner_pole_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 45656
+       },
+       {
+        "material": "banner_pole_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 42766
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/banners": {
+   "role": "cloth",
+   "kind": "banner",
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/banners.glb",
+     "webp": "kit/banners.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/banners.low.glb",
+     "webp": "kit/banners.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 521128,
+      "primitives": 4,
+      "textures": [
+       {
+        "material": "banners",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 334841
+       },
+       {
+        "material": "banners",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 116387
+       },
+       {
+        "material": "banners",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 53710
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 474540,
+      "primitives": 4,
+      "textures": [
+       {
+        "material": "banners",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 182814
+       },
+       {
+        "material": "banners",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 204730
+       },
+       {
+        "material": "banners",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 70824
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 217648,
+      "primitives": 4,
+      "textures": [
+       {
+        "material": "banners",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 128671
+       },
+       {
+        "material": "banners",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 55444
+       },
+       {
+        "material": "banners",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 23401
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 189916,
+      "primitives": 4,
+      "textures": [
+       {
+        "material": "banners",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 134778
+       },
+       {
+        "material": "banners",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 13444
+       },
+       {
+        "material": "banners",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 31574
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/barrel": {
+   "role": "prop",
+   "kind": "barrel",
+   "contract": {
+    "radius": 0.4,
+    "height": 1,
+    "source": "src/sim/arenaGen.ts PROP_BASE.barrel.r, src/sim/world.ts TOP.barrel"
+   },
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/barrel.glb",
+     "webp": "kit/barrel.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/barrel.low.glb",
+     "webp": "kit/barrel.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 710688,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barrel",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 94196
+       },
+       {
+        "material": "barrel",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 436947
+       },
+       {
+        "material": "barrel",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 127665
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 374708,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barrel",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 63398
+       },
+       {
+        "material": "barrel",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 110582
+       },
+       {
+        "material": "barrel",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 148872
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 294360,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barrel_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 36078
+       },
+       {
+        "material": "barrel_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 162676
+       },
+       {
+        "material": "barrel_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 55027
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 176348,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barrel_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 27318
+       },
+       {
+        "material": "barrel_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 48438
+       },
+       {
+        "material": "barrel_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 60030
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/barricade": {
+   "role": "feature",
+   "kind": "barricade",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/barricade.glb",
+     "webp": "kit/barricade.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/barricade.low.glb",
+     "webp": "kit/barricade.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 750808,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barricade",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 111255
+       },
+       {
+        "material": "barricade",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 432982
+       },
+       {
+        "material": "barricade",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 164378
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 381460,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barricade",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 53388
+       },
+       {
+        "material": "barricade",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 109720
+       },
+       {
+        "material": "barricade",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 176176
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 314012,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barricade_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 37884
+       },
+       {
+        "material": "barricade_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 169968
+       },
+       {
+        "material": "barricade_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 63135
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 174280,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "barricade_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 21776
+       },
+       {
+        "material": "barricade_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 46002
+       },
+       {
+        "material": "barricade_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 63484
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/bell": {
+   "role": "dress",
+   "kind": "bell",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/bell.glb",
+     "webp": "kit/bell.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/bell.low.glb",
+     "webp": "kit/bell.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 232028,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bell",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 31169
+       },
+       {
+        "material": "bell",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 118793
+       },
+       {
+        "material": "bell",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 63891
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 125384,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bell",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 21344
+       },
+       {
+        "material": "bell",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 32010
+       },
+       {
+        "material": "bell",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 53876
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 90916,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bell_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 10872
+       },
+       {
+        "material": "bell_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 44380
+       },
+       {
+        "material": "bell_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 22093
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 51752,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bell_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 7832
+       },
+       {
+        "material": "bell_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 11882
+       },
+       {
+        "material": "bell_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 18480
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/bone_pile": {
+   "role": "dress",
+   "kind": "bones",
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/bone_pile.glb",
+     "webp": "kit/bone_pile.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/bone_pile.low.glb",
+     "webp": "kit/bone_pile.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 412700,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bone_pile",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 44264
+       },
+       {
+        "material": "bone_pile",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 230843
+       },
+       {
+        "material": "bone_pile",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 69416
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 317300,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bone_pile",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 55850
+       },
+       {
+        "material": "bone_pile",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 70428
+       },
+       {
+        "material": "bone_pile",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 122844
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 143740,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bone_pile_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 12205
+       },
+       {
+        "material": "bone_pile_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 69944
+       },
+       {
+        "material": "bone_pile_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 20153
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 108460,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "bone_pile_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 10668
+       },
+       {
+        "material": "bone_pile_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 23692
+       },
+       {
+        "material": "bone_pile_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 32680
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/brazier_pedestal": {
+   "role": "dress",
+   "kind": "brazier",
+   "sources": [
+    "polyhaven/lichen_rock",
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/brazier_pedestal.glb",
+     "webp": "kit/brazier_pedestal.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/brazier_pedestal.low.glb",
+     "webp": "kit/brazier_pedestal.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1098880,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pedestal",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 139546
+       },
+       {
+        "material": "brazier_pedestal",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 737206
+       },
+       {
+        "material": "brazier_pedestal",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 196518
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 708504,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pedestal",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 161976
+       },
+       {
+        "material": "brazier_pedestal",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 217596
+       },
+       {
+        "material": "brazier_pedestal",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 303338
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 356008,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pedestal_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 45327
+       },
+       {
+        "material": "brazier_pedestal_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 218053
+       },
+       {
+        "material": "brazier_pedestal_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 74350
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 228064,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pedestal_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 48758
+       },
+       {
+        "material": "brazier_pedestal_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 68974
+       },
+       {
+        "material": "brazier_pedestal_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 92064
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/brazier_pillartop": {
+   "role": "dress",
+   "kind": "brazier",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/brazier_pillartop.glb",
+     "webp": "kit/brazier_pillartop.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/brazier_pillartop.low.glb",
+     "webp": "kit/brazier_pillartop.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 318324,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pillartop",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 43083
+       },
+       {
+        "material": "brazier_pillartop",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 174368
+       },
+       {
+        "material": "brazier_pillartop",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 80373
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 199864,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pillartop",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 33794
+       },
+       {
+        "material": "brazier_pillartop",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 45420
+       },
+       {
+        "material": "brazier_pillartop",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 100156
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 114876,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pillartop_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 13150
+       },
+       {
+        "material": "brazier_pillartop_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 60131
+       },
+       {
+        "material": "brazier_pillartop_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 24534
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 80736,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_pillartop_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 13766
+       },
+       {
+        "material": "brazier_pillartop_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 17598
+       },
+       {
+        "material": "brazier_pillartop_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 32330
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/brazier_tripod": {
+   "role": "prop",
+   "kind": "brazier",
+   "contract": {
+    "radius": 0.45,
+    "height": 1.2,
+    "source": "src/sim/arenaGen.ts PROP_BASE.brazier.r, src/sim/world.ts TOP.brazier"
+   },
+   "sources": [
+    "polyhaven/metal_plate_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/brazier_tripod.glb",
+     "webp": "kit/brazier_tripod.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/brazier_tripod.low.glb",
+     "webp": "kit/brazier_tripod.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 726616,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 94872
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 420896
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 179909
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 502148,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 70244
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 89970
+       },
+       {
+        "material": "brazier_iron",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 310998
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 322460,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 39778
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 189209
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 75711
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 223936,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_iron_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 31126
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 52828
+       },
+       {
+        "material": "brazier_iron_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 122236
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/brazier_wall": {
+   "role": "dress",
+   "kind": "brazier",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/brazier_wall.glb",
+     "webp": "kit/brazier_wall.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/brazier_wall.low.glb",
+     "webp": "kit/brazier_wall.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 285360,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_wall",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 40345
+       },
+       {
+        "material": "brazier_wall",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 147046
+       },
+       {
+        "material": "brazier_wall",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 74002
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 176516,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_wall",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 26334
+       },
+       {
+        "material": "brazier_wall",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 32072
+       },
+       {
+        "material": "brazier_wall",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 94162
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 107232,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_wall_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 12690
+       },
+       {
+        "material": "brazier_wall_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 54643
+       },
+       {
+        "material": "brazier_wall_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 23271
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 70884,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "brazier_wall_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 10118
+       },
+       {
+        "material": "brazier_wall_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 14264
+       },
+       {
+        "material": "brazier_wall_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 29892
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/candles": {
+   "role": "dress",
+   "kind": "candle",
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/candles.glb",
+     "webp": "kit/candles.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/candles.low.glb",
+     "webp": "kit/candles.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 320916,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "candles",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 17619
+       },
+       {
+        "material": "candles",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 210806
+       },
+       {
+        "material": "candles",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 56659
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 179384,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "candles",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 15632
+       },
+       {
+        "material": "candles",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 56962
+       },
+       {
+        "material": "candles",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 70970
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 102536,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "candles_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 5883
+       },
+       {
+        "material": "candles_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 62035
+       },
+       {
+        "material": "candles_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 16976
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 63376,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "candles_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 3988
+       },
+       {
+        "material": "candles_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 19838
+       },
+       {
+        "material": "candles_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 21918
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/chain_link": {
+   "role": "chain",
+   "kind": "chain",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/chain_link.glb",
+     "webp": "kit/chain_link.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/chain_link.low.glb",
+     "webp": "kit/chain_link.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 243340,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "chain_link",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 35404
+       },
+       {
+        "material": "chain_link",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 133315
+       },
+       {
+        "material": "chain_link",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 64171
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 104752,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "chain_link",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 19228
+       },
+       {
+        "material": "chain_link",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 24164
+       },
+       {
+        "material": "chain_link",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 50930
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 93000,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "chain_link_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 12353
+       },
+       {
+        "material": "chain_link_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 50720
+       },
+       {
+        "material": "chain_link_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 21247
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 44364,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "chain_link_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 7696
+       },
+       {
+        "material": "chain_link_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 10710
+       },
+       {
+        "material": "chain_link_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 17292
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/chain_weight": {
+   "role": "hazard",
+   "kind": "chains",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/chain_weight.glb",
+     "webp": "kit/chain_weight.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/chain_weight.low.glb",
+     "webp": "kit/chain_weight.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 321896,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "chain_weight",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 45186
+       },
+       {
+        "material": "chain_weight",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 181674
+       },
+       {
+        "material": "chain_weight",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 78574
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 219580,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "chain_weight",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 46976
+       },
+       {
+        "material": "chain_weight",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 50792
+       },
+       {
+        "material": "chain_weight",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 105376
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 113736,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "chain_weight_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 13735
+       },
+       {
+        "material": "chain_weight_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 62588
+       },
+       {
+        "material": "chain_weight_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 24529
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 83360,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "chain_weight_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 16484
+       },
+       {
+        "material": "chain_weight_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 18900
+       },
+       {
+        "material": "chain_weight_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 35106
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/chunk": {
+   "role": "prop",
+   "kind": "chunk",
+   "contract": {
+    "radius": 0.38,
+    "height": 0.6,
+    "source": "src/sim/world.ts chunk props (r 0.38) + TOP.chunk"
+   },
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/chunk.glb",
+     "webp": "kit/chunk.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/chunk.low.glb",
+     "webp": "kit/chunk.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 301776,
+      "primitives": 6,
+      "textures": [
+       {
+        "material": "chunk",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 38193
+       },
+       {
+        "material": "chunk",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 196762
+       },
+       {
+        "material": "chunk",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 50332
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 175856,
+      "primitives": 6,
+      "textures": [
+       {
+        "material": "chunk",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 46220
+       },
+       {
+        "material": "chunk",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 64768
+       },
+       {
+        "material": "chunk",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 48398
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 105256,
+      "primitives": 6,
+      "textures": [
+       {
+        "material": "chunk_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 11682
+       },
+       {
+        "material": "chunk_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 59633
+       },
+       {
+        "material": "chunk_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 17191
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 70144,
+      "primitives": 6,
+      "textures": [
+       {
+        "material": "chunk_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 14640
+       },
+       {
+        "material": "chunk_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 21362
+       },
+       {
+        "material": "chunk_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 17406
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/column_ruin": {
+   "role": "obstacle",
+   "kind": "column",
+   "contract": {
+    "r0": 0.6,
+    "height": 4.2,
+    "footprintR": 0.8768,
+    "shaft": [
+     0.62,
+     3.45
+    ],
+    "source": "nominal sim obstacle (src/sim/arenaGen.ts THEME_RULES obstacleR / obstacleH); dressKit scales xz by o.r / r0 and stretches SHAFT to o.h"
+   },
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/column_ruin.glb",
+     "webp": "kit/column_ruin.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/column_ruin.low.glb",
+     "webp": "kit/column_ruin.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1068748,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "column_ruin_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 118018
+       },
+       {
+        "material": "column_ruin_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 783518
+       },
+       {
+        "material": "column_ruin_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 123937
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 626444,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "column_ruin_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 168594
+       },
+       {
+        "material": "column_ruin_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 261572
+       },
+       {
+        "material": "column_ruin_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 153040
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 325468,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "column_ruin_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 38639
+       },
+       {
+        "material": "column_ruin_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 214345
+       },
+       {
+        "material": "column_ruin_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 49089
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 201756,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "column_ruin_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 46180
+       },
+       {
+        "material": "column_ruin_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 80568
+       },
+       {
+        "material": "column_ruin_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 51630
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/crate": {
+   "role": "prop",
+   "kind": "crate",
+   "contract": {
+    "radius": 0.45,
+    "height": 0.9,
+    "source": "src/sim/arenaGen.ts PROP_BASE.crate.r, src/sim/world.ts TOP.crate"
+   },
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/crate.glb",
+     "webp": "kit/crate.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/crate.low.glb",
+     "webp": "kit/crate.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 970408,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "crate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 129006
+       },
+       {
+        "material": "crate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 575069
+       },
+       {
+        "material": "crate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 201539
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 624140,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "crate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 85496
+       },
+       {
+        "material": "crate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 174100
+       },
+       {
+        "material": "crate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 299766
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 376576,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "crate_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 41374
+       },
+       {
+        "material": "crate_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 199339
+       },
+       {
+        "material": "crate_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 74589
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 265556,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "crate_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 30100
+       },
+       {
+        "material": "crate_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 66926
+       },
+       {
+        "material": "crate_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 107272
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/crumble": {
+   "role": "hazard",
+   "kind": "crumble",
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/crumble.glb",
+     "webp": "kit/crumble.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/crumble.low.glb",
+     "webp": "kit/crumble.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 992232,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "crumble",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 106387
+       },
+       {
+        "material": "crumble",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 731608
+       },
+       {
+        "material": "crumble",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 129125
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 628808,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "crumble",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 144024
+       },
+       {
+        "material": "crumble",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 271306
+       },
+       {
+        "material": "crumble",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 188376
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 325740,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "crumble_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 37155
+       },
+       {
+        "material": "crumble_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 214343
+       },
+       {
+        "material": "crumble_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 51710
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 217736,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "crumble_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 43002
+       },
+       {
+        "material": "crumble_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 84024
+       },
+       {
+        "material": "crumble_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 68186
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/dais": {
+   "role": "module",
+   "kind": "dais",
+   "contract": {
+    "width": 4,
+    "depth": 4,
+    "height": 0.6,
+    "bounds": [
+     [
+      -2,
+      -2,
+      0
+     ],
+     [
+      2,
+      2,
+      0.6000000238418579
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/dais.glb",
+     "webp": "kit/dais.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/dais.low.glb",
+     "webp": "kit/dais.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 8160,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 8160,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 5868,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 5868,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/keg": {
+   "role": "prop",
+   "kind": "explosive",
+   "contract": {
+    "radius": 0.4,
+    "height": 1,
+    "source": "src/sim/arenaGen.ts PROP_BASE.explosive.r, src/sim/world.ts TOP.explosive"
+   },
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/keg.glb",
+     "webp": "kit/keg.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/keg.low.glb",
+     "webp": "kit/keg.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 967996,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "keg",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 114300
+       },
+       {
+        "material": "keg",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 596419
+       },
+       {
+        "material": "keg",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 178338
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 560200,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "keg",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 94472
+       },
+       {
+        "material": "keg",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 150970
+       },
+       {
+        "material": "keg",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 235838
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 379604,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "keg_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 42710
+       },
+       {
+        "material": "keg_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 203508
+       },
+       {
+        "material": "keg_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 71132
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 256784,
+      "primitives": 10,
+      "textures": [
+       {
+        "material": "keg_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 42830
+       },
+       {
+        "material": "keg_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 65478
+       },
+       {
+        "material": "keg_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 86238
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/lantern_cage": {
+   "role": "dress",
+   "kind": "lantern",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/lantern_cage.glb",
+     "webp": "kit/lantern_cage.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/lantern_cage.low.glb",
+     "webp": "kit/lantern_cage.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 368784,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_cage",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 44255
+       },
+       {
+        "material": "lantern_cage",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 222893
+       },
+       {
+        "material": "lantern_cage",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 77285
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 211788,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_cage",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 34068
+       },
+       {
+        "material": "lantern_cage",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 62112
+       },
+       {
+        "material": "lantern_cage",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 91268
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 126856,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_cage_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 13465
+       },
+       {
+        "material": "lantern_cage_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 70444
+       },
+       {
+        "material": "lantern_cage_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 24051
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 88420,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_cage_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 12936
+       },
+       {
+        "material": "lantern_cage_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 27032
+       },
+       {
+        "material": "lantern_cage_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 29588
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/lantern_paper": {
+   "role": "dress",
+   "kind": "lantern",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02",
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/lantern_paper.glb",
+     "webp": "kit/lantern_paper.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/lantern_paper.low.glb",
+     "webp": "kit/lantern_paper.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 174864,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_paper",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 30140
+       },
+       {
+        "material": "lantern_paper",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 83177
+       },
+       {
+        "material": "lantern_paper",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 44464
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 93044,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_paper",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 12308
+       },
+       {
+        "material": "lantern_paper",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 24020
+       },
+       {
+        "material": "lantern_paper",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 39652
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 71788,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_paper_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 10352
+       },
+       {
+        "material": "lantern_paper_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 34666
+       },
+       {
+        "material": "lantern_paper_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 15284
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 41144,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "lantern_paper_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 4914
+       },
+       {
+        "material": "lantern_paper_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 11042
+       },
+       {
+        "material": "lantern_paper_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 13708
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/lantern_toro": {
+   "role": "prop",
+   "kind": "lantern",
+   "contract": {
+    "radius": 0.35,
+    "height": 1.6,
+    "source": "src/sim/arenaGen.ts PROP_BASE.lantern.r, src/sim/world.ts TOP.lantern"
+   },
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/lantern_toro.glb",
+     "webp": "kit/lantern_toro.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/lantern_toro.low.glb",
+     "webp": "kit/lantern_toro.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1346504,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "lantern_toro",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 148506
+       },
+       {
+        "material": "lantern_toro",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 999665
+       },
+       {
+        "material": "lantern_toro",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 161318
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 778836,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "lantern_toro",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 225446
+       },
+       {
+        "material": "lantern_toro",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 311988
+       },
+       {
+        "material": "lantern_toro",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 204432
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 407392,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "lantern_toro_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 44461
+       },
+       {
+        "material": "lantern_toro_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 268074
+       },
+       {
+        "material": "lantern_toro_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 60220
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 260592,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "lantern_toro_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 61444
+       },
+       {
+        "material": "lantern_toro_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 98888
+       },
+       {
+        "material": "lantern_toro_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 65638
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/pillar_square": {
+   "role": "obstacle",
+   "kind": "column",
+   "contract": {
+    "r0": 0.7,
+    "height": 5,
+    "footprintR": 1.0607,
+    "shaft": [
+     0.7,
+     4.3
+    ],
+    "source": "nominal sim obstacle (src/sim/arenaGen.ts THEME_RULES obstacleR / obstacleH); dressKit scales xz by o.r / r0 and stretches SHAFT to o.h"
+   },
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/pillar_square.glb",
+     "webp": "kit/pillar_square.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/pillar_square.low.glb",
+     "webp": "kit/pillar_square.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 3936360,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "pillar_square_stone",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 459726
+       },
+       {
+        "material": "pillar_square_stone",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 3008205
+       },
+       {
+        "material": "pillar_square_stone",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 428592
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 2300292,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "pillar_square_stone",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 712454
+       },
+       {
+        "material": "pillar_square_stone",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 961864
+       },
+       {
+        "material": "pillar_square_stone",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 586148
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 1092524,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "pillar_square_stone_low",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 119117
+       },
+       {
+        "material": "pillar_square_stone_low",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 809678
+       },
+       {
+        "material": "pillar_square_stone_low",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 131074
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 672028,
+      "primitives": 7,
+      "textures": [
+       {
+        "material": "pillar_square_stone_low",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 181294
+       },
+       {
+        "material": "pillar_square_stone_low",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 289236
+       },
+       {
+        "material": "pillar_square_stone_low",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 168880
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/plinth": {
+   "role": "module",
+   "kind": "plinth",
+   "contract": {
+    "width": 1.6,
+    "depth": 1.6,
+    "height": 1.2,
+    "bounds": [
+     [
+      -0.800000011920929,
+      -0.800000011920929,
+      0
+     ],
+     [
+      0.800000011920929,
+      0.800000011920929,
+      1.2000000476837158
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/plinth.glb",
+     "webp": "kit/plinth.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/plinth.low.glb",
+     "webp": "kit/plinth.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 6968,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 6968,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 5484,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 5484,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/rock_prop": {
+   "role": "prop",
+   "kind": "rock",
+   "contract": {
+    "radius": 0.4,
+    "height": 0.75,
+    "source": "src/sim/arenaGen.ts PROP_BASE.rock.r, src/sim/world.ts TOP.rock"
+   },
+   "sources": [
+    "polyhaven/rock_moss_set_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/rock_prop.glb",
+     "webp": "kit/rock_prop.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/rock_prop.low.glb",
+     "webp": "kit/rock_prop.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1367036,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rock_prop_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 157552
+       },
+       {
+        "material": "rock_prop_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 986476
+       },
+       {
+        "material": "rock_prop_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 200325
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 766880,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rock_prop_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 154112
+       },
+       {
+        "material": "rock_prop_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 284464
+       },
+       {
+        "material": "rock_prop_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 305648
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 401616,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rock_prop_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 46169
+       },
+       {
+        "material": "rock_prop_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 278539
+       },
+       {
+        "material": "rock_prop_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 66281
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 256440,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rock_prop_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 51318
+       },
+       {
+        "material": "rock_prop_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 105194
+       },
+       {
+        "material": "rock_prop_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 89318
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/rubble_pile": {
+   "role": "obstacle",
+   "kind": "rock",
+   "contract": {
+    "r0": 0.6,
+    "height": 0.9859,
+    "footprintR": 0.9011,
+    "shaft": null,
+    "source": "nominal sim obstacle (src/sim/arenaGen.ts THEME_RULES obstacleR / obstacleH); dressKit scales xz by o.r / r0 and stretches SHAFT to o.h"
+   },
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/rubble_pile.glb",
+     "webp": "kit/rubble_pile.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/rubble_pile.low.glb",
+     "webp": "kit/rubble_pile.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1202716,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_pile_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 140859
+       },
+       {
+        "material": "rubble_pile_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 888438
+       },
+       {
+        "material": "rubble_pile_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 156260
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 686388,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_pile_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 201892
+       },
+       {
+        "material": "rubble_pile_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 277288
+       },
+       {
+        "material": "rubble_pile_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 190068
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 387600,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_pile_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 45499
+       },
+       {
+        "material": "rubble_pile_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 269457
+       },
+       {
+        "material": "rubble_pile_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 64177
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 242652,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_pile_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 61928
+       },
+       {
+        "material": "rubble_pile_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 96472
+       },
+       {
+        "material": "rubble_pile_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 75812
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/rubble_scatter": {
+   "role": "decor",
+   "kind": "rubble",
+   "contract": {
+    "radius": 1.1436,
+    "height": 0.4258
+   },
+   "sources": [
+    "polyhaven/rock_moss_set_02",
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/rubble_scatter.glb",
+     "webp": "kit/rubble_scatter.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/rubble_scatter.low.glb",
+     "webp": "kit/rubble_scatter.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1384456,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_scatter_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 157447
+       },
+       {
+        "material": "rubble_scatter_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 990406
+       },
+       {
+        "material": "rubble_scatter_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 202182
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 967332,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_scatter_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 218490
+       },
+       {
+        "material": "rubble_scatter_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 341228
+       },
+       {
+        "material": "rubble_scatter_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 373206
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 426532,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_scatter_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 49128
+       },
+       {
+        "material": "rubble_scatter_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 288476
+       },
+       {
+        "material": "rubble_scatter_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 72611
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 310072,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "rubble_scatter_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 66778
+       },
+       {
+        "material": "rubble_scatter_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 116004
+       },
+       {
+        "material": "rubble_scatter_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 110980
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/skull": {
+   "role": "dress",
+   "kind": "skull",
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/skull.glb",
+     "webp": "kit/skull.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/skull.low.glb",
+     "webp": "kit/skull.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 276128,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "skull",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 28804
+       },
+       {
+        "material": "skull",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 171627
+       },
+       {
+        "material": "skull",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48616
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 138004,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "skull",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 14444
+       },
+       {
+        "material": "skull",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 49404
+       },
+       {
+        "material": "skull",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 47082
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 103716,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "skull_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 10400
+       },
+       {
+        "material": "skull_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 59108
+       },
+       {
+        "material": "skull_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 17412
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 55488,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "skull_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 5646
+       },
+       {
+        "material": "skull_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 16244
+       },
+       {
+        "material": "skull_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 16816
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/spear_fence": {
+   "role": "module",
+   "kind": "spearfence",
+   "contract": {
+    "width": 2,
+    "depth": 0.54,
+    "height": 2,
+    "bounds": [
+     [
+      -1,
+      -0.27000001072883606,
+      0
+     ],
+     [
+      1,
+      0.27000001072883606,
+      2
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/spear_fence.glb",
+     "webp": "kit/spear_fence.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/spear_fence.low.glb",
+     "webp": "kit/spear_fence.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 20344,
+      "primitives": 3,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 20344,
+      "primitives": 3,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 17348,
+      "primitives": 3,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 17348,
+      "primitives": 3,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/spike_grate": {
+   "role": "hazard",
+   "kind": "spikes",
+   "sources": [
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/spike_grate.glb",
+     "webp": "kit/spike_grate.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/spike_grate.low.glb",
+     "webp": "kit/spike_grate.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1022132,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "spike_grate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 133301
+       },
+       {
+        "material": "spike_grate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 646031
+       },
+       {
+        "material": "spike_grate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 213348
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 635188,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "spike_grate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 136540
+       },
+       {
+        "material": "spike_grate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 163792
+       },
+       {
+        "material": "spike_grate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 305424
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 360308,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "spike_grate_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 43044
+       },
+       {
+        "material": "spike_grate_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 213373
+       },
+       {
+        "material": "spike_grate_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 81730
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 222340,
+      "primitives": 3,
+      "textures": [
+       {
+        "material": "spike_grate_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 40328
+       },
+       {
+        "material": "spike_grate_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 57882
+       },
+       {
+        "material": "spike_grate_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 101980
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/stairs": {
+   "role": "module",
+   "kind": "stairs",
+   "contract": {
+    "width": 4,
+    "depth": 3.4000000000000004,
+    "height": 1.45,
+    "bounds": [
+     [
+      -2,
+      -1.7000000476837158,
+      0
+     ],
+     [
+      2,
+      1.7000000476837158,
+      1.4500000476837158
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/stairs.glb",
+     "webp": "kit/stairs.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/stairs.low.glb",
+     "webp": "kit/stairs.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 11044,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 11044,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 7824,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 7824,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/stakes": {
+   "role": "dress",
+   "kind": "stakes",
+   "sources": [
+    "polyhaven/weathered_planks"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/stakes.glb",
+     "webp": "kit/stakes.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/stakes.low.glb",
+     "webp": "kit/stakes.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 997760,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "stakes",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 134610
+       },
+       {
+        "material": "stakes",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 638385
+       },
+       {
+        "material": "stakes",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 190764
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 650940,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "stakes",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 154516
+       },
+       {
+        "material": "stakes",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 189078
+       },
+       {
+        "material": "stakes",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 273368
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 341088,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "stakes_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 44399
+       },
+       {
+        "material": "stakes_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 204973
+       },
+       {
+        "material": "stakes_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 67998
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 232068,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "stakes_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 54266
+       },
+       {
+        "material": "stakes_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 63284
+       },
+       {
+        "material": "stakes_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 90804
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/statue_hooded": {
+   "role": "statue",
+   "kind": "statue",
+   "contract": {
+    "r0": 0.85,
+    "height": 5,
+    "footprintR": 1.0821,
+    "plinthTop": 1.05,
+    "source": "sim statue obstacle (src/sim/arenaGen.ts THEME_RULES.desert obstacleR 0.85 / obstacleH 5.0); dressKit scales the plinth in xz by o.r / r0 and the figure uniformly by o.h / height"
+   },
+   "sources": [
+    "polyhaven/lichen_rock",
+    "mixamo/Paladin"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/statue_hooded.glb",
+     "webp": "kit/statue_hooded.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/statue_hooded.low.glb",
+     "webp": "kit/statue_hooded.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1732940,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 163002
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1074486
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 182216
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 1236848,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 284200
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 358856
+       },
+       {
+        "material": "statue_hooded_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 280588
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 564792,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48304
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 298305
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 65134
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 413780,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 66980
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 110776
+       },
+       {
+        "material": "statue_hooded_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 82990
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/statue_knight": {
+   "role": "statue",
+   "kind": "statue",
+   "contract": {
+    "r0": 0.85,
+    "height": 5,
+    "footprintR": 1.0821,
+    "plinthTop": 1.05,
+    "source": "sim statue obstacle (src/sim/arenaGen.ts THEME_RULES.desert obstacleR 0.85 / obstacleH 5.0); dressKit scales the plinth in xz by o.r / r0 and the figure uniformly by o.h / height"
+   },
+   "sources": [
+    "polyhaven/lichen_rock",
+    "mixamo/Paladin"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/statue_knight.glb",
+     "webp": "kit/statue_knight.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/statue_knight.low.glb",
+     "webp": "kit/statue_knight.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1749540,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 164389
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1038138
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 195239
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 1349568,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 298758
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 347322
+       },
+       {
+        "material": "statue_knight_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 351728
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 568740,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48544
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 300343
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 67657
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 428388,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 67588
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 116332
+       },
+       {
+        "material": "statue_knight_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 92274
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/statue_mage": {
+   "role": "statue",
+   "kind": "statue",
+   "contract": {
+    "r0": 0.85,
+    "height": 5,
+    "footprintR": 1.0821,
+    "plinthTop": 1.05,
+    "source": "sim statue obstacle (src/sim/arenaGen.ts THEME_RULES.desert obstacleR 0.85 / obstacleH 5.0); dressKit scales the plinth in xz by o.r / r0 and the figure uniformly by o.h / height"
+   },
+   "sources": [
+    "polyhaven/lichen_rock",
+    "mixamo/erika-archer"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/statue_mage.glb",
+     "webp": "kit/statue_mage.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/statue_mage.low.glb",
+     "webp": "kit/statue_mage.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 1728968,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 164107
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 1072967
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 187525
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 1242120,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 291300
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 353898
+       },
+       {
+        "material": "statue_mage_stone",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 292572
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 559112,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 48185
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 302654
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 65339
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 409316,
+      "primitives": 11,
+      "textures": [
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 67616
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 117604
+       },
+       {
+        "material": "statue_mage_stone_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 81184
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/stone_trim": {
+   "role": "texset",
+   "kind": "trim",
+   "texset": {
+    "sizeM": 8,
+    "px": 2048,
+    "rows": {
+     "ashlar": [
+      6,
+      8
+     ],
+     "blocks": [
+      4,
+      6
+     ],
+     "moulding": [
+      3,
+      4
+     ],
+     "frieze": [
+      2,
+      3
+     ],
+     "rough": [
+      1,
+      2
+     ],
+     "plain": [
+      0,
+      1
+     ]
+    },
+    "channels": {
+     "orm": "R occlusion, G roughness, B 0"
+    }
+   },
+   "sources": [
+    "polyhaven/lichen_rock"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/stone_trim.glb",
+     "webp": "kit/stone_trim.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/stone_trim.low.glb",
+     "webp": "kit/stone_trim.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 4170476,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "stone_trim",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 597074
+       },
+       {
+        "material": "stone_trim",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "uastc+zstd",
+        "bytes": 3200706
+       },
+       {
+        "material": "stone_trim",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "etc1s",
+        "bytes": 369393
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 2205708,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "stone_trim",
+        "slot": "baseColor",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 793006
+       },
+       {
+        "material": "stone_trim",
+        "slot": "normal",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 1123468
+       },
+       {
+        "material": "stone_trim",
+        "slot": "orm",
+        "w": 2048,
+        "h": 2048,
+        "codec": "webp",
+        "bytes": 285952
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 1201516,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "stone_trim",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 156901
+       },
+       {
+        "material": "stone_trim",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 915612
+       },
+       {
+        "material": "stone_trim",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 125705
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 665204,
+      "primitives": 1,
+      "textures": [
+       {
+        "material": "stone_trim",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 211618
+       },
+       {
+        "material": "stone_trim",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 348684
+       },
+       {
+        "material": "stone_trim",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 101622
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/urn": {
+   "role": "prop",
+   "kind": "urn",
+   "contract": {
+    "radius": 0.32,
+    "height": 0.7,
+    "source": "src/sim/arenaGen.ts PROP_BASE.urn.r, src/sim/world.ts TOP.urn"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/urn.glb",
+     "webp": "kit/urn.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/urn.low.glb",
+     "webp": "kit/urn.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 249176,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "urn",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 19574
+       },
+       {
+        "material": "urn",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 132877
+       },
+       {
+        "material": "urn",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 41167
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 142080,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "urn",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 15150
+       },
+       {
+        "material": "urn",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 26954
+       },
+       {
+        "material": "urn",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 44434
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 112696,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "urn_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 8188
+       },
+       {
+        "material": "urn_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "uastc+zstd",
+        "bytes": 47370
+       },
+       {
+        "material": "urn_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "etc1s",
+        "bytes": 16517
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 75880,
+      "primitives": 9,
+      "textures": [
+       {
+        "material": "urn_low",
+        "slot": "baseColor",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 6004
+       },
+       {
+        "material": "urn_low",
+        "slot": "normal",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 11702
+       },
+       {
+        "material": "urn_low",
+        "slot": "orm",
+        "w": 256,
+        "h": 256,
+        "codec": "webp",
+        "bytes": 17562
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/vent_grate": {
+   "role": "hazard",
+   "kind": "flamejet",
+   "sources": [
+    "polyhaven/lichen_rock",
+    "polyhaven/metal_plate_02",
+    "polyhaven/rusty_metal_02"
+   ],
+   "files": {
+    "full": {
+     "ktx2": "kit/vent_grate.glb",
+     "webp": "kit/vent_grate.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/vent_grate.low.glb",
+     "webp": "kit/vent_grate.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 798848,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "vent_grate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 84871
+       },
+       {
+        "material": "vent_grate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "uastc+zstd",
+        "bytes": 543259
+       },
+       {
+        "material": "vent_grate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "etc1s",
+        "bytes": 152529
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 435344,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "vent_grate",
+        "slot": "baseColor",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 59136
+       },
+       {
+        "material": "vent_grate",
+        "slot": "normal",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 159084
+       },
+       {
+        "material": "vent_grate",
+        "slot": "orm",
+        "w": 1024,
+        "h": 1024,
+        "codec": "webp",
+        "bytes": 198952
+       }
+      ]
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 320240,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "vent_grate_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 36306
+       },
+       {
+        "material": "vent_grate_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "uastc+zstd",
+        "bytes": 199492
+       },
+       {
+        "material": "vent_grate_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "etc1s",
+        "bytes": 70637
+       }
+      ]
+     },
+     "webp": {
+      "bytes": 183076,
+      "primitives": 2,
+      "textures": [
+       {
+        "material": "vent_grate_low",
+        "slot": "baseColor",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 25542
+       },
+       {
+        "material": "vent_grate_low",
+        "slot": "normal",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 64280
+       },
+       {
+        "material": "vent_grate_low",
+        "slot": "orm",
+        "w": 512,
+        "h": 512,
+        "codec": "webp",
+        "bytes": 79468
+       }
+      ]
+     }
+    }
+   }
+  },
+  "kit/wall_a": {
+   "role": "module",
+   "kind": "wall",
+   "contract": {
+    "width": 4,
+    "depth": 0.9,
+    "height": 3.4426,
+    "bounds": [
+     [
+      -2,
+      -0.44999998807907104,
+      0
+     ],
+     [
+      2,
+      0.44999998807907104,
+      3.442573070526123
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/wall_a.glb",
+     "webp": "kit/wall_a.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/wall_a.low.glb",
+     "webp": "kit/wall_a.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 13844,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 13844,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 10060,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 10060,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/wall_b": {
+   "role": "module",
+   "kind": "wall",
+   "contract": {
+    "width": 4,
+    "depth": 0.9,
+    "height": 3.4426,
+    "bounds": [
+     [
+      -2,
+      -0.44999998807907104,
+      0
+     ],
+     [
+      2,
+      0.44999998807907104,
+      3.442573070526123
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/wall_b.glb",
+     "webp": "kit/wall_b.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/wall_b.low.glb",
+     "webp": "kit/wall_b.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 15700,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 15700,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 11292,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 11292,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  },
+  "kit/wall_broken": {
+   "role": "module",
+   "kind": "wall",
+   "contract": {
+    "width": 4,
+    "depth": 0.9,
+    "height": 3.4426,
+    "bounds": [
+     [
+      -2,
+      -0.44999998807907104,
+      0
+     ],
+     [
+      2,
+      0.44999998807907104,
+      3.442573070526123
+     ]
+    ],
+    "trim": "kit/stone_trim",
+    "frame": "origin at the base centre; Blender -y (three +z) = the face towards the arena"
+   },
+   "sources": [],
+   "files": {
+    "full": {
+     "ktx2": "kit/wall_broken.glb",
+     "webp": "kit/wall_broken.webp.glb"
+    },
+    "low": {
+     "ktx2": "kit/wall_broken.low.glb",
+     "webp": "kit/wall_broken.low.webp.glb"
+    }
+   },
+   "stats": {
+    "full": {
+     "ktx2": {
+      "bytes": 15052,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 15052,
+      "primitives": 2,
+      "textures": []
+     }
+    },
+    "low": {
+     "ktx2": {
+      "bytes": 11160,
+      "primitives": 2,
+      "textures": []
+     },
+     "webp": {
+      "bytes": 11160,
+      "primitives": 2,
+      "textures": []
+     }
+    }
+   }
+  }
+ },
+ "generated": "2026-10-18",
+ "backdrops": {
+  "moongate": {
+   "json": "backdrop/moongate/backdrop.json",
+   "files": [
+    "backdrop/moongate/backdrop.json",
+    "backdrop/moongate/q0/all.ktx2",
+    "backdrop/moongate/q0/all.webp",
+    "backdrop/moongate/q0/all_aov.ktx2",
+    "backdrop/moongate/q0/all_aov.webp",
+    "backdrop/moongate/q0/all_cover.bin",
+    "backdrop/moongate/q0/all_depth.bin",
+    "backdrop/moongate/q1/farc.ktx2",
+    "backdrop/moongate/q1/farc.webp",
+    "backdrop/moongate/q1/farc_aov.ktx2",
+    "backdrop/moongate/q1/farc_aov.webp",
+    "backdrop/moongate/q1/farc_cover.bin",
+    "backdrop/moongate/q1/farc_depth.bin",
+    "backdrop/moongate/q1/near.ktx2",
+    "backdrop/moongate/q1/near.webp",
+    "backdrop/moongate/q1/near_aov.ktx2",
+    "backdrop/moongate/q1/near_aov.webp",
+    "backdrop/moongate/q1/near_cover.bin",
+    "backdrop/moongate/q1/near_depth.bin",
+    "backdrop/moongate/q2/far.ktx2",
+    "backdrop/moongate/q2/far.webp",
+    "backdrop/moongate/q2/far_aov.ktx2",
+    "backdrop/moongate/q2/far_aov.webp",
+    "backdrop/moongate/q2/far_cover.bin",
+    "backdrop/moongate/q2/far_depth.bin",
+    "backdrop/moongate/q2/mid.ktx2",
+    "backdrop/moongate/q2/mid.webp",
+    "backdrop/moongate/q2/mid_aov.ktx2",
+    "backdrop/moongate/q2/mid_aov.webp",
+    "backdrop/moongate/q2/mid_cover.bin",
+    "backdrop/moongate/q2/mid_depth.bin",
+    "backdrop/moongate/q2/near.ktx2",
+    "backdrop/moongate/q2/near.webp",
+    "backdrop/moongate/q2/near_aov.ktx2",
+    "backdrop/moongate/q2/near_aov.webp",
+    "backdrop/moongate/q2/near_cover.bin",
+    "backdrop/moongate/q2/near_depth.bin"
+   ],
+   "tiers": {
+    "q2": {
+     "gpuMB": 36.74,
+     "downloadMB": 1.42
+    },
+    "q1": {
+     "gpuMB": 6.68,
+     "downloadMB": 0.72
+    },
+    "q0": {
+     "gpuMB": 1.12,
+     "downloadMB": 0.2
+    }
+   }
+  }
+ }
+}

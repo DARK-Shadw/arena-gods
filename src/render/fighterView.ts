@@ -7,9 +7,10 @@ import * as THREE from 'three';
 import { APPEARANCE, type Appearance } from '../data/appearance';
 import type { FighterDef, FighterFrame, MoveDef } from '../sim/types';
 import { getFighter } from '../sim/fighters';
-import { AnimController, buildSharedClip, instantiate, loadSharedClips, type CharAsset, type ClipMeta } from './character';
+import { AnimController, buildSharedClip, instantiate, loadSharedClips, type AnimCat, type AnimRequest, type CharAsset, type ClipMeta } from './character';
 import { LIFT_DUR, THROW_CLIP, THROW_DUR } from '../sim/world';
-import { Telegraph, Trail } from './vfx';
+import { Telegraph } from './vfx';
+import { buildLibClip } from './animLib';
 
 /** Cutscene / manual animation input. */
 export interface AnimInput {
@@ -39,7 +40,13 @@ export class FighterView {
   anim: AnimController;
   /** Compatibility handles used by cutscenes / camera. */
   rig: { root: THREE.Group; joints: { haL: THREE.Object3D; haR: THREE.Object3D; head: THREE.Object3D; chest: THREE.Object3D } };
-  trail: Trail;
+  /**
+   * Weapon / limb trail sample of the last update (FX owns the ribbon since F3: fx/ribbons.ts reads
+   * these through the FxWorld `trail` getter): base, tip (world) and whether the trail window is on.
+   */
+  readonly trailBase = new THREE.Vector3();
+  readonly trailTip = new THREE.Vector3();
+  trailOn = false;
   telegraph: Telegraph;
   aura: THREE.Mesh;
   private bones: Record<string, THREE.Object3D> = {};
@@ -57,6 +64,14 @@ export class FighterView {
   private tmpA = new THREE.Vector3();
   private tmpB = new THREE.Vector3();
   weaponGlow = 0;
+  /** sim-time clock for cosmetic pulses (set by the game each fight tick); replaces performance.now */
+  fxTime = 0;
+  /** resolves when runtime-loaded clips (shared props, animation library) are attached */
+  ready: Promise<void>;
+  /** variant picks per pool (metrics: repetition / entropy) */
+  usage: Record<string, string[]> = {};
+  /** optional per-event hook (audits replay events through it) */
+  onEvent?: (e: import('../sim/types').SimEvent, rec: import('../sim/types').MatchRecord) => void;
   /** Height in metres (for camera framing). */
   height: number;
 
@@ -89,7 +104,7 @@ export class FighterView {
     }
     this.anim = new AnimController(this.model, asset.clips, meta);
     // shared prop clip (Throw_Object): pick-up, carry hold pose, throw
-    loadSharedClips()
+    this.ready = loadSharedClips()
       .then((d) => {
         const clip = buildSharedClip(d, 'throw_object', this.model, meta);
         if (!clip) return;
@@ -99,7 +114,6 @@ export class FighterView {
       .catch(() => {});
     for (const mv of this.def.moves) this.moves[mv.id] = mv;
     const accent = new THREE.Color(this.ap.accent);
-    this.trail = new Trail(accent);
     this.telegraph = new Telegraph(new THREE.Color(this.def.color));
     const c = document.createElement('canvas');
     c.width = c.height = 128;
@@ -118,12 +132,31 @@ export class FighterView {
     this.aura.rotation.x = -Math.PI / 2;
     this.aura.position.y = 0.04;
     this.root.add(this.aura);
-    scene.add(this.root, this.trail.mesh, this.telegraph.mesh);
+    scene.add(this.root, this.telegraph.mesh);
   }
 
   dispose(scene: THREE.Scene) {
-    scene.remove(this.root, this.trail.mesh, this.telegraph.mesh);
+    scene.remove(this.root, this.telegraph.mesh);
     this.anim.mixer.stopAllAction();
+  }
+
+  /** the per-instance character materials (FX wounds / weapon blood patch them) */
+  get materials(): THREE.Material[] {
+    return this.mats;
+  }
+  /** a bone by Mixamo name without the prefix ('Spine2'), for FX anchors */
+  bone(name: string): THREE.Object3D | undefined {
+    return this.bones[name];
+  }
+  /** blade base / tip (world) for fighters with a weapon; false without one */
+  bladeWorld(base: THREE.Vector3, tip: THREE.Vector3): boolean {
+    if (!this.tip || !this.base) return false;
+    this.base.getWorldPosition(base);
+    this.tip.getWorldPosition(tip);
+    return true;
+  }
+  get hasWeapon(): boolean {
+    return !!this.tip;
   }
 
   get position() {
@@ -161,6 +194,87 @@ export class FighterView {
     return pts;
   }
 
+  /**
+   * Procedural flinch (spring additive, real-time): from = world position the
+   * blow comes from; strength ~0.5 light .. 2.5 huge.
+   */
+  onHit(from: THREE.Vector3, strength: number, height: 'head' | 'body' = 'body') {
+    const push = this.root.position.clone().sub(from).setY(0);
+    // world -> character space (+Z forward, +X left)
+    push.applyAxisAngle(new THREE.Vector3(0, 1, 0), -this.root.rotation.y);
+    this.anim.flinch.impulse(push, strength, height);
+  }
+
+  /** Make sure a shared-library clip is attached to this fighter's controller; returns its name or '' */
+  libName(id: string): string {
+    if (!id) return '';
+    const name = 'lib:' + id;
+    if (this.anim.has(name)) return name;
+    const [base, shift] = id.split('@');
+    const clip = buildLibClip(base, this.model, this.anim.meta.hipsY, 'inplace', name, shift ? Number(shift) : 0);
+    if (!clip) return '';
+    this.anim.addClip(clip, clip.duration);
+    return name;
+  }
+  private lastClip = '';
+  /** world velocity of the weapon tip / striking hand (m/s) */
+  tipVel = new THREE.Vector3();
+  private lastTip = new THREE.Vector3();
+  /** the blade plane right now: contains the blade (hand -> tip) and its motion */
+  bladePlane(at: THREE.Vector3): THREE.Plane {
+    const tip = this.tipWorld(new THREE.Vector3());
+    const hand = this.rig.joints.haR.getWorldPosition(new THREE.Vector3());
+    const blade = tip.clone().sub(hand);
+    const n = blade.clone().cross(this.tipVel.lengthSq() > 0.01 ? this.tipVel : new THREE.Vector3(0, -1, 0));
+    if (n.lengthSq() < 1e-6) n.set(0, 1, 0);
+    return new THREE.Plane().setFromNormalAndCoplanarPoint(n.normalize(), at);
+  }
+  private flightTilt = 0;
+
+  /**
+   * Pose probe: where joints are (character space, metres: +Z forward, +X left,
+   * +Y up from the feet) at a clip time, sampled on this rig without disturbing
+   * the current pose. Used to place actors so hands / weapon reach a target.
+   */
+  probe(clipName: string, time: number, joints: string[]): Record<string, THREE.Vector3> {
+    const name = clipName.startsWith('lib:') ? this.libName(clipName.slice(4)) : clipName;
+    const out: Record<string, THREE.Vector3> = {};
+    const clip = name ? this.anim.clip(name) : null;
+    if (!clip) return out;
+    const saved: [THREE.Object3D, THREE.Quaternion, THREE.Vector3][] = [];
+    this.model.traverse((o) => {
+      if ((o as THREE.Bone).isBone) saved.push([o, o.quaternion.clone(), o.position.clone()]);
+    });
+    const rp = this.root.position.clone(),
+      rr = this.root.rotation.y;
+    this.root.position.set(0, 0, 0);
+    this.root.rotation.y = 0;
+    const mixer = new THREE.AnimationMixer(this.model);
+    const act = mixer.clipAction(clip);
+    act.play();
+    act.time = Math.min(time, clip.duration - 1e-3);
+    mixer.update(0);
+    this.root.updateMatrixWorld(true);
+    for (const j of joints) {
+      const o = j === 'tip' ? (this.tip ?? this.bones.RightHand) : this.bones[j];
+      if (o) out[j] = o.getWorldPosition(new THREE.Vector3());
+    }
+    act.stop();
+    mixer.uncacheRoot(this.model);
+    for (const [o, q, p] of saved) {
+      o.quaternion.copy(q);
+      o.position.copy(p);
+    }
+    this.root.position.copy(rp);
+    this.root.rotation.y = rr;
+    this.root.updateMatrixWorld(true);
+    return out;
+  }
+  /** hips height in metres (scale of root-motion curves) */
+  get hipsM() {
+    return this.anim.meta.hipsY * 0.01 * this.anim.meta.scale;
+  }
+
   /** Called by the app for block events (plays a block-impact reaction). */
   onBlocked() {
     this.blockHitT = 0;
@@ -187,8 +301,8 @@ export class FighterView {
   }
 
   /** Drive from a sim frame. dt is sim-time elapsed (slow-mo aware). */
-  updateFromFrame(fr: FighterFrame, dt: number, opp?: FighterFrame) {
-    this.root.position.set(fr.x, 0, fr.z);
+  updateFromFrame(fr: FighterFrame, dt: number, opp?: FighterFrame, realDt = dt) {
+    this.root.position.set(fr.x, fr.state === 'launched' || fr.state === 'dead' ? fr.y : 0, fr.z);
     this.root.rotation.y = fr.facing;
     if (dt > 0) this.vel.set(fr.x - this.last.x, 0, fr.z - this.last.z).divideScalar(dt);
     this.last.set(fr.x, 0, fr.z);
@@ -211,61 +325,103 @@ export class FighterView {
     }
     this.lastState = fr.state;
     this.blockHitT += dt;
+    // sim-chosen library variant for this state (hit reaction, fall, get-up, death, dodge, launch)
+    const lib = fr.clip ? this.libName(fr.clip) : '';
+    if (fr.clip && fr.clip !== this.lastClip) {
+      const pool = fr.state === 'stagger' ? 'hit' : fr.state === 'launched' ? 'launch' : fr.state === 'dead' ? 'death' : fr.state;
+      (this.usage[pool] ??= []).push(fr.clip);
+    }
+    this.lastClip = fr.clip;
+    // launched: the sim owns the arc; the body flails a little mid-air (cosmetic springs) and settles before landing
+    const air = fr.state === 'launched' || (fr.state === 'dead' && fr.y > 0.02);
+    this.anim.flinch.flail = air ? Math.max(0, Math.min(1, fr.y / 0.6)) : 0;
 
-    let req: { name?: string; time?: number; auto?: boolean; fadeIn?: number } = {};
+    let req: Omit<AnimRequest, 'fwd' | 'side'> = {};
     const A = this.anim;
     switch (fr.state) {
       case 'attack': {
         const meta = move ? A.meta.clips[move.id] : undefined;
         if (move && meta) {
           const w = this.warpAttack(meta, move, fr.phase, fr.phaseT);
-          req = w.fadeOut ? {} : { name: move.id, time: w.time, fadeIn: fr.attackId !== this.lastAttackId ? 14 : 30 };
+          req = w.fadeOut ? {} : { name: move.id, time: w.time, fadeIn: fr.attackId !== this.lastAttackId ? 14 : 30, cat: 'attack', restart: fr.attackId !== this.lastAttackId };
         }
         break;
       }
       case 'block':
-        req = this.blockHitT < 0.45 ? { name: 'blockHit', time: this.blockHitT * 1.2 } : { name: 'block', auto: true, fadeIn: 14 };
+        req = this.blockHitT < 0.45 ? { name: 'blockHit', time: this.blockHitT * 1.2, cat: 'hit' } : { name: 'block', auto: true, fadeIn: 14, cat: 'block' };
         break;
       case 'dodge':
-        req = { name: this.dodgeClip, time: Math.min(1, fr.stateT / 0.5) * A.dur(this.dodgeClip) * 0.85, fadeIn: 20 };
+        req = lib
+          ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'dodge', restart: entering }
+          : { name: this.dodgeClip, time: Math.min(1, fr.stateT / 0.5) * A.dur(this.dodgeClip) * 0.85, fadeIn: 20, cat: 'dodge' };
         break;
       case 'stagger':
-        req = { name: this.hitClip, time: 0.05 + fr.stateT * 1.15, fadeIn: 20 };
+        req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'hit', restart: entering } : { name: this.hitClip, time: 0.05 + fr.stateT * 1.15, fadeIn: 20, cat: 'hit', restart: entering };
         break;
+      case 'launched':
+        req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'launch' } : { name: 'fall', auto: true, cat: 'launch' };
+        break;
+      case 'scene': {
+        // finisher role: shared-library clip, or the fighter's own move clip ('own:<move>'); no clip = walking up
+        const name = fr.clip.startsWith('own:') ? fr.clip.slice(4) : lib;
+        req = name && A.has(name) ? { name, time: Math.min(A.dur(name) - 0.02, fr.clipT), cat: 'scene' } : {};
+        break;
+      }
       case 'winded':
-        req = { name: 'winded', auto: true, fadeIn: 6 };
+        req = { name: 'winded', auto: true, fadeIn: 6, cat: 'other' };
         break;
       case 'knockdown':
-        req = { name: 'death', time: Math.min(1, fr.stateT / 0.65) * A.dur('death') * 0.55, fadeIn: 18 };
+        req = lib
+          ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'knockdown' }
+          : { name: 'death', time: Math.min(1, fr.stateT / 0.65) * A.dur('death') * 0.55, fadeIn: 18, cat: 'knockdown' };
         break;
       case 'getup':
-        req = { name: 'getup', time: fr.phaseT * A.dur('getup'), fadeIn: 7 };
+        req = lib ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: 'getup' } : { name: 'getup', time: fr.phaseT * A.dur('getup'), fadeIn: 7, cat: 'getup' };
         break;
       case 'dead':
-        req = { name: 'death', time: Math.min(A.dur('death') - 0.05, A.dur('death') * 0.4 + fr.stateT * 0.9), fadeIn: 18 };
+        req = lib
+          ? { name: lib, time: Math.min(A.dur(lib) - 0.02, fr.clipT), cat: air ? 'launch' : 'death' }
+          : { name: 'death', time: Math.min(A.dur('death') - 0.05, A.dur('death') * 0.4 + fr.stateT * 0.9), fadeIn: 18, cat: 'death' };
         break;
       case 'taunt':
-        req = { name: 'taunt', time: Math.min(A.dur('taunt') - 0.05, fr.stateT * 1.3), fadeIn: 8 };
+        req = { name: 'taunt', time: Math.min(A.dur('taunt') - 0.05, fr.stateT * 1.3), fadeIn: 8, cat: 'taunt' };
         break;
       case 'roar':
-        req = { name: 'roar', time: Math.min(A.dur('roar') - 0.05, 0.2 + fr.stateT * 1.2), fadeIn: 10 };
+        req = { name: 'roar', time: Math.min(A.dur('roar') - 0.05, 0.2 + fr.stateT * 1.2), fadeIn: 10, cat: 'taunt' };
         break;
       case 'lift':
-        req = { name: 'throw_object', time: THROW_CLIP.liftFrom + Math.min(1, fr.stateT / LIFT_DUR) * (THROW_CLIP.liftTo - THROW_CLIP.liftFrom), fadeIn: 14 };
+        req = { name: 'throw_object', time: THROW_CLIP.liftFrom + Math.min(1, fr.stateT / LIFT_DUR) * (THROW_CLIP.liftTo - THROW_CLIP.liftFrom), fadeIn: 14, cat: 'carry' };
         break;
       case 'throw':
-        req = { name: 'throw_object', time: THROW_CLIP.throwFrom + Math.min(1, fr.stateT / THROW_DUR) * (THROW_CLIP.throwTo - THROW_CLIP.throwFrom), fadeIn: 30 };
+        req = { name: 'throw_object', time: THROW_CLIP.throwFrom + Math.min(1, fr.stateT / THROW_DUR) * (THROW_CLIP.throwTo - THROW_CLIP.throwFrom), fadeIn: 30, cat: 'carry' };
         break;
       case 'victory': {
         const d = A.dur('taunt');
-        req = { name: 'taunt', time: fr.stateT % d, fadeIn: 5 };
+        req = { name: 'taunt', time: fr.stateT % d, fadeIn: 5, cat: 'taunt' };
         break;
       }
     }
     this.lastAttackId = fr.attackId;
     A.overlayTarget = fr.carry >= 0 && (fr.state === 'idle' || fr.state === 'block') ? 1 : 0;
-    A.update(dt, { ...req, fwd: fr.state === 'idle' || fr.state === 'block' ? fwd : 0, side: fr.state === 'idle' || fr.state === 'block' ? side : 0 });
+    // airborne: tip the whole body back along the flight (cosmetic; peaks mid-air, level again at landing)
+    if (air && fr.y > 0.01) {
+      const hv = Math.hypot(this.vel.x, this.vel.z);
+      if (hv > 0.5) {
+        const travel = new THREE.Vector3(this.vel.x, 0, this.vel.z).normalize();
+        const fwdW = new THREE.Vector3(Math.sin(fr.facing), 0, Math.cos(fr.facing));
+        const back = travel.dot(fwdW) < 0 ? 1 : -1; // flying backwards -> tip back
+        const k = Math.min(1, fr.y / 1.2);
+        this.flightTilt += (back * 0.75 * k - this.flightTilt) * Math.min(1, realDt * 8);
+      }
+    } else this.flightTilt *= Math.exp(-realDt * 10);
+    this.model.rotation.x = -this.flightTilt;
+    const loco = fr.state === 'idle' || fr.state === 'block' || (fr.state === 'scene' && !req.name);
+    A.update(dt, { ...req, fwd: loco ? fwd : 0, side: loco ? side : 0 }, realDt);
     this.root.updateMatrixWorld(true);
+    // weapon tip velocity (finisher cut plane = blade direction x swing direction)
+    const tipNow = this.tipWorld(new THREE.Vector3());
+    if (dt > 0) this.tipVel.copy(tipNow).sub(this.lastTip).divideScalar(dt);
+    this.lastTip.copy(tipNow);
 
     // weapon/limb trail during active frames
     const attacking = fr.state === 'attack' && (fr.phase === 1 || (fr.phase === 0 && fr.phaseT > 0.85) || (fr.phase === 2 && fr.phaseT < 0.12));
@@ -274,7 +430,7 @@ export class FighterView {
     // telegraph decal during windup of big / slow moves
     if (fr.state === 'attack' && move && fr.phase === 0 && (move.kind === 'heavy' || move.kind === 'ultimate' || move.kind === 'gap' || move.windup >= 0.6)) {
       const reach = move.range + this.def.stats.radius * 0.5 + Math.max(0, move.lunge ?? 0) * 0.6;
-      this.telegraph.show(fr.x, fr.z, fr.facing, reach, move.arc, !!move.aoe, fr.phaseT, move.kind === 'ultimate');
+      this.telegraph.show(fr.x, fr.z, fr.facing, reach, move.arc, !!move.aoe, fr.phaseT, move.kind === 'ultimate', this.fxTime);
     } else this.telegraph.hide();
 
     const ult = fr.state === 'attack' && move?.kind === 'ultimate';
@@ -296,11 +452,13 @@ export class FighterView {
       base = (e.parent ?? e).getWorldPosition(this.tmpA).lerp(tip, 0.45);
       tip.add(this.tmpA.clone().sub(tip).multiplyScalar(-0.25));
     }
-    this.trail.push(base, tip, active ? 1 : 0);
+    this.trailBase.copy(base);
+    this.trailTip.copy(tip);
+    this.trailOn = active;
   }
 
   private applyGlow(aura: boolean) {
-    const pulse = 0.75 + Math.sin(performance.now() * 0.008) * 0.25;
+    const pulse = 0.75 + Math.sin(this.fxTime * 8) * 0.25;
     const col = new THREE.Color(this.ap.accent).multiplyScalar(this.weaponGlow * 0.18 * pulse);
     for (const m of this.mats) if (m.emissive) m.emissive.copy(col);
     (this.aura.material as THREE.MeshBasicMaterial).opacity = aura ? 0.5 * pulse + this.weaponGlow * 0.05 : 0;
@@ -313,7 +471,7 @@ export class FighterView {
     this.last.copy(pos);
     const A = this.anim;
     const t = inp.stateT ?? 0;
-    let req: { name?: string; time?: number; auto?: boolean; fadeIn?: number } = {};
+    let req: Omit<AnimRequest, 'fwd' | 'side'> = {};
     let fwd = 0;
     switch (inp.state) {
       case 'idle':
@@ -343,9 +501,11 @@ export class FighterView {
         if (meta) req = { name: inp.clip, time: this.warpAttack(meta, this.moves[inp.clip!], inp.phase ?? 0, inp.phaseT ?? 0).time };
         break;
       }
-      case 'clip':
-        if (inp.clip) req = { name: inp.clip, time: Math.min(A.dur(inp.clip) - 0.05, t), fadeIn: 8 };
+      case 'clip': {
+        const name = inp.clip?.startsWith('lib:') ? this.libName(inp.clip.slice(4)) : inp.clip;
+        if (name) req = { name, time: Math.min(A.dur(name) - 0.02, t), fadeIn: 8, cat: 'cine' };
         break;
+      }
     }
     A.overlayTarget = 0;
     A.update(dt, { ...req, fwd, side: 0 });

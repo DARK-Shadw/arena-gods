@@ -2,6 +2,7 @@
  * Theme dressing: the Gilded Colosseum, the Sky Sanctum, the Sunset Ruins.
  */
 import * as THREE from 'three';
+import type { V3 } from './arenaView';
 import type { HazardDef, Obstacle } from '../../sim/arenaGen';
 import type { Arena } from './arenaView';
 import type { Dressing } from './dressing';
@@ -96,19 +97,25 @@ export function dressColosseum(a: Arena): Dressing {
   med.rotation.x = -Math.PI / 2;
   med.position.y = 0.012;
   med.receiveShadow = true;
+  med.userData.floorDeco = true; // A2: replaced by the kit wet floor's inlay
   G.add(med);
   for (const [r0, w] of [[2.6, 0.12], [1.15, 0.06]] as [number, number][]) {
     const ring = new THREE.Mesh(new THREE.RingGeometry(r0, r0 + w, 96), goldMat);
     ring.rotation.x = -Math.PI / 2;
     ring.position.y = 0.016;
+    ring.userData.floorDeco = true;
     G.add(ring);
   }
-  // curb
-  G.add(shadowed(new THREE.Mesh(sweepEllipse(L, [[0.35, 0], [0.35, 0.16], [0.42, 0.22], [0.9, 0.22]], 220, 2.4, 0.5), marbleMat)));
+  // curb (A3: flagged for the kit stone re-tint; flags never change the legacy render)
+  const curb = shadowed(new THREE.Mesh(sweepEllipse(L, [[0.35, 0], [0.35, 0.16], [0.42, 0.22], [0.9, 0.22]], 220, 2.4, 0.5), marbleMat));
+  curb.userData.legacyStone = true;
+  G.add(curb);
 
   // ---------------- podium wall + stands
   const podium = sweepEllipse(L, [[0.9, 0.22], [0.9, 3.15], [0.78, 3.22], [0.78, 3.42], [1.3, 3.45]], 220, 2.4, 0.33);
-  G.add(shadowed(new THREE.Mesh(podium, travMat)));
+  const podiumMesh = shadowed(new THREE.Mesh(podium, travMat));
+  podiumMesh.userData.ring = 'podium'; // A3: replaced by kit wall modules in kit mode
+  G.add(podiumMesh);
   const steps: [number, number][] = [[1.3, 3.45]];
   const rows: { off: number; y: number }[] = [];
   let o = 1.3,
@@ -121,7 +128,10 @@ export function dressColosseum(a: Arena): Dressing {
     rows.push({ off: o - 0.5, y });
   }
   steps.push([o + 0.4, y], [o + 0.4, y + 1.2]);
-  G.add(shadowed(new THREE.Mesh(sweepEllipse(L, steps, 200, 0, 0.5), stepsMat), false, true));
+  const stands = shadowed(new THREE.Mesh(sweepEllipse(L, steps, 200, 0, 0.5), stepsMat), false, true);
+  stands.userData.legacyStone = true;
+  stands.userData.ring = 'stands'; // A7: kit mode replaces the stands with ruined tiers
+  G.add(stands);
   // upper gallery: arcade facade (sky shows through the arches)
   const galleryOff = o + 0.8;
   alongEllipse(
@@ -133,10 +143,12 @@ export function dressColosseum(a: Arena): Dressing {
       seg.position.set(p.x, y, p.z);
       seg.rotation.y = yaw;
       shadowed(seg, true, true);
+      seg.userData.ring = 'gallery'; // A3: replaced in place by kit arcade bays in kit mode
       G.add(seg);
       const cap = new THREE.Mesh(new THREE.BoxGeometry(3.55, 0.35, 1.2), marbleMat);
       cap.position.set(p.x, y + 6.55, p.z);
       cap.rotation.y = yaw;
+      cap.userData.ring = 'galleryCap';
       G.add(shadowed(cap));
     },
     0,
@@ -159,6 +171,7 @@ export function dressColosseum(a: Arena): Dressing {
     (p, yaw, ang) => {
       const mast = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.12, 4.2, 6), woodDark);
       mast.position.set(p.x, galleryTop + 2.0, p.z);
+      mast.userData.ring = 'velarium'; // A7: removed in kit mode
       G.add(mast);
       if (si++ % 2 === 0) return;
       // sail: quad from the mast top inward and down over the stands
@@ -177,6 +190,7 @@ export function dressColosseum(a: Arena): Dressing {
       geo.setIndex([0, 2, 1, 1, 2, 3]);
       geo.computeVertexNormals();
       const sail = new THREE.Mesh(geo, sailMat);
+      sail.userData.ring = 'velarium';
       sail.castShadow = true;
       G.add(sail);
     },
@@ -190,16 +204,21 @@ export function dressColosseum(a: Arena): Dressing {
     const b = banner(a, i % 2 ? '#9a1f1c' : '#1f3466', '#e8c066', 1.2, 2.3, i % 2 ? 'diamond' : 'sun');
     b.position.set(p.x, 3.2, p.z);
     b.rotation.y = yaw;
+    b.userData.ring = 'banner'; // A4: kit mode replaces these with kit banners (dressKit wallBanners)
     G.add(b);
   }, 3.6, 0.5);
   alongEllipse(L, 1.05, 9.5, (p) => {
     const stand = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.08, 0.9, 6), bronzeMat);
     stand.position.set(p.x, 3.9, p.z);
+    stand.userData.wallBrazier = true; // A3: kit walls keep an intact top under these
     G.add(stand);
     const bowl = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.22, 0.3, 12), bronzeMat);
     bowl.position.set(p.x, 4.4, p.z);
+    bowl.userData.wallBrazierBowl = true; // A4: kit mode swaps stand + bowl for the kit wall brazier
     G.add(bowl);
-    G.add(a.flame(new THREE.Vector3(p.x, 4.5, p.z), 1.0, '#ffa040', false));
+    const wf = a.flame(new THREE.Vector3(p.x, 4.5, p.z), 1.0, '#ffa040', false);
+    wf.userData.wallFlame = true; // A7: hidden in kit mode where a gate structure replaces the wall
+    G.add(wf);
   }, 4, 0.3);
 
   // ---------------- gates
@@ -207,9 +226,11 @@ export function dressColosseum(a: Arena): Dressing {
     makeGate(a, i, 0.9, (g) => {
       const fac = shadowed(new THREE.Mesh(arcadeGeo(6.6, 5.6, 1.7, 1, 3.1, 3.7), travMat));
       fac.position.z = -0.85;
+      fac.userData.legacyStone = true;
       g.add(fac);
       const ent = shadowed(new THREE.Mesh(new THREE.BoxGeometry(7.4, 0.6, 2.0), marbleMat));
       ent.position.set(0, 5.9, -0.8);
+      ent.userData.legacyStone = true;
       g.add(ent);
       const tri = new THREE.Shape();
       tri.moveTo(-3.7, 0);
@@ -218,25 +239,36 @@ export function dressColosseum(a: Arena): Dressing {
       tri.lineTo(-3.7, 0);
       const ped = shadowed(new THREE.Mesh(new THREE.ExtrudeGeometry(tri, { depth: 1.8, bevelEnabled: true, bevelSize: 0.06, bevelThickness: 0.06, bevelSegments: 1 }), marbleMat));
       ped.position.set(0, 6.2, -1.7);
+      ped.userData.legacyStone = true;
       g.add(ped);
+      // A7: every decorative gate part is flagged gateDeco (kit mode removes them; the portcullis, tunnel and light stay)
+      fac.userData.gateDeco = ent.userData.gateDeco = ped.userData.gateDeco = true;
       const shield = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 24), goldMat);
+      shield.userData.gateDeco = true;
       shield.rotation.x = Math.PI / 2;
       shield.position.set(0, 4.55, 0.1);
       g.add(shield);
       for (const s of [-1, 1]) {
         const col = shadowed(new THREE.Mesh(columnGeo(0.32, 5.6, { capital: 'ionic', plinth: true }), marbleMat));
         col.position.set(s * 2.75, 0, 0.25);
+        col.userData.legacyStone = true;
+        col.userData.gateDeco = true;
         g.add(col);
         const st = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.1, 1.5, 6), bronzeMat);
         st.position.set(s * 1.95, 0.75, 1.2);
+        st.userData.gateDeco = true;
         g.add(st);
         const bw = new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.2, 0.3, 12), bronzeMat);
         bw.position.set(s * 1.95, 1.55, 1.2);
+        bw.userData.gateDeco = true;
         g.add(bw);
-        g.add(a.flame(new THREE.Vector3(s * 1.95, 1.62, 1.2), 0.9, '#ff9a40', s > 0));
+        const gf = a.flame(new THREE.Vector3(s * 1.95, 1.62, 1.2), 0.9, '#ff9a40', s > 0);
+        gf.userData.gateFlame = true;
+        g.add(gf);
       }
       const tunnel = new THREE.Mesh(new THREE.BoxGeometry(3.1, 3.7, 7), new THREE.MeshStandardMaterial({ color: '#1a120c', roughness: 1, side: THREE.BackSide }));
       tunnel.position.set(0, 1.85, -4.2);
+      tunnel.userData.gateTunnel = true;
       g.add(tunnel);
       const port = new THREE.Group();
       for (let k = -5; k <= 5; k++) {
@@ -251,7 +283,26 @@ export function dressColosseum(a: Arena): Dressing {
       }
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.4, 1.6), lightColor: '#ffb060' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.4, 1.6),
+        lightColor: '#ffb060',
+        anchors: {
+          barrier: 'portcullis',
+          barrierHalfW: 1.45,
+          barrierH: 3.6,
+          tunnel: { depth: 7, height: 3.7, floorY: 0 },
+          // podium wall top (3.45 m, 0.78-1.3 m behind the boundary), beside the gate gap
+          // the entablature's corners over the gate (in front of the low end of the pediment), then the podium wall
+          perches: [
+            ...[-1, 1].map((s) => ({ id: s < 0 ? 'entablature_l' : 'entablature_r', pos: [s * 3.45, 6.2, -0.8] as V3, depth: 2.0 })),
+            ...[-1, 1].map((s) => ({ id: s < 0 ? 'wall_l' : 'wall_r', pos: [s * 3.0, 3.45, 0.9 - 0.92] as V3, depth: 0.5 })),
+          ],
+          // crowd tiers (second row), clear of the gate's entablature (half width 3.7)
+          stands: [[5.2, 4.57, 0.9 - 2.7], [-5.2, 4.57, 0.9 - 2.7]],
+          wallH: 3.45,
+        },
+      };
     });
   }
 
@@ -457,7 +508,23 @@ export function dressSkytemple(a: Arena): Dressing {
       port.add(veil);
       port.position.z = 0.2;
       g.add(port);
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 3, 1.4), lightColor: '#ffe6b0' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 3, 1.4),
+        lightColor: '#ffe6b0',
+        anchors: {
+          barrier: 'veil',
+          barrierHalfW: 1.8,
+          barrierH: 4.6,
+          // the causeway out into the sky is the walk-in space (no roof)
+          tunnel: { depth: 11, height: 99, floorY: 0 },
+          perches: [],
+          // causeway side edges over the void: climb up from below
+          rims: [-1, 1].map((s) => ({ id: s < 0 ? 'causeway_l' : 'causeway_r', pos: [s * 1.6, 0, -3.0] as V3, drop: 30, dir: [-s, 0] as [number, number] })),
+          lowWall: { pos: [5.2, 1.08, 1.0 - 0.95], height: 1.08 },
+          wallH: 1.08,
+        },
+      };
     });
   }
 
@@ -729,7 +796,20 @@ export function dressDesert(a: Arena): Dressing {
       port.position.z = 0.2;
       g.add(port);
       for (const s of [-1, 1]) g.add(a.flame(new THREE.Vector3(s * 2.2, 3.3, 0.6), 0.8, '#ff9a40', s > 0));
-      return { portcullis: port, lightPos: new THREE.Vector3(0, 2.4, 1.6), lightColor: '#ffa050' };
+      return {
+        portcullis: port,
+        lightPos: new THREE.Vector3(0, 2.4, 1.6),
+        lightColor: '#ffa050',
+        anchors: {
+          barrier: 'portcullis',
+          barrierHalfW: 1.5,
+          barrierH: 3.9,
+          tunnel: { depth: 6, height: 4.0, floorY: 0 },
+          // the lintel between the pylons (top 5.2 m, 1.6 m deep)
+          perches: [{ id: 'lintel', pos: [0, 5.2, 0.15], depth: 1.6 }],
+          wallH: 2.2,
+        },
+      };
     });
   }
 

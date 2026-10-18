@@ -1,0 +1,294 @@
+{
+ "kit": {
+  "configs": 20,
+  "failed": 20,
+  "fails": [
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   }
+  ]
+ },
+ "kitstone=0": {
+  "configs": 20,
+  "failed": 20,
+  "fails": [
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "pit",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "oval",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "cross",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "split",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 0,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 0,
+    "fighter": "maw",
+    "variant": "great_gate"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 1,
+    "fighter": "gorak",
+    "variant": "cage_breaker:portcullis"
+   },
+   {
+    "theme": "colosseum",
+    "layout": "gauntlet",
+    "gate": 1,
+    "fighter": "maw",
+    "variant": "great_gate"
+   }
+  ]
+ }
+}

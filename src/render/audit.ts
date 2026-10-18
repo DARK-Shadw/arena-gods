@@ -12,6 +12,7 @@ import * as THREE from 'three';
 import { simulate } from '../sim/match';
 import { getFighter } from '../sim/fighters';
 import { FighterView } from './fighterView';
+import { initLib } from './animLib';
 import { loadCharacter } from './character';
 import type { MatchRecord } from '../sim/types';
 
@@ -42,7 +43,7 @@ export async function runAudit(scene: THREE.Scene, pairs: [string, string][], se
   let deathsWithoutHit = 0;
   let matches = 0;
   for (const [a, b] of pairs) {
-    const assets = await Promise.all([loadCharacter(a), loadCharacter(b)]);
+    const [assets] = await Promise.all([Promise.all([loadCharacter(a), loadCharacter(b)]), initLib('core')]);
     for (let s = 1; s <= seeds; s++) {
       const seed = s * 7919 + a.length * 31 + b.length;
       const rec: MatchRecord = simulate(a, b, seed);
@@ -55,7 +56,7 @@ export async function runAudit(scene: THREE.Scene, pairs: [string, string][], se
         rec.events.some(
           (e) =>
             Math.abs(e.t - t) < 0.02 &&
-            (((e.type === 'hit' || e.type === 'prop_hit' || e.type === 'crush' || e.type === 'hazard_hit') && e.b === victim) || e.type === 'wall_slam' || e.type === 'pillar_slam' || e.type === 'explosion'),
+            (((e.type === 'hit' || e.type === 'prop_hit' || e.type === 'crush' || e.type === 'hazard_hit') && e.b === victim) || (e.type === 'finisher_contact' && e.data?.kind === 'kill' && e.b === victim) || e.type === 'wall_slam' || e.type === 'pillar_slam' || e.type === 'explosion'),
         );
       if (kill && !contactAt(kill.t, kill.b)) deathsWithoutHit++;
       let hi = 0;

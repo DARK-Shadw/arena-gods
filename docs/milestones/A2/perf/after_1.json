@@ -1,0 +1,368 @@
+{
+ "label": "after",
+ "dist": "C:\\Programming\\GameDev\\Research\\arena\\dist",
+ "w": 1920,
+ "h": 1080,
+ "n": 120,
+ "runs": [
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 2,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 21.507,
+     "p50": 21.6,
+     "p95": 27.3,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 16.153,
+     "p50": 16.501,
+     "p95": 19.905,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0367,
+     "updateMs": 0.06,
+     "frameMax": 1.6,
+     "updateMax": 1.1
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 1,
+      "mask": 1,
+      "dust_ring": 0
+     },
+     "decals": 48
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 20.67,
+     "p50": 20.4,
+     "p95": 23.2,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 14.804,
+     "p50": 14.473,
+     "p95": 16.879,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0461,
+     "updateMs": 0.1301,
+     "frameMax": 1.6,
+     "updateMax": 1.1
+    },
+    "fxLive": {
+     "particles": {
+      "add": 313,
+      "alpha": 70,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 45,
+      "mask": 427,
+      "dust_ring": 22,
+      "unity_explosion00": 12,
+      "unity_wispysmoke01": 7,
+      "unity_explosion01_nofire": 28
+     },
+     "decals": 131
+    }
+   },
+   "passes": {
+    "reflect": {
+     "avg": 0.585,
+     "p50": 0.866,
+     "p95": 1.661,
+     "n": 120
+    },
+    "scene": {
+     "avg": 7.878,
+     "p50": 8.139,
+     "p95": 10.369,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.142,
+     "p50": 0.128,
+     "p95": 0.189,
+     "n": 120
+    },
+    "ao": {
+     "avg": 1.845,
+     "p50": 1.822,
+     "p95": 2.102,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.013,
+     "p50": 0.013,
+     "p95": 0.023,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.439,
+     "p50": 0.422,
+     "p95": 0.525,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.4,
+     "p50": 0.388,
+     "p95": 0.474,
+     "n": 120
+    },
+    "dist": {
+     "avg": 0.023,
+     "p50": 0.021,
+     "p95": 0.023,
+     "n": 25
+    }
+   }
+  },
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 1,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 22.093,
+     "p50": 22,
+     "p95": 25.2,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 15.934,
+     "p50": 15.693,
+     "p95": 18.061,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0299,
+     "updateMs": 0.0747,
+     "frameMax": 0.8,
+     "updateMax": 0.3
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 1,
+      "mask": 1,
+      "dust_ring": 0
+     },
+     "decals": 48
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 22.693,
+     "p50": 22.7,
+     "p95": 25.4,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 16.858,
+     "p50": 16.679,
+     "p95": 19.182,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0343,
+     "updateMs": 0.1327,
+     "frameMax": 0.8,
+     "updateMax": 0.4
+    },
+    "fxLive": {
+     "particles": {
+      "add": 313,
+      "alpha": 70,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 36,
+      "mask": 324,
+      "dust_ring": 22,
+      "unity_explosion00": 12,
+      "unity_wispysmoke01": 7,
+      "unity_explosion01_nofire": 28
+     },
+     "decals": 99
+    }
+   },
+   "passes": {
+    "reflect": {
+     "avg": 0.461,
+     "p50": 0.721,
+     "p95": 1.252,
+     "n": 120
+    },
+    "scene": {
+     "avg": 14.074,
+     "p50": 14.002,
+     "p95": 16.913,
+     "n": 120
+    },
+    "depth": {
+     "avg": 0.155,
+     "p50": 0.148,
+     "p95": 0.184,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.057,
+     "p50": 0.055,
+     "p95": 0.073,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.554,
+     "p50": 0.541,
+     "p95": 0.641,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.541,
+     "p50": 0.539,
+     "p95": 0.549,
+     "n": 120
+    }
+   }
+  },
+  {
+   "fight": "colosseum:gorak-erika",
+   "q": 0,
+   "timer": true,
+   "base": {
+    "frame": {
+     "avg": 15.562,
+     "p50": 15.6,
+     "p95": 18,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 10.974,
+     "p50": 10.913,
+     "p95": 12.494,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0219,
+     "updateMs": 0.0419,
+     "frameMax": 0.9,
+     "updateMax": 1.4
+    },
+    "fxLive": {
+     "particles": {
+      "add": 6,
+      "alpha": 0,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 0,
+      "mask": 1,
+      "dust_ring": 0
+     },
+     "decals": 36
+    }
+   },
+   "stress": {
+    "frame": {
+     "avg": 16.298,
+     "p50": 16.2,
+     "p95": 18.1,
+     "n": 120
+    },
+    "gpu": {
+     "avg": 11.217,
+     "p50": 11.341,
+     "p95": 12.692,
+     "n": 120
+    },
+    "passes": {},
+    "calls": 1,
+    "fxCpu": {
+     "frameMs": 0.0244,
+     "updateMs": 0.0998,
+     "frameMax": 0.9,
+     "updateMax": 1.4
+    },
+    "fxLive": {
+     "particles": {
+      "add": 313,
+      "alpha": 70,
+      "addCap": 4096,
+      "alphaCap": 2048
+     },
+     "sprites": {
+      "dust_puff": 6,
+      "mask": 211,
+      "dust_ring": 22,
+      "unity_explosion00": 12,
+      "unity_explosion01_nofire": 14
+     },
+     "decals": 51
+    }
+   },
+   "passes": {
+    "reflect": {
+     "avg": 0.001,
+     "p50": 0,
+     "p95": 0,
+     "n": 120
+    },
+    "scene": {
+     "avg": 10.632,
+     "p50": 10.443,
+     "p95": 12.538,
+     "n": 120
+    },
+    "fx": {
+     "avg": 0.014,
+     "p50": 0.013,
+     "p95": 0.018,
+     "n": 120
+    },
+    "bloom": {
+     "avg": 0.196,
+     "p50": 0.199,
+     "p95": 0.256,
+     "n": 120
+    },
+    "final": {
+     "avg": 0.636,
+     "p50": 0.627,
+     "p95": 0.733,
+     "n": 120
+    }
+   }
+  }
+ ]
+}

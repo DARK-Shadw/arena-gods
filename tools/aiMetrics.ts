@@ -49,7 +49,20 @@ export interface AiAgg {
   matchesWithProp: number;
   matchesWithDestruction: number;
   envKillSources: Record<string, number>;
+  // A2b per-fight counters
+  finishers: number;
+  hazardKills: number;
+  triggers: number;
+  triggerKinds: Record<string, number>;
+  brazierTips: number;
+  obstacleBreaks: number;
+  collapses: number;
+  matchesWithPickup: number;
+  matchesWithEnvUse: number;
 }
+
+/** kill sources that are arena hazards (not moves, finishers, props, cover or walls) */
+export const HAZARD_KILL = new Set(['lava', 'firepit', 'spike trap', 'geyser', 'chandelier', 'swinging chain', 'fire jet', 'collapsing floor', 'into the pit', 'burning oil', 'fire']);
 
 export function newAgg(): AiAgg {
   return {
@@ -57,6 +70,7 @@ export function newAgg(): AiAgg {
     attacks: 0, repeats: 0, dumbHits: 0, hits: 0, corneredEp: 0, corneredEsc: 0, rangedLowTicks: 0, rangedLowApproach: 0, coverTicks: 0,
     feints: 0, counters: 0, noContactKills: 0, kills: 0, attacksByRole: {},
     pickups: 0, throws: 0, throwHits: 0, throwBlocked: 0, batted: 0, topples: 0, crush: 0, explosions: 0, hazardHits: 0, envKills: 0, coverHits: 0, propBreaks: 0, chandeliers: 0, matchesWithProp: 0, matchesWithDestruction: 0, envKillSources: {},
+    finishers: 0, hazardKills: 0, triggers: 0, triggerKinds: {}, brazierTips: 0, obstacleBreaks: 0, collapses: 0, matchesWithPickup: 0, matchesWithEnvUse: 0,
   };
 }
 
@@ -157,6 +171,18 @@ export function accountAi(agg: AiAgg, rec: MatchRecord) {
     if (e.type === 'cover_hit') agg.coverHits++;
     if (e.type === 'prop_break') agg.propBreaks++;
     if (e.type === 'chandelier_fall') agg.chandeliers++;
+    if (e.type === 'finisher_start') agg.finishers++;
+    if (e.type === 'brazier_tip') agg.brazierTips++;
+    if (e.type === 'obstacle_break') agg.obstacleBreaks++;
+    if (e.type === 'floor_collapse') agg.collapses++;
+    // interactable triggers: anything in the arena set off (hazards armed / swinging / cracking, toppling, shattering, igniting, blasts)
+    if (e.type === 'hazard_trigger' || e.type === 'topple' || e.type === 'obstacle_break' || e.type === 'brazier_tip' || e.type === 'explosion') {
+      // periodic hazards (geyser / fire-jet cycles) are listed by kind but are not interactions
+      const periodic = e.type === 'hazard_trigger' && (e.data?.kind === 'geyser' || e.data?.kind === 'flamejet');
+      if (!periodic) agg.triggers++;
+      const k = e.type === 'hazard_trigger' ? `trigger ${String(e.data?.kind)}${periodic ? ' (periodic)' : ''}` : e.type;
+      agg.triggerKinds[k] = (agg.triggerKinds[k] ?? 0) + 1;
+    }
     if (e.type === 'counter') agg.counters++;
     if (e.type === 'whiff' || e.type === 'dodge' || e.type === 'parry') {
       // the "punisher" is the side that did NOT attack
@@ -198,12 +224,15 @@ export function accountAi(agg: AiAgg, rec: MatchRecord) {
         (x) =>
           Math.abs(x.t - e.t) < 0.02 &&
           (((x.type === 'hit' || x.type === 'prop_hit' || x.type === 'crush' || x.type === 'hazard_hit') && x.b === e.b) ||
+            // finisher kills land on the scene's measured contact frame
+            (x.type === 'finisher_contact' && x.data?.kind === 'kill' && x.b === e.b) ||
             ((x.type === 'wall_slam' || x.type === 'pillar_slam') && x.a === e.b) ||
             x.type === 'explosion'),
       );
       if (!ok) agg.noContactKills++;
       const mv = String(e.data?.move ?? '');
       const isMove = defs[e.a]?.moves.some((m) => m.id === mv);
+      if (HAZARD_KILL.has(mv)) agg.hazardKills++;
       if (!isMove) {
         agg.envKills++;
         const k = mv.replace(/^(thrown|falling) .*/, '$1');
@@ -213,6 +242,9 @@ export function accountAi(agg: AiAgg, rec: MatchRecord) {
   }
   if (evs.some((e) => e.type === 'prop_pickup' || e.type === 'topple' || e.type === 'explosion' || e.type === 'hazard_hit')) agg.matchesWithProp++;
   if (evs.some((e) => e.type === 'prop_break' || e.type === 'cover_hit' || e.type === 'topple' || e.type === 'explosion')) agg.matchesWithDestruction++;
+  if (evs.some((e) => e.type === 'prop_pickup')) agg.matchesWithPickup++;
+  // a fighter USED the environment: picked up / threw a prop, toppled or broke cover, set off a brazier / barrel, or hit them with a hazard
+  if (evs.some((e) => e.type === 'prop_pickup' || e.type === 'topple' || e.type === 'obstacle_break' || e.type === 'brazier_tip' || e.type === 'explosion' || e.type === 'hazard_hit' || e.type === 'crush')) agg.matchesWithEnvUse++;
   for (let i = 0; i < 2; i++) {
     const c = Object.values(counts[i]);
     const tot = c.reduce((s, x) => s + x, 0);
@@ -263,4 +295,8 @@ export function printAi(agg: AiAgg) {
   console.log(`Props: pickups/match ${f(agg.pickups)} | throws/match ${f(agg.throws)} | throw hit rate ${p(agg.throwHits, agg.throws)} (blocked ${p(agg.throwBlocked, agg.throws)}, swatted ${p(agg.batted, agg.throws)}) | breaks/match ${f(agg.propBreaks)}`);
   console.log(`Cover: hits on cover/match ${f(agg.coverHits)} | topples/match ${f(agg.topples)} | crush hits/match ${f(agg.crush)} | explosions/match ${f(agg.explosions)} | chandeliers/match ${f(agg.chandeliers)}`);
   console.log(`Hazard hits/match ${f(agg.hazardHits)} | environmental kills ${agg.envKills}/${agg.kills} (${p(agg.envKills, agg.kills)}) ${JSON.stringify(agg.envKillSources)}`);
+  console.log(`\n--- Per-fight counters (A2b; means per match)`);
+  console.log(`finishers ${f(agg.finishers)} | pickups ${f(agg.pickups)} | throws ${f(agg.throws)} | hazard kills ${f(agg.hazardKills)} (${p(agg.hazardKills, agg.kills)} of kills) | interactable triggers ${f(agg.triggers)}`);
+  console.log(`brazier tips ${f(agg.brazierTips)} | barricade breaks ${f(agg.obstacleBreaks)} | floor collapses ${f(agg.collapses)} | matches with a pickup ${p(agg.matchesWithPickup, n)} | matches with environment use ${p(agg.matchesWithEnvUse, n)}`);
+  console.log(`triggers by kind/match: ${Object.entries(agg.triggerKinds).sort((a, b) => b[1] - a[1]).map(([k, v]) => `${k} ${f(v)}`).join(', ')}`);
 }

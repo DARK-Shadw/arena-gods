@@ -1,0 +1,108 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\pano_medium",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "w": 4096,
+  "h": 683,
+  "samples": 64,
+  "denoise": true,
+  "fog": false,
+  "engine": "cycles",
+  "device": "CPU",
+  "slice": false,
+  "tile": 1024,
+  "tag": "",
+  "repeat": 1
+ },
+ "steps": [
+  {
+   "step": "build_scene",
+   "value": {
+    "objects": 5420,
+    "instancedBlocks": 5403
+   },
+   "ok": true,
+   "seconds": 13.42,
+   "peakMB": 417,
+   "freeMB": 6861
+  },
+  {
+   "step": "setup",
+   "value": {
+    "device": {
+     "requested": "CPU",
+     "used": "CPU",
+     "devices": []
+    },
+    "compositor": {
+     "linked": [
+      "Image",
+      "Depth",
+      "emit"
+     ],
+     "missing": [],
+     "rlOutputs": [
+      "Image",
+      "Alpha",
+      "Depth",
+      "Noisy Image",
+      "emit",
+      "Normal",
+      "UV",
+      "Vector",
+      "Position",
+      "Deprecated",
+      "Deprecated",
+      "Shadow",
+      "Ambient Occlusion",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Object Index",
+      "Material Index",
+      "Mist",
+      "Emission",
+      "Environment",
+      "Diffuse Direct",
+      "Diffuse Indirect",
+      "Diffuse Color",
+      "Glossy Direct",
+      "Glossy Indirect",
+      "Glossy Color",
+      "Transmission Direct",
+      "Transmission Indirect",
+      "Transmission Color",
+      "Subsurface Direct"
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 0.01,
+   "peakMB": 417,
+   "freeMB": 6860
+  },
+  {
+   "step": "render",
+   "value": {
+    "seconds": 138.0,
+    "allRuns": [
+     138.0
+    ],
+    "files": {
+     "pano_cycles_4096x683_s64_dn_cpu.png": 2304227,
+     "pano_cycles_4096x683_s64_dn_cpu_.exr": 55993942
+    },
+    "tag": "cycles_4096x683_s64_dn_cpu",
+    "msPerMegapixelPerSample": 770.76
+   },
+   "ok": true,
+   "seconds": 138.0,
+   "peakMB": 2837,
+   "freeMB": 6357
+  }
+ ],
+ "seconds": 151.5,
+ "peakMB": 2837
+}

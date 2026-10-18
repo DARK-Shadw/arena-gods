@@ -1,0 +1,63 @@
+{
+ "ktx": {
+  "exe": "C:\\Program Files\\KTX-Software\\bin\\ktx.exe",
+  "dir": "C:\\Program Files\\KTX-Software\\bin",
+  "version": "ktx version: v5.0.0-rc2~3"
+ },
+ "input": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\probe_bake_1024\\probe_pillar.glb",
+ "inputBytes": 1521096,
+ "runs": {
+  "meshopt": {
+   "ok": true,
+   "bytes": 1516584,
+   "seconds": 2.747
+  },
+  "uastc": {
+   "ok": false,
+   "bytes": 1517756,
+   "seconds": 1.95,
+   "log": [
+    "error: ktx:texture(pillar_1024_ao): Failed → ",
+    "ktx create fatal: Option 'assign-oetf' does not exist. See 'ktx create --help'.",
+    "error: ktx:texture(pillar_1024_normal): Failed → ",
+    "ktx create fatal: Option 'assign-oetf' does not exist. See 'ktx create --help'."
+   ]
+  },
+  "etc1s": {
+   "ok": false,
+   "bytes": 1517756,
+   "seconds": 1.896,
+   "log": [
+    "error: ktx:texture(pillar_1024_normal): Failed → ",
+    "ktx create fatal: Option 'assign-oetf' does not exist. See 'ktx create --help'.",
+    "error: ktx:texture(pillar_1024_ao): Failed → ",
+    "ktx create fatal: Option 'assign-oetf' does not exist. See 'ktx create --help'."
+   ]
+  },
+  "webp": {
+   "ok": false,
+   "bytes": null,
+   "seconds": 1.51,
+   "log": [
+    "error: colourspace: parameter space not set"
+   ]
+  }
+ },
+ "direct": {
+  "pillar_1024_ao.png": {
+   "ok": true,
+   "codec": "basis-lz (etc1s)",
+   "pngBytes": 657400,
+   "ktx2Bytes": 101258,
+   "seconds": 2.924
+  },
+  "pillar_1024_normal.png": {
+   "ok": true,
+   "codec": "uastc+zstd18",
+   "pngBytes": 854450,
+   "ktx2Bytes": 948682,
+   "seconds": 2.585
+  }
+ },
+ "inspectUastc": []
+}

@@ -1,0 +1,62 @@
+{
+ "full": {
+  "info": {
+   "tier": "full",
+   "format": "ktx2",
+   "assets": [
+    "kit/arcade_bay",
+    "kit/arcade_broken",
+    "kit/arch",
+    "kit/balustrade",
+    "kit/dais",
+    "kit/plinth",
+    "kit/spear_fence",
+    "kit/stairs",
+    "kit/wall_a",
+    "kit/wall_b",
+    "kit/wall_broken",
+    "kit/column_ruin",
+    "kit/brazier_tripod",
+    "kit/rock_prop",
+    "kit/rubble_pile",
+    "kit/rubble_scatter",
+    "kit/pillar_square",
+    "kit/stone_trim"
+   ],
+   "drawCalls": 0,
+   "triangles": 0
+  },
+  "errors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+ },
+ "low": {
+  "info": {
+   "tier": "low",
+   "format": "ktx2",
+   "assets": [
+    "kit/arcade_bay",
+    "kit/arcade_broken",
+    "kit/arch",
+    "kit/balustrade",
+    "kit/dais",
+    "kit/plinth",
+    "kit/spear_fence",
+    "kit/stairs",
+    "kit/wall_a",
+    "kit/wall_b",
+    "kit/wall_broken",
+    "kit/brazier_tripod",
+    "kit/column_ruin",
+    "kit/rock_prop",
+    "kit/rubble_pile",
+    "kit/rubble_scatter",
+    "kit/pillar_square",
+    "kit/stone_trim"
+   ],
+   "drawCalls": 0,
+   "triangles": 0
+  },
+  "errors": []
+ }
+}

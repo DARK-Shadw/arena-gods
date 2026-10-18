@@ -1,0 +1,54 @@
+{
+ "rows": 69,
+ "within": 69,
+ "hits": 29,
+ "hitsWithin": 29,
+ "by": {
+  "shoulder_throw_stomp:kill": {
+   "n": 11,
+   "max": 0,
+   "mean": 0
+  },
+  "executioner:kill": {
+   "n": 2,
+   "max": 0.003,
+   "mean": 0.002
+  },
+  "hell_slammer:hit": {
+   "n": 21,
+   "max": 0.103,
+   "mean": 0.01
+  },
+  "hell_slammer:kill": {
+   "n": 7,
+   "max": 0.12,
+   "mean": 0.055
+  },
+  "curb_stomp:kill": {
+   "n": 12,
+   "max": 0.002,
+   "mean": 0
+  },
+  "vampire_kiss:hit": {
+   "n": 4,
+   "max": 0,
+   "mean": 0
+  },
+  "vampire_kiss:kill": {
+   "n": 4,
+   "max": 0,
+   "mean": 0
+  },
+  "silent_blade:hit": {
+   "n": 4,
+   "max": 0,
+   "mean": 0
+  },
+  "silent_blade:kill": {
+   "n": 4,
+   "max": 0,
+   "mean": 0
+  }
+ },
+ "over": []
+}

@@ -12,13 +12,17 @@
  *  - hazards: lava / fire pits (burst + pop-out), pressure-plate spike traps,
  *    geysers (periodic), shallow water (slow), chandeliers / stalactites
  *    shaken loose by nearby impacts
+ *  - A2b: swinging chain weights (set swinging by nearby impacts), fire jets
+ *    (periodic floor vents), collapsing floor (cracks under impacts / weight,
+ *    then drops into a pit), braziers that tip and spill burning oil (a
+ *    temporary fire patch), banner poles that topple, barricades that shatter
  *
  * Every damage here follows the contact rule: it is applied on the tick the
  * thing visibly reaches the fighter (prop capsule sweep, column landing, blast).
  */
 import { atan2, cos, hypot, sin } from './dmath';
 import type { ArenaLayout, PropKind } from './arenaGen';
-import { boundR } from './arenaGen';
+import { boundR, chainSwing, CHAIN_SWING } from './arenaGen';
 import type { FighterState, Match } from './match';
 import { segSegDist } from './reach';
 
@@ -78,7 +82,25 @@ export interface HazRT {
   state: number;
   t0: number;
   cool: [number, number];
+  /** crumble: accumulated stress (impacts + standing weight); cracks at 1 */
+  stress: number;
+  /** chains: swing direction along the hazard axis (+1 / -1) */
+  dir: number;
 }
+/** A2b: burning oil from a tipped brazier (temporary fire patch, not a layout hazard) */
+export interface FireRT {
+  x: number;
+  z: number;
+  r: number;
+  t0: number;
+  until: number;
+  by: number;
+  cool: [number, number];
+}
+/** burning oil patch: lifetime (s) and radius (m) */
+export const OIL_FIRE = { life: 7, r: 1.25 };
+/** crumble: crack warning (s) before the floor drops, collapse (s) */
+export const CRUMBLE = { warn: 1.1, fall: 0.45 };
 
 const TOP: Record<RtPropKind, number> = { crate: 0.9, barrel: 1.0, urn: 0.7, rock: 0.75, explosive: 1.0, brazier: 1.2, lantern: 1.6, chunk: 0.6 };
 const FRAGILE: Record<RtPropKind, boolean> = { crate: true, barrel: true, urn: true, rock: false, explosive: true, brazier: true, lantern: true, chunk: false };
@@ -89,14 +111,16 @@ export class World {
   obs: ObsRT[];
   haz: HazRT[];
   /** analytics */
-  stats = { pickups: 0, throws: 0, throwHits: 0, throwBlocked: 0, throwDodged: 0, batted: 0, topples: 0, crushHits: 0, explosions: 0, blastHits: 0, hazardHits: 0, coverHits: 0, propBreaks: 0, chandeliers: 0 };
+  stats = { pickups: 0, throws: 0, throwHits: 0, throwBlocked: 0, throwDodged: 0, batted: 0, topples: 0, crushHits: 0, explosions: 0, blastHits: 0, hazardHits: 0, coverHits: 0, propBreaks: 0, chandeliers: 0, triggers: 0 };
+  /** A2b: live burning-oil patches (from tipped braziers) */
+  fires: FireRT[] = [];
 
   constructor(L: ArenaLayout) {
     this.L = L;
     for (const p of L.props)
       this.props.push({ id: p.id, kind: p.kind, x: p.x, y: 0, z: p.z, vx: 0, vy: 0, vz: 0, rot: (p.id * 2.39996) % (Math.PI * 2), spin: 0, r: p.r, hp: p.hp, maxHp: p.hp, mass: p.mass, throwable: p.throwable, explosive: p.explosive, state: PS_REST, carrier: -1, owner: -1, fuseAt: -1, top: TOP[p.kind] });
     this.obs = L.obstacles.map((o) => ({ hp: o.hp, maxHp: o.hp, fallT: -1, dirX: 0, dirZ: 0, landed: false }));
-    this.haz = L.hazards.map(() => ({ state: 0, t0: -9, cool: [-9, -9] as [number, number] }));
+    this.haz = L.hazards.map(() => ({ state: 0, t0: -9, cool: [-9, -9] as [number, number], stress: 0, dir: 1 }));
   }
 
   /** standing (collidable / cover) obstacle? */
@@ -131,6 +155,19 @@ export class World {
     o.hp -= amount;
     this.stats.coverHits++;
     m.emit('cover_hit', by, -1, { obs: i, dmg: Math.round(amount), hp: +Math.max(0, o.hp / o.maxHp).toFixed(2) });
+    if (o.hp <= 0 && !d.toppleable) {
+      // barricades / gates shatter in place: no fall, planks left as throwable chunks
+      o.hp = 0;
+      o.fallT = m.t;
+      o.landed = true;
+      this.stats.topples++;
+      this.stats.triggers++;
+      m.drama.spectacle(1.5);
+      m.emit('obstacle_break', by, -1, { obs: i, kind: d.kind, x: +d.x.toFixed(2), z: +d.z.toFixed(2) });
+      for (const k of [-1, 1]) this.addChunk(d.x + k * 0.45, d.z - k * 0.25, i * 3 + k);
+      this.shake(m, d.x, d.z, 4);
+      return;
+    }
     if (o.hp <= 0) {
       o.hp = 0;
       let dx = d.x - fromX,
@@ -171,6 +208,31 @@ export class World {
     p.hp = 0;
     this.stats.propBreaks++;
     m.emit('prop_break', by, -1, { prop: i, kind: p.kind, x: +p.x.toFixed(2), y: +p.y.toFixed(2), z: +p.z.toFixed(2) });
+    if (p.kind === 'brazier') this.igniteOil(m, p.x, p.z, by);
+  }
+
+  /** A2b: a tipped brazier spills burning oil (a temporary fire patch that burns whoever stands in it) */
+  igniteOil(m: Match, x: number, z: number, by: number) {
+    const g = this.edgeGap(x, z);
+    if (g < 0.4) {
+      const r = hypot(x, z) || 1;
+      x *= (r + g - 0.4) / r;
+      z *= (r + g - 0.4) / r;
+    }
+    this.fires.push({ x, z, r: OIL_FIRE.r, t0: m.t, until: m.t + OIL_FIRE.life, by, cool: [-9, -9] });
+    this.stats.triggers++;
+    m.drama.spectacle(1.5);
+    m.emit('brazier_tip', by, -1, { x: +x.toFixed(2), z: +z.toFixed(2), r: OIL_FIRE.r, life: OIL_FIRE.life });
+  }
+
+  private addChunk(x: number, z: number, seed: number) {
+    const g = this.edgeGap(x, z);
+    if (g < 0.8) {
+      const r = hypot(x, z) || 1;
+      x *= (r + g - 0.8) / r;
+      z *= (r + g - 0.8) / r;
+    }
+    this.props.push({ id: this.props.length, kind: 'chunk', x, y: 0, z, vx: 0, vy: 0, vz: 0, rot: seed * 1.7, spin: 0, r: 0.38, hp: 999, maxHp: 999, mass: 1.4, throwable: true, explosive: false, state: PS_REST, carrier: -1, owner: -1, fuseAt: -1, top: TOP.chunk });
   }
 
   private release(m: Match, p: PropRT) {
@@ -227,15 +289,43 @@ export class World {
   shake(m: Match, x: number, z: number, radius: number) {
     for (let i = 0; i < this.L.hazards.length; i++) {
       const h = this.L.hazards[i];
-      if (h.kind !== 'chandelier') continue;
       const s = this.haz[i];
-      if (s.state !== 0) continue;
-      if (hypot(h.x - x, h.z - z) < radius) {
+      const d = hypot(h.x - x, h.z - z);
+      if (h.kind === 'chains') {
+        // a slam / knockdown / blast nearby sets the weight swinging away from it (again, once it has settled)
+        if (s.state !== 0 || d >= radius * 0.75 + 1.2) continue;
+        this.swingChain(m, i, (h.x - x) * sin(h.phase) + (h.z - z) * cos(h.phase) >= 0 ? 1 : -1, -1);
+      } else if (h.kind === 'chandelier') {
+        if (s.state !== 0 || d >= radius) continue;
         s.state = 1;
         s.t0 = m.t;
+        this.stats.triggers++;
         m.emit('hazard_trigger', -1, -1, { haz: i, kind: h.kind });
+      } else if (h.kind === 'crumble' && s.state === 0 && d < h.r + radius * 0.6) {
+        // impacts on / near the cracked floor weaken it (big ones count more)
+        s.stress += (radius / 6) * (1 - Math.max(0, d - h.r) / (radius * 0.6 + 1e-3)) * 0.55;
+        if (s.stress >= 1) this.crack(m, i);
       }
     }
+  }
+
+  /** A2b: set a chain weight swinging along its axis in direction dir (by = who struck it, -1 = an impact) */
+  swingChain(m: Match, i: number, dir: number, by: number) {
+    const s = this.haz[i];
+    if (s.state !== 0) return;
+    s.state = 1;
+    s.t0 = m.t;
+    s.dir = dir;
+    this.stats.triggers++;
+    m.emit('hazard_trigger', by, -1, { haz: i, kind: 'chains', dir });
+  }
+
+  private crack(m: Match, i: number) {
+    const s = this.haz[i];
+    s.state = 1;
+    s.t0 = m.t;
+    this.stats.triggers++;
+    m.emit('hazard_trigger', -1, -1, { haz: i, kind: this.L.hazards[i].kind });
   }
 
   // ------------------------------------------------------------------ fighter interaction
@@ -329,8 +419,11 @@ export class World {
   }
 
   // ------------------------------------------------------------------ per-tick
+  /** sim time of the last update (snapshot encoding) */
+  lastT = 0;
   update(m: Match, dt: number) {
     const t = m.t;
+    this.lastT = t;
     // carried props ride along (render puts them in the hands)
     for (const p of this.props) {
       if (p.state === PS_CARRIED && p.carrier >= 0) {
@@ -407,6 +500,7 @@ export class World {
     }
     // hazards
     for (let i = 0; i < this.L.hazards.length; i++) this.updateHazard(m, i, dt);
+    this.updateFires(m);
   }
 
   private flightVsFighter(m: Match, i: number, def: FighterState, ox: number, oy: number, oz: number): boolean {
@@ -522,7 +616,7 @@ export class World {
       const att = m.f[1 - f.idx];
       this.stats.crushHits++;
       m.emit('crush', att.idx, f.idx, { obs: i });
-      m.envHit(f, att, 48 * m.drama.damageMul(att, f), 'falling ' + d.kind, { x: cx, z: cz, kb: 5, knockdown: true, lethal: true });
+      m.envHit(f, att, (d.kind === 'banner' ? 28 : 48) * m.drama.damageMul(att, f), 'falling ' + d.kind, { x: cx, z: cz, kb: d.kind === 'banner' ? 3.5 : 5, knockdown: true, lethal: true });
     }
     // props under it break
     for (let j = 0; j < this.props.length; j++) {
@@ -530,8 +624,8 @@ export class World {
       if (p.state !== PS_REST) continue;
       if (segPointDist(ax, az, bx, bz, p.x, p.z) < p.r + d.r * 0.7) this.damageProp(m, j, 999, -1);
     }
-    // rubble: throwable chunks along the fall line
-    for (const k of [0.45, 0.8]) {
+    // rubble: throwable chunks along the fall line (a banner pole leaves only its broken shaft)
+    for (const k of d.kind === 'banner' ? [0.6] : [0.45, 0.8]) {
       let x = ax + (bx - ax) * k + -o.dirZ * 0.35,
         z = az + (bz - az) * k + o.dirX * 0.35;
       const g = this.edgeGap(x, z);
@@ -573,8 +667,26 @@ export class World {
         case 'water':
           d += 0.25;
           break;
+        case 'flamejet':
+          d += s.state >= 1 ? 2.2 : 0.3;
+          break;
+        case 'crumble':
+          d += s.state === 1 || s.state === 2 ? 2.5 : s.state === 3 ? 2.2 * Math.max(w, dist < 0 ? 1 : 0) : 0.15;
+          break;
+        case 'chains':
+          d += s.state === 1 ? 1.2 : 0;
+          break;
       }
     }
+    // a swinging chain weight: the whole sweep is dangerous
+    for (let i = 0; i < this.L.hazards.length; i++) {
+      const h = this.L.hazards[i];
+      if (h.kind !== 'chains' || this.haz[i].state !== 1) continue;
+      const ax = sin(h.phase) * 2.8,
+        az = cos(h.phase) * 2.8;
+      if (segPointDist(h.x - ax, h.z - az, h.x + ax, h.z + az, x, z) < 0.6 + pad) d += 1.8;
+    }
+    for (const fr of this.fires) if (hypot(x - fr.x, z - fr.z) < fr.r + pad) d += 2;
     for (const p of this.props) {
       if (p.fuseAt >= 0 && p.state !== PS_GONE && hypot(x - p.x, z - p.z) < 3.6) d += 3;
     }
@@ -590,8 +702,100 @@ export class World {
     const h = this.L.hazards[i];
     const s = this.haz[i];
     const t = m.t;
-    const inside = (f: FighterState, pad = 0) => f.state !== 'dead' && hypot(f.x - h.x, f.z - h.z) < h.r + pad;
+    const inside = (f: FighterState, pad = 0) => f.state !== 'dead' && f.state !== 'launched' && hypot(f.x - h.x, f.z - h.z) < h.r + pad;
     switch (h.kind) {
+      case 'chains': {
+        if (s.state !== 1) break;
+        const tau = t - s.t0;
+        if (tau >= CHAIN_SWING.dur) {
+          s.state = 0;
+          break;
+        }
+        // the weight's position now; it hits a fighter when it visibly reaches the body (low part of the swing)
+        const w = chainSwing(tau);
+        const wx = h.x + sin(h.phase) * w.off * s.dir,
+          wz = h.z + cos(h.phase) * w.off * s.dir;
+        if (w.y > 1.9 || m.over) break;
+        const w2 = chainSwing(tau + 0.02);
+        const vdir = (w2.off - w.off >= 0 ? 1 : -1) * s.dir;
+        for (const f of m.f) {
+          if (f.state === 'dead' || f.state === 'launched' || t < s.cool[f.idx]) continue;
+          if (hypot(f.x - wx, f.z - wz) > f.def.stats.radius + 0.38) continue;
+          s.cool[f.idx] = t + 0.9;
+          const att = m.f[1 - f.idx];
+          this.stats.hazardHits++;
+          const speed = Math.abs(w2.off - w.off) / 0.02;
+          m.emit('hazard_hit', att.idx, f.idx, { haz: i, kind: h.kind, x: +wx.toFixed(2), y: +w.y.toFixed(2), z: +wz.toFixed(2) });
+          // knocked along the swing
+          m.envHit(f, att, (14 + speed * 2.2) * m.drama.damageMul(att, f), 'swinging chain', { x: f.x - sin(h.phase) * vdir, z: f.z - cos(h.phase) * vdir, kb: 3 + speed * 0.5, knockdown: speed > 3.5, lethal: true, hitEvent: true });
+        }
+        break;
+      }
+      case 'flamejet': {
+        const per = h.period;
+        const ph = (t + h.phase) % per;
+        // 0 idle, 1 warning glow (1 s), 2 jet (1.2 s)
+        const ns = ph < per - 2.2 ? 0 : ph < per - 1.2 ? 1 : 2;
+        if (ns === 1 && s.state === 0) {
+          this.stats.triggers++;
+          m.emit('hazard_trigger', -1, -1, { haz: i, kind: h.kind });
+        }
+        s.state = ns;
+        if (ns !== 2 || m.over) break;
+        for (const f of m.f) {
+          if (!inside(f, 0.05) || t < s.cool[f.idx]) continue;
+          s.cool[f.idx] = t + 1.3;
+          const att = m.f[1 - f.idx];
+          this.stats.hazardHits++;
+          m.emit('hazard_hit', att.idx, f.idx, { haz: i, kind: h.kind });
+          m.envHit(f, att, 22 * m.drama.damageMul(att, f), 'fire jet', { x: h.x, z: h.z, kb: 5.5, knockdown: false, lethal: true, minKb: true });
+        }
+        break;
+      }
+      case 'crumble': {
+        if (s.state === 0) {
+          // weight: fighters standing on the cracked floor slowly break it (about 3 s of standing, less while fighting)
+          for (const f of m.f) {
+            if (!inside(f)) continue;
+            s.stress += dt * (f.state === 'attack' || f.state === 'knockdown' ? 0.55 : 0.3) * Math.max(0.7, f.def.stats.weight);
+          }
+          if (s.stress >= 1) this.crack(m, i);
+        } else if (s.state === 1 && t - s.t0 >= CRUMBLE.warn) {
+          s.state = 2;
+          s.t0 = t;
+          m.emit('floor_collapse', -1, -1, { haz: i, x: +h.x.toFixed(2), z: +h.z.toFixed(2), r: h.r });
+          m.drama.spectacle(2.5);
+          for (const f of m.f) {
+            if (!inside(f, 0.1) || m.over) continue;
+            const att = m.f[1 - f.idx];
+            this.stats.hazardHits++;
+            s.cool[f.idx] = t + 1.1;
+            m.emit('hazard_hit', att.idx, f.idx, { haz: i, kind: h.kind });
+            m.envHit(f, att, 30 * m.drama.damageMul(att, f), 'collapsing floor', { x: h.x, z: h.z, kb: 6.5, knockdown: true, lethal: true, minKb: true });
+          }
+          for (let j = 0; j < this.props.length; j++) {
+            const p = this.props[j];
+            if (p.state === PS_REST && hypot(p.x - h.x, p.z - h.z) < h.r) {
+              if (p.kind === 'rock' || p.kind === 'chunk') p.state = PS_GONE;
+              else this.damageProp(m, j, 999, -1);
+            }
+          }
+        } else if (s.state === 2 && t - s.t0 >= CRUMBLE.fall) {
+          s.state = 3;
+          s.t0 = t;
+        } else if (s.state === 3) {
+          // the hole: whoever is knocked into it falls in and climbs out hurt
+          for (const f of m.f) {
+            if (!inside(f, -0.2) || t < s.cool[f.idx] || m.over) continue;
+            s.cool[f.idx] = t + 1.1;
+            const att = m.f[1 - f.idx];
+            this.stats.hazardHits++;
+            m.emit('hazard_hit', att.idx, f.idx, { haz: i, kind: h.kind });
+            m.envHit(f, att, 20 * m.drama.damageMul(att, f), 'into the pit', { x: h.x, z: h.z, kb: 6.5, knockdown: true, lethal: true, minKb: true });
+          }
+        }
+        break;
+      }
       case 'lava':
       case 'firepit': {
         for (const f of m.f) {
@@ -672,11 +876,29 @@ export class World {
         break;
       }
     }
-    void dt;
+  }
+
+  /** A2b: burning oil patches burn whoever stands in them; they go out after OIL_FIRE.life */
+  private updateFires(m: Match) {
+    const t = m.t;
+    for (let k = this.fires.length - 1; k >= 0; k--) if (t >= this.fires[k].until) this.fires.splice(k, 1);
+    if (m.over) return;
+    for (let k = 0; k < this.fires.length; k++) {
+      const fr = this.fires[k];
+      for (const f of m.f) {
+        if (f.state === 'dead' || f.state === 'launched' || t < fr.cool[f.idx]) continue;
+        if (hypot(f.x - fr.x, f.z - fr.z) > fr.r - 0.1) continue;
+        fr.cool[f.idx] = t + 1.5;
+        const att = m.f[1 - f.idx];
+        this.stats.hazardHits++;
+        m.emit('hazard_hit', att.idx, f.idx, { haz: -1, kind: 'oil', x: +fr.x.toFixed(2), z: +fr.z.toFixed(2) });
+        m.envHit(f, att, 14 * m.drama.damageMul(att, f), 'burning oil', { x: fr.x, z: fr.z, kb: 7, knockdown: false, lethal: true, minKb: true });
+      }
+    }
   }
 
   /** compact per-frame snapshot for playback */
-  snapshot(): { props: Float32Array; obs: Float32Array; haz: Uint8Array } {
+  snapshot(): { props: Float32Array; obs: Float32Array; haz: Uint8Array; fires: Float32Array } {
     const props = new Float32Array(this.props.length * 6);
     for (let i = 0; i < this.props.length; i++) {
       const p = this.props[i];
@@ -685,8 +907,18 @@ export class World {
     const obs = new Float32Array(this.obs.length);
     for (let i = 0; i < this.obs.length; i++) obs[i] = this.obs[i].fallT >= 0 ? -1 - this.obs[i].fallT : this.obs[i].hp / this.obs[i].maxHp;
     const haz = new Uint8Array(this.haz.length);
-    for (let i = 0; i < this.haz.length; i++) haz[i] = this.haz[i].state;
-    return { props, obs, haz };
+    for (let i = 0; i < this.haz.length; i++) {
+      const s = this.haz[i];
+      // chains: 0 still, else 1 + swing time in 1/40 s (+127 when swinging the negative way); the renderer rebuilds the swing
+      haz[i] = this.L.hazards[i].kind === 'chains' && s.state === 1 ? 1 + Math.min(126, Math.floor((this.lastT - s.t0) * 40)) + (s.dir < 0 ? 127 : 0) : s.state;
+    }
+    // burning oil: [x, z, r, life fraction left]
+    const fires = new Float32Array(this.fires.length * 4);
+    for (let k = 0; k < this.fires.length; k++) {
+      const f = this.fires[k];
+      fires.set([f.x, f.z, f.r, Math.max(0, (f.until - this.lastT) / OIL_FIRE.life)], k * 4);
+    }
+    return { props, obs, haz, fires };
   }
 }
 

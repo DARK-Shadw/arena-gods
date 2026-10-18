@@ -1,0 +1,294 @@
+{
+ "kit_arcade_bay": {
+  "seconds": 21.3,
+  "peakMB": 1203,
+  "steps": {
+   "build": 0.3,
+   "export": 0.22,
+   "preview": 20.75
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_arcade_broken": {
+  "seconds": 15.8,
+  "peakMB": 1202,
+  "steps": {
+   "build": 0.28,
+   "export": 0.21,
+   "preview": 15.35
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_arch": {
+  "seconds": 28.5,
+  "peakMB": 1204,
+  "steps": {
+   "build": 0.39,
+   "export": 0.26,
+   "preview": 27.9
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_balustrade": {
+  "seconds": 22.6,
+  "peakMB": 1204,
+  "steps": {
+   "build": 0.56,
+   "export": 0.62,
+   "preview": 21.45
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_column_ruin": {
+  "seconds": 53.3,
+  "peakMB": 1681,
+  "steps": {
+   "build": 4.01,
+   "build_high": 2.44,
+   "bake_lod0": 17.95,
+   "bake_lod1": 5.61,
+   "export": 0.54,
+   "preview": 22.68
+  },
+  "normalCheck": {
+   "bake_lod0": {
+    "meanZ": 0.9250571727752686,
+    "belowZ0.3": 0.02518939971923828,
+    "negativeZ": 0.013384819030761719
+   },
+   "bake_lod1": {
+    "meanZ": 0.9265338778495789,
+    "belowZ0.3": 0.02652740478515625,
+    "negativeZ": 0.01531982421875
+   }
+  },
+  "high": {
+   "verts": 126224,
+   "tris": 252444,
+   "chipMax": 0.04499647065676262,
+   "convexShare": 0.1781198504246419,
+   "crackShare": 0.013816706806946381,
+   "wetShare": 0.23592977563696285,
+   "mossShare": 0.005078273545443022
+  }
+ },
+ "kit_dais": {
+  "seconds": 16.6,
+  "peakMB": 1202,
+  "steps": {
+   "build": 0.24,
+   "export": 0.24,
+   "preview": 16.07
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_pillar_square": {
+  "seconds": 125.5,
+  "peakMB": 1872,
+  "steps": {
+   "build": 8.61,
+   "build_high": 3.8,
+   "bake_lod0": 67.59,
+   "bake_lod1": 16.8,
+   "export": 2.11,
+   "preview": 26.62
+  },
+  "normalCheck": {
+   "bake_lod0": {
+    "meanZ": 0.9534112215042114,
+    "belowZ0.3": 0.00739288330078125,
+    "negativeZ": 0.001798868179321289
+   },
+   "bake_lod1": {
+    "meanZ": 0.950788140296936,
+    "belowZ0.3": 0.0075321197509765625,
+    "negativeZ": 0.0016794204711914062
+   }
+  },
+  "high": {
+   "verts": 204192,
+   "tris": 408380,
+   "chipMax": 0.09216264421219542,
+   "convexShare": 0.14095557122708038,
+   "crackShare": 0.011156166745024291,
+   "wetShare": 0.20794154521234917,
+   "mossShare": 0.003864010343206394
+  }
+ },
+ "kit_plinth": {
+  "seconds": 22.3,
+  "peakMB": 1201,
+  "steps": {
+   "build": 0.25,
+   "export": 0.29,
+   "preview": 21.79
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_rock_prop": {
+  "seconds": 49.5,
+  "peakMB": 1147,
+  "steps": {
+   "build": 3.64,
+   "bake_lod0": 14.42,
+   "bake_lod1": 4.28,
+   "export": 0.24,
+   "preview": 26.89
+  },
+  "normalCheck": {
+   "bake_lod0": {
+    "meanZ": 0.9306301474571228,
+    "belowZ0.3": 0.005035400390625,
+    "negativeZ": 0.0012674331665039062
+   },
+   "bake_lod1": {
+    "meanZ": 0.9003098607063293,
+    "belowZ0.3": 0.00783538818359375,
+    "negativeZ": 0.001544952392578125
+   }
+  },
+  "high": null
+ },
+ "kit_rubble_pile": {
+  "seconds": 66.8,
+  "peakMB": 1286,
+  "steps": {
+   "build": 13.96,
+   "build_high": 1.2,
+   "bake_lod0": 20.81,
+   "bake_lod1": 6.76,
+   "export": 0.37,
+   "preview": 23.69
+  },
+  "normalCheck": {
+   "bake_lod0": {
+    "meanZ": 0.8810466527938843,
+    "belowZ0.3": 0.052359580993652344,
+    "negativeZ": 0.038654327392578125
+   },
+   "bake_lod1": {
+    "meanZ": 0.7409269213676453,
+    "belowZ0.3": 0.12235641479492188,
+    "negativeZ": 0.0625
+   }
+  },
+  "high": {
+   "verts": 56162,
+   "tris": 112316,
+   "chipMax": 0.04839327869814824,
+   "convexShare": 0.1892738862576119,
+   "crackShare": 0.006962002777678857,
+   "wetShare": 0.5004273352088601,
+   "mossShare": 0.012250275987322388
+  }
+ },
+ "kit_rubble_scatter": {
+  "seconds": 59.2,
+  "peakMB": 1419,
+  "steps": {
+   "build": 5.06,
+   "bake_lod0": 23.78,
+   "bake_lod1": 10.87,
+   "export": 0.18,
+   "preview": 19.32
+  },
+  "normalCheck": {
+   "bake_lod0": {
+    "meanZ": 0.9310647249221802,
+    "belowZ0.3": 0.005444526672363281,
+    "negativeZ": 0.0013856887817382812
+   },
+   "bake_lod1": {
+    "meanZ": 0.8909690976142883,
+    "belowZ0.3": 0.010807037353515625,
+    "negativeZ": 0.003688812255859375
+   }
+  },
+  "high": null
+ },
+ "kit_spear_fence": {
+  "seconds": 18.0,
+  "peakMB": 1202,
+  "steps": {
+   "build": 0.29,
+   "export": 0.27,
+   "preview": 17.46
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_stairs": {
+  "seconds": 19.8,
+  "peakMB": 1202,
+  "steps": {
+   "build": 0.27,
+   "export": 0.3,
+   "preview": 19.24
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_stone_trim": {
+  "seconds": 83.2,
+  "peakMB": 2412,
+  "steps": {
+   "build_high": 16.25,
+   "bake": 54.33,
+   "compose": 2.81,
+   "export": 0.34,
+   "preview": 9.45
+  },
+  "normalCheck": {},
+  "high": {
+   "height": {
+    "hMin": -0.18984773755073547,
+    "hMax": 0.06252896785736084
+   },
+   "highTris": 2359296,
+   "device": {
+    "requested": "CPU",
+    "used": "CPU",
+    "devices": []
+   }
+  }
+ },
+ "kit_wall_a": {
+  "seconds": 31.2,
+  "peakMB": 1202,
+  "steps": {
+   "build": 0.32,
+   "export": 0.33,
+   "preview": 30.58
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_wall_b": {
+  "seconds": 29.7,
+  "peakMB": 1202,
+  "steps": {
+   "build": 0.24,
+   "export": 0.25,
+   "preview": 29.22
+  },
+  "normalCheck": {},
+  "high": null
+ },
+ "kit_wall_broken": {
+  "seconds": 29.0,
+  "peakMB": 1203,
+  "steps": {
+   "build": 0.37,
+   "export": 0.36,
+   "preview": 28.27
+  },
+  "normalCheck": {},
+  "high": null
+ }
+}

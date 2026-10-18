@@ -1,0 +1,758 @@
+[
+ {
+  "run": "q0/ktx2",
+  "ok": true,
+  "problems": [],
+  "ms": 15624,
+  "readyMs": 4327,
+  "firstFramesMs": 10788,
+  "props": [
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   "brazier_iron_low.map": {
+    "compressed": true,
+    "w": 512,
+    "format": 36492
+   },
+   "brazier_iron_low.normalMap": {
+    "compressed": true,
+    "w": 512,
+    "format": 36492
+   },
+   "brazier_iron_low.roughnessMap": {
+    "compressed": true,
+    "w": 512,
+    "format": 36492
+   },
+   "brazier_iron_low.aoMap": {
+    "compressed": true,
+    "w": 512,
+    "format": 36492
+   }
+  },
+  "lods": {},
+  "format": "ktx2",
+  "loaded": [
+   "kit/brazier_tripod|low|ktx2"
+  ],
+  "renderer": {
+   "calls": 517,
+   "tris": 169346,
+   "textures": 271,
+   "geometries": 287
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 3354ms (kit low/ktx2: 1 assets in 252ms)",
+   "[arena] simulated gorak vs vex seed=11 in 98ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q0_ktx2.jpg"
+ },
+ {
+  "run": "q0/webp",
+  "ok": true,
+  "problems": [],
+  "ms": 4072,
+  "readyMs": 3392,
+  "firstFramesMs": 541,
+  "props": [
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD1",
+    "meshes": 2,
+    "r": 0.4500000672212175,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   "brazier_iron_low.map": {
+    "compressed": false,
+    "w": 512,
+    "format": 1023
+   },
+   "brazier_iron_low.normalMap": {
+    "compressed": false,
+    "w": 512,
+    "format": 1023
+   },
+   "brazier_iron_low.roughnessMap": {
+    "compressed": false,
+    "w": 512,
+    "format": 1023
+   },
+   "brazier_iron_low.aoMap": {
+    "compressed": false,
+    "w": 512,
+    "format": 1023
+   }
+  },
+  "lods": {},
+  "format": "webp",
+  "loaded": [
+   "kit/brazier_tripod|low|webp"
+  ],
+  "renderer": {
+   "calls": 517,
+   "tris": 169346,
+   "textures": 271,
+   "geometries": 287
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 2885ms (kit low/webp: 1 assets in 487ms)",
+   "[arena] simulated gorak vs vex seed=11 in 93ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q0_webp.jpg"
+ },
+ {
+  "run": "q1/ktx2",
+  "ok": true,
+  "problems": [],
+  "ms": 15659,
+  "readyMs": 3738,
+  "firstFramesMs": 11055,
+  "props": [
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   "brazier_iron.map": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   },
+   "brazier_iron.normalMap": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   },
+   "brazier_iron.roughnessMap": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   },
+   "brazier_iron.aoMap": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   }
+  },
+  "lods": {},
+  "format": "ktx2",
+  "loaded": [
+   "kit/brazier_tripod|full|ktx2"
+  ],
+  "renderer": {
+   "calls": 520,
+   "tris": 177889,
+   "textures": 273,
+   "geometries": 287
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 2817ms (kit full/ktx2: 1 assets in 198ms)",
+   "[arena] simulated gorak vs vex seed=11 in 91ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q1_ktx2.jpg"
+ },
+ {
+  "run": "q1/webp",
+  "ok": true,
+  "problems": [],
+  "ms": 4643,
+  "readyMs": 3923,
+  "firstFramesMs": 597,
+  "props": [
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   "brazier_iron.map": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   },
+   "brazier_iron.normalMap": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   },
+   "brazier_iron.roughnessMap": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   },
+   "brazier_iron.aoMap": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   }
+  },
+  "lods": {},
+  "format": "webp",
+  "loaded": [
+   "kit/brazier_tripod|full|webp"
+  ],
+  "renderer": {
+   "calls": 520,
+   "tris": 177889,
+   "textures": 273,
+   "geometries": 287
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 3454ms (kit full/webp: 1 assets in 455ms)",
+   "[arena] simulated gorak vs vex seed=11 in 84ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q1_webp.jpg"
+ },
+ {
+  "run": "q2/ktx2",
+  "ok": true,
+  "problems": [],
+  "ms": 14007,
+  "readyMs": 3563,
+  "firstFramesMs": 9946,
+  "props": [
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   "brazier_iron.map": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   },
+   "brazier_iron.normalMap": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   },
+   "brazier_iron.roughnessMap": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   },
+   "brazier_iron.aoMap": {
+    "compressed": true,
+    "w": 1024,
+    "format": 36492
+   }
+  },
+  "lods": {},
+  "format": "ktx2",
+  "loaded": [
+   "kit/brazier_tripod|full|ktx2"
+  ],
+  "renderer": {
+   "calls": 523,
+   "tris": 177892,
+   "textures": 277,
+   "geometries": 287
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 2617ms (kit full/ktx2: 1 assets in 162ms)",
+   "[arena] simulated gorak vs vex seed=11 in 76ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q2_ktx2.jpg"
+ },
+ {
+  "run": "q2/webp",
+  "ok": true,
+  "problems": [],
+  "ms": 4078,
+  "readyMs": 3322,
+  "firstFramesMs": 582,
+  "props": [
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": "kit/brazier_tripod",
+    "lod": "LOD0",
+    "meshes": 2,
+    "r": 0.45001747361962147,
+    "ymin": 0,
+    "ymax": 1.2000000476837158,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   "brazier_iron.map": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   },
+   "brazier_iron.normalMap": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   },
+   "brazier_iron.roughnessMap": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   },
+   "brazier_iron.aoMap": {
+    "compressed": false,
+    "w": 1024,
+    "format": 1023
+   }
+  },
+  "lods": {},
+  "format": "webp",
+  "loaded": [
+   "kit/brazier_tripod|full|webp"
+  ],
+  "renderer": {
+   "calls": 523,
+   "tris": 177892,
+   "textures": 277,
+   "geometries": 287
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 2736ms (kit full/webp: 1 assets in 224ms)",
+   "[arena] simulated gorak vs vex seed=11 in 80ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q2_webp.jpg"
+ },
+ {
+  "run": "q1/legacy",
+  "ok": true,
+  "problems": [],
+  "ms": 4207,
+  "readyMs": 3547,
+  "firstFramesMs": 517,
+  "props": [
+   {
+    "kit": null,
+    "lod": null,
+    "meshes": 1,
+    "r": 0.5,
+    "ymin": -0.015187251381576061,
+    "ymax": 1.2100000381469727,
+    "x": 10.524231910705566,
+    "z": 2.0682260990142822
+   },
+   {
+    "kit": null,
+    "lod": null,
+    "meshes": 1,
+    "r": 0.5,
+    "ymin": -0.015187251381576061,
+    "ymax": 1.2100000381469727,
+    "x": 1.9179800748825073,
+    "z": 8.22685432434082
+   },
+   {
+    "kit": null,
+    "lod": null,
+    "meshes": 1,
+    "r": 0.5,
+    "ymin": -0.015187251381576061,
+    "ymax": 1.2100000381469727,
+    "x": 8.512588500976562,
+    "z": 0.8346073627471924
+   },
+   {
+    "kit": null,
+    "lod": null,
+    "meshes": 1,
+    "r": 0.5,
+    "ymin": -0.015187251381576061,
+    "ymax": 1.2100000381469727,
+    "x": 0.826704204082489,
+    "z": -4.58014440536499
+   },
+   {
+    "kit": null,
+    "lod": null,
+    "meshes": 1,
+    "r": 0.5,
+    "ymin": -0.015187251381576061,
+    "ymax": 1.2100000381469727,
+    "x": 2.3018786907196045,
+    "z": 11.050134658813477
+   },
+   {
+    "kit": null,
+    "lod": null,
+    "meshes": 1,
+    "r": 0.5,
+    "ymin": -0.015187251381576061,
+    "ymax": 1.2100000381469727,
+    "x": -5.671451568603516,
+    "z": -9.510441780090332
+   }
+  ],
+  "textures": {
+   ".map": {
+    "compressed": false,
+    "w": 256,
+    "format": 1023
+   },
+   ".normalMap": {
+    "compressed": false,
+    "w": 256,
+    "format": 1023
+   },
+   ".roughnessMap": {
+    "compressed": false,
+    "w": 256,
+    "format": 1023
+   }
+  },
+  "lods": {},
+  "format": "ktx2",
+  "loaded": [],
+  "renderer": {
+   "calls": 513,
+   "tris": 166325,
+   "textures": 270,
+   "geometries": 286
+  },
+  "errors": [],
+  "logs": [
+   "[arena] built forge/cross#1 in 2699ms (legacy dressing)",
+   "[arena] simulated gorak vs vex seed=11 in 85ms {winner: 0, duration: 58.38, timeout: false, swings: 2, leadChanges: 2}"
+  ],
+  "shot": "brazier_q1_legacy.jpg"
+ }
+]

@@ -1,0 +1,126 @@
+{
+ "matches": 224,
+ "seedsPerPair": 4,
+ "new": [
+  {
+   "pool": "hit",
+   "picks": 6140,
+   "R1_immediate": 0,
+   "R2_within8s": 0.3,
+   "R3_entropy": 0.939,
+   "R4_topShare": 7.4,
+   "R4_topShareMean": 6.6,
+   "distinctUsed": 86,
+   "poolSize": 86
+  },
+  {
+   "pool": "fall",
+   "picks": 1923,
+   "R1_immediate": 0,
+   "R2_within8s": 0.1,
+   "R3_entropy": 0.942,
+   "R4_topShare": 10.8,
+   "R4_topShareMean": 9.7,
+   "distinctUsed": 22,
+   "poolSize": 22
+  },
+  {
+   "pool": "getup",
+   "picks": 2103,
+   "R1_immediate": 0,
+   "R2_within8s": 0.2,
+   "R3_entropy": 0.89,
+   "R4_topShare": 21.9,
+   "R4_topShareMean": 17.1,
+   "distinctUsed": 11,
+   "poolSize": 11
+  },
+  {
+   "pool": "death",
+   "picks": 224,
+   "R1_immediate": 0,
+   "R2_within8s": 0,
+   "R3_entropy": null,
+   "R4_topShare": 14.8,
+   "R4_topShareMean": 11.6,
+   "R5_deathDistinct10": 7,
+   "distinctUsed": 62,
+   "poolSize": 64
+  },
+  {
+   "pool": "dodge",
+   "picks": 1976,
+   "R1_immediate": 0.1,
+   "R2_within8s": 0.1,
+   "R3_entropy": 0.94,
+   "R4_topShare": 10.9,
+   "R4_topShareMean": 8.5,
+   "distinctUsed": 25,
+   "poolSize": 25
+  },
+  {
+   "pool": "launch",
+   "picks": 195,
+   "R1_immediate": 0,
+   "R2_within8s": 0,
+   "R3_entropy": 1,
+   "R4_topShare": 46.2,
+   "R4_topShareMean": 26.1,
+   "distinctUsed": 15,
+   "poolSize": 18
+  }
+ ],
+ "old": [
+  {
+   "pool": "hit",
+   "picks": 6140,
+   "R1_immediate": 99.3,
+   "R2_within8s": 77.2,
+   "R3_entropy": 0.005,
+   "R4_topShare": 100,
+   "R4_topShareMean": 99.6,
+   "distinctUsed": 3
+  },
+  {
+   "pool": "fall",
+   "picks": 2118,
+   "R1_immediate": 100,
+   "R2_within8s": 38.3,
+   "R3_entropy": 0,
+   "R4_topShare": 100,
+   "R4_topShareMean": 100,
+   "distinctUsed": 1
+  },
+  {
+   "pool": "getup",
+   "picks": 2103,
+   "R1_immediate": 100,
+   "R2_within8s": 37.8,
+   "R3_entropy": 0,
+   "R4_topShare": 100,
+   "R4_topShareMean": 100,
+   "distinctUsed": 1
+  },
+  {
+   "pool": "death",
+   "picks": 224,
+   "R1_immediate": 0,
+   "R2_within8s": 0,
+   "R3_entropy": null,
+   "R4_topShare": 100,
+   "R4_topShareMean": 100,
+   "R5_deathDistinct10": 1,
+   "distinctUsed": 1
+  },
+  {
+   "pool": "dodge",
+   "picks": 1976,
+   "R1_immediate": 42.4,
+   "R2_within8s": 18.9,
+   "R3_entropy": 0.44,
+   "R4_topShare": 55.2,
+   "R4_topShareMean": 46,
+   "distinctUsed": 3
+  }
+ ]
+}

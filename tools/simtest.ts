@@ -50,8 +50,12 @@ interface Agg {
   secondWind: number;
   stalemate: number;
   shrink: number;
+  launches: number;
+  launchEnv: number;
+  knockdowns: number;
+  launchKills: number;
 }
-const agg: Agg = { n: 0, dur: [], swings: [], leads: [], oneSided: 0, timeout: 0, comeback: 0, draws: 0, ults: 0, parries: 0, dodges: 0, hits: 0, lastStand: 0, secondWind: 0, stalemate: 0, shrink: 0 };
+const agg: Agg = { launches: 0, launchEnv: 0, knockdowns: 0, launchKills: 0, n: 0, dur: [], swings: [], leads: [], oneSided: 0, timeout: 0, comeback: 0, draws: 0, ults: 0, parries: 0, dodges: 0, hits: 0, lastStand: 0, secondWind: 0, stalemate: 0, shrink: 0 };
 const wins: Record<string, Record<string, number>> = {};
 const games: Record<string, Record<string, number>> = {};
 const totalWins: Record<string, number> = {};
@@ -71,7 +75,9 @@ interface Diag { matches: number; attacks: number; hits: number; blocked: number
 const diag: Record<string, Diag> = {};
 for (const id of ids) diag[id] = { matches: 0, attacks: 0, hits: 0, blocked: 0, parried: 0, dodged: 0, whiffs: 0, dmg: 0, ults: 0, ultHits: 0 };
 
+let launchMatchCount = 0;
 function account(rec: MatchRecord) {
+  if (rec.events.some((e) => e.type === 'launch')) launchMatchCount++;
   accountAi(ai, rec);
   const r = rec.result;
   for (const key of [`theme ${rec.arena.theme}`, `layout ${rec.arena.layout}`]) {
@@ -117,6 +123,11 @@ function account(rec: MatchRecord) {
     else if (e.type === 'second_wind') agg.secondWind++;
     else if (e.type === 'stalemate_break') agg.stalemate++;
     else if (e.type === 'arena_shrink') agg.shrink++;
+    else if (e.type === 'launch') {
+      agg.launches++;
+      if (e.data?.move === 'env') agg.launchEnv++;
+    } else if (e.type === 'knockdown') agg.knockdowns++;
+    else if (e.type === 'kill' && rec.events.some((x) => x.type === 'launch' && x.b !== undefined && Math.abs(x.t - e.t) < 0.02)) agg.launchKills++;
   }
   games[a][b]++;
   games[b][a]++;
@@ -153,6 +164,7 @@ if (only) {
 }
 const ms = Date.now() - t0;
 
+const launchMatches = launchMatchCount;
 const pct = (x: number) => `${((x / agg.n) * 100).toFixed(1)}%`;
 const sorted = [...agg.dur].sort((a, b) => a - b);
 const q = (p: number) => sorted[Math.min(sorted.length - 1, Math.floor(p * sorted.length))];
@@ -164,6 +176,7 @@ console.log(`Duration  mean ${mean(agg.dur).toFixed(1)}s | p10 ${q(0.1).toFixed(
 const sw = [0, 0, 0, 0, 0];
 for (const s of agg.swings) sw[Math.min(4, s)]++;
 console.log(`Momentum swings (HP-lead flips, 8% hysteresis): 0:${pct(sw[0])}  1:${pct(sw[1])}  2:${pct(sw[2])}  3:${pct(sw[3])}  4+:${pct(sw[4])}  | mean ${mean(agg.swings).toFixed(2)} | >=2 swings: ${pct(sw[2] + sw[3] + sw[4])}`);
+console.log(`Launches/match ${(agg.launches / agg.n).toFixed(2)} (env ${(agg.launchEnv / agg.n).toFixed(2)}, lethal ${(agg.launchKills / agg.n).toFixed(2)}) | knockdowns/match ${(agg.knockdowns / agg.n).toFixed(2)} | matches with >=1 launch ${pct(launchMatches)}`);
 console.log(`One-sided: ${pct(agg.oneSided)} | Timeouts: ${pct(agg.timeout)} | Draws: ${pct(agg.draws)} | Comeback wins (winner was down >=25% HP): ${pct(agg.comeback)}`);
 console.log(
   `Per match: hits ${(agg.hits / agg.n).toFixed(1)}, dodges ${(agg.dodges / agg.n).toFixed(1)}, parries ${(agg.parries / agg.n).toFixed(2)}, ultimates ${(agg.ults / agg.n).toFixed(2)}, last stands ${(agg.lastStand / agg.n).toFixed(2)}, second winds ${(agg.secondWind / agg.n).toFixed(2)}, stalemate breaks ${(agg.stalemate / agg.n).toFixed(2)}, ring-shrink reached ${pct(agg.shrink)}`,

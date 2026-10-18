@@ -1,0 +1,60 @@
+{
+ "full": {
+  "info": {
+   "tier": "full",
+   "format": "ktx2",
+   "assets": [
+    "kit/arcade_broken",
+    "kit/arcade_bay",
+    "kit/arch",
+    "kit/balustrade",
+    "kit/dais",
+    "kit/plinth",
+    "kit/spear_fence",
+    "kit/stairs",
+    "kit/wall_a",
+    "kit/wall_broken",
+    "kit/wall_b",
+    "kit/banners",
+    "kit/banner_pole",
+    "kit/bell",
+    "kit/bone_pile",
+    "kit/barrel",
+    "kit/brazier_pillartop",
+    "kit/barricade",
+    "kit/brazier_tripod",
+    "kit/brazier_wall",
+    "kit/candles",
+    "kit/chain_link",
+    "kit/brazier_pedestal",
+    "kit/chain_weight",
+    "kit/chunk",
+    "kit/crate",
+    "kit/column_ruin",
+    "kit/crumble",
+    "kit/lantern_cage",
+    "kit/lantern_paper",
+    "kit/keg",
+    "kit/lantern_toro",
+    "kit/rock_prop",
+    "kit/skull",
+    "kit/rubble_pile",
+    "kit/rubble_scatter",
+    "kit/spike_grate",
+    "kit/stakes",
+    "kit/statue_hooded",
+    "kit/urn",
+    "kit/statue_knight",
+    "kit/statue_mage",
+    "kit/vent_grate",
+    "kit/pillar_square",
+    "kit/stone_trim"
+   ],
+   "drawCalls": 0,
+   "triangles": 0
+  },
+  "errors": [
+   "Failed to load resource: the server responded with a status of 404 (Not Found)"
+  ]
+ }
+}

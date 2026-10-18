@@ -1,0 +1,223 @@
+{
+ "seed": 1,
+ "q": 2,
+ "bg": "neutral",
+ "times": [
+  0.05,
+  0.15,
+  0.3,
+  0.6,
+  1.2
+ ],
+ "items": [
+  {
+   "key": "f3.trail.axe",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 29.696284489435474,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.axe.heavy",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.472151947087045,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.sword",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.27389398351608,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.sword.heavy",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.099540891270998,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.claw",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.736380950378628,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.claw.heavy",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 23.073338775113676,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.blunt",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 23.856067588479505,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.trail.blunt.heavy",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 24.253734774286897,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 11.7
+  },
+  {
+   "key": "f3.metal",
+   "drawCalls": 46,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 29.151515757750655,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.block",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.388393582987998,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.parry",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.528544208006654,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.knockdown",
+   "drawCalls": 47,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 26.077763032807567,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.steps",
+   "drawCalls": 44,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 25.643162100442346,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.dodge",
+   "drawCalls": 43,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 24.03187959445404,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.pumpkin",
+   "drawCalls": 45,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 22.4927809770029,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  },
+  {
+   "key": "f3.flame",
+   "drawCalls": 51,
+   "particles": {
+    "add": 0,
+    "alpha": 0,
+    "addCap": 4096,
+    "alphaCap": 2048
+   },
+   "frameMs": 26.58801835404116,
+   "atlasFormat": "webp",
+   "atlasGpuMB": 23.7
+  }
+ ],
+ "errors": []
+}

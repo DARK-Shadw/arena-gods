@@ -1,0 +1,935 @@
+{
+ "seedsPerPair": 4,
+ "matches": 224,
+ "diagSeconds": 24.5,
+ "global": {
+  "meanDur": 69.908,
+  "msPerMatchNoRecord_withAnalysis": 109.123,
+  "stepUs_plain": 13.5,
+  "stateCopyUs_proxy": 189.7,
+  "exchangesPerMin": 39.672,
+  "lullsOver4sPerMatch": 1.51,
+  "lullShareOfFightTime": 10.8,
+  "simultaneousStartsPerMatch": 1.54,
+  "tradesPerMatch": 3.08,
+  "attacks": 14436,
+  "atkCtx": {
+   "neutral": 3493,
+   "recovery": 3619,
+   "windup": 2183,
+   "open": 1594,
+   "down": 1356,
+   "getup": 1499,
+   "dodge": 166,
+   "active": 396,
+   "block": 130
+  },
+  "outcome": {
+   "blocked": 1125,
+   "got_hit_in_own_attack": 5887,
+   "parried": 475,
+   "dodged": 464,
+   "hit": 8243,
+   "feint": 1135,
+   "whiff": 2269
+  },
+  "atkOutOfReachPct": 2.7,
+  "punish": {
+   "episodes": 1657,
+   "punishedPct": 59.1,
+   "feasibleEpisodes": 844,
+   "feasiblePunishedPct": 79.3,
+   "latencyMedian": 0.117,
+   "latencyMean": 0.166,
+   "punishAttackLandedPct": 87.2
+  },
+  "incoming": {
+   "n": 11347,
+   "resp": {
+    "none": 6427,
+    "attack": 1292,
+    "block": 1625,
+    "dodge": 1459,
+    "already_block": 135,
+    "backstep": 139
+   },
+   "respLatencyMedian": 0.333,
+   "result": {
+    "ate_it": 5661,
+    "block": 914,
+    "parry": 475,
+    "dodge": 435,
+    "they_whiffed": 605
+   }
+  },
+  "spacing": {
+   "mid": 31979,
+   "outside_edge": 33752,
+   "inside_edge": 21520,
+   "deep_inside": 290590,
+   "far": 19983
+  },
+  "stillPctOfFree": 1,
+  "jitterPerMin": 6.75,
+  "goalSwitchesPerMin": 29.21,
+  "ngramAcc": {
+   "order0": 22.9,
+   "order1": 20.9,
+   "order2": 20.2
+  },
+  "blockedPct": {
+   "early": 9.1,
+   "late": 6.7
+  },
+  "guardbreakShare": {
+   "early": 4.7,
+   "late": 4.1
+  },
+  "afterBlockedNext": {
+   "heavy": 146,
+   "feint": 51,
+   "same_kind_poke": 252,
+   "guardbreak": 35,
+   "ranged": 102
+  },
+  "feints": {
+   "n": 1135,
+   "followUpPct": null,
+   "convertPct": 29.3
+  },
+  "ults": {
+   "n": 612,
+   "hitPct": 154.9,
+   "ctx": {
+    "neutral": 162,
+    "recovery": 172,
+    "open": 90,
+    "windup": 81,
+    "getup": 33,
+    "active": 46,
+    "dodge": 6,
+    "down": 18,
+    "block": 4
+   }
+  },
+  "lowStaminaAttackPct": 22.7,
+  "exhaustedPerMatch": 2.23,
+  "attacksPerFreeMinByHp": [
+   114.7,
+   136.9,
+   216
+  ],
+  "attacksPerFreeMinByLead": [
+   171.9,
+   127.5,
+   112
+  ],
+  "heavyShareByHp": [
+   28.8,
+   29.4,
+   25.8
+  ],
+  "ctxEntropyMean": 0.251,
+  "ctxOutcome": {
+   "neutral": {
+    "n": 3268,
+    "blocked": 13.5,
+    "parried": 5.7,
+    "dodged": 5.5,
+    "whiff": 24.1,
+    "superseded": 7.3,
+    "hit": 44
+   },
+   "recovery": {
+    "n": 3328,
+    "hit": 62.3,
+    "parried": 4.9,
+    "blocked": 8.7,
+    "whiff": 15.3,
+    "dodged": 3.9,
+    "superseded": 4.8
+   },
+   "open": {
+    "n": 1395,
+    "hit": 78.3,
+    "whiff": 10.3,
+    "blocked": 3.7,
+    "dodged": 2.3,
+    "superseded": 3.7,
+    "parried": 1.8
+   },
+   "windup": {
+    "n": 2007,
+    "hit": 41.3,
+    "superseded": 53.4,
+    "blocked": 0.7,
+    "parried": 0.8,
+    "whiff": 2.9,
+    "dodged": 0.8
+   },
+   "getup": {
+    "n": 1288,
+    "hit": 53.6,
+    "blocked": 6.3,
+    "whiff": 22,
+    "dodged": 2.7,
+    "superseded": 13.7,
+    "parried": 1.7
+   },
+   "dodge": {
+    "n": 159,
+    "parried": 5,
+    "hit": 45.9,
+    "whiff": 34.6,
+    "blocked": 7.5,
+    "dodged": 2.5,
+    "superseded": 4.4
+   },
+   "down": {
+    "n": 1208,
+    "whiff": 16.9,
+    "superseded": 68,
+    "hit": 15.1
+   },
+   "active": {
+    "n": 369,
+    "hit": 68.8,
+    "whiff": 10,
+    "dodged": 1.1,
+    "parried": 1.4,
+    "superseded": 17.6,
+    "blocked": 1.1
+   },
+   "block": {
+    "n": 116,
+    "superseded": 3.4,
+    "hit": 16.4,
+    "whiff": 25.9,
+    "blocked": 41.4,
+    "dodged": 4.3,
+    "parried": 8.6
+   }
+  },
+  "heavy": {
+   "attempts": 4126,
+   "whiffPct": 19.1,
+   "whiffsPerMatch": 3.52
+  },
+  "hitsOnAttackingVictimPerMatch": 17.03,
+  "hitsOnStaggeredOrDownPerMatch": 11.78,
+  "ultLandedPct": 60.1,
+  "exhaustedTimePct": 24.4,
+  "attackCadenceCV": {
+   "mean": 0.641,
+   "median": 0.641
+  }
+ },
+ "fighters": {
+  "gorak": {
+   "attacksPerMatch": 27.3,
+   "atkCtx": {
+    "neutral": 31.4,
+    "recovery": 21.1,
+    "windup": 19.5,
+    "open": 10,
+    "down": 4,
+    "getup": 9.5,
+    "dodge": 1.2,
+    "active": 2.7,
+    "block": 0.7
+   },
+   "outcome": {
+    "blocked": 2.57,
+    "got_hit_in_own_attack": 18.61,
+    "parried": 0.96,
+    "dodged": 1.13,
+    "hit": 11.09,
+    "feint": 3.18,
+    "whiff": 6.34
+   },
+   "punishedPct": 53.1,
+   "feasiblePunishedPct": 71.1,
+   "punishLatencyMed": 0.117,
+   "incomingResp": {
+    "none": 71.4,
+    "attack": 12.6,
+    "block": 7.9,
+    "dodge": 4.7,
+    "already_block": 0.9,
+    "backstep": 0.4
+   },
+   "incomingResult": {
+    "ate_it": 68.9,
+    "block": 7.1,
+    "parry": 1.5,
+    "dodge": 1.8,
+    "they_whiffed": 1.2
+   },
+   "stillPct": 1.4,
+   "spacing": {
+    "mid": 12.1,
+    "outside_edge": 9.1,
+    "inside_edge": 5.3,
+    "deep_inside": 68,
+    "far": 5.6
+   },
+   "ctxEntropy": {
+    "H_move_bits": 2.9,
+    "H_move_given_ctx": 2.32,
+    "MI_share": 0.199
+   },
+   "ngram": {
+    "o0": 15.5,
+    "o1": 15.9,
+    "o2": 15.4
+   },
+   "blocked": {
+    "early": 11.1,
+    "late": 7.9
+   },
+   "gbShare": {
+    "early": 13,
+    "late": 9.8
+   },
+   "feintConvertPct": 24.2,
+   "ults": 81,
+   "ultHitPct": 132.1
+  },
+  "aldric": {
+   "attacksPerMatch": 36.7,
+   "atkCtx": {
+    "recovery": 34.6,
+    "open": 21.5,
+    "windup": 8.8,
+    "neutral": 18.3,
+    "down": 6.4,
+    "getup": 5.9,
+    "active": 2.3,
+    "dodge": 1.9,
+    "block": 0.3
+   },
+   "outcome": {
+    "hit": 20.82,
+    "got_hit_in_own_attack": 12.07,
+    "feint": 3.63,
+    "blocked": 1.75,
+    "whiff": 6.63,
+    "dodged": 1.07,
+    "parried": 1.14
+   },
+   "punishedPct": 62.8,
+   "feasiblePunishedPct": 88.6,
+   "punishLatencyMed": 0.15,
+   "incomingResp": {
+    "block": 31.1,
+    "dodge": 10.1,
+    "none": 44.8,
+    "attack": 5.6,
+    "backstep": 1.3,
+    "already_block": 4.2
+   },
+   "incomingResult": {
+    "block": 16.5,
+    "parry": 11.2,
+    "dodge": 4.9,
+    "ate_it": 38.1,
+    "they_whiffed": 6
+   },
+   "stillPct": 1,
+   "spacing": {
+    "far": 3,
+    "mid": 6.5,
+    "outside_edge": 11.8,
+    "inside_edge": 4.4,
+    "deep_inside": 74.3
+   },
+   "ctxEntropy": {
+    "H_move_bits": 3.08,
+    "H_move_given_ctx": 2.47,
+    "MI_share": 0.196
+   },
+   "ngram": {
+    "o0": 21.5,
+    "o1": 17.3,
+    "o2": 17.1
+   },
+   "blocked": {
+    "early": 5.9,
+    "late": 4
+   },
+   "gbShare": {
+    "early": 8.3,
+    "late": 7.8
+   },
+   "feintConvertPct": 38.4,
+   "ults": 76,
+   "ultHitPct": 77.6
+  },
+  "ozrel": {
+   "attacksPerMatch": 29.2,
+   "atkCtx": {
+    "windup": 16.4,
+    "open": 8.3,
+    "down": 11.4,
+    "recovery": 25.3,
+    "neutral": 25.8,
+    "active": 3.8,
+    "getup": 6.7,
+    "dodge": 2,
+    "block": 0.2
+   },
+   "outcome": {
+    "hit": 23.93,
+    "got_hit_in_own_attack": 8.8,
+    "parried": 1.05,
+    "blocked": 2.71,
+    "dodged": 1.27,
+    "whiff": 0.93
+   },
+   "punishedPct": 47.2,
+   "feasiblePunishedPct": 73.7,
+   "punishLatencyMed": 0.117,
+   "incomingResp": {
+    "attack": 13.5,
+    "block": 12.6,
+    "none": 55.3,
+    "dodge": 14.1,
+    "backstep": 1,
+    "already_block": 0.3
+   },
+   "incomingResult": {
+    "ate_it": 42.3,
+    "parry": 2.7,
+    "block": 5.6,
+    "they_whiffed": 7.8,
+    "dodge": 2.2
+   },
+   "stillPct": 0.9,
+   "spacing": {
+    "far": 12.6,
+    "mid": 4.9,
+    "outside_edge": 4.7,
+    "inside_edge": 5.6,
+    "deep_inside": 72.3
+   },
+   "ctxEntropy": {
+    "H_move_bits": 2.81,
+    "H_move_given_ctx": 2.22,
+    "MI_share": 0.208
+   },
+   "ngram": {
+    "o0": 23.2,
+    "o1": 22,
+    "o2": 21.5
+   },
+   "blocked": {
+    "early": 10.2,
+    "late": 8.4
+   },
+   "gbShare": {
+    "early": 0,
+    "late": 0
+   },
+   "feintConvertPct": null,
+   "ults": 73,
+   "ultHitPct": 280.8
+  },
+  "erika": {
+   "attacksPerMatch": 36,
+   "atkCtx": {
+    "windup": 11.9,
+    "recovery": 25.1,
+    "open": 9.6,
+    "neutral": 28.5,
+    "down": 10.7,
+    "getup": 9.8,
+    "active": 3.6,
+    "dodge": 0.7,
+    "block": 0
+   },
+   "outcome": {
+    "parried": 0.32,
+    "hit": 29.14,
+    "got_hit_in_own_attack": 6.5,
+    "dodged": 0.63,
+    "whiff": 2.04,
+    "blocked": 2.36,
+    "feint": 0.64
+   },
+   "punishedPct": 53.8,
+   "feasiblePunishedPct": 72.1,
+   "punishLatencyMed": 0.117,
+   "incomingResp": {
+    "attack": 9.8,
+    "none": 44.5,
+    "block": 16.4,
+    "dodge": 23,
+    "backstep": 3
+   },
+   "incomingResult": {
+    "ate_it": 30.8,
+    "they_whiffed": 12.1,
+    "block": 6,
+    "parry": 3.7,
+    "dodge": 3
+   },
+   "stillPct": 0.6,
+   "spacing": {
+    "far": 4.5,
+    "mid": 9.3,
+    "deep_inside": 75.2,
+    "inside_edge": 7,
+    "outside_edge": 4.1
+   },
+   "ctxEntropy": {
+    "H_move_bits": 2.7,
+    "H_move_given_ctx": 1.87,
+    "MI_share": 0.307
+   },
+   "ngram": {
+    "o0": 34.8,
+    "o1": 31.4,
+    "o2": 29.2
+   },
+   "blocked": {
+    "early": 6.7,
+    "late": 6.4
+   },
+   "gbShare": {
+    "early": 0,
+    "late": 0
+   },
+   "feintConvertPct": 44.4,
+   "ults": 70,
+   "ultHitPct": 237.1
+  },
+  "vex": {
+   "attacksPerMatch": 38.5,
+   "atkCtx": {
+    "neutral": 19.1,
+    "recovery": 28.7,
+    "windup": 13.1,
+    "down": 9.9,
+    "getup": 11.8,
+    "open": 12.7,
+    "active": 2,
+    "block": 1.9,
+    "dodge": 0.9
+   },
+   "outcome": {
+    "hit": 20.84,
+    "whiff": 8.25,
+    "blocked": 2.95,
+    "got_hit_in_own_attack": 11.23,
+    "feint": 5.23,
+    "dodged": 0.8,
+    "parried": 0.77
+   },
+   "punishedPct": 69.1,
+   "feasiblePunishedPct": 82.1,
+   "punishLatencyMed": 0.117,
+   "incomingResp": {
+    "dodge": 24.2,
+    "attack": 9.5,
+    "block": 17.3,
+    "none": 41.8,
+    "already_block": 1.9,
+    "backstep": 3
+   },
+   "incomingResult": {
+    "they_whiffed": 8.3,
+    "ate_it": 35.7,
+    "block": 8.8,
+    "parry": 6.6,
+    "dodge": 6.3
+   },
+   "stillPct": 0.8,
+   "spacing": {
+    "far": 2.7,
+    "mid": 7.5,
+    "deep_inside": 73.4,
+    "outside_edge": 10.7,
+    "inside_edge": 5.8
+   },
+   "ctxEntropy": {
+    "H_move_bits": 3.01,
+    "H_move_given_ctx": 2.2,
+    "MI_share": 0.267
+   },
+   "ngram": {
+    "o0": 15.8,
+    "o1": 16,
+    "o2": 16.2
+   },
+   "blocked": {
+    "early": 10.2,
+    "late": 5.8
+   },
+   "gbShare": {
+    "early": 0,
+    "late": 0
+   },
+   "feintConvertPct": 30.4,
+   "ults": 64,
+   "ultHitPct": 37.5
+  },
+  "fenrik": {
+   "attacksPerMatch": 35.9,
+   "atkCtx": {
+    "recovery": 21,
+    "getup": 10.7,
+    "down": 10.9,
+    "open": 6.8,
+    "windup": 17.9,
+    "neutral": 27.6,
+    "active": 2.3,
+    "block": 1.6,
+    "dodge": 1.1
+   },
+   "outcome": {
+    "hit": 14.63,
+    "whiff": 7.23,
+    "got_hit_in_own_attack": 16.77,
+    "feint": 3.88,
+    "blocked": 3.09,
+    "parried": 2.16,
+    "dodged": 0.86
+   },
+   "punishedPct": 59.1,
+   "feasiblePunishedPct": 83.6,
+   "punishLatencyMed": 0.2,
+   "incomingResp": {
+    "dodge": 11.5,
+    "none": 64.8,
+    "block": 7.2,
+    "attack": 14.6,
+    "backstep": 0.3,
+    "already_block": 0.2
+   },
+   "incomingResult": {
+    "dodge": 4,
+    "block": 4.6,
+    "ate_it": 61.2,
+    "they_whiffed": 1.9,
+    "parry": 2.3
+   },
+   "stillPct": 0.3,
+   "spacing": {
+    "far": 4.3,
+    "mid": 7.8,
+    "outside_edge": 8.4,
+    "inside_edge": 5.7,
+    "deep_inside": 73.8
+   },
+   "ctxEntropy": {
+    "H_move_bits": 2.66,
+    "H_move_given_ctx": 1.93,
+    "MI_share": 0.274
+   },
+   "ngram": {
+    "o0": 31.9,
+    "o1": 27.1,
+    "o2": 25.3
+   },
+   "blocked": {
+    "early": 9.6,
+    "late": 7.9
+   },
+   "gbShare": {
+    "early": 0,
+    "late": 0
+   },
+   "feintConvertPct": 24,
+   "ults": 93,
+   "ultHitPct": 220.4
+  },
+  "maw": {
+   "attacksPerMatch": 23.4,
+   "atkCtx": {
+    "open": 9.7,
+    "recovery": 24,
+    "down": 8.8,
+    "windup": 17.8,
+    "active": 3.4,
+    "getup": 15.1,
+    "neutral": 20.3,
+    "block": 0.5,
+    "dodge": 0.4
+   },
+   "outcome": {
+    "blocked": 2.21,
+    "hit": 11.5,
+    "whiff": 3.45,
+    "got_hit_in_own_attack": 16.96,
+    "dodged": 1.77,
+    "parried": 1.45
+   },
+   "punishedPct": 44.8,
+   "feasiblePunishedPct": 61.1,
+   "punishLatencyMed": 0.117,
+   "incomingResp": {
+    "block": 11.4,
+    "dodge": 4.3,
+    "none": 70.4,
+    "attack": 11.1,
+    "already_block": 1
+   },
+   "incomingResult": {
+    "parry": 1.9,
+    "dodge": 2.6,
+    "ate_it": 64,
+    "block": 9.1,
+    "they_whiffed": 2.4
+   },
+   "stillPct": 1.6,
+   "spacing": {
+    "far": 6,
+    "mid": 10.9,
+    "outside_edge": 6.9,
+    "inside_edge": 3.8,
+    "deep_inside": 72.5
+   },
+   "ctxEntropy": {
+    "H_move_bits": 2.86,
+    "H_move_given_ctx": 1.96,
+    "MI_share": 0.317
+   },
+   "ngram": {
+    "o0": 22.5,
+    "o1": 19.5,
+    "o2": 18.5
+   },
+   "blocked": {
+    "early": 11,
+    "late": 8.1
+   },
+   "gbShare": {
+    "early": 8.1,
+    "late": 8.1
+   },
+   "feintConvertPct": null,
+   "ults": 72,
+   "ultHitPct": 116.7
+  },
+  "hollowjack": {
+   "attacksPerMatch": 30.7,
+   "atkCtx": {
+    "windup": 18.6,
+    "recovery": 18.1,
+    "down": 12.3,
+    "getup": 14.9,
+    "open": 7.7,
+    "neutral": 23.8,
+    "active": 2.2,
+    "dodge": 0.9,
+    "block": 1.6
+   },
+   "outcome": {
+    "hit": 15.25,
+    "feint": 3.71,
+    "blocked": 2.45,
+    "got_hit_in_own_attack": 14.18,
+    "whiff": 5.66,
+    "dodged": 0.77,
+    "parried": 0.63
+   },
+   "punishedPct": 77.3,
+   "feasiblePunishedPct": 83.8,
+   "punishLatencyMed": 0.117,
+   "incomingResp": {
+    "attack": 15.2,
+    "none": 62.8,
+    "dodge": 10,
+    "block": 8.7,
+    "backstep": 0.6,
+    "already_block": 0.5
+   },
+   "incomingResult": {
+    "ate_it": 60.4,
+    "dodge": 5.4,
+    "they_whiffed": 3,
+    "parry": 2.5,
+    "block": 5.9
+   },
+   "stillPct": 1.7,
+   "spacing": {
+    "far": 5.4,
+    "mid": 7.6,
+    "outside_edge": 9.7,
+    "inside_edge": 5.6,
+    "deep_inside": 71.7
+   },
+   "ctxEntropy": {
+    "H_move_bits": 3.09,
+    "H_move_given_ctx": 2.34,
+    "MI_share": 0.243
+   },
+   "ngram": {
+    "o0": 15.3,
+    "o1": 16.2,
+    "o2": 17
+   },
+   "blocked": {
+    "early": 9.2,
+    "late": 6.8
+   },
+   "gbShare": {
+    "early": 11.1,
+    "late": 10.7
+   },
+   "feintConvertPct": 26.4,
+   "ults": 83,
+   "ultHitPct": 118.1
+  }
+ },
+ "bots": {
+  "spam": {
+   "botWinPct": 40,
+   "n": 80,
+   "byFighter": {
+    "gorak": "2/10",
+    "aldric": "2/10",
+    "ozrel": "7/10",
+    "erika": "6/10",
+    "vex": "10/10",
+    "fenrik": "3/10",
+    "maw": "1/10",
+    "hollowjack": "1/10"
+   }
+  },
+  "heavy": {
+   "botWinPct": 47.5,
+   "n": 80,
+   "byFighter": {
+    "gorak": "1/10",
+    "aldric": "0/10",
+    "ozrel": "8/10",
+    "erika": "6/10",
+    "vex": "4/10",
+    "fenrik": "6/10",
+    "maw": "7/10",
+    "hollowjack": "6/10"
+   }
+  },
+  "turtle": {
+   "botWinPct": 27.5,
+   "n": 80,
+   "byFighter": {
+    "gorak": "4/10",
+    "aldric": "1/10",
+    "ozrel": "0/10",
+    "erika": "0/10",
+    "vex": "9/10",
+    "fenrik": "3/10",
+    "maw": "2/10",
+    "hollowjack": "3/10"
+   }
+  }
+ },
+ "goals": {
+  "gorak": {
+   "pressure": 49.1,
+   "close": 18.7,
+   "punish": 17.7,
+   "regroup": 9.4,
+   "grab": 2.6,
+   "finish": 1,
+   "guard": 0.9,
+   "gambit": 0.3,
+   "escape": 0.1,
+   "footsies": 0.1,
+   "cover": 0,
+   "kite": 0,
+   "bait": 0
+  },
+  "aldric": {
+   "punish": 37.8,
+   "regroup": 17.6,
+   "pressure": 14.6,
+   "close": 9.7,
+   "guard": 8.9,
+   "footsies": 8.1,
+   "finish": 1,
+   "escape": 1,
+   "grab": 0.6,
+   "smash": 0.3,
+   "kite": 0.2,
+   "gambit": 0.2,
+   "cover": 0.1,
+   "bait": 0
+  },
+  "ozrel": {
+   "kite": 34.2,
+   "punish": 33,
+   "regroup": 12.8,
+   "pressure": 11.7,
+   "close": 3.7,
+   "escape": 2.9,
+   "smash": 1,
+   "finish": 0.6,
+   "gambit": 0.1
+  },
+  "erika": {
+   "kite": 40.8,
+   "punish": 32.9,
+   "pressure": 12.5,
+   "regroup": 7,
+   "escape": 4.5,
+   "close": 1.4,
+   "smash": 0.7,
+   "finish": 0.2
+  },
+  "vex": {
+   "punish": 34.3,
+   "pressure": 28.7,
+   "regroup": 16,
+   "close": 6.1,
+   "footsies": 5.9,
+   "guard": 3.7,
+   "finish": 2.1,
+   "grab": 1.3,
+   "escape": 1,
+   "smash": 0.5,
+   "bait": 0.3,
+   "cover": 0.1,
+   "kite": 0,
+   "gambit": 0
+  },
+  "fenrik": {
+   "pressure": 55.4,
+   "punish": 23.6,
+   "close": 13.2,
+   "regroup": 7.2,
+   "grab": 0.3,
+   "finish": 0.2
+  },
+  "maw": {
+   "pressure": 36.8,
+   "punish": 29.7,
+   "close": 13.1,
+   "regroup": 10,
+   "grab": 4.4,
+   "finish": 2.7,
+   "guard": 2.4,
+   "gambit": 0.3,
+   "footsies": 0.2,
+   "smash": 0.2,
+   "cover": 0.2,
+   "bait": 0.1,
+   "escape": 0
+  },
+  "hollowjack": {
+   "pressure": 49.8,
+   "punish": 23.2,
+   "close": 15.7,
+   "regroup": 6.9,
+   "grab": 2.9,
+   "finish": 0.7,
+   "guard": 0.5,
+   "escape": 0.2,
+   "kite": 0.1,
+   "gambit": 0,
+   "smash": 0
+  }
+ }
+}

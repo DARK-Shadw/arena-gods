@@ -1,0 +1,1375 @@
+{
+ "_doc": "Arena Blender jobs for tools/arena/bake.py. Each job: id, script (Blender) or kind 'cmd' + cmd, args, env, inputs (extra files whose content invalidates done.json), note; any key of `defaults` overrides it per job. MB values are free system RAM thresholds. A1: kit asset jobs write <out>/asset.json + <id>_raw.glb + PNG sets; tools/arena/build_assets.mjs turns them into public/arena/kit/*.glb.",
+ "blender": "C:/Program Files/Blender Foundation/Blender 5.0/blender.exe",
+ "defaults": {
+  "startMinFreeMb": 4096,
+  "startWaitMin": 10,
+  "pauseBelowMb": 1500,
+  "resumeAboveMb": 2500,
+  "killBelowMb": 700,
+  "maxPauseMin": 20,
+  "timeoutMin": 120,
+  "selfPauseMin": 3
+ },
+ "jobs": [
+  {
+   "id": "probe_env",
+   "script": "tools/arena/blender/probe_env.py",
+   "args": [],
+   "note": "A0: devices, GN SDF nodes, bake/glTF options, EEVEE pano, threads during render"
+  },
+  {
+   "id": "probe_env_oneapi",
+   "script": "tools/arena/blender/probe_env.py",
+   "args": [],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "note": "A0: same with CYCLES_ONEAPI_ALL_DEVICES=1 (iGPU)"
+  },
+  {
+   "id": "probe_bake_256",
+   "script": "tools/arena/blender/probe_bake.py",
+   "args": [
+    "--px",
+    "256",
+    "--high-level",
+    "6",
+    "--ao-samples",
+    "128",
+    "--voxel",
+    "0.01"
+   ],
+   "note": "A0: normal+AO bake 256 px, SDF erosion, voxel remesh 1 cm, GLB"
+  },
+  {
+   "id": "probe_bake_1024",
+   "script": "tools/arena/blender/probe_bake.py",
+   "args": [
+    "--px",
+    "1024",
+    "--high-level",
+    "7",
+    "--ao-samples",
+    "128",
+    "--voxel",
+    "0"
+   ],
+   "note": "A0: kit-size bake 1024 px from a ~3 M tri high"
+  },
+  {
+   "id": "ktx_probe",
+   "kind": "cmd",
+   "script": "tools/arena/ktx_probe.mjs",
+   "cmd": [
+    "node",
+    "{root}/tools/arena/ktx_probe.mjs",
+    "{out}"
+   ],
+   "inputs": [
+    "tools/arena/_bake/probe_bake_1024/probe_pillar.glb"
+   ],
+   "startMinFreeMb": 1024,
+   "note": "A0: KTX-Software + gltf-transform meshopt/uastc/etc1s/webp"
+  },
+  {
+   "id": "probe_misc",
+   "script": "tools/arena/blender/probe_misc.py",
+   "args": [
+    "--frames",
+    "60",
+    "--card-frames",
+    "8"
+   ],
+   "note": "A0: banner cloth settle 40x80 60 f, EEVEE 512 px card frames"
+  },
+  {
+   "id": "pano_quick",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "2048",
+    "--h",
+    "341",
+    "--samples",
+    "32",
+    "--repeat",
+    "2"
+   ],
+   "note": "A0: Cycles CPU equirect 2048x341 32 spp + Depth + AOV"
+  },
+  {
+   "id": "pano_quick_gpu",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "2048",
+    "--h",
+    "341",
+    "--samples",
+    "32",
+    "--device",
+    "ONEAPI",
+    "--repeat",
+    "2"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "note": "A0: same on oneAPI (falls back to CPU if no device)"
+  },
+  {
+   "id": "pano_eevee_slice",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--engine",
+    "eevee",
+    "--slice",
+    "--w",
+    "1024",
+    "--h",
+    "1365",
+    "--samples",
+    "32"
+   ],
+   "note": "A0: EEVEE 45 deg perspective slice (fallback preview), 1024x1365"
+  },
+  {
+   "id": "pano_fog_quick",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "2048",
+    "--h",
+    "341",
+    "--samples",
+    "32",
+    "--fog"
+   ],
+   "note": "A0: volume fog cost (Cycles 5.0 unbiased volumes)"
+  },
+  {
+   "id": "pano_medium",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "4096",
+    "--h",
+    "683",
+    "--samples",
+    "64",
+    "--denoise"
+   ],
+   "note": "A0: medium-tier layer 4096x683 64 spp + OIDN"
+  },
+  {
+   "id": "pano_high",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "8192",
+    "--h",
+    "1365",
+    "--samples",
+    "128",
+    "--denoise"
+   ],
+   "timeoutMin": 180,
+   "note": "A0: the plan's high-tier layer 8192x1365 128 spp + OIDN"
+  },
+  {
+   "id": "pano_medium_gpu",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "4096",
+    "--h",
+    "683",
+    "--samples",
+    "64",
+    "--denoise",
+    "--device",
+    "ONEAPI"
+   ],
+   "note": "A0: medium layer on the Arc iGPU (oneAPI)"
+  },
+  {
+   "id": "inset_hero",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--slice",
+    "--w",
+    "2048",
+    "--h",
+    "1024",
+    "--samples",
+    "128",
+    "--denoise",
+    "--tag",
+    "inset_2048x1024_s128"
+   ],
+   "note": "A0: hero-inset-like perspective render 2048x1024 128 spp (x4 for 4096x2048)"
+  },
+  {
+   "id": "pano_high_gpu",
+   "script": "tools/arena/blender/probe_pano.py",
+   "args": [
+    "--w",
+    "8192",
+    "--h",
+    "1365",
+    "--samples",
+    "128",
+    "--denoise",
+    "--device",
+    "ONEAPI"
+   ],
+   "timeoutMin": 90,
+   "startMinFreeMb": 6000,
+   "note": "A0: the high-tier layer on the Arc iGPU (oneAPI); needs about 6 GB free"
+  },
+  {
+   "id": "kit_brazier_tripod",
+   "script": "tools/arena/blender/kit_brazier.py",
+   "args": [
+    "--px",
+    "1024",
+    "--px-low",
+    "512",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/metal_plate_02/meta.json"
+   ],
+   "timeoutMin": 30,
+   "note": "A1: tripod brazier prop (PROP_BASE r 0.45, TOP 1.2), LOD0 1024 + LOD1 512 bakes, raw GLB + asset.json"
+  },
+  {
+   "id": "floor_flagstone",
+   "script": "tools/arena/blender/floor_set.py",
+   "args": [
+    "--name",
+    "flagstone_bluegrey",
+    "--cc0",
+    "polyhaven/large_grey_tiles",
+    "--tile-m",
+    "4.2",
+    "--px",
+    "2048",
+    "--grid",
+    "384",
+    "--disp-m",
+    "0.035",
+    "--device",
+    "ONEAPI",
+    "--sat",
+    "0.28",
+    "--tint",
+    "0.78,0.86,1.0",
+    "--gain",
+    "0.62",
+    "--joint-dark",
+    "0.8",
+    "--cracks",
+    "0.5",
+    "--crack-cells",
+    "14",
+    "--seed",
+    "7"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/large_grey_tiles/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A2: blue-grey flagstone floor set (Moon Gate, ref-3) from Poly Haven large_grey_tiles: graded albedo, scan normal + cracks, ORM with Cycles AO (3x3 tile bake) + dry roughness + water rank"
+  },
+  {
+   "id": "floor_slate",
+   "script": "tools/arena/blender/floor_set.py",
+   "args": [
+    "--name",
+    "slate_slabs",
+    "--cc0",
+    "polyhaven/stone_tiles",
+    "--tile-m",
+    "5.0",
+    "--px",
+    "2048",
+    "--grid",
+    "384",
+    "--disp-m",
+    "0.03",
+    "--device",
+    "ONEAPI",
+    "--sat",
+    "0.18",
+    "--tint",
+    "0.86,0.9,0.98",
+    "--gain",
+    "0.5",
+    "--joint-lo",
+    "0.04",
+    "--joint-hi",
+    "0.16",
+    "--joint-dark",
+    "0.9",
+    "--cracks",
+    "0.35",
+    "--crack-cells",
+    "10",
+    "--seed",
+    "19"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/stone_tiles/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A2: dark slate slab floor set (Molten Citadel ref-4 and others) from Poly Haven stone_tiles"
+  },
+  {
+   "id": "inlay_moongate",
+   "script": "tools/arena/blender/inlay_moongate.py",
+   "args": [
+    "--px",
+    "2048",
+    "--grid",
+    "1280",
+    "--ao-samples",
+    "96",
+    "--device",
+    "ONEAPI"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A2: Moon Gate engraved ritual circle (4 rings + rune band + crescents), 16 m disc, numpy SDF height -> displaced grid -> Cycles normal + AO bakes"
+  },
+  {
+   "id": "kit_pillar_square",
+   "script": "tools/arena/blender/kit_stone.py",
+   "args": [
+    "--piece",
+    "pillar_square",
+    "--px",
+    "2048",
+    "--px-low",
+    "1024",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json",
+    "tools/arena/blender/fracture.py"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: square masonry pillar (ref-3), 9-slice SHAFT, FRAC 4 slices, unique 2048/1024 bake from a weathered voxel high; A5: FRAC = fracture.py tilted rough cuts + an axial split",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_column_ruin",
+   "script": "tools/arena/blender/kit_stone.py",
+   "args": [
+    "--piece",
+    "column_ruin",
+    "--px",
+    "1024",
+    "--px-low",
+    "512",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json",
+    "tools/arena/blender/fracture.py"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: fluted ruin column with a broken top, 9-slice SHAFT, FRAC drums; A5: FRAC = fracture.py tilted rough cuts + an axial split",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_rubble_pile",
+   "script": "tools/arena/blender/kit_stone.py",
+   "args": [
+    "--piece",
+    "rubble_pile",
+    "--px",
+    "1024",
+    "--px-low",
+    "512",
+    "--ao-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: rubble pile (broken masonry + toppled drum) for the indestructible rock obstacle",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_stone_trim",
+   "script": "tools/arena/blender/kit_stone_trim.py",
+   "args": [
+    "--px",
+    "2048",
+    "--grid",
+    "1024",
+    "--ao-samples",
+    "64"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 40,
+   "note": "A3: stone trim sheet 2048 over 8 x 8 m (ashlar, blocks, moulding, rune frieze, rough, plain rows), numpy height -> exact normal, Cycles AO from the displaced high",
+   "startMinFreeMb": 3200
+  },
+  {
+   "id": "kit_wall_a",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "wall_a",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module wall_a (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_wall_b",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "wall_b",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module wall_b (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_wall_broken",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "wall_broken",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module wall_broken (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_arcade_bay",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "arcade_bay",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module arcade_bay (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_arcade_broken",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "arcade_broken",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module arcade_broken (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_arch",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "arch",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module arch (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_stairs",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "stairs",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module stairs (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_plinth",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "plinth",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module plinth (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_dais",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "dais",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module dais (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_balustrade",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "balustrade",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module balustrade (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_spear_fence",
+   "script": "tools/arena/blender/kit_ring.py",
+   "args": [
+    "--piece",
+    "spear_fence",
+    "--ao-samples",
+    "96"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: trim-sheet architecture module spear_fence (vertex AO + wet base, LOD0 0.5 m / LOD1 1 m grid)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_rock_prop",
+   "script": "tools/arena/blender/kit_rock.py",
+   "args": [
+    "--piece",
+    "rock_prop"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/rock_moss_set_02/meta.json"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: scan rock (Poly Haven rock_moss_set_02) fitted to PROP_BASE.rock 0.4 / TOP.rock 0.75",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_rubble_scatter",
+   "script": "tools/arena/blender/kit_rock.py",
+   "args": [
+    "--piece",
+    "rubble_scatter"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "../Assets/arena-src/polyhaven/rock_moss_set_02/meta.json"
+   ],
+   "timeoutMin": 20,
+   "note": "A3: render-only rubble cluster (5 scan rocks + 2 weathered masonry chunks) for wall feet",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_brazier_pedestal",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "brazier_pedestal"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece brazier_pedestal (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_brazier_wall",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "brazier_wall"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece brazier_wall (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_brazier_pillartop",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "brazier_pillartop"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece brazier_pillartop (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_lantern_toro",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "lantern_toro"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece lantern_toro (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_lantern_cage",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "lantern_cage"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece lantern_cage (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_lantern_paper",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "lantern_paper"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece lantern_paper (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_candles",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "candles"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece candles (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_bell",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "bell"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece bell (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_skull",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "skull"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece skull (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_bone_pile",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "bone_pile"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece bone_pile (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_stakes",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "stakes"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece stakes (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_spike_grate",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "spike_grate"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece spike_grate (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_chain_weight",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "chain_weight"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece chain_weight (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_vent_grate",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "vent_grate"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece vent_grate (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_crumble",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "crumble"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece crumble (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_chain_link",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "chain_link"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece chain_link (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_banner_pole",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "banner_pole"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece banner_pole (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_barricade",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "barricade"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece barricade (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_crate",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "crate"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece crate (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_barrel",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "barrel"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece barrel (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_keg",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "keg"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece keg (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_urn",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "urn"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece urn (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_chunk",
+   "script": "tools/arena/blender/kit_dress.py",
+   "args": [
+    "--piece",
+    "chunk"
+   ],
+   "inputs": [
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/stonekit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: dressing kit piece chunk (dresskit pipeline: procedural LODs, baked high, FRAC / nodes / sockets)",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "kit_banners",
+   "script": "tools/arena/blender/kit_banner.py",
+   "args": [],
+   "inputs": [
+    "tools/arena/blender/dresskit.py"
+   ],
+   "timeoutMin": 25,
+   "note": "A4: banners (cloth-sim drape: vertical / swag / short) + 8-sigil tattered atlas (numpy) + rod",
+   "startMinFreeMb": 2500
+  },
+  {
+   "id": "statue_hooded",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "statue_hooded"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/Paladin.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: hooded guardian (ref-3), Paladin base, robe/mantle/hood/sleeves, sword point-down; 2048/1024",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "statue_knight",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "statue_knight"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/Paladin.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: knight colossus (ref-7), Paladin armour, hood + cowl + back cloak, greatsword; 1024/512",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "statue_mage",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "statue_mage"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/erika-archer.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: staff saint (ref-8), Erika base, robe/hood/sleeves, ring staff; 1024/512",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "colossus_goddess",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "colossus_goddess"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/erika-archer.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: A6 backdrop source: veiled goddess (ref-9), 12 m weathered high -> colossus_goddess_hi.blend",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "colossus_seated",
+   "script": "tools/arena/blender/statue_kit.py",
+   "args": [
+    "--piece",
+    "colossus_seated"
+   ],
+   "inputs": [
+    "tools/arena/blender/stonekit.py",
+    "tools/arena/blender/dresskit.py",
+    "tools/arena/blender/fracture.py",
+    "../Assets/Models/brute.fbx",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "timeoutMin": 60,
+   "note": "A5: A6 backdrop source: hooded seated colossus (ref-5), 9 m weathered high -> colossus_seated_hi.blend",
+   "startMinFreeMb": 3000
+  },
+  {
+   "id": "backdrop_quick",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "layers",
+    "--quick",
+    "--markers",
+    "--device",
+    "ONEAPI"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 3000,
+   "timeoutMin": 20,
+   "note": "A6: pipeline test of the panorama renderer at 1024x172 with azimuth / distance markers (mapping + depth check)"
+  },
+  {
+   "id": "backdrop_moongate_preview",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "preview"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "startMinFreeMb": 3000,
+   "timeoutMin": 20,
+   "note": "A6: EEVEE 8-slice preview of the Moon Gate test backdrop (EEVEE has no panoramic camera)"
+  },
+  {
+   "id": "backdrop_moongate",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "layers",
+    "--device",
+    "ONEAPI",
+    "--w",
+    "8192",
+    "--h",
+    "1368",
+    "--samples",
+    "128",
+    "--strips",
+    "4",
+    "--far-scale",
+    "0.5",
+    "--far-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 4500,
+   "timeoutMin": 90,
+   "note": "A6: Moon Gate test backdrop, 3 Cycles panorama layers (near / mid 8192x1368 128 spp as 4 longitude strips for memory, far 4096x684 128 spp with cloud volumes) + Depth + AOV on the Arc iGPU"
+  },
+  {
+   "id": "backdrop_moongate_inset",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "inset",
+    "--device",
+    "ONEAPI",
+    "--inset-w",
+    "4096",
+    "--inset-h",
+    "2048",
+    "--samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 4500,
+   "timeoutMin": 60,
+   "note": "A6: hero inset 4096x2048 of the near layer from the ref-3 concept camera"
+  },
+  {
+   "id": "backdrop_cards",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "cards",
+    "--card-px",
+    "256",
+    "--frames",
+    "32"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "startMinFreeMb": 3000,
+   "timeoutMin": 30,
+   "note": "A6: EEVEE volumetric card sequences (moon light shaft, fog bank), 32 looped frames each, 8x4 atlas of 256 px"
+  },
+  {
+   "id": "backdrop_look",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "layers",
+    "--device",
+    "ONEAPI",
+    "--w",
+    "2048",
+    "--h",
+    "344",
+    "--samples",
+    "32",
+    "--far-scale",
+    "1.0",
+    "--far-samples",
+    "24",
+    "--strips",
+    "4"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 3500,
+   "timeoutMin": 20,
+   "note": "A6: look-development render of the Moon Gate test backdrop at 2048x344 (fast iteration before the full-size layers)"
+  }
+ ],
+ "groups": {
+  "a0": [
+   "probe_env",
+   "probe_env_oneapi",
+   "probe_bake_256",
+   "probe_bake_1024",
+   "ktx_probe",
+   "probe_misc",
+   "pano_quick",
+   "pano_quick_gpu",
+   "pano_eevee_slice",
+   "pano_fog_quick",
+   "pano_medium",
+   "pano_medium_gpu",
+   "inset_hero"
+  ],
+  "a0-long": [
+   "pano_high",
+   "pano_high_gpu"
+  ],
+  "kit": [
+   "kit_brazier_tripod",
+   "kit_pillar_square",
+   "kit_column_ruin",
+   "kit_rubble_pile"
+  ],
+  "a1": [
+   "kit_brazier_tripod"
+  ],
+  "floor": [
+   "floor_flagstone",
+   "floor_slate",
+   "inlay_moongate"
+  ],
+  "a2": [
+   "floor_flagstone",
+   "floor_slate",
+   "inlay_moongate"
+  ],
+  "a3": [
+   "kit_stone_trim",
+   "kit_pillar_square",
+   "kit_column_ruin",
+   "kit_rubble_pile",
+   "kit_wall_a",
+   "kit_wall_b",
+   "kit_wall_broken",
+   "kit_arcade_bay",
+   "kit_arcade_broken",
+   "kit_arch",
+   "kit_stairs",
+   "kit_plinth",
+   "kit_dais",
+   "kit_balustrade",
+   "kit_spear_fence",
+   "kit_rock_prop",
+   "kit_rubble_scatter"
+  ],
+  "a3-ring": [
+   "kit_wall_a",
+   "kit_wall_b",
+   "kit_wall_broken",
+   "kit_arcade_bay",
+   "kit_arcade_broken",
+   "kit_arch",
+   "kit_stairs",
+   "kit_plinth",
+   "kit_dais",
+   "kit_balustrade",
+   "kit_spear_fence"
+  ],
+  "a4": [
+   "kit_brazier_pedestal",
+   "kit_brazier_wall",
+   "kit_brazier_pillartop",
+   "kit_lantern_toro",
+   "kit_lantern_cage",
+   "kit_lantern_paper",
+   "kit_candles",
+   "kit_bell",
+   "kit_skull",
+   "kit_bone_pile",
+   "kit_stakes",
+   "kit_spike_grate",
+   "kit_chain_weight",
+   "kit_vent_grate",
+   "kit_crumble",
+   "kit_chain_link",
+   "kit_banner_pole",
+   "kit_barricade",
+   "kit_crate",
+   "kit_barrel",
+   "kit_keg",
+   "kit_urn",
+   "kit_chunk",
+   "kit_banners"
+  ],
+  "a5": [
+   "kit_pillar_square",
+   "kit_column_ruin",
+   "statue_hooded",
+   "statue_knight",
+   "statue_mage",
+   "colossus_goddess",
+   "colossus_seated"
+  ],
+  "a5-statues": [
+   "statue_hooded",
+   "statue_knight",
+   "statue_mage"
+  ],
+  "a5-colossi": [
+   "colossus_goddess",
+   "colossus_seated"
+  ],
+  "a6": [
+   "backdrop_moongate_preview",
+   "backdrop_moongate",
+   "backdrop_moongate_inset",
+   "backdrop_cards"
+  ]
+ }
+}

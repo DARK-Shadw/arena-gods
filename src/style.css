@@ -142,3 +142,10 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color:
 @media (max-width: 700px) { .menu .themes { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 .splash.arena { flex-direction: column; gap: 4px; font-size: clamp(30px, 4.2vw, 64px); top: auto; bottom: 16vh; align-items: center; justify-content: flex-end; letter-spacing: 0.06em; text-align: center; padding: 0 16px; }
 .splash.arena small { font-size: 0.32em; letter-spacing: 0.3em; color: var(--gold); font-weight: 600; text-transform: uppercase; max-width: 80vw; }
+
+/* ---------------- finisher freeze: anime speed lines */
+.speedlines { position: absolute; inset: 0; pointer-events: none; opacity: 0; z-index: 3;
+  background: repeating-conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0) 0deg 4deg, rgba(255,255,255,0.22) 4deg 4.6deg, rgba(255,255,255,0) 4.6deg 9deg);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 32%, #000 62%); mask-image: radial-gradient(circle at 50% 50%, transparent 0 32%, #000 62%); }
+.speedlines.show { animation: speedlines var(--dur, 0.45s) ease-out forwards; }
+@keyframes speedlines { 0% { opacity: 0.95; transform: scale(1.08); } 70% { opacity: 0.8; } 100% { opacity: 0; transform: scale(1); } }

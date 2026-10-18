@@ -1,0 +1,120 @@
+{
+ "blender": "5.0.1",
+ "args": {
+  "out": "C:\\Programming\\GameDev\\Research\\arena\\tools\\arena\\_bake\\pano_quick_gpu",
+  "min_free_mb": 1500,
+  "threads": 0,
+  "w": 2048,
+  "h": 341,
+  "samples": 32,
+  "denoise": false,
+  "fog": false,
+  "engine": "cycles",
+  "device": "ONEAPI",
+  "slice": false,
+  "tile": 1024,
+  "tag": "",
+  "repeat": 2
+ },
+ "steps": [
+  {
+   "step": "build_scene",
+   "value": {
+    "objects": 5420,
+    "instancedBlocks": 5403
+   },
+   "ok": true,
+   "seconds": 14.13,
+   "peakMB": 407,
+   "freeMB": 6854
+  },
+  {
+   "step": "setup",
+   "value": {
+    "device": {
+     "requested": "ONEAPI",
+     "used": "ONEAPI",
+     "devices": [
+      {
+       "name": "Intel Core Ultra 5 125H",
+       "type": "CPU",
+       "use": false
+      },
+      {
+       "name": "Intel(R) Arc(TM) Graphics",
+       "type": "ONEAPI",
+       "use": true
+      }
+     ]
+    },
+    "compositor": {
+     "linked": [
+      "Image",
+      "Depth",
+      "emit"
+     ],
+     "missing": [],
+     "rlOutputs": [
+      "Image",
+      "Alpha",
+      "Depth",
+      "emit",
+      "Normal",
+      "UV",
+      "Vector",
+      "Position",
+      "Deprecated",
+      "Deprecated",
+      "Shadow",
+      "Ambient Occlusion",
+      "Deprecated",
+      "Deprecated",
+      "Deprecated",
+      "Object Index",
+      "Material Index",
+      "Mist",
+      "Emission",
+      "Environment",
+      "Diffuse Direct",
+      "Diffuse Indirect",
+      "Diffuse Color",
+      "Glossy Direct",
+      "Glossy Indirect",
+      "Glossy Color",
+      "Transmission Direct",
+      "Transmission Indirect",
+      "Transmission Color",
+      "Subsurface Direct",
+      "Subsurface Indirect"
+     ]
+    }
+   },
+   "ok": true,
+   "seconds": 0.12,
+   "peakMB": 482,
+   "freeMB": 6788
+  },
+  {
+   "step": "render",
+   "value": {
+    "seconds": 3.4,
+    "allRuns": [
+     6.5,
+     3.4
+    ],
+    "files": {
+     "pano_cycles_2048x341_s32_oneapi.png": 794105,
+     "pano_cycles_2048x341_s32_oneapi_.exr": 13989422
+    },
+    "tag": "cycles_2048x341_s32_oneapi",
+    "msPerMegapixelPerSample": 152.14
+   },
+   "ok": true,
+   "seconds": 9.93,
+   "peakMB": 2231,
+   "freeMB": 5524
+  }
+ ],
+ "seconds": 24.2,
+ "peakMB": 2231
+}

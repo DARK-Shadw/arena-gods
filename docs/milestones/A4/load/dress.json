@@ -1,0 +1,1608 @@
+[
+ {
+  "theme": "colosseum",
+  "layout": "pit",
+  "q": 1,
+  "props": [
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   }
+  ],
+  "features": [
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "barricade",
+    "kit": "kit/barricade",
+    "fallen": false
+   }
+  ],
+  "hazards": [
+   {
+    "kind": "spikes",
+    "kit": "kit/spike_grate"
+   },
+   {
+    "kind": "chandelier",
+    "kit": null
+   },
+   {
+    "kind": "chains",
+    "kit": "kit/chain_weight"
+   },
+   {
+    "kind": "crumble",
+    "kit": "kit/crumble"
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitBanners",
+    "tris": 7840,
+    "inst": 0
+   },
+   {
+    "name": "kitBannerRods",
+    "tris": 1792,
+    "inst": 0
+   },
+   {
+    "name": "kitBannerChains_small",
+    "tris": 96,
+    "inst": 84
+   },
+   {
+    "name": "kitCandleGlow",
+    "tris": 360,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_trim",
+    "tris": 56668,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 11296,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/brazier_wall",
+    "tris": 9720,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/brazier_wall",
+    "tris": 720,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/candles",
+    "tris": 17280,
+    "inst": 0
+   }
+  ],
+  "sway": {
+   "ms": 0.19999999925494194,
+   "frames": 1200
+  },
+  "drawCalls": 1,
+  "tris": 1,
+  "contractMismatch": [],
+  "swayMsPerFrame": 0.00016666666604578495,
+  "errors": []
+ },
+ {
+  "theme": "colosseum",
+  "layout": "cross",
+  "q": 2,
+  "props": [
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "chunk",
+    "kit": "kit/chunk",
+    "r": 0.38,
+    "y": [
+     0,
+     0.6
+    ],
+    "want": [
+     0.38,
+     0.6
+    ]
+   },
+   {
+    "kind": "chunk",
+    "kit": "kit/chunk",
+    "r": 0.38,
+    "y": [
+     0,
+     0.6
+    ],
+    "want": [
+     0.38,
+     0.6
+    ]
+   }
+  ],
+  "features": [
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "barricade",
+    "kit": "kit/barricade",
+    "fallen": false
+   }
+  ],
+  "hazards": [
+   {
+    "kind": "spikes",
+    "kit": "kit/spike_grate"
+   },
+   {
+    "kind": "chandelier",
+    "kit": null
+   },
+   {
+    "kind": "chains",
+    "kit": "kit/chain_weight"
+   },
+   {
+    "kind": "crumble",
+    "kit": "kit/crumble"
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitBanners",
+    "tris": 7840,
+    "inst": 0
+   },
+   {
+    "name": "kitBannerRods",
+    "tris": 1792,
+    "inst": 0
+   },
+   {
+    "name": "kitBannerChains_small",
+    "tris": 96,
+    "inst": 84
+   },
+   {
+    "name": "kitCandleGlow",
+    "tris": 360,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_trim",
+    "tris": 56668,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 11296,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/brazier_wall",
+    "tris": 9720,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/brazier_wall",
+    "tris": 720,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/candles",
+    "tris": 17280,
+    "inst": 0
+   }
+  ],
+  "sway": {
+   "ms": 0.09999999776482582,
+   "frames": 1200
+  },
+  "drawCalls": 1,
+  "tris": 1,
+  "contractMismatch": [],
+  "swayMsPerFrame": 0.00008333333147068819,
+  "errors": []
+ },
+ {
+  "theme": "colosseum",
+  "layout": "oval",
+  "q": 0,
+  "props": [
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   }
+  ],
+  "features": [
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "barricade",
+    "kit": "kit/barricade",
+    "fallen": false
+   }
+  ],
+  "hazards": [
+   {
+    "kind": "spikes",
+    "kit": "kit/spike_grate"
+   },
+   {
+    "kind": "chandelier",
+    "kit": null
+   },
+   {
+    "kind": "chains",
+    "kit": "kit/chain_weight"
+   },
+   {
+    "kind": "crumble",
+    "kit": "kit/crumble"
+   }
+  ],
+  "ring": [
+   {
+    "name": "kitBanners",
+    "tris": 2100,
+    "inst": 0
+   },
+   {
+    "name": "kitBannerRods",
+    "tris": 300,
+    "inst": 0
+   },
+   {
+    "name": "kitBannerChains_small",
+    "tris": 48,
+    "inst": 90
+   },
+   {
+    "name": "kitCandleGlow",
+    "tris": 360,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_trim",
+    "tris": 30956,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/rubble_scatter",
+    "tris": 3704,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/brazier_wall",
+    "tris": 4800,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/brazier_wall",
+    "tris": 480,
+    "inst": 0
+   },
+   {
+    "name": "kitRing_kit/candles",
+    "tris": 5040,
+    "inst": 0
+   }
+  ],
+  "sway": {
+   "ms": 0.5000000037252903,
+   "frames": 1200
+  },
+  "drawCalls": 1,
+  "tris": 1,
+  "contractMismatch": [],
+  "swayMsPerFrame": 0.00041666666977107524,
+  "errors": []
+ },
+ {
+  "theme": "forge",
+  "layout": "pit",
+  "q": 1,
+  "props": [
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   }
+  ],
+  "features": [
+   {
+    "kind": "barricade",
+    "kit": "kit/barricade",
+    "fallen": false
+   },
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   }
+  ],
+  "hazards": [
+   {
+    "kind": "lava",
+    "kit": null
+   },
+   {
+    "kind": "chandelier",
+    "kit": null
+   },
+   {
+    "kind": "flamejet",
+    "kit": "kit/vent_grate"
+   },
+   {
+    "kind": "flamejet",
+    "kit": "kit/vent_grate"
+   }
+  ],
+  "ring": [],
+  "sway": {
+   "ms": 0.30000000074505806,
+   "frames": 1200
+  },
+  "drawCalls": 1,
+  "tris": 1,
+  "contractMismatch": [],
+  "swayMsPerFrame": 0.0002500000006208817,
+  "errors": []
+ },
+ {
+  "theme": "desert",
+  "layout": "cross",
+  "q": 1,
+  "props": [
+   {
+    "kind": "rock",
+    "kit": "kit/rock_prop",
+    "r": 0.4,
+    "y": [
+     0,
+     0.75
+    ],
+    "want": [
+     0.4,
+     0.75
+    ]
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rock_prop",
+    "r": 0.4,
+    "y": [
+     0,
+     0.75
+    ],
+    "want": [
+     0.4,
+     0.75
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rock_prop",
+    "r": 0.4,
+    "y": [
+     0,
+     0.75
+    ],
+    "want": [
+     0.4,
+     0.75
+    ]
+   },
+   {
+    "kind": "brazier",
+    "kit": "kit/brazier_tripod",
+    "r": 0.45,
+    "y": [
+     0,
+     1.2
+    ],
+    "want": [
+     0.45,
+     1.2
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rock_prop",
+    "r": 0.4,
+    "y": [
+     0,
+     0.75
+    ],
+    "want": [
+     0.4,
+     0.75
+    ]
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rock_prop",
+    "r": 0.4,
+    "y": [
+     0,
+     0.75
+    ],
+    "want": [
+     0.4,
+     0.75
+    ]
+   },
+   {
+    "kind": "explosive",
+    "kit": "kit/keg",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "rock",
+    "kit": "kit/rock_prop",
+    "r": 0.4,
+    "y": [
+     0,
+     0.75
+    ],
+    "want": [
+     0.4,
+     0.75
+    ]
+   },
+   {
+    "kind": "chunk",
+    "kit": "kit/chunk",
+    "r": 0.38,
+    "y": [
+     0,
+     0.6
+    ],
+    "want": [
+     0.38,
+     0.6
+    ]
+   },
+   {
+    "kind": "chunk",
+    "kit": "kit/chunk",
+    "r": 0.38,
+    "y": [
+     0,
+     0.6
+    ],
+    "want": [
+     0.38,
+     0.6
+    ]
+   },
+   {
+    "kind": "chunk",
+    "kit": "kit/chunk",
+    "r": 0.38,
+    "y": [
+     0,
+     0.6
+    ],
+    "want": [
+     0.38,
+     0.6
+    ]
+   },
+   {
+    "kind": "chunk",
+    "kit": "kit/chunk",
+    "r": 0.38,
+    "y": [
+     0,
+     0.6
+    ],
+    "want": [
+     0.38,
+     0.6
+    ]
+   }
+  ],
+  "features": [
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "barricade",
+    "kit": "kit/barricade",
+    "fallen": false
+   }
+  ],
+  "hazards": [
+   {
+    "kind": "firepit",
+    "kit": null
+   },
+   {
+    "kind": "geyser",
+    "kit": null
+   },
+   {
+    "kind": "flamejet",
+    "kit": "kit/vent_grate"
+   },
+   {
+    "kind": "crumble",
+    "kit": "kit/crumble"
+   }
+  ],
+  "ring": [],
+  "sway": {
+   "ms": 0.10000000149011612,
+   "frames": 1200
+  },
+  "drawCalls": 1,
+  "tris": 1,
+  "contractMismatch": [],
+  "swayMsPerFrame": 0.00008333333457509676,
+  "errors": []
+ },
+ {
+  "theme": "sakura",
+  "layout": "oval",
+  "q": 1,
+  "props": [
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "urn",
+    "kit": "kit/urn",
+    "r": 0.32,
+    "y": [
+     0,
+     0.7
+    ],
+    "want": [
+     0.32,
+     0.7
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "crate",
+    "kit": "kit/crate",
+    "r": 0.45,
+    "y": [
+     0,
+     0.9
+    ],
+    "want": [
+     0.45,
+     0.9
+    ]
+   },
+   {
+    "kind": "barrel",
+    "kit": "kit/barrel",
+    "r": 0.4,
+    "y": [
+     0,
+     1
+    ],
+    "want": [
+     0.4,
+     1
+    ]
+   },
+   {
+    "kind": "lantern",
+    "kit": "kit/lantern_toro",
+    "r": 0.35,
+    "y": [
+     0,
+     1.6
+    ],
+    "want": [
+     0.35,
+     1.6
+    ]
+   }
+  ],
+  "features": [
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "banner",
+    "kit": "kit/banner_pole",
+    "fallen": false
+   },
+   {
+    "kind": "barricade",
+    "kit": "kit/barricade",
+    "fallen": false
+   }
+  ],
+  "hazards": [
+   {
+    "kind": "water",
+    "kit": null
+   },
+   {
+    "kind": "firepit",
+    "kit": null
+   },
+   {
+    "kind": "chains",
+    "kit": "kit/chain_weight"
+   }
+  ],
+  "ring": [],
+  "sway": {
+   "ms": 0.5,
+   "frames": 1200
+  },
+  "drawCalls": 1,
+  "tris": 1,
+  "contractMismatch": [],
+  "swayMsPerFrame": 0.0004166666666666667,
+  "errors": []
+ }
+]

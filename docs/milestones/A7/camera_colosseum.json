@@ -1,0 +1,129 @@
+{
+ "readable": 93.8,
+ "contact": 94.8,
+ "cutsPerMin": 22.1,
+ "shortShots": 10,
+ "per": [
+  "gorak-aldric#4242 colosseum/pit#7 98.2% c98% cuts18.1",
+  "maw-vex#404 colosseum/oval#5 86.6% c92% cuts23.7",
+  "erika-fenrik#101 colosseum/cross#11 90.2% c93% cuts21.7",
+  "ozrel-hollowjack#202 colosseum/split#13 97.6% c94% cuts19.7",
+  "vex-gorak#303 colosseum/gauntlet#9 95.7% c97% cuts27.5"
+ ],
+ "bad": [
+  "gorak-aldric#4242:two_shot_low 27/621 {\"f1 hidden by arena\":12,\"f0 hidden by arena+f1 hidden by arena\":13,\"f0 hidden by arena\":2}",
+  "maw-vex#404:two_shot 195/538 {\"f0 hidden by arena\":22,\"f0 out of frame+f1 hidden by arena\":13,\"f1 hidden by arena\":114,\"f0 hidden by arena+f1 hidden by arena\":8,\"f0 out of frame+f0 hidden by arena\":12,\"f0 out of frame+f0 hidden by arena+f1 hidden by arena\":2,\"f0 out of frame\":10,\"f0 hidden by arena+f1 hidden by fighter\":3,\"f1 hidden by fighter\":1,\"f0 hidden by fighter\":1,\"fighters tiny\":2,\"f1 hidden by arena+fighters tiny\":7}",
+  "maw-vex#404:ots_0 70/362 {\"fighters tiny\":61,\"f1 hidden by fighter\":9}",
+  "erika-fenrik#101:establish 40/71 {\"fighters tiny\":29,\"f1 hidden by arena\":4,\"f1 hidden by arena+fighters tiny\":7}",
+  "erika-fenrik#101:crane_1 43/227 {\"f0 hidden by arena\":24,\"fighters tiny\":19}",
+  "erika-fenrik#101:two_shot_low 78/935 {\"f0 hidden by arena\":9,\"f1 out of frame\":23,\"f0 hidden by fighter+f1 out of frame\":1,\"f0 hidden by arena+f1 hidden by arena\":21,\"f1 hidden by arena\":17,\"f0 out of frame+f1 out of frame\":3,\"f0 hidden by fighter\":1,\"f0 out of frame\":3}",
+  "erika-fenrik#101:ots_1 52/623 {\"f0 hidden by fighter\":6,\"f0 hidden by arena\":2,\"fighters tiny\":43,\"f0 hidden by fighter+fighters tiny\":1}",
+  "erika-fenrik#101:two_shot 26/331 {\"f0 out of frame+f1 out of frame\":5,\"f0 hidden by arena+f1 hidden by arena\":1,\"f0 hidden by fighter\":5,\"f1 out of frame\":4,\"f0 out of frame\":11}",
+  "erika-fenrik#101:hero_1 22/43 {\"f0 out of frame+fighters tiny\":1,\"f0 out of frame\":19,\"f0 out of frame+f1 hidden by fighter\":2}",
+  "ozrel-hollowjack#202:hero_1 33/43 {\"f1 out of frame\":25,\"f0 out of frame+f1 out of frame\":7,\"f0 out of frame\":1}",
+  "vex-gorak#303:ots_1 46/761 {\"f0 hidden by fighter\":2,\"fighters tiny\":37,\"f0 hidden by arena\":7}",
+  "vex-gorak#303:hero_1 25/140 {\"f0 out of frame\":7,\"f0 out of frame+f1 out of frame\":9,\"f1 out of frame\":9}"
+ ],
+ "worst": [
+  [
+   {
+    "t": 14.3,
+    "why": "contact (hit) not visible",
+    "shot": "crane_0"
+   },
+   {
+    "t": 16.41,
+    "why": "f1 hidden by arena:LOD0_body@-5.2,0.8,3.5",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 81.98,
+    "why": "f0 hidden by arena:LOD0_body@2.5,0.8,6.5, f1 hidden by arena:LOD0_body@2.5,0.8,6.6",
+    "shot": "two_shot_low"
+   }
+  ],
+  [
+   {
+    "t": 6.57,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   },
+   {
+    "t": 10.5,
+    "why": "f1 hidden by arena:LOD0_body@5.7,1.6,2.4",
+    "shot": "two_shot"
+   },
+   {
+    "t": 12.84,
+    "why": "f1 hidden by arena:LOD0_body@5.5,1.4,2.0",
+    "shot": "two_shot"
+   },
+   {
+    "t": 15.24,
+    "why": "f0 out of frame",
+    "shot": "two_shot"
+   }
+  ],
+  [
+   {
+    "t": 0.4,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 15.54,
+    "why": "f0 hidden by arena:CircleGeometry@-5.2,5.3,-4.5",
+    "shot": "crane_1"
+   },
+   {
+    "t": 21.98,
+    "why": "f1 hidden by arena:LOD0_body@-8.3,0.8,-1.4",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 21.98,
+    "why": "contact (hit) not visible",
+    "shot": "two_shot_low"
+   }
+  ],
+  [
+   {
+    "t": 19.62,
+    "why": "contact (hit) not visible",
+    "shot": "crane_1"
+   },
+   {
+    "t": 22.07,
+    "why": "contact (hit) not visible",
+    "shot": "two_shot"
+   },
+   {
+    "t": 55.53,
+    "why": "f1 out of frame",
+    "shot": "hero_1"
+   }
+  ],
+  [
+   {
+    "t": 46.49,
+    "why": "f1 out of frame",
+    "shot": "hero_1"
+   },
+   {
+    "t": 61.99,
+    "why": "fighters tiny",
+    "shot": "ots_1"
+   },
+   {
+    "t": 64.51,
+    "why": "fighters tiny",
+    "shot": "ots_1"
+   },
+   {
+    "t": 70.2,
+    "why": "f0 hidden by arena:LOD0_body@-16.9,1.2,0.8",
+    "shot": "hero_0"
+   }
+  ]
+ ]
+}

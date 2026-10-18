@@ -1,0 +1,333 @@
+{
+ "w": 1920,
+ "h": 1080,
+ "fights": [
+  {
+   "tag": "gorak-erika#4242_colosseum",
+   "moments": [
+    [
+     "heavy_hit",
+     7.22
+    ],
+    [
+     "parry",
+     47.95
+    ],
+    [
+     "ultimate",
+     40.05
+    ],
+    [
+     "knockdown",
+     10.8
+    ]
+   ],
+   "bench20": {
+    "avg": 25.91,
+    "p95": 28.4,
+    "calls": 316,
+    "tris": 724114
+   },
+   "benchHit": {
+    "avg": 31.67,
+    "p95": 43.6,
+    "calls": 416,
+    "tris": 778538
+   },
+   "fxCpu": {
+    "msPerFrame": 0.0172,
+    "p95": 0.1,
+    "maxAdd": 62,
+    "maxAlpha": 45
+   },
+   "idleUpdateMs": 0.027,
+   "seekSameSession": {
+    "s1": {
+     "id": "n/a (pre-F0: no effect list)",
+     "st": "dbb70df7",
+     "n": {
+      "add": 2,
+      "alpha": 17,
+      "rings": 0,
+      "debris": 0
+     }
+    },
+    "s2": {
+     "id": "n/a (pre-F0: no effect list)",
+     "st": "aa5fea32",
+     "n": {
+      "add": 3,
+      "alpha": 14,
+      "rings": 0,
+      "debris": 0
+     }
+    },
+    "idEqual": true,
+    "stateEqual": false
+   },
+   "leak": {
+    "before": {
+     "geometries": 213,
+     "textures": 108,
+     "programs": 50,
+     "groupChildren": 3,
+     "heapMB": 113.4
+    },
+    "after": {
+     "geometries": 615,
+     "textures": 108,
+     "programs": 51,
+     "groupChildren": 3,
+     "heapMB": 122
+    }
+   },
+   "seekFreshLoad": {
+    "fresh": [
+     {
+      "id": "n/a (pre-F0: no effect list)",
+      "st": "f24043b3",
+      "n": {
+       "add": 2,
+       "alpha": 19,
+       "rings": 0,
+       "debris": 0
+      }
+     },
+     {
+      "id": "n/a (pre-F0: no effect list)",
+      "st": "20458a79",
+      "n": {
+       "add": 3,
+       "alpha": 19,
+       "rings": 0,
+       "debris": 0
+      }
+     }
+    ],
+    "idEqual": true,
+    "stateEqual": false
+   }
+  },
+  {
+   "tag": "ozrel-maw#77_forge",
+   "moments": [
+    [
+     "heavy_hit",
+     8.32
+    ],
+    [
+     "block",
+     23.67
+    ],
+    [
+     "ultimate",
+     31.92
+    ],
+    [
+     "explosion",
+     51.52
+    ],
+    [
+     "knockdown",
+     8.32
+    ]
+   ],
+   "bench20": {
+    "avg": 29.72,
+    "p95": 32.7,
+    "calls": 109,
+    "tris": 264374
+   },
+   "benchHit": {
+    "avg": 36.14,
+    "p95": 34.5,
+    "calls": 150,
+    "tris": 290336
+   },
+   "fxCpu": {
+    "msPerFrame": 0.0177,
+    "p95": 0.1,
+    "maxAdd": 88,
+    "maxAlpha": 40
+   },
+   "idleUpdateMs": 0.0108,
+   "seekSameSession": {
+    "s1": {
+     "id": "n/a (pre-F0: no effect list)",
+     "st": "811c9dc5",
+     "n": {
+      "add": 0,
+      "alpha": 0,
+      "rings": 0,
+      "debris": 0
+     }
+    },
+    "s2": {
+     "id": "n/a (pre-F0: no effect list)",
+     "st": "811c9dc5",
+     "n": {
+      "add": 0,
+      "alpha": 0,
+      "rings": 0,
+      "debris": 0
+     }
+    },
+    "idEqual": true,
+    "stateEqual": true
+   },
+   "leak": {
+    "before": {
+     "geometries": 105,
+     "textures": 59,
+     "programs": 49,
+     "groupChildren": 3,
+     "heapMB": 81.5
+    },
+    "after": {
+     "geometries": 507,
+     "textures": 59,
+     "programs": 50,
+     "groupChildren": 4,
+     "heapMB": 101
+    }
+   },
+   "seekFreshLoad": {
+    "fresh": [
+     {
+      "id": "n/a (pre-F0: no effect list)",
+      "st": "811c9dc5",
+      "n": {
+       "add": 0,
+       "alpha": 0,
+       "rings": 0,
+       "debris": 0
+      }
+     },
+     {
+      "id": "n/a (pre-F0: no effect list)",
+      "st": "811c9dc5",
+      "n": {
+       "add": 0,
+       "alpha": 0,
+       "rings": 0,
+       "debris": 0
+      }
+     }
+    ],
+    "idEqual": true,
+    "stateEqual": true
+   }
+  },
+  {
+   "tag": "aldric-vex#1234_glacier",
+   "moments": [
+    [
+     "heavy_hit",
+     9.42
+    ],
+    [
+     "block",
+     6.14
+    ],
+    [
+     "parry",
+     8.69
+    ],
+    [
+     "ultimate",
+     52.24
+    ],
+    [
+     "knockdown",
+     9.42
+    ]
+   ],
+   "bench20": {
+    "avg": 45.28,
+    "p95": 53.3,
+    "calls": 963,
+    "tris": 260946
+   },
+   "benchHit": {
+    "avg": 45.36,
+    "p95": 49.2,
+    "calls": 969,
+    "tris": 261778
+   },
+   "fxCpu": {
+    "msPerFrame": 0.0192,
+    "p95": 0.1,
+    "maxAdd": 52,
+    "maxAlpha": 41
+   },
+   "idleUpdateMs": 0.008,
+   "seekSameSession": {
+    "s1": {
+     "id": "n/a (pre-F0: no effect list)",
+     "st": "4cfd0fc8",
+     "n": {
+      "add": 21,
+      "alpha": 31,
+      "rings": 0,
+      "debris": 0
+     }
+    },
+    "s2": {
+     "id": "n/a (pre-F0: no effect list)",
+     "st": "e733db6f",
+     "n": {
+      "add": 19,
+      "alpha": 35,
+      "rings": 0,
+      "debris": 0
+     }
+    },
+    "idEqual": true,
+    "stateEqual": false
+   },
+   "leak": {
+    "before": {
+     "geometries": 281,
+     "textures": 255,
+     "programs": 45,
+     "groupChildren": 4,
+     "heapMB": 169.3
+    },
+    "after": {
+     "geometries": 681,
+     "textures": 255,
+     "programs": 49,
+     "groupChildren": 3,
+     "heapMB": 187.1
+    }
+   },
+   "seekFreshLoad": {
+    "fresh": [
+     {
+      "id": "n/a (pre-F0: no effect list)",
+      "st": "8b47e76c",
+      "n": {
+       "add": 18,
+       "alpha": 31,
+       "rings": 0,
+       "debris": 0
+      }
+     },
+     {
+      "id": "n/a (pre-F0: no effect list)",
+      "st": "965ffa57",
+      "n": {
+       "add": 22,
+       "alpha": 31,
+       "rings": 0,
+       "debris": 0
+      }
+     }
+    ],
+    "idEqual": true,
+    "stateEqual": false
+   }
+  }
+ ],
+ "logs": []
+}

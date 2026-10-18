@@ -12,7 +12,12 @@ import type { UI } from '../ui/ui';
 import type { FighterDef } from '../sim/types';
 import { ARENA } from '../sim/arena';
 import { ENTRANCES, type CamPose, type EntranceSpec, type V3 } from '../data/entrances';
+import { ENTRANCE_VARIANTS } from '../data/entranceVariants';
 import { Ease, Timeline } from './timeline';
+import { resolveCamera } from '../camera/cameraRig';
+import { beatTimes, type Beat, type CompiledEntrance, type EntranceVariant, type VariantCtx } from './beats';
+import { decodeClip, libClip, rootAt } from '../render/animLib';
+import { Rng, hashSeed } from '../sim/rng';
 
 export interface CineCtx {
   scene: THREE.Scene;
@@ -23,6 +28,24 @@ export interface CineCtx {
   ui: UI;
   /** Announcer callback (prepare / fight). */
   onAnnounce?: (which: 'prepare' | 'fight') => void;
+  /** cinematic slow-motion: play the cutscene clock at `scale` for `realDur` seconds */
+  slowmo?: (scale: number, realDur: number) => void;
+  /** match seed (entrance variant choice) */
+  seed?: number;
+}
+
+/** what the entrance validator needs to know about a built entrance */
+export interface EntranceMeta {
+  variant: string;
+  duration: number;
+  /** physical barrier events and what causes them */
+  events: { t: number; fx: string; cause?: string }[];
+  /** airborne spans (no support check) */
+  air: [number, number][];
+  /** intentionally hidden spans (no framing checks) */
+  hidden: [number, number][];
+  /** camera shot spans */
+  shots: [number, number][];
 }
 
 /** Gate-local frame helper. */
@@ -54,7 +77,75 @@ export interface CineLine {
  *   title card and the entrance is lengthened (holding the final shot and the
  *   taunt) so the line finishes before the cut.
  */
-export function buildEntrance(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: FighterDef, monologue?: CineLine): Timeline {
+/** Pick an arena-valid variant for this fighter at this gate (seeded among the valid ones). */
+/**
+ * Anchors are declared by the dressing; snap them onto the geometry that was
+ * actually built (ray cast down) and drop any that do not land on a surface.
+ */
+function snapAnchors(arena: CineCtx['arena'], gate: number) {
+  const g = arena.gates[gate];
+  const A = g.anchors as typeof g.anchors & { snapped?: boolean };
+  if (A.snapped) return A;
+  A.snapped = true;
+  arena.group.updateMatrixWorld(true);
+  // A7: the arena's losGroup proxies (invisible, e.g. the kit wet floor) are plain meshes in the group: they are snapped onto too
+  const meshes: THREE.Mesh[] = [];
+  arena.group.traverse((o) => {
+    const m = o as THREE.Mesh;
+    if (m.isMesh && !(m as unknown as THREE.InstancedMesh).isInstancedMesh && o !== arena.sky && !o.userData.dyn) meshes.push(m);
+  });
+  const G = new GateFrame(arena, gate);
+  const ray = new THREE.Raycaster();
+  const snap = (p: V3, tol: number): V3 | null => {
+    const w = G.w(p);
+    ray.set(new THREE.Vector3(w.x, p[1] + tol, w.z), new THREE.Vector3(0, -1, 0));
+    ray.far = tol * 2;
+    const hit = ray.intersectObjects(meshes, false).find((h) => !!h.face && h.face.normal.clone().transformDirection(h.object.matrixWorld).y > 0.6);
+    return hit ? [p[0], +hit.point.y.toFixed(3), p[2]] : null;
+  };
+  // head room above a spot (a crouching / standing fighter must fit under whatever overhangs it)
+  const clear = (p: V3, h: number) => {
+    const w = G.w(p);
+    ray.set(new THREE.Vector3(w.x, p[1] + 0.15, w.z), new THREE.Vector3(0, 1, 0));
+    ray.far = h;
+    return ray.intersectObjects(meshes, false).length === 0;
+  };
+  A.perches = A.perches.flatMap((p) => {
+    const s = snap(p.pos, 0.6);
+    return s && clear(s, 2.3) && clear([s[0], s[1], s[2] + 0.35], 2.3) ? [{ ...p, pos: s }] : [];
+  });
+  // a low wall to vault: slide along the wall until the whole vault path has head room
+  if (A.lowWall) {
+    const W = A.lowWall;
+    const side = W.pos[0] >= 0 ? 1 : -1;
+    let ok: V3 | null = null;
+    for (let x = Math.abs(W.pos[0]); x <= 7.5 && !ok; x += 0.4) {
+      const path = [-2.2, -1.4, -0.7, 0, 0.7, 1.4, 2.2].map((dz) => [side * x, 0, W.pos[2] + dz] as V3);
+      // head room all along the vault, and real ground where the run-up starts and where it lands
+      if (path.every((q) => clear([q[0], 1.2, q[2]], 1.2)) && snap([side * x, 0, W.pos[2] - 1.0], 0.5) && snap([side * x, 0, W.pos[2] - 2.0], 0.5) && snap([side * x, 0, W.pos[2] + 1.6], 0.5)) ok = [side * x, W.pos[1], W.pos[2]];
+    }
+    A.lowWall = ok ? { ...W, pos: ok } : undefined;
+  }
+  A.stands = A.stands.flatMap((p) => {
+    const s = snap(p, 0.7);
+    return s ? [s] : [];
+  });
+  return A;
+}
+
+export function chooseVariant(fighterId: string, ctx: CineCtx, gate: number, force?: string): EntranceVariant | null {
+  const list = ENTRANCE_VARIANTS[fighterId];
+  if (!list) return null;
+  const A = snapAnchors(ctx.arena, gate);
+  const ok = list.filter((x) => (!force || x.v.id === force) && x.v.needs(A));
+  if (!ok.length) return null;
+  const r = new Rng(hashSeed(`entrance:${ctx.seed ?? 1}:${fighterId}:${gate}:${ctx.arena.layout.theme}`));
+  return ok[r.weighted(ok.map((x) => x.w))]?.v ?? ok[0].v;
+}
+
+export function buildEntrance(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: FighterDef, monologue?: CineLine, opts: { variant?: string } = {}): Timeline & { meta?: EntranceMeta } {
+  const variant = chooseVariant(view.def.id, ctx, gate, opts.variant);
+  if (variant) return buildCompiled(ctx, view, gate, opp, monologue, variant);
   const base: EntranceSpec = ENTRANCES[view.def.id];
   const speakAt = base.title - 0.2;
   const hold = monologue ? Math.max(0, speakAt + monologue.dur + 0.7 - base.duration) : 0;
@@ -150,7 +241,297 @@ export function buildEntrance(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp:
     for (const o of temp) ctx.scene.remove(o);
     gateObj.light.intensity = 3;
   });
-  return tl;
+  const meta: EntranceMeta = {
+    variant: 'legacy',
+    duration: spec.duration,
+    events: spec.cues.filter((c) => c.fx && /gate_(shake|smash)/.test(c.fx)).map((c) => ({ t: c.t, fx: c.fx!, cause: 'hands' })),
+    air: spec.actor.flatMap((k, i) => (k.state === 'airborne' || k.pos[1] !== 0 ? [[k.t, spec.actor[i + 1]?.t ?? k.t] as [number, number]] : [])),
+    hidden: spec.actor.flatMap((k, i) => (k.pos[1] < -0.5 ? [[k.t, spec.actor[i + 1]?.t ?? k.t] as [number, number]] : [])),
+    shots: spec.camera.map((c) => [c.t, c.t + c.dur] as [number, number]),
+  };
+  return Object.assign(tl, { meta });
+}
+
+// ------------------------------------------------------------------ compiled (beat) entrances
+function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: FighterDef, monologue: CineLine | undefined, variant: EntranceVariant): Timeline & { meta: EntranceMeta } {
+  const A = ctx.arena.gates[gate].anchors;
+  const ownImpacts = (clip: string): number[] => {
+    if (clip.startsWith('lib:')) return ((libClip(clip.slice(4))?.meta as unknown as { impacts?: [number, string][] })?.impacts ?? []).map((x) => x[0]);
+    const m = view.anim.meta.clips[clip];
+    return m ? [m.strike, ...(m.peaks ?? []).filter((p) => p > m.strike + 0.05)] : [];
+  };
+  // cover / props / hazards in the gate frame (actor paths and low cameras steer around them)
+  const G0 = new GateFrame(ctx.arena, gate);
+  const avoid: [number, number, number][] = [];
+  {
+    const L = ctx.arena.layout;
+    const toFrame = (x: number, z: number): [number, number] => {
+      const dx = x - G0.o.x,
+        dz = z - G0.o.z;
+      return [dx * G0.r.x + dz * G0.r.z, dx * G0.f.x + dz * G0.f.z];
+    };
+    for (const o of L.obstacles) avoid.push([...toFrame(o.x, o.z), o.r + 0.75]);
+    for (const p of L.props) avoid.push([...toFrame(p.x, p.z), p.r + 0.6]);
+    for (const h of L.hazards) if (h.kind !== 'chandelier') avoid.push([...toFrame(h.x, h.z), h.r + 0.55]);
+  }
+  const pushOut = (p: V3, pad = 0): V3 => {
+    let x = p[0],
+      z = p[2];
+    for (let it = 0; it < 3; it++)
+      for (const [cx, cz, r0] of avoid) {
+        const r = r0 + pad;
+        const dx = x - cx,
+          dz = z - cz;
+        const d = Math.hypot(dx, dz);
+        if (d < r) {
+          const side = dx >= 0 ? 1 : -1;
+          x = cx + side * Math.sqrt(Math.max(0, r * r - dz * dz)) + side * 0.02;
+        }
+      }
+    return [x, p[1], z];
+  };
+  const vctx: VariantCtx = {
+    free: (p) => pushOut(p, 0.4),
+    A,
+    probe: (clip, t, joints) => view.probe(clip, t, joints),
+    hipsM: view.hipsM,
+    impacts: ownImpacts,
+    dur: (clip) => (clip.startsWith('lib:') ? (libClip(clip.slice(4))?.meta.dur ?? 1) : view.anim.dur(clip)),
+    height: view.height,
+  };
+  const C: CompiledEntrance = variant.build(vctx);
+  // monologue: hold the last beat / shot until the line has finished
+  const speakAt = C.title - 0.2;
+  const hold = monologue ? Math.max(0, speakAt + monologue.dur + 0.7 - C.duration) : 0;
+  const beats: Beat[] = C.beats.map((b, i) => (i === C.beats.length - 1 ? { ...b, dur: b.dur + hold } : b));
+  const camera = C.camera.map((c, i) => (i === C.camera.length - 1 ? { ...c, dur: c.dur + hold } : c));
+  const duration = C.duration + hold;
+  const T = beatTimes(beats);
+  const G = new GateFrame(ctx.arena, gate);
+  const tl = new Timeline();
+  const gateObj = ctx.arena.gates[gate];
+  const temp: THREE.Object3D[] = [];
+  tl.cue('light', 0, () => {
+    ctx.arena.applyMood(C.mood);
+    gateObj.light.color.set(C.mood.gateColor);
+    gateObj.light.intensity = 2;
+    ctx.rig.collide = false;
+    view.rig.root.visible = true;
+  });
+
+  // ---- actor: evaluate the beat at the local time
+  // ground paths steer around cover / props / hazards standing in the way (pushed sideways, never backwards)
+  const steer = (p: V3): V3 => (p[1] > 0.4 || p[1] < -0.3 ? p : pushOut(p));
+  const startOf: V3[] = [];
+  {
+    // beat start positions (end of the previous beat's motion)
+    let p: V3 = C.start;
+    for (let i = 0; i < beats.length; i++) {
+      startOf.push(p);
+      p = beatPos(beats[i], p, beats[i].dur, view.hipsM);
+      if (beats[i].exitY !== undefined) p = [p[0], beats[i].exitY!, p[2]];
+    }
+  }
+  const pos = new THREE.Vector3();
+  const prev = new THREE.Vector3();
+  let first = true;
+  let lastBeat = -1;
+  tl.span('actor', 0, duration, (_k, lt, dt) => {
+    let i = 0;
+    while (i < beats.length - 1 && lt >= T[i + 1]) i++;
+    const b = beats[i];
+    const bt = lt - T[i];
+    const raw = beatPos(b, startOf[i], bt, view.hipsM);
+    const p = b.move.type === 'lerp' ? steer(raw) : raw;
+    G.w(p, pos);
+    const speed = first || dt <= 0 ? 0 : Math.hypot(pos.x - prev.x, pos.z - prev.z) / dt;
+    first = false;
+    prev.copy(pos);
+    if (i !== lastBeat) {
+      lastBeat = i;
+    }
+    // procedural pulses (pulling the bars): spring impulse backwards on the torso / arms
+    for (const pt of b.pulses ?? []) if (bt - dt < pt && bt >= pt) view.anim.flinch.impulse(new THREE.Vector3(0, 0, 1), 1.1, 'body');
+    view.updateManual(
+      { state: b.state, clip: b.clip, phase: 0, phaseT: Math.min(1, bt / b.dur), stateT: (b.from ?? 0) + bt * (b.rate ?? 1), fwd: b.state === 'idle' || b.state === 'relaxed' || b.state === 'run' ? speed : 0 },
+      pos,
+      G.yaw + (b.yaw ?? 0),
+      dt,
+    );
+  });
+
+  // ---- camera
+  const losPick = new Map<CamPose, number>();
+  let solids: THREE.Mesh[] | null = null;
+  const losRay = new THREE.Raycaster();
+  const losClear = (from: THREE.Vector3, to: THREE.Vector3) => {
+    if (!solids) {
+      solids = [];
+      const ex = new Set<THREE.Object3D>();
+      gateObj.portcullis.traverse((o) => ex.add(o));
+      ctx.arena.group.updateMatrixWorld(true);
+      ctx.arena.group.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (!m.isMesh || ex.has(o) || (m as unknown as THREE.InstancedMesh).isInstancedMesh || o === ctx.arena.sky || o.userData.dyn) return;
+        const mat = (Array.isArray(m.material) ? m.material[0] : m.material) as THREE.Material;
+        if (mat.transparent && mat.side !== THREE.BackSide) return;
+        solids!.push(m);
+      });
+    }
+    const d = to.clone().sub(from);
+    const dist = d.length();
+    losRay.set(from, d.normalize());
+    losRay.far = Math.max(0.01, dist - 0.3);
+    return losRay.intersectObjects(solids, false).length === 0;
+  };
+  const resolve = (cp: CamPose, outPos: THREE.Vector3, outLook: THREE.Vector3) => {
+    // low cameras inside the arena step out of cover / props / hazard rims
+    G.w(cp.pos[1] < 2.5 && cp.pos[2] > 0.3 ? pushOut(cp.pos, 0.35) : cp.pos, outPos);
+    // ...and orbit around the subject if cover blocks the line of sight (camera inside the arena only)
+    if (cp.pos[2] > 0.3) {
+      const look = cp.look === 'actor' ? view.chestWorld(new THREE.Vector3()) : cp.look === 'head' ? view.headWorld(new THREE.Vector3()) : G.w(cp.look);
+      resolveCamera(outPos, look, true, [view.chestWorld(new THREE.Vector3())]);
+      if (outPos.y < 2.5) {
+        const dx = outPos.x - G.o.x,
+          dz = outPos.z - G.o.z;
+        const fp = pushOut([dx * G.r.x + dz * G.r.z, outPos.y, dx * G.f.x + dz * G.f.z], 0.35);
+        G.w(fp, outPos);
+      }
+    }
+    if (cp.look === 'actor') view.chestWorld(outLook);
+    else if (cp.look === 'head') view.headWorld(outLook);
+    else G.w(cp.look, outLook);
+  };
+  const p0 = new THREE.Vector3(),
+    p1 = new THREE.Vector3(),
+    l0 = new THREE.Vector3(),
+    l1 = new THREE.Vector3();
+  for (const shot of camera)
+    tl.span('camera', shot.t, shot.dur, (k, _lt, dt) => {
+      const e = Ease[shot.ease ?? 'inOut'](k);
+      resolve(shot.from, p0, l0);
+      resolve(shot.to, p1, l1);
+      p0.lerp(p1, e);
+      l0.lerp(l1, e);
+      // real line of sight on the INTERPOLATED camera against the built geometry (decor the layout data
+      // does not know: props, brazier stands, lanterns, rubble). The chosen fallback sticks for the shot.
+      if (shot.from.pos[2] > 0.3 || shot.to.pos[2] > 0.3) {
+        const target = view.chestWorld(new THREE.Vector3());
+        const tryAt = (i: number) => {
+          const c = p0.clone();
+          if (i === 1) c.y += 1.2;
+          else if (i === 2) c.lerp(target, 0.35);
+          else if (i === 3) c.y += 2.4;
+          else if (i === 4) c.lerp(target, 0.55).setY(c.y + 0.8);
+          else if (i === 5 || i === 6) {
+            // onto the gate's axis (looking straight down the tunnel), same depth
+            const dep = (c.x - G.o.x) * G.f.x + (c.z - G.o.z) * G.f.z;
+            c.x = G.o.x + G.f.x * dep;
+            c.z = G.o.z + G.f.z * dep;
+            if (i === 6) c.y = Math.max(c.y, 1.6);
+          }
+          return c;
+        };
+        let pick = losPick.get(shot.from) ?? 0;
+        if (!losClear(tryAt(pick), target)) {
+          for (let i = 0; i < 7; i++)
+            if (losClear(tryAt(i), target)) {
+              pick = i;
+              break;
+            }
+          losPick.set(shot.from, pick);
+        }
+        p0.copy(tryAt(pick));
+        // a moved camera re-aims toward the actor so a fixed look point cannot leave them out of frame
+        if (pick !== 0) l0.lerp(target, 0.6);
+      }
+      const fov = shot.from.fov + (shot.to.fov - shot.from.fov) * e;
+      ctx.rig.cut(p0, l0, fov);
+      ctx.rig.update(p0, l0, fov, dt);
+    });
+
+  tl.cue('text', C.title, () => ctx.ui.showTitle(view.def, opp, gate));
+  if (monologue) tl.cue('audio', speakAt, () => monologue.play());
+  tl.cue('text', duration - 0.3, () => ctx.ui.hideTitle());
+
+  // ---- cues: beat cues (bound to measured impacts) + extra cues
+  const events: EntranceMeta['events'] = [];
+  const actorPos = () => view.rig.root.position.clone();
+  const all: { t: number; fx?: string; sfx?: string; arg?: number; dur?: number; cause?: string }[] = [...C.cues];
+  beats.forEach((b, i) => {
+    for (const c of b.cues ?? []) {
+      let t: number;
+      if (typeof c.at === 'number') t = T[i] + c.at;
+      else {
+        const clip = b.clip ?? '';
+        let imps = ownImpacts(clip);
+        const eff = c.at.effector;
+        if (eff && clip.startsWith('lib:')) {
+          const raw = ((libClip(clip.slice(4))?.meta as unknown as { impacts?: [number, string][] })?.impacts ?? []).filter((x) => x[1] === eff);
+          if (raw.length) imps = raw.map((x) => x[0]);
+        }
+        const it = imps.filter((x) => x >= (b.from ?? 0))[(c.at as { impact: number }).impact] ?? imps[0] ?? 0;
+        t = T[i] + (it - (b.from ?? 0)) / Math.max(1e-3, b.rate ?? 1);
+      }
+      all.push({ t, fx: c.fx, sfx: c.sfx, arg: c.arg, dur: c.dur, cause: c.cause });
+      if (c.cause && c.fx) events.push({ t, fx: c.fx, cause: c.cause });
+    }
+  });
+  for (const c of all) {
+    if (c.sfx) tl.cue('audio', c.t, () => playSfx(ctx.audio, c.sfx!));
+    if (c.fx) addFx(tl, ctx, c.fx, c.t, c.dur ?? 1, c.arg ?? 0, G, view, gate, temp, actorPos, duration);
+  }
+  tl.cue('cleanup', duration, () => {
+    for (const o of temp) ctx.scene.remove(o);
+    gateObj.light.intensity = 3;
+  });
+  const air: [number, number][] = beats.flatMap((b, i) => (b.air ? [[T[i], T[i + 1]] as [number, number]] : []));
+  const hidden: [number, number][] = beats.flatMap((b, i) => (b.hidden ? [[T[i], T[i + 1]] as [number, number]] : []));
+  const meta: EntranceMeta = { variant: C.id, duration, events, air, hidden, shots: camera.map((c) => [c.t, c.t + c.dur]) };
+  return Object.assign(tl, { meta });
+}
+
+/** actor position (gate frame) at bt seconds into a beat that started at p0 */
+function beatPos(b: Beat, p0: V3, bt: number, hipsM: number): V3 {
+  const k = Math.max(0, Math.min(1, bt / Math.max(1e-3, b.dur)));
+  const m = b.move;
+  if (m.type === 'hold') return p0;
+  if (m.type === 'lerp') {
+    const e = Ease[m.ease ?? 'inOut'](k);
+    const y = p0[1] + (m.to[1] - p0[1]) * e + (m.arc ? Math.sin(k * Math.PI) * m.arc : 0);
+    return [p0[0] + (m.to[0] - p0[0]) * e, y, p0[2] + (m.to[2] - p0[2]) * e];
+  }
+  // root motion from the library clip's root curve (clip frame: +z forward, +x left)
+  const id = b.clip?.startsWith('lib:') ? b.clip.slice(4) : '';
+  const d = id ? decodeClip(id) : null;
+  let x = p0[0],
+    z = p0[2],
+    y = p0[1];
+  const from = b.from ?? 0,
+    rate = b.rate ?? 1;
+  const ct = from + bt * rate;
+  if (d) {
+    const a = rootAt(d, from),
+      c = rootAt(d, Math.min(d.dur, ct));
+    const s = (m.scale ?? 1) * hipsM;
+    const dx = (c.x - a.x) * s,
+      dz = (c.z - a.z) * s;
+    // rotate the clip's frame by the beat yaw (gate frame: x right, z inward; clip +x = character's left)
+    const yaw = b.yaw ?? 0;
+    const cs = Math.cos(yaw),
+      sn = Math.sin(yaw);
+    // gate frame: forward = (-sin yaw, cos yaw), character left (clip +x) = (-cos yaw, -sin yaw)
+    x += -dx * cs - dz * sn;
+    z += -dx * sn + dz * cs;
+  }
+  if (m.y) {
+    const t0 = m.y.t0,
+      t1 = m.y.t1;
+    const kk = t1 > t0 ? Math.max(0, Math.min(1, (k - t0) / (t1 - t0))) : 1;
+    const curve = m.y.curve === 'fall' ? kk * kk : m.y.curve === 'rise' ? 1 - (1 - kk) * (1 - kk) : kk * kk * (3 - 2 * kk);
+    y = m.y.from + (m.y.to - m.y.from) * curve;
+  }
+  return [x, y, z];
 }
 
 function playSfx(a: AudioEngine, s: string) {
@@ -197,8 +578,9 @@ function addFx(
         ctx.rig.addShake(0.35);
         V.dust(G.w([0, 3.5, 0.5]), 8, 1.5);
         gateObj.portcullis.position.z = 0.35;
-        setTimeout(() => (gateObj.portcullis.position.z = 0.2), 90);
       });
+      // the rattle settles 90 ms later on the cutscene clock (was a wall-clock setTimeout)
+      tl.cue('vfx', t + 0.09, () => (gateObj.portcullis.position.z = 0.2));
       break;
     case 'gate_smash': {
       const vel = new THREE.Vector3();
@@ -312,7 +694,7 @@ function addFx(
         (_k, lt) => {
           flame.scale.y = 0.9 + Math.sin(lt * 17 + arg) * 0.12;
           if (light) light.intensity = Math.min(9, lt * 20) * (0.9 + Math.sin(lt * 23) * 0.1);
-          if (Math.random() < 0.15) V.embers(new THREE.Vector3(p.x, 1.7, p.z), 1, '#ffb060', 0.1);
+          if (V.rand() < 0.15) V.embers(new THREE.Vector3(p.x, 1.7, p.z), 1, '#ffb060', 0.1);
         },
         () => {
           flame.visible = true;
@@ -348,8 +730,8 @@ function addFx(
         (k) => {
           const strength = k < 0.75 ? 1 : 1 - (k - 0.75) / 0.25;
           light.intensity = 40 * strength;
-          for (let i = 0; i < 6; i++) V.fire(new THREE.Vector3(p.x + (Math.random() - 0.5) * 0.9, Math.random() * 1.5, p.z + (Math.random() - 0.5) * 0.9), new THREE.Vector3(0, 6 + Math.random() * 4, 0), 1, 0.7 * strength + 0.2, 0.5);
-          if (Math.random() < 0.5) V.embers(p.clone().setY(1), 2, '#ffaa40', 1);
+          for (let i = 0; i < 6; i++) V.fire(new THREE.Vector3(p.x + (V.rand() - 0.5) * 0.9, V.rand() * 1.5, p.z + (V.rand() - 0.5) * 0.9), new THREE.Vector3(0, 6 + V.rand() * 4, 0), 1, 0.7 * strength + 0.2, 0.5);
+          if (V.rand() < 0.5) V.embers(p.clone().setY(1), 2, '#ffaa40', 1);
         },
         () => {
           ctx.scene.add(light);
@@ -377,6 +759,115 @@ function addFx(
         ctx.rig.addShake(0.45);
       });
       break;
+    case 'slowmo':
+      tl.cue('vfx', t, () => ctx.slowmo?.(arg || 0.3, dur));
+      break;
+    case 'barrier_shake': {
+      // the bars move with his pull: bend in, spring back (per piece, slightly different)
+      const A = gateObj.anchors;
+      tl.span(
+        'vfx',
+        t,
+        0.55,
+        (k) => {
+          const amp = Math.sin(k * Math.PI * 3) * Math.exp(-k * 3) * (0.07 + arg * 0.02);
+          A.pieces.forEach((pc, i) => {
+            pc.obj.position.z = pc.pos.z - amp * (0.7 + ((i * 37) % 10) / 15);
+            pc.obj.rotation.x = pc.rot.x + amp * 0.25 * (i % 2 ? 1 : -1);
+          });
+        },
+        () => {
+          ctx.rig.addShake(0.22 + arg * 0.06);
+          V.dust(G.w([0, A.barrierH * 0.95, A.barrierZ + 0.1]), 10, 1.4);
+          V.sparks(G.w([0, 1.6, A.barrierZ + 0.1]), 6, '#ffb060', 3);
+        },
+        () => A.pieces.forEach((pc) => (pc.obj.position.copy(pc.pos), pc.obj.rotation.copy(pc.rot))),
+      );
+      break;
+    }
+    case 'barrier_break': {
+      // pre-fractured pieces fly along the strike direction (into the arena), tumble, bounce, settle
+      const A = gateObj.anchors;
+      const vel: THREE.Vector3[] = [];
+      const spin: THREE.Vector3[] = [];
+      const rng = (i: number, k: number) => ((Math.sin(i * 12.9898 + k * 78.233) * 43758.5453) % 1 + 1) % 1;
+      tl.span(
+        'vfx',
+        t,
+        2.4,
+        (_k, _lt, dt) => {
+          A.pieces.forEach((pc, i) => {
+            const v = vel[i];
+            if (!v) return;
+            if (A.barrier === 'veil') {
+              const mt = (pc.obj as THREE.Mesh).material as THREE.MeshBasicMaterial;
+              if (mt) mt.opacity = Math.max(0, mt.opacity - dt * 3.5);
+              return;
+            }
+            v.y -= 13 * dt;
+            pc.obj.position.addScaledVector(v, dt);
+            pc.obj.rotation.x += spin[i].x * dt;
+            pc.obj.rotation.y += spin[i].y * dt;
+            pc.obj.rotation.z += spin[i].z * dt;
+            // ground in the portcullis group's local frame (group origin is on the floor)
+            if (pc.obj.position.y < 0.05) {
+              pc.obj.position.y = 0.05;
+              v.y = Math.abs(v.y) * 0.25;
+              v.x *= 0.6;
+              v.z *= 0.6;
+              spin[i].multiplyScalar(0.5);
+            }
+          });
+        },
+        () => {
+          gateObj.smashed = true;
+          A.pieces.forEach((pc, i) => {
+            const up = A.barrier === 'rope' ? 0 : 2 + rng(i, 1) * 3;
+            const fwd = A.barrier === 'rope' ? 0.5 : 4 + rng(i, 2) * 6 * (arg ? 1 : 0.6);
+            vel[i] = new THREE.Vector3((rng(i, 3) - 0.5) * 3, up, fwd);
+            spin[i] = new THREE.Vector3((rng(i, 4) - 0.5) * 9, (rng(i, 5) - 0.5) * 6, (rng(i, 6) - 0.5) * 9);
+          });
+          const p = G.w([0, 1.8, A.barrierZ + 0.2]);
+          ctx.rig.addShake(0.9);
+          ctx.rig.punchFov(8);
+          if (A.barrier === 'veil') {
+            V.sparks(p, 90, '#fff2c0', 9);
+            V.embers(p, 70, '#ffe6a0', 1.6);
+            V.flash(p, '#fff6d8', 3.5, 30);
+          } else if (A.barrier === 'icicles') {
+            V.sparks(p, 70, '#bfefff', 10);
+            V.debrisBurst(p, '#cfefff', 18);
+            V.flash(p, '#bfe8ff', 2.5, 20);
+          } else {
+            V.debrisBurst(p, '#3b3632', 16);
+            V.sparks(p, 70, '#ffb060', 11);
+            V.flash(p, '#ff9a50', 3, 25);
+          }
+          V.dust(G.w([0, 0.2, A.barrierZ + 1.2]), 34, 2.4);
+        },
+      );
+      break;
+    }
+    case 'shadow_pool': {
+      const p = actorPos().setY(0.03);
+      const disc = new THREE.Mesh(new THREE.CircleGeometry(1.3, 40), new THREE.MeshBasicMaterial({ color: '#07040c', transparent: true, opacity: 0, depthWrite: false }));
+      disc.rotation.x = -Math.PI / 2;
+      disc.position.copy(p);
+      tl.span(
+        'vfx',
+        t,
+        dur,
+        (k) => {
+          (disc.material as THREE.MeshBasicMaterial).opacity = Math.min(0.92, k * 6) * (k > 0.8 ? (1 - k) * 5 : 1);
+          if (V.rand() < 0.6) V.smoke(p.clone().setY(0.2), 1, '#1a1024', 0.9, 0.5);
+        },
+        () => {
+          ctx.scene.add(disc);
+          temp.push(disc);
+        },
+      );
+      break;
+    }
   }
 }
 

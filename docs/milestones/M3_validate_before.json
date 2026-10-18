@@ -1,0 +1,96 @@
+{
+ "configs": 660,
+ "failed": 66,
+ "by": {
+  "gorak cage_breaker": [
+   70,
+   15
+  ],
+  "aldric legacy": [
+   70,
+   8
+  ],
+  "ozrel legacy": [
+   70,
+   3
+  ],
+  "erika legacy": [
+   70,
+   2
+  ],
+  "vex perch_drop": [
+   50,
+   8
+  ],
+  "vex shadow_rise": [
+   70,
+   0
+  ],
+  "fenrik legacy": [
+   70,
+   11
+  ],
+  "maw legacy": [
+   70,
+   8
+  ],
+  "hollowjack stands_leap": [
+   10,
+   4
+  ],
+  "hollowjack gate_burst": [
+   70,
+   3
+  ],
+  "vex rim_climb": [
+   20,
+   1
+  ],
+  "hollowjack fence_vault": [
+   20,
+   3
+  ]
+ },
+ "fails": [
+  "vex colosseum/oval g0 perch_drop:wall_l [\"support@0.03 feet 3.45 vs ground 4.01 (BufferGeometry/MeshStandardMaterial @(-15.6,4.0,-3.9)) at (-15.6\"]",
+  "hollowjack colosseum/oval g0 stands_leap [\"support@0.03 feet 4.57 vs ground 5.13 (BufferGeometry/MeshStandardMaterial @(-17.2,5.1,5.2)) at (-17.2,\"]",
+  "vex colosseum/oval g1 perch_drop:wall_l [\"support@0.03 feet 3.45 vs ground 4.01 (BufferGeometry/MeshStandardMaterial @(15.6,4.0,3.9)) at (15.6,3.\"]",
+  "hollowjack colosseum/oval g1 stands_leap [\"support@0.03 feet 4.57 vs ground 5.13 (BufferGeometry/MeshStandardMaterial @(17.2,5.1,-5.2)) at (17.2,4\"]",
+  "gorak colosseum/cross g0 cage_breaker:portcullis [\"occlusion@11.83 geometry between the camera (-0.4,0.6,-2.9) and the actor (BufferGeometry/MeshStandardMate\"]",
+  "fenrik colosseum/cross g0 legacy [\"occlusion@6.5 geometry between the camera (-1.4,1.2,1.7) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "gorak colosseum/cross g1 cage_breaker:portcullis [\"occlusion@4.9 geometry between the camera (8.0,1.2,2.5) and the actor (CylinderGeometry/MeshStandardMate\",\"occlusion@11.83 geometry between the camera (0.4,0.6,2.9) and the actor (BufferGeometry/MeshStandardMateri\"]",
+  "fenrik colosseum/cross g1 legacy [\"occlusion@6.5 geometry between the camera (1.4,1.2,-1.7) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "vex colosseum/gauntlet g0 perch_drop:wall_l [\"support@0.03 feet 3.45 vs ground 4.01 (BufferGeometry/MeshStandardMaterial @(-16.0,4.0,-4.0)) at (-16.6\"]",
+  "hollowjack colosseum/gauntlet g0 stands_leap [\"support@0.03 nothing under the feet at y 4.57 at (-18.2,4.6,5.2)\"]",
+  "vex colosseum/gauntlet g1 perch_drop:wall_l [\"support@0.03 feet 3.45 vs ground 4.01 (BufferGeometry/MeshStandardMaterial @(16.0,4.0,4.0)) at (16.6,3.\"]",
+  "hollowjack colosseum/gauntlet g1 stands_leap [\"support@0.03 nothing under the feet at y 4.57 at (18.2,4.6,-5.2)\"]",
+  "erika skytemple/pit g0 legacy [\"support@3.73 feet 0.00 vs ground 0.39 (IcosahedronGeometry/MeshStandardMaterial @(-7.9,0.4,0.0)) at (-8\"]",
+  "fenrik skytemple/pit g0 legacy [\"support@3 feet 0.00 vs ground 0.29 (IcosahedronGeometry/MeshStandardMaterial @(-7.9,0.3,-0.3)) at (-\"]",
+  "maw skytemple/pit g0 legacy [\"occlusion@2.83 geometry between the camera (-5.3,0.3,-1.5) and the actor (CylinderGeometry/MeshStandardMa\",\"support@4.63 feet 0.00 vs ground 0.35 (IcosahedronGeometry/MeshStandardMaterial @(-8.1,0.4,-0.2)) at (-\"]",
+  "gorak skytemple/cross g0 cage_breaker:veil [\"occlusion@9.63 geometry between the camera (-0.4,0.6,-2.8) and the actor (BufferGeometry/MeshStandardMate\"]",
+  "aldric skytemple/cross g0 legacy [\"occlusion@0.83 geometry between the camera (-5.8,1.4,0.0) and the actor (CylinderGeometry/MeshStandardMat\"]",
+  "fenrik skytemple/cross g0 legacy [\"occlusion@6.5 geometry between the camera (-1.4,1.2,1.7) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "maw skytemple/cross g0 legacy [\"occlusion@0.83 geometry between the camera (-5.8,1.1,0.0) and the actor (CylinderGeometry/MeshStandardMat\",\"support@5.4 feet 0.00 vs ground 0.28 (BoxGeometry/MeshStandardMaterial @(-6.8,0.3,0.0)) at (-6.8,0.0,0\"]",
+  "gorak skytemple/cross g1 cage_breaker:veil [\"occlusion@9.63 geometry between the camera (0.4,0.6,2.8) and the actor (BufferGeometry/MeshStandardMateri\"]",
+  "fenrik skytemple/cross g1 legacy [\"occlusion@6.5 geometry between the camera (1.4,1.2,-1.7) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "hollowjack sakura/oval g0 fence_vault [\"occlusion@0.53 geometry between the camera (-11.1,1.3,2.5) and the actor (BufferGeometry/MeshStandardMate\"]",
+  "hollowjack sakura/oval g1 fence_vault [\"head@1.27 head inside geometry (BufferGeometry/MeshStandardMaterial @(15.4,1.7,-5.6)) chest (15.6,1.\",\"head@2.3 head inside geometry (BufferGeometry/MeshStandardMaterial @(14.2,1.7,-5.5)) chest (14.3,1.\"]",
+  "gorak sakura/cross g0 cage_breaker:rope [\"occlusion@9.63 geometry between the camera (-0.4,0.6,-2.8) and the actor (BufferGeometry/MeshStandardMate\"]",
+  "gorak sakura/cross g1 cage_breaker:rope [\"occlusion@9.63 geometry between the camera (0.4,0.6,2.8) and the actor (BufferGeometry/MeshStandardMateri\"]",
+  "hollowjack sakura/split g0 fence_vault [\"head@0.1 head inside geometry (BufferGeometry/MeshStandardMaterial @(-14.4,1.7,5.5)) chest (-14.5,1\",\"occlusion@0.53 geometry between the camera (-9.2,1.2,3.0) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "aldric sakura/gauntlet g0 legacy [\"occlusion@0.83 geometry between the camera (-9.0,1.4,0.0) and the actor (PlaneGeometry/MeshBasicMaterial \"]",
+  "maw sakura/gauntlet g0 legacy [\"occlusion@0.83 geometry between the camera (-9.0,1.1,0.0) and the actor (PlaneGeometry/MeshBasicMaterial \"]",
+  "aldric forge/pit g1 legacy [\"support@3.7 feet 0.00 vs ground 0.01 (PlaneGeometry/MeshStandardMaterial @(8.6,0.0,0.1)) at (8.1,0.0,0\"]",
+  "erika forge/oval g0 legacy [\"support@4.63 feet 0.00 vs ground 0.37 (IcosahedronGeometry/MeshStandardMaterial @(-8.4,0.4,0.1)) at (-8\"]",
+  "vex forge/oval g0 perch_drop:wall_l [\"support@0.03 nothing under the feet at y 3.42 at (-15.8,3.4,-3.9)\"]",
+  "vex forge/oval g1 perch_drop:wall_l [\"support@0.03 nothing under the feet at y 3.42 at (15.8,3.4,3.9)\"]",
+  "gorak forge/cross g0 cage_breaker:portcullis [\"occlusion@11.83 geometry between the camera (-0.4,0.6,-2.9) and the actor (BufferGeometry/MeshStandardMate\"]",
+  "fenrik forge/cross g0 legacy [\"occlusion@6.5 geometry between the camera (-1.4,1.2,1.7) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "gorak forge/cross g1 cage_breaker:portcullis [\"occlusion@11.83 geometry between the camera (0.4,0.6,2.9) and the actor (BufferGeometry/MeshStandardMateri\"]",
+  "fenrik forge/cross g1 legacy [\"occlusion@6.5 geometry between the camera (1.4,1.2,-1.7) and the actor (BufferGeometry/MeshStandardMater\"]",
+  "vex forge/gauntlet g0 perch_drop:wall_l [\"support@0.03 nothing under the feet at y 3.42 at (-16.9,3.4,-3.9)\"]",
+  "gorak forge/gauntlet g1 cage_breaker:portcullis [\"causality@3.05 barrier_shake: hands 0.36 m from the barrier\"]",
+  "vex forge/gauntlet g1 perch_drop:wall_l [\"support@0.03 nothing under the feet at y 3.42 at (16.9,3.4,3.9)\"]",
+  "maw glacier/oval g0 legacy [\"occlusion@2.83 geometry between the camera (-7.5,0.3,-1.5) and the actor (IcosahedronGeometry/MeshStandar\"]"
+ ]
+}

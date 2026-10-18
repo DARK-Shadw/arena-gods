@@ -70,12 +70,45 @@ export class Debris {
     this.geo.center();
   }
 
+  /** A5: per-theme chunk meshes (kit FRAC pieces, unit size) and, optionally, their textured kit material */
+  private chunks = new Map<DebrisMat, { geo: THREE.BufferGeometry; mat?: THREE.Material }>();
+
+  /**
+   * A5: the pool of `m` draws this chunk mesh (normalised to the procedural rock's size: largest half extent 0.5, centred)
+   * instead of the procedural rock; with `mat` (a kit material, owned by the asset cache) instead of the flat colour.
+   * Still one InstancedMesh per material kind, so the debris draw calls are unchanged. Call before the first burst.
+   */
+  setChunk(m: DebrisMat, src: THREE.BufferGeometry, mat?: THREE.Material) {
+    if (this.pools.has(m)) return;
+    const g = new THREE.BufferGeometry();
+    for (const name of ['position', 'normal', 'uv']) {
+      const at = src.attributes[name] as THREE.BufferAttribute | undefined;
+      if (!at) continue;
+      const arr = new Float32Array(at.count * at.itemSize);
+      for (let i = 0; i < at.count; i++) for (let c = 0; c < at.itemSize; c++) arr[i * at.itemSize + c] = at.getComponent(i, c);
+      g.setAttribute(name, new THREE.BufferAttribute(arr, at.itemSize));
+    }
+    if (src.index) g.setIndex(Array.from(src.index.array as ArrayLike<number>));
+    g.computeBoundingBox();
+    const b = g.boundingBox!;
+    const c = b.getCenter(new THREE.Vector3());
+    const s = 0.5 / Math.max(1e-4, Math.max(b.max.x - b.min.x, b.max.y - b.min.y, b.max.z - b.min.z) / 2);
+    g.translate(-c.x, -c.y, -c.z);
+    g.scale(s, s, s);
+    if (!g.attributes.normal) g.computeVertexNormals();
+    g.computeBoundingSphere();
+    this.chunks.set(m, { geo: g, mat });
+  }
+
   private pool(m: DebrisMat): Pool {
     let p = this.pools.get(m);
     if (!p) {
       const d = MATS[m];
-      const mat = new THREE.MeshStandardMaterial({ color: d.color, roughness: d.rough, metalness: d.metal ?? 0, emissive: d.emissive ?? '#000000', emissiveIntensity: d.emissive ? 1.5 : 0 });
-      p = new Pool(this.geo, mat);
+      const ch = this.chunks.get(m);
+      const mat = ch?.mat ?? new THREE.MeshStandardMaterial({ color: d.color, roughness: d.rough, metalness: d.metal ?? 0, emissive: d.emissive ?? '#000000', emissiveIntensity: d.emissive ? 1.5 : 0 });
+      p = new Pool(ch?.geo ?? this.geo, mat);
+      // a kit material belongs to the asset cache (Arena.dispose must not dispose it)
+      if (ch?.mat) p.mesh.userData.sharedMat = true;
       this.pools.set(m, p);
       this.group.add(p.mesh);
     }
@@ -154,6 +187,215 @@ export class Debris {
         pool.mesh.setMatrixAt(i, _m);
       }
       pool.mesh.instanceMatrix.needsUpdate = true;
+    }
+  }
+}
+
+// ------------------------------------------------------------------ A5: pre-fractured pieces (FRAC_*) spawned in place
+
+/** how a fracture set moves: 'lie' = pieces of a toppled obstacle settling along its fall line, 'burst' = a prop or
+ * barricade breaking apart where it stood */
+export type FracMode = 'lie' | 'burst';
+
+interface FracPiece {
+  start: number;
+  count: number;
+  /** centroid at spawn (world) */
+  c0: THREE.Vector3;
+  v: THREE.Vector3;
+  axis: THREE.Vector3;
+  spin: number;
+  /** time of ground contact, centroid height at rest */
+  tg: number;
+  restY: number;
+}
+
+const _fq = new THREE.Quaternion();
+const _fv = new THREE.Vector3();
+const _fn = new THREE.Vector3();
+
+/**
+ * A5: the hidden FRAC_* pieces of a kit asset instance (props, features, obstacles), merged into ONE mesh per material
+ * (normally one: every piece uses the LOD's baked material) and animated on the CPU as rigid bodies: a hop / burst, a spin,
+ * gravity, a rest on the floor, then (after `linger` s) a slow sink out of sight. The motion is an analytic function of the
+ * time since spawn (seeded per object), so a seek lands on the same picture. The intact mesh is hidden by the caller, so a
+ * breaking object costs the same draw calls as the intact one. Vertex positions are rewritten only while pieces move.
+ */
+export class FracSet {
+  readonly meshes: THREE.Mesh[] = [];
+  private pieces: { mesh: THREE.Mesh; base: Float32Array; baseN: Float32Array | null; list: FracPiece[] }[] = [];
+  private lastT = -1;
+  private linger: number;
+  private sinkT: number;
+  /** seconds until every piece rests; after linger + sink the set is finished */
+  readonly settle: number;
+  constructor(
+    owner: THREE.Object3D,
+    mode: FracMode,
+    seed: number,
+    opts: { dir?: THREE.Vector3; speed?: number; linger?: number; sink?: number } = {},
+  ) {
+    this.linger = opts.linger ?? (mode === 'lie' ? 10 : 6);
+    this.sinkT = opts.sink ?? 1.6;
+    owner.updateMatrixWorld(true);
+    const byMat = new Map<THREE.Material, THREE.Mesh[]>();
+    owner.traverse((o) => {
+      const m = o as THREE.Mesh;
+      if (!m.isMesh || !o.userData.frac) return;
+      const k = m.material as THREE.Material;
+      if (!byMat.has(k)) byMat.set(k, []);
+      byMat.get(k)!.push(m);
+    });
+    const rnd = new R(seed * 7919 + 17);
+    const dir = opts.dir ?? new THREE.Vector3(1, 0, 0);
+    const speed = opts.speed ?? 1;
+    // centre of the whole set (burst direction)
+    const all = new THREE.Box3();
+    for (const list of byMat.values()) for (const m of list) all.expandByObject(m);
+    const center = all.getCenter(new THREE.Vector3());
+    let settle = 0;
+    for (const [mat, list] of byMat) {
+      const pos: number[] = [],
+        nor: number[] = [],
+        uv: number[] = [];
+      const idx: number[] = [];
+      const pcs: FracPiece[] = [];
+      for (const m of list) {
+        const g = m.geometry;
+        const P = g.attributes.position as THREE.BufferAttribute;
+        const N = g.attributes.normal as THREE.BufferAttribute | undefined;
+        const U = g.attributes.uv as THREE.BufferAttribute | undefined;
+        const nm = new THREE.Matrix3().getNormalMatrix(m.matrixWorld);
+        const base = pos.length / 3;
+        const c0 = new THREE.Vector3();
+        for (let i = 0; i < P.count; i++) {
+          _fv.fromBufferAttribute(P, i).applyMatrix4(m.matrixWorld);
+          pos.push(_fv.x, _fv.y, _fv.z);
+          c0.add(_fv);
+          if (N) {
+            _fn.fromBufferAttribute(N, i).applyMatrix3(nm).normalize();
+            nor.push(_fn.x, _fn.y, _fn.z);
+          }
+          uv.push(U ? U.getX(i) : 0, U ? U.getY(i) : 0);
+        }
+        c0.multiplyScalar(1 / Math.max(1, P.count));
+        if (g.index) for (let i = 0; i < g.index.count; i++) idx.push(base + g.index.getX(i));
+        else for (let i = 0; i < P.count; i++) idx.push(base + i);
+        // motion: 'lie' = a short hop away from the impact along the fall line, rolling about the line; 'burst' = outward
+        const out = _fv.copy(c0).sub(center).setY(0);
+        if (out.lengthSq() < 1e-6) out.set(rnd.range(-1, 1), 0, rnd.range(-1, 1));
+        out.normalize();
+        const v = new THREE.Vector3();
+        let axis: THREE.Vector3, spin: number;
+        if (mode === 'lie') {
+          const along = Math.max(0, c0.clone().sub(owner.getWorldPosition(new THREE.Vector3())).dot(dir));
+          v.copy(dir).multiplyScalar(speed * (0.25 + 0.18 * along) * rnd.range(0.6, 1.2)).addScaledVector(out, rnd.range(0.2, 0.9)).setY(rnd.range(0.6, 2.2));
+          axis = new THREE.Vector3().crossVectors(dir, new THREE.Vector3(0, 1, 0)).normalize();
+          if (rnd.next() < 0.5) axis.negate();
+          axis.add(new THREE.Vector3(rnd.range(-0.3, 0.3), rnd.range(-0.3, 0.3), rnd.range(-0.3, 0.3))).normalize();
+          spin = rnd.range(0.6, 2.4);
+        } else {
+          v.copy(out).multiplyScalar(speed * rnd.range(1.2, 3.2)).setY(speed * rnd.range(1.6, 3.6));
+          axis = new THREE.Vector3(rnd.range(-1, 1), rnd.range(-1, 1), rnd.range(-1, 1)).normalize();
+          spin = rnd.range(3, 9);
+        }
+        pcs.push({ start: base, count: P.count, c0, v, axis, spin, tg: 0, restY: 0 });
+      }
+      // rest height and contact time per piece (lowest vertex on the floor at its final rotation, embedded 2 cm)
+      const posArr = new Float32Array(pos);
+      for (const pc of pcs) {
+        let tg = 0.25;
+        for (let it = 0; it < 3; it++) {
+          _fq.setFromAxisAngle(pc.axis, pc.spin * tg);
+          let lo = Infinity;
+          for (let i = pc.start; i < pc.start + pc.count; i++) {
+            _fv.set(posArr[i * 3] - pc.c0.x, posArr[i * 3 + 1] - pc.c0.y, posArr[i * 3 + 2] - pc.c0.z).applyQuaternion(_fq);
+            lo = Math.min(lo, _fv.y);
+          }
+          pc.restY = -lo - 0.02;
+          // y(t) = c0y + vy t - 4.9 t^2 = restY  ->  the later root
+          const a = -4.9,
+            b = pc.v.y,
+            c = pc.c0.y - pc.restY;
+          const disc = b * b - 4 * a * c;
+          tg = disc > 0 ? Math.max(0.12, (-b - Math.sqrt(disc)) / (2 * a)) : 0.3;
+        }
+        pc.tg = tg;
+        settle = Math.max(settle, tg);
+      }
+      const g = new THREE.BufferGeometry();
+      g.setAttribute('position', new THREE.BufferAttribute(posArr.slice(), 3));
+      if (nor.length === pos.length) g.setAttribute('normal', new THREE.BufferAttribute(new Float32Array(nor), 3));
+      else g.computeVertexNormals();
+      g.setAttribute('uv', new THREE.BufferAttribute(new Float32Array(uv), 2));
+      g.setIndex(idx);
+      const mesh = new THREE.Mesh(g, mat);
+      mesh.castShadow = mesh.receiveShadow = true;
+      mesh.frustumCulled = false;
+      mesh.matrixAutoUpdate = false;
+      mesh.name = 'fracSet';
+      // the material is the asset's (or the obstacle's crack clone, owned by the obstacle): the arena must not dispose it here
+      mesh.userData.sharedMat = true;
+      mesh.userData.dyn = true;
+      this.meshes.push(mesh);
+      this.pieces.push({ mesh, base: posArr, baseN: nor.length === pos.length ? new Float32Array(nor) : null, list: pcs });
+    }
+    this.settle = settle;
+  }
+
+  /** true once every piece has sunk out of sight */
+  get finished() {
+    return this.lastT >= this.settle + this.linger + this.sinkT;
+  }
+
+  /** pose at `t` seconds after the spawn (analytic: seeks land on the same picture) */
+  update(t: number) {
+    t = Math.max(0, t);
+    const end = this.settle + this.linger + this.sinkT;
+    if (this.lastT >= 0 && ((t >= end && this.lastT >= end) || (t > this.settle && this.lastT > this.settle && t < this.settle + this.linger && this.lastT < this.settle + this.linger))) {
+      this.lastT = t;
+      return;
+    }
+    this.lastT = t;
+    const sink = Math.max(0, Math.min(1, (t - this.settle - this.linger) / this.sinkT));
+    for (const s of this.pieces) {
+      const P = s.mesh.geometry.attributes.position as THREE.BufferAttribute;
+      const N = s.mesh.geometry.attributes.normal as THREE.BufferAttribute | undefined;
+      const pa = P.array as Float32Array;
+      const na = N?.array as Float32Array | undefined;
+      for (const pc of s.list) {
+        const tt = Math.min(t, pc.tg);
+        // after contact: a little slide along the throw, decaying
+        const slide = t > pc.tg ? 0.12 * (1 - Math.exp(-(t - pc.tg) * 5)) : 0;
+        const cx = pc.c0.x + pc.v.x * (tt + slide),
+          cz = pc.c0.z + pc.v.z * (tt + slide);
+        let cy = t >= pc.tg ? pc.restY : pc.c0.y + pc.v.y * tt - 4.9 * tt * tt;
+        cy -= sink * 0.9;
+        _fq.setFromAxisAngle(pc.axis, pc.spin * tt);
+        const b = s.base;
+        for (let i = pc.start; i < pc.start + pc.count; i++) {
+          _fv.set(b[i * 3] - pc.c0.x, b[i * 3 + 1] - pc.c0.y, b[i * 3 + 2] - pc.c0.z).applyQuaternion(_fq);
+          pa[i * 3] = cx + _fv.x;
+          pa[i * 3 + 1] = cy + _fv.y;
+          pa[i * 3 + 2] = cz + _fv.z;
+          if (na && s.baseN) {
+            _fn.set(s.baseN[i * 3], s.baseN[i * 3 + 1], s.baseN[i * 3 + 2]).applyQuaternion(_fq);
+            na[i * 3] = _fn.x;
+            na[i * 3 + 1] = _fn.y;
+            na[i * 3 + 2] = _fn.z;
+          }
+        }
+      }
+      P.needsUpdate = true;
+      if (N) N.needsUpdate = true;
+      s.mesh.visible = sink < 1;
+    }
+  }
+
+  dispose() {
+    for (const m of this.meshes) {
+      m.removeFromParent();
+      m.geometry.dispose();
     }
   }
 }

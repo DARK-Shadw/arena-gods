@@ -6,7 +6,7 @@
 import * as THREE from 'three';
 import type { ArenaLayout } from '../../sim/arenaGen';
 import { boundR } from '../../sim/arenaGen';
-import type { Arena, Gate } from './arenaView';
+import type { Arena, Gate, GateAnchors, V3 } from './arenaView';
 import { canvasTexture } from './textures';
 import { shaderTime } from './materials';
 import { R } from './noise';
@@ -108,6 +108,9 @@ export function floorDisc(L: ArenaLayout, pad: number, tile: number, mat: THREE.
   g.computeVertexNormals();
   const m = new THREE.Mesh(g, mat);
   m.receiveShadow = true;
+  // A2: the kit wet floor (dressKit.ts) replaces meshes flagged floor / floorDeco
+  m.userData.floor = true;
+  m.userData.floorPad = pad;
   return m;
 }
 
@@ -134,7 +137,15 @@ export function groundPlane(size: number, tile: number, mat: THREE.Material, y =
  * receives the gate group (local +Z points into the arena, origin at the
  * opening) and returns the moving "portcullis" and the light position.
  */
-export function makeGate(a: Arena, i: number, off: number, build: (g: THREE.Group) => { portcullis: THREE.Object3D; lightPos?: THREE.Vector3; lightColor?: string }): Gate {
+/** anchors as returned by a theme's gate builder: positions in GROUP-local space (origin at the gate opening, +z inward) */
+export type AnchorSpec = Partial<Omit<GateAnchors, 'pieces'>> & { barrier: GateAnchors['barrier'] };
+
+export function makeGate(
+  a: Arena,
+  i: number,
+  off: number,
+  build: (g: THREE.Group) => { portcullis: THREE.Object3D; lightPos?: THREE.Vector3; lightColor?: string; anchors?: AnchorSpec },
+): Gate {
   const L = a.layout;
   const ang = i === 0 ? Math.PI : 0;
   const x = Math.cos(ang) * (L.rx + off);
@@ -146,7 +157,29 @@ export function makeGate(a: Arena, i: number, off: number, build: (g: THREE.Grou
   const light = new THREE.PointLight(r.lightColor ?? a.theme.accent, 0, 14, 1.6);
   light.position.copy(r.lightPos ?? new THREE.Vector3(0, 2.4, 1.6));
   g.add(light);
-  const gate: Gate = { angle: ang, pos: new THREE.Vector3(Math.cos(ang) * L.rx, 0, 0), inward: new THREE.Vector3(-Math.cos(ang), 0, 0), portcullis: r.portcullis, light, group: g, smashed: false };
+  // group-local -> gate frame (origin at the boundary, the group sits `off` further out)
+  const A = r.anchors ?? { barrier: 'none' };
+  const fz = (p: V3): V3 => [p[0], p[1], p[2] - off];
+  const pieces: GateAnchors['pieces'] = [];
+  r.portcullis.traverse((o) => {
+    if (o !== r.portcullis) pieces.push({ obj: o, pos: o.position.clone(), rot: o.rotation.clone(), vis: o.visible });
+    const mt = (o as THREE.Mesh).material as THREE.Material | undefined;
+    if (mt && (mt as THREE.Material).transparent) mt.userData.op = (mt as THREE.MeshBasicMaterial).opacity;
+  });
+  const anchors: GateAnchors = {
+    barrier: A.barrier,
+    barrierZ: 0.2 - off,
+    barrierHalfW: A.barrierHalfW ?? 1.5,
+    barrierH: A.barrierH ?? 3.6,
+    tunnel: A.tunnel,
+    perches: (A.perches ?? []).map((p) => ({ ...p, pos: fz(p.pos) })),
+    rims: (A.rims ?? []).map((p) => ({ ...p, pos: fz(p.pos) })),
+    stands: (A.stands ?? []).map(fz),
+    lowWall: A.lowWall ? { ...A.lowWall, pos: fz(A.lowWall.pos) } : undefined,
+    wallH: A.wallH ?? L.wallH,
+    pieces,
+  };
+  const gate: Gate = { angle: ang, pos: new THREE.Vector3(Math.cos(ang) * L.rx, 0, 0), inward: new THREE.Vector3(-Math.cos(ang), 0, 0), portcullis: r.portcullis, light, group: g, smashed: false, anchors };
   a.gates.push(gate);
   return gate;
 }
@@ -223,6 +256,7 @@ export function crowd(a: Arena, rows: { off: number; y: number }[], count: numbe
   mesh.receiveShadow = true;
   heads.receiveShadow = true;
   mesh.userData.noAO = heads.userData.noAO = true;
+  mesh.userData.crowd = heads.userData.crowd = true; // A7: the Moon Gate (kit mode) removes the crowd
   a.group.add(mesh, heads);
   a.onUpdate(() => (excite.value = a.excitement));
 }
@@ -299,8 +333,12 @@ export function banner(a: Arena, color: string, trim: string, w: number, h: numb
   mesh.castShadow = true;
   mesh.userData.dyn = true;
   const basePos = (geo.attributes.position.array as Float32Array).slice();
-  const ph = Math.random() * 10;
+  // A4: the legacy phase stays Math.random() ONLY on the legacy path (?arena=legacy must stay pixel-identical: the concept
+  // harness seeds Math.random); kit mode gets a deterministic phase (render seed + build order) and replaces these banners
+  // with kit banners whose sway runs in the vertex shader (cloth.ts)
+  const ph = a.kit ? (((a.layout.seed * 7919 + a.group.children.length * 104729) % 1000) / 1000) * 10 : Math.random() * 10;
   a.onUpdate((t) => {
+    if (!mesh.parent) return; // A4: removed by the kit ring (dressKit wallBanners): no more CPU flutter
     const pos = geo.attributes.position as THREE.BufferAttribute;
     const arr = pos.array as Float32Array;
     for (let i = 0; i < arr.length; i += 3) {

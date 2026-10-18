@@ -1,0 +1,43 @@
+matches 336 launches by attacker /match-appearance {
+  gorak: 0.65,
+  ozrel: 0.6,
+  maw: 0.99,
+  hollowjack: 0.64,
+  aldric: 0.2,
+  erika: 0.08,
+  vex: 0.13,
+  fenrik: 0.26
+}
+victims {
+  aldric: 36,
+  ozrel: 49,
+  gorak: 13,
+  erika: 65,
+  vex: 70,
+  fenrik: 44,
+  hollowjack: 19,
+  maw: 3
+}
+moves {
+  skullsplitter: 14,
+  brute_rush: 14,
+  env: 64,
+  cinder_nova: 27,
+  skull_crack: 19,
+  earthshaker: 40,
+  devour: 4,
+  hammer_of_ages: 12,
+  bonfire_night: 17,
+  reaping_cut: 4,
+  bulwark_rush: 5,
+  falling_star: 14,
+  maw_sweep: 5,
+  crushing_leap: 8,
+  harvest_slam: 16,
+  rolling_charge: 6,
+  heel_hook: 2,
+  maul: 17,
+  shoulder_barge: 6,
+  scarecrow_spin: 5
+}
+into wall/pillar 116 props broken in flight 39

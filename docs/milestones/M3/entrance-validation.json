@@ -1,0 +1,85 @@
+{
+ "configs": 638,
+ "failed": 0,
+ "by": {
+  "gorak cage_breaker": [
+   70,
+   0
+  ],
+  "aldric shield_march": [
+   70,
+   0
+  ],
+  "ozrel fire_pillar": [
+   70,
+   0
+  ],
+  "erika torch_path": [
+   70,
+   0
+  ],
+  "vex perch_drop": [
+   40,
+   0
+  ],
+  "vex shadow_rise": [
+   70,
+   0
+  ],
+  "fenrik shadow_leap": [
+   70,
+   0
+  ],
+  "maw great_gate": [
+   70,
+   0
+  ],
+  "hollowjack stands_leap": [
+   8,
+   0
+  ],
+  "hollowjack gate_burst": [
+   70,
+   0
+  ],
+  "vex rim_climb": [
+   20,
+   0
+  ],
+  "hollowjack fence_vault": [
+   10,
+   0
+  ]
+ },
+ "byTheme": {
+  "colosseum": [
+   98,
+   0
+  ],
+  "skytemple": [
+   90,
+   0
+  ],
+  "sakura": [
+   100,
+   0
+  ],
+  "forge": [
+   80,
+   0
+  ],
+  "glacier": [
+   80,
+   0
+  ],
+  "moonlake": [
+   100,
+   0
+  ],
+  "desert": [
+   90,
+   0
+  ]
+ },
+ "fails": []
+}

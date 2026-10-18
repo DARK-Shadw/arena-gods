@@ -15,6 +15,8 @@ export const camWorld = {
   wallH: 3.2,
   /** hanging hazards (chandeliers): sphere centre + radius */
   hanging: [] as { x: number; y: number; z: number; r: number }[],
+  /** real line-of-sight test against the built arena (decor the layout data does not know); set by the app */
+  occluded: (_from: THREE.Vector3, _to: THREE.Vector3) => false,
 };
 
 /** Unity-style SmoothDamp for a scalar (critically damped). */
@@ -204,7 +206,17 @@ export function resolveCamera(p: THREE.Vector3, look: THREE.Vector3, avoidOcclus
         const k = Math.max(0, Math.min(1, ((b.x - x) * dx + (b.y - y) * dy + (b.z - z) * dz) / l2));
         return Math.hypot(x + dx * k - b.x, y + dy * k - b.y, z + dz * k - b.z) < b.r + 0.4;
       });
-    if (blocked(p.x, p.y, p.z)) {
+    // looking straight down the line between the two fighters hides one behind the other
+    const lined = (x: number, z: number) => {
+      if (subjects.length < 2) return false;
+      const a0 = Math.atan2(subjects[0].x - x, subjects[0].z - z),
+        a1 = Math.atan2(subjects[1].x - x, subjects[1].z - z);
+      let d = Math.abs(a0 - a1) % (Math.PI * 2);
+      if (d > Math.PI) d = Math.PI * 2 - d;
+      return d < 0.2 && Math.hypot(subjects[0].x - subjects[1].x, subjects[0].z - subjects[1].z) > 0.6;
+    };
+    const blockedOrLined = (x: number, y: number, z: number) => blocked(x, y, z) || lined(x, z);
+    if (blockedOrLined(p.x, p.y, p.z)) {
       const dx = p.x - look.x,
         dz = p.z - look.z;
       const base = Math.atan2(dz, dx);
@@ -215,7 +227,7 @@ export function resolveCamera(p: THREE.Vector3, look: THREE.Vector3, avoidOcclus
         const a = base + step;
         c.set(look.x + Math.cos(a) * dist, p.y, look.z + Math.sin(a) * dist);
         clampWall(c);
-        if (!blocked(c.x, c.y, c.z)) {
+        if (!blockedOrLined(c.x, c.y, c.z)) {
           p.copy(c);
           found = true;
           break;

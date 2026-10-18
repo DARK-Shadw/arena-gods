@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Arena Kit Gallery</title>
+    <style>
+      html, body { margin: 0; height: 100%; background: #07080d; color: #ddd; font: 12px/1.35 system-ui, sans-serif; overflow: hidden; }
+      #c { width: 100%; height: 100%; display: block; }
+      #hud { position: absolute; left: 10px; top: 8px; white-space: pre; font: 12px/1.35 ui-monospace, monospace; color: #d8d8d8; text-shadow: 0 1px 2px #000; pointer-events: none; }
+      #views { position: absolute; right: 10px; top: 8px; display: flex; gap: 6px; }
+      #views button { background: #1b1d22; color: #ddd; border: 1px solid #333; padding: 3px 9px; border-radius: 4px; cursor: pointer; font: inherit; }
+      .lbl { position: absolute; transform: translate(-50%, 0); font: 11px/1.2 ui-monospace, monospace; color: #e8d6a8; text-shadow: 0 1px 2px #000, 0 0 4px #000; pointer-events: none; white-space: nowrap; text-align: center; }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="hud">loading kit...</div>
+    <div id="views"></div>
+    <script type="module" src="./gallery.ts"></script>
+  </body>
+</html>
