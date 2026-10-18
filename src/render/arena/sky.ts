@@ -33,6 +33,18 @@ export interface SkyParams {
    * halo (tuned for small moons; a 12 deg concept moon hid it under the disc), so every legacy theme renders identically.
    */
   moonHalo?: number;
+  /**
+   * A7b: storm-cloud deck down to the horizon (direction-space fbm, so it has texture where the plane-projected clouds
+   * stretch flat), lit from behind by the moon: a bright glow round the moon, silver edges, dark storm cloud beyond.
+   * 0 / undefined = off (every other theme renders identically).
+   */
+  storm?: number;
+  stormLit?: THREE.Color;
+  stormDark?: THREE.Color;
+  /** A7b: storm cloud scale (higher = smaller billows) */
+  stormScale?: number;
+  /** A7b: the baked storm deck (bakeStormTexture), set by the arena before the sky is made */
+  stormTex?: THREE.Texture;
 }
 
 /** A6: moon / sun angular RADIUS (rad) from the apparent DIAMETER in degrees (ref-3's moon is about 12 deg wide) */
@@ -53,6 +65,7 @@ uniform float uCloudCover; uniform float uCloudScale; uniform vec3 uCloudColor; 
 uniform float uStars; uniform float uAurora; uniform vec3 uAuroraA; uniform vec3 uAuroraB;
 uniform vec3 uMoonDir; uniform float uMoonSize; uniform vec3 uMoonColor; uniform float uMoonHalo;
 uniform float uTime;
+uniform float uStorm; uniform vec3 uStormLit; uniform sampler2D uStormTex;
 varying vec3 vDir;
 ${GLSL_NOISE}
 float h21(vec2 p){ return fract(sin(dot(p, vec2(127.1,311.7)))*43758.5453); }
@@ -108,7 +121,20 @@ void main(){
     c *= smoothstep(0.0, 0.12, h);
     col = mix(col, cc, c * 0.92);
   }
-  // sun disk (after clouds; dimmed when covered would need more work - keep it bright)
+  // A7b storm deck (kit Moon Gate only): billowing cloud down to the horizon, backlit by the moon. The noise is baked
+  // once per arena into uStormTex (bakeStormTexture: the per-pixel fbm cost about 2-3 ms on the iGPU); rgb = sqrt(colour / 2)
+  float stDens = 0.0; vec3 stCol = vec3(0.0);
+  if (uStorm > 0.0 && h > -0.08) {
+    vec2 suv = vec2(atan(d.z, d.x) / 6.2831853 + 0.5 + uTime * 0.00025, (h + 0.1) / 1.1);
+    vec4 st = texture2D(uStormTex, suv);
+    stCol = st.rgb * st.rgb * 2.0;
+    float md = max(dot(d, uMoonDir), 0.0);
+    float glow = pow(md, 28.0) * 1.0 + pow(md, 7.0) * 0.28 + pow(md, 2.5) * 0.05;
+    // the gaps between clouds carry the moon's glow (haze), the cloud body covers it
+    vec3 gap = col + uStormLit * glow * 0.5;
+    stDens = st.a * uStorm * smoothstep(-0.08, 0.04, h);
+    col = mix(gap, stCol, stDens);
+  }  // sun disk (after clouds; dimmed when covered would need more work - keep it bright)
   if (uSunSize > 0.0) {
     float disk = smoothstep(cos(uSunSize), cos(uSunSize * 0.85), sd);
     col += uSunColor * disk * 1.5;
@@ -130,6 +156,8 @@ void main(){
     } else {
       col += uMoonColor * (pow(max(md, 0.0), 900.0) * 0.6 + pow(max(md, 0.0), 60.0) * 0.06);
     }
+    // A7b: storm cloud wisps drift across the lower part of the disc (backlit: they stay bright-edged)
+    if (uStorm > 0.0) col = mix(col, stCol * 1.4, stDens * m * 0.55 * (1.0 - smoothstep(-0.6, 0.3, mp.y)));
   }
   gl_FragColor = vec4(max(col, vec3(0.0)), 1.0);
 }`;
@@ -164,6 +192,9 @@ export function makeSkyMaterial(p: SkyParams): THREE.ShaderMaterial {
       uMoonSize: { value: p.moonSize },
       uMoonColor: { value: p.moonColor },
       uMoonHalo: { value: p.moonHalo ?? 0 },
+      uStorm: { value: p.storm ?? 0 },
+      uStormLit: { value: p.stormLit ?? new THREE.Color(1, 1, 1) },
+      uStormTex: { value: p.stormTex ?? null },
       uTime: shaderTime,
     },
   });
@@ -177,12 +208,78 @@ export function makeSky(p: SkyParams): THREE.Mesh {
 }
 
 /** Bake an environment map (IBL) from the sky (plus optional extra objects, e.g. a sea of clouds). */
-export function bakeEnvironment(renderer: THREE.WebGLRenderer, p: SkyParams, extra: THREE.Object3D[] = []): THREE.Texture {
+export function bakeEnvironment(renderer: THREE.WebGLRenderer, p: SkyParams, extra: THREE.Object3D[] = [], opts: { fog?: THREE.Fog; far?: number } = {}): THREE.Texture {
   const scene = new THREE.Scene();
   scene.add(makeSky(p));
   for (const e of extra) scene.add(e);
+  // A7b: the backdrop layers in the probe need the scene fog (their fog match reads its uniforms)
+  if (opts.fog) scene.fog = opts.fog;
   const pm = new THREE.PMREMGenerator(renderer);
-  const rt = pm.fromScene(scene, 0.02, 0.1, 1200);
+  const rt = pm.fromScene(scene, 0.02, 0.1, opts.far ?? 1200);
   pm.dispose();
+  return rt.texture;
+}
+
+const STORM_BAKE_FRAG = /* glsl */ `
+uniform vec3 uMoonDir; uniform vec3 uStormLit; uniform vec3 uStormDark; uniform float uStormScale;
+varying vec2 vUv;
+${GLSL_NOISE}
+void main(){
+  float az = (vUv.x - 0.5) * 6.2831853;
+  float y = vUv.y * 1.1 - 0.1;
+  float r = sqrt(max(0.0, 1.0 - y * y));
+  vec3 d = vec3(r * cos(az), y, r * sin(az));
+  vec3 q = d * uStormScale;
+  q.y *= 2.2; // flattened billows
+  float n1 = an_fbm(q);
+  float n2 = an_fbm(q * 2.7 + vec3(4.1, 1.3, 7.7));
+  float n = n1 * 0.72 + n2 * 0.28;
+  float md = max(dot(d, uMoonDir), 0.0);
+  float glow = pow(md, 28.0) * 1.0 + pow(md, 7.0) * 0.28 + pow(md, 2.5) * 0.05;
+  float dens = smoothstep(0.36, 0.62, n);
+  // light from behind: thin cloud and cloud edges near the moon glow, thick cloud stays dark
+  float thin = 1.0 - smoothstep(0.42, 0.75, n);
+  float edge = smoothstep(0.36, 0.48, n) * thin;
+  float lit = clamp(glow * (0.35 + 1.4 * thin) + edge * glow * 2.5, 0.0, 3.0);
+  vec3 c = mix(uStormDark, uStormLit, clamp(lit, 0.0, 1.0)) + uStormLit * max(lit - 1.0, 0.0) * 0.6;
+  c *= 0.8 + 0.4 * an_noise(q * 6.0); // grain inside the billows
+  gl_FragColor = vec4(sqrt(clamp(c * 0.5, 0.0, 1.0)), dens);
+}`;
+
+/**
+ * A7b: bake the storm deck (SkyParams.storm) into an equirectangular texture (u = azimuth, v = (dir.y + 0.1) / 1.1), once
+ * per arena build: the fbm per sky pixel cost 2-3 ms per frame on the Arc iGPU (same-page timer A/B). The sky samples it.
+ */
+export function bakeStormTexture(renderer: THREE.WebGLRenderer, p: SkyParams, w = 2048, h = 512): THREE.Texture {
+  const rt = new THREE.WebGLRenderTarget(w, h, { depthBuffer: false, minFilter: THREE.LinearFilter, magFilter: THREE.LinearFilter, generateMipmaps: false });
+  rt.texture.wrapS = THREE.RepeatWrapping;
+  rt.texture.name = 'sky.storm';
+  rt.texture.userData.rt = rt; // the owner disposes the target through its texture
+  const mat = new THREE.ShaderMaterial({
+    vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }',
+    fragmentShader: STORM_BAKE_FRAG,
+    depthTest: false,
+    depthWrite: false,
+    uniforms: {
+      uMoonDir: { value: p.moonDir },
+      uStormLit: { value: p.stormLit ?? new THREE.Color(1, 1, 1) },
+      uStormDark: { value: p.stormDark ?? new THREE.Color(0, 0, 0) },
+      uStormScale: { value: p.stormScale ?? 3 },
+    },
+  });
+  const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat);
+  quad.frustumCulled = false;
+  const scene = new THREE.Scene();
+  scene.add(quad);
+  const cam = new THREE.Camera();
+  const prev = renderer.getRenderTarget();
+  const tm = renderer.toneMapping;
+  renderer.toneMapping = THREE.NoToneMapping;
+  renderer.setRenderTarget(rt);
+  renderer.render(scene, cam);
+  renderer.setRenderTarget(prev);
+  renderer.toneMapping = tm;
+  quad.geometry.dispose();
+  mat.dispose();
   return rt.texture;
 }

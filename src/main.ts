@@ -676,7 +676,8 @@ class App {
     this.rimLight.position.copy(tgt).addScaledVector(fwd, 4.5).addScaledVector(right, 1.5).add(new THREE.Vector3(0, 3.2, 0));
     this.rimLight.target.position.copy(tgt);
     const cine = this.state === 'intro' || this.state === 'faceoff';
-    this.keyLight.intensity = cine ? 22 : 16;
+    // A7b: the kit Moon Gate's darker look lifts the fighters' key (ThemeArt.look.stage.keyGain; 1 everywhere else)
+    this.keyLight.intensity = (cine ? 22 : 16) * (this.arena?.stage?.art.keyGain ?? 1);
     this.rimLight.intensity = cine ? 55 : 35;
   }
 

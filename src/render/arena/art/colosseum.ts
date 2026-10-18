@@ -83,48 +83,72 @@ export const COLOSSEUM_ART: ThemeArt = {
   backdrop: {
     id: 'moongate',
     tune: {
-      gain: 1.25,
+      gain: 1.1,
       emitGain: 3.2,
       fogRange: 140,
       fogMax: 0.8,
-      shafts: { count: 3, color: '#aaa6ff', opacity: 0.32, az: -1.7, dist: 66 },
-      fogBanks: { count: [8, 16], radius: 52, opacity: 0.6, lift: 1.3 },
+      // A7b: the baked Cycles layers are violet; ref-3's stone and cloud are blue-grey
+      sat: 0.5,
+      tint: [0.94, 0.97, 1.06],
+      shafts: { count: 3, color: '#c4caf0', opacity: 0.22, az: -1.7, dist: 66 },
+      fogBanks: { count: [8, 16], radius: 52, opacity: 0.5, lift: 1.3 },
+      // A7b: procedural stand-ins until A8 renders the EEVEE shaft / fog-bank atlases
+      proceduralCards: true,
+      // A7b: the baked storm clouds: dark away from the moon, backlit round it
+      cloud: { away: 0.24, near: 0.3, power: 8 },
     },
   },
+  // A7b: the real night look (light / fog / grade pass against ref-3): dark overall with strong accents, a cold moon
+  // back-rim on every stone edge, warm fire pools on stone, desaturated blue-grey stone and storm cloud (warm only at the
+  // fires), the sky + backdrop as the light probe, view-dependent haze, ground mist. See docs/milestones/A7b/README.md.
   look: {
     sky: {
       sunDir: MOON,
-      sunColor: hdr('#d8d4ff', 2),
+      // drives the cloud silver lining and the horizon glow toward the moon (no sun disc at night)
+      sunColor: hdr('#d4d8ff', 2.2),
       sunSize: 0,
       sunGlow: 0,
-      zenith: C('#0a0d26'),
-      horizon: C('#363866'),
-      ground: C('#15132a'),
-      horizonGlow: C('#5c4c9a'),
-      cloudCover: 0.5,
+      zenith: C('#06070d'),
+      horizon: C('#262a3a'),
+      ground: C('#0c0d13'),
+      horizonGlow: C('#2e3346'),
+      cloudCover: 0.0,
       cloudScale: 0.75,
-      cloudColor: C('#8a86b4'),
-      cloudShade: C('#1a1934'),
-      stars: 0.45,
+      cloudColor: C('#7c8098'),
+      cloudShade: C('#15171f'),
+      stars: 0.3,
       moonDir: MOON,
       // A6: ref-3's moon is about 12 deg wide (plan 3.1), framed by the backdrop's ring arch; halo scaled to the disc
       moonSize: discRadius(12),
-      moonHalo: 1,
-      moonColor: hdr('#ece8ff', 2.4),
+      moonHalo: 0.22,
+      moonColor: hdr('#eef0ff', 1.3),
+      storm: 1,
+      stormLit: hdr('#a8aee8', 0.15),
+      stormDark: C('#121428'),
+      stormScale: 3.4,
     },
-    sunIntensity: 1.5,
-    sunColor: '#c9c4ff',
-    hemi: ['#4c4a8c', '#1c1828', 0.6],
-    fog: { color: '#3b3462', density: 0.0065, height: 0.07 },
-    exposure: 1.15,
+    sunIntensity: 2.4,
+    sunColor: '#c6cbf2',
+    hemi: ['#55566a', '#1a1618', 0.8],
+    fog: { color: '#262a3a', density: 0.0068, height: 0.05 },
+    exposure: 1.2,
     bloom: { strength: 0.45, radius: 0.65, threshold: 1.2 },
-    grade: { tint: [0.99, 0.98, 1.04], contrast: 1.12, saturation: 1.04, lift: [0.0, 0.0, 0.02], gain: [1.02, 1.0, 1.0], vignette: 0.95 },
-    godrays: 0, // moon rays cost about 1.5 ms on high (A2 measurement); A7 decides
+    grade: { tint: [1.0, 1.0, 1.0], contrast: 1.1, saturation: 0.86, lift: [0.004, 0.003, 0.008], gain: [1.0, 1.0, 1.0], vignette: 1.0 },
+    godrays: 0, // moon rays cost about 1.5 ms on high (A2 measurement); the backdrop's shaft cards stand in for them
     ambient: ['embers'],
     fire: '#ff7a2a',
-    key: '#c8c8ff',
-    rim: '#b4b0ff', // the camera rim light sits behind the fighters: on the wet floor it is the moonlit sheen
+    key: '#bcc0dc',
+    rim: '#c4c8ff', // the camera rim light sits behind the fighters: on the wet floor it is the moonlit sheen
     accent: '#ff8a40',
-    lookId: 'moonlake',
+    lookId: 'moongate',
+    stage: {
+      envIntensity: 1.2,
+      envBackdrop: true,
+      keyGain: 1.8,
+      rim: { color: '#b4bcff', intensity: 3.2, power: 2.6, away: 0.35 },
+      fires: { count: [4, 8, 12], gain: 3.5, reach: 7, color: '#ff8a3a' },
+      fogSky: { toward: '#56556e', away: '#1a1a26', power: 2.0 },
+      mist: { count: [8, 14], offset: 1.2, w: 9, h: 2.6, opacity: 0.6, color: '#6a7090' },
+    },
   },
 };

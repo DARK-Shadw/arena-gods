@@ -15,6 +15,7 @@ import type { SkyParams } from '../sky';
 import type { AmbientKind, Grade } from '../themes';
 import type { DebrisMat } from '../debris';
 import type { BackdropTuning } from '../backdrop';
+import type { StageLightArt } from '../stageLight';
 
 /** id of a kit or theme asset in public/arena/manifest.json, e.g. 'kit/brazier_tripod' */
 export type AssetId = string;
@@ -72,6 +73,8 @@ export interface LookArt {
   accent?: string;
   /** fxLook.ts THEME_LOOK row to use instead of the theme's own (bloom knee, split toning) */
   lookId?: string;
+  /** A7b: the stage light model (moon rim, fire pools on stone, env probe from the backdrop, sky-driven fog, ground mist) */
+  stage?: StageLightArt;
 }
 
 export interface RingArt {

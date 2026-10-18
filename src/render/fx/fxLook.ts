@@ -48,6 +48,9 @@ export const THEME_LOOK: Record<string, ThemeLook> = {
   forge: { bloom: { threshold: 1.15, knee: 0.55, strength: 0.4, radius: 0.6 }, extras: { shadowTint: [0.9, 0.95, 1.12], highlightTint: [1.07, 0.99, 0.9], crush: 0.02 } },
   glacier: { bloom: { threshold: 1.25, knee: 0.55, strength: 0.36, radius: 0.62 }, extras: { shadowTint: [0.95, 0.98, 1.06], highlightTint: [1.04, 1.0, 0.95], crush: 0.015 } },
   moonlake: { bloom: { threshold: 1.1, knee: 0.55, strength: 0.38, radius: 0.68 }, extras: { shadowTint: [0.9, 0.95, 1.12], highlightTint: [1.08, 0.98, 0.9], crush: 0.02 } },
+  // A7b: the kit colosseum's Moon Gate night (ThemeArt.look.lookId): hot moon / fire cores bloom wide, neutral-cool
+  // shadows (blue-grey, not violet), warm highlights only where fire is, deeper toe
+  moongate: { bloom: { threshold: 1.0, knee: 0.6, strength: 0.5, radius: 0.72 }, extras: { shadowTint: [0.95, 0.98, 1.1], highlightTint: [1.07, 0.99, 0.91], crush: 0.012 } },
   desert: { bloom: { threshold: 1.8, knee: 0.7, strength: 0.28, radius: 0.6 }, extras: { shadowTint: [0.94, 0.97, 1.07], highlightTint: [1.04, 1.0, 0.94], crush: 0.012 } },
 };
 

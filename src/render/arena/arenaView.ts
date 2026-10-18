@@ -13,7 +13,7 @@ import type { ArenaLayout, HazardDef, Obstacle, ObstacleKind } from '../../sim/a
 import { boundR, chainSwing, CHAIN_LEN, CHAIN_PIVOT_H } from '../../sim/arenaGen';
 import type { Frame, SimEvent } from '../../sim/types';
 import { THEME_DEFS, type ThemeDef } from './themes';
-import { bakeEnvironment, makeSky } from './sky';
+import { bakeEnvironment, bakeStormTexture, makeSky } from './sky';
 import { Backdrop } from './backdrop';
 import { ArenaFog, installHeightFog } from './fog';
 import { Ambient } from './ambient';
@@ -26,6 +26,7 @@ import { canvasTexture, softDot } from './textures';
 import { R } from './noise';
 import { alongEllipse } from './common';
 import { withLook } from './art';
+import { StageLight } from './stageLight';
 import type { WetFloor } from './floor';
 import { FloorLightMap } from './lightmap';
 import { LAYER_REFLECT, PlanarReflection, StreakCards, type FloorLightSource } from './reflection';
@@ -144,7 +145,7 @@ export class Arena {
   private scene: THREE.Scene;
   private propMats: Record<string, THREE.Material> = {};
   private propGeos: Record<string, THREE.BufferGeometry> = {};
-  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number }[] = [];
+  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number; k: number }[] = [];
   /** A2b: pre-built burning-oil patches (tipped braziers), driven by Frame.fires */
   private oilFires: { g: THREE.Group; disc: THREE.Mesh }[] = [];
   private updaters: ((t: number, dt: number) => void)[] = [];
@@ -190,6 +191,8 @@ export class Arena {
     }
 
     // ---------------- sky, environment, fog
+    // A7b: the kit Moon Gate's storm deck is baked once (sky.ts bakeStormTexture) and sampled by the sky and the probe
+    if (kit && T.sky.storm) T.sky.stormTex = bakeStormTexture(renderer, T.sky, quality >= 1 ? 2048 : 1024, quality >= 2 ? 512 : 256);
     this.sky = makeSky(T.sky);
     this.sky.userData.dyn = true;
     this.group.add(this.sky);
@@ -198,12 +201,28 @@ export class Arena {
     // A6: baked panorama layers (kit mode, when the theme art has one and it loaded); not merged (userData.dyn)
     if (kit?.backdrop && kit.art.backdrop) {
       this.backdrop = new Backdrop(kit.backdrop, quality, kit.art.backdrop.tune);
+      this.backdrop.setMoon(T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir);
       this.group.add(this.backdrop.group);
     }
-    this.env = bakeEnvironment(renderer, T.sky, this.dressing.envExtras);
-    scene.environment = this.env;
-    scene.background = null;
     this.fog = new ArenaFog(T.fog.color, T.fog.density, T.fog.height);
+    // A7b: kit Moon Gate stage light; its IBL probe also sees the backdrop (sky, storm, arch, ruins light the stone and
+    // the fighters), with the scene fog so the layers' fog match is right in the probe
+    const stageArt = kit?.art.look?.stage;
+    const envExtras = [...(this.dressing.envExtras ?? [])];
+    if (stageArt?.envBackdrop && this.backdrop)
+      this.backdrop.group.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh && m.userData.backdrop) {
+          const c = new THREE.Mesh(m.geometry, m.material);
+          c.renderOrder = m.renderOrder;
+          c.frustumCulled = false;
+          envExtras.push(c);
+        }
+      });
+    this.env = stageArt ? bakeEnvironment(renderer, T.sky, envExtras, { fog: this.fog, far: 1400 }) : bakeEnvironment(renderer, T.sky, this.dressing.envExtras);
+    scene.environment = this.env;
+    scene.environmentIntensity = stageArt?.envIntensity ?? 1;
+    scene.background = null;
     scene.fog = this.fog;
 
     // ---------------- lights
@@ -305,7 +324,17 @@ export class Arena {
       this.tagReflect();
       F.readWater(renderer);
     }
+    // A7b: moon rim + fire pools on every standard material of the arena (not the wet floor), ground mist cards
+    if (stageArt) {
+      this.stage = new StageLight(stageArt, quality, T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir);
+      const skip = new Set<THREE.Object3D>();
+      if (this.wetFloor) skip.add(this.wetFloor.mesh);
+      this.stage.patch(this.group, skip);
+      this.stage.buildMist(this.group, layout.rx, layout.rz, shaderTime);
+    }
   }
+  /** A7b: the kit Moon Gate stage light (moon rim, fire pools, sky fog, mist), null elsewhere */
+  stage: StageLight | null = null;
 
   /** A2: render-only braziers along the boundary (ThemeArt.ringFlames), skipping the gates */
   private addRingFlames(kit: ArenaPack) {
@@ -541,7 +570,7 @@ export class Arena {
       g.add(core);
     }
     // A7: kit mode takes a deterministic flicker phase (render seed); legacy keeps Math.random (pixel-identical gate)
-    const entry: (typeof this.flames)[number] = { obj: g, ph: this.kit ? ((this.flames.length * 7.31 + at.x * 1.7 + at.z * 2.3) % 10 + 10) % 10 : Math.random() * 10, base: 1, size };
+    const entry: (typeof this.flames)[number] = { obj: g, ph: this.kit ? ((this.flames.length * 7.31 + at.x * 1.7 + at.z * 2.3) % 10 + 10) % 10 : Math.random() * 10, base: 1, size, k: 1 };
     if (light && this.lightBudget > 0) {
       this.lightBudget--;
       const L = new THREE.PointLight(color, size * 6, size * 14, 1.6);
@@ -1451,7 +1480,9 @@ export class Arena {
       const k = 0.88 + Math.sin(t * 13 + f.ph) * 0.07 + Math.sin(t * 29 + f.ph * 2) * 0.05;
       f.obj.scale.set(1, k, 1);
       if (f.light && f.li) f.light.intensity = f.li * k;
+      f.k = k;
     }
+    this.stage?.update(cam, this.flames, this.fog);
     // A2: one global flicker for the floor light map and the streak cards (plan 6.2)
     if (this.wetFloor) {
       const fl = 0.9 + Math.sin(t * 11.3) * 0.06 + Math.sin(t * 23.7 + 1.3) * 0.04;
@@ -1474,6 +1505,10 @@ export class Arena {
   }
 
   dispose() {
+    // A7b: undo the stage-light patch on the shared kit materials before anything else builds with them
+    this.stage?.dispose();
+    this.stage = null;
+    (this.theme.sky.stormTex?.userData.rt as THREE.WebGLRenderTarget | undefined)?.dispose();
     this.scene.remove(this.group);
     this.group.traverse((o) => {
       // kit asset clones share geometry / materials with the ArenaAssets cache: it disposes them (release); A3 obstacles own

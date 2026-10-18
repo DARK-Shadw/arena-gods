@@ -26,7 +26,7 @@ const Q = Number(opt('q', '1'));
 const CLIP = Number(opt('clip', '0'));
 const COMPARE = opt('compare', '1') !== '0';
 const VIEWS = opt('views', 'counter,flank,overview') === 'none' ? [] : opt('views', 'counter,flank,overview').split(',');
-const OVR = ['theme', 'layout', 'aseed', 'arena', 'arenatex', 'kitstone', 'lit', 'backdrop'].map((k) => (opt(k, '') ? `&${k}=${opt(k, '')}` : '')).join('');
+const OVR = ['theme', 'layout', 'aseed', 'arena', 'arenatex', 'kitstone', 'lit', 'backdrop', 'stage'].map((k) => (opt(k, '') ? `&${k}=${opt(k, '')}` : '')).join('');
 const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234', 'chrome-win64', 'chrome.exe');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.webp': 'image/webp', '.ktx2': 'image/ktx2', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.bin': 'application/octet-stream' };
 

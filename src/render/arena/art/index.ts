@@ -59,6 +59,8 @@ export function artFor(theme: ThemeId): ThemeArt {
     delete art.look;
     delete art.ringFlames;
   }
+  // A7b: `?stage=0` keeps the night look but drops the stage light (moon rim, fire pools, sky fog, mist, backdrop probe)
+  if (art.look?.stage && typeof location !== 'undefined' && new URLSearchParams(location.search).get('stage') === '0') art.look = { ...art.look, stage: undefined };
   // A6: `?backdrop=0` drops the baked panorama (before / after shots, perf A/B)
   if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('backdrop') === '0') delete art.backdrop;
   // A2: `?floorset=slate_slabs` previews another floor set on a theme that has a kit floor
@@ -70,7 +72,7 @@ export function artFor(theme: ThemeId): ThemeArt {
 /** A2: the theme's display data with the kit art's look overrides (a new object; THEME_DEFS stays untouched) */
 export function withLook(T: ThemeDef, look?: LookArt): ThemeDef {
   if (!look) return T;
-  const { sky, lookId, ...rest } = look;
+  const { sky, lookId, stage: _stage, ...rest } = look;
   return { ...T, ...rest, sky: { ...T.sky, ...(sky ?? {}) }, lookId: lookId ?? T.lookId };
 }
 
