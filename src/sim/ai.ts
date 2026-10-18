@@ -32,6 +32,12 @@ import { edgeReach } from './reach';
 /** Switches for A/B metrics (tools/simtest ARENA_AI=0 disables the arena tactics layer). */
 export const AI_TUNING = { arenaTactics: true };
 
+/**
+ * A2b environment-use tuning (owner: fighters must use the environment much more often). Before A2b: search radius
+ * 6 m, grab base 1.2 + usesProps * 1.6, decay x0.8 per pickup, no brazier tipping.
+ */
+export const ENV_AI = { propSearch: 8.5, grabBase: 1.7, grabProps: 1.9, grabDecay: 0.9, liftSafety: 0.45, igniteChance: 0.35 };
+
 export type Goal = 'pressure' | 'close' | 'kite' | 'footsies' | 'bait' | 'guard' | 'regroup' | 'cover' | 'escape' | 'punish' | 'finish' | 'gambit' | 'grab' | 'smash';
 
 interface OppModel {
@@ -175,7 +181,7 @@ function safeToLift(m: Match, f: FighterState, o: FighterState, q: { gap: number
   if (oppBusy(m, o) && q.gap > 2.5) return true;
   if (q.oppRanged) return !q.los && q.gap > 3;
   // brutes who love throwing things take the risk sooner
-  return q.gap > Math.min(maxReach(o) + 0.3, 6.0) * (1 - 0.35 * doctrineOf(f.def.id).usesProps) || (!q.los && q.gap > 3);
+  return q.gap > Math.min(maxReach(o) + 0.3, 6.0) * (1 - ENV_AI.liftSafety * doctrineOf(f.def.id).usesProps) || (!q.los && q.gap > 3);
 }
 
 /** opponent tied up for a moment (safe-ish to bend over for a prop) */
@@ -521,6 +527,10 @@ interface Percept {
   blocker: number;
   /** explosive barrel next to the opponent I can shoot */
   barrel: number;
+  /** A2b: a brazier right next to them I can knock over (burning oil under their feet) */
+  ignite: number;
+  /** A2b: a still chain weight between us whose swing would sweep through them */
+  chain: number;
 }
 
 function perceive(m: Match, f: FighterState, o: FighterState): Percept {
@@ -548,7 +558,7 @@ function perceive(m: Match, f: FighterState, o: FighterState): Percept {
     if (p.state !== PS_REST || !p.throwable || p.carrier >= 0 || p.fuseAt >= 0) continue;
     const d = hypot(p.x - f.x, p.z - f.z);
     const dOpp = hypot(p.x - o.x, p.z - o.z);
-    if (d > 6 || dOpp < d + 1.5 || dOpp < 3) continue;
+    if (d > ENV_AI.propSearch || dOpp < d + 0.6 || dOpp < 2.6) continue;
     const sc = d - (p.explosive ? 1.5 : 0) - p.mass * 0.5;
     if (sc < pd) {
       pd = sc;
@@ -577,6 +587,29 @@ function perceive(m: Match, f: FighterState, o: FighterState): Percept {
     if (p.state !== PS_REST || !p.explosive || p.fuseAt >= 0) continue;
     if (hypot(p.x - o.x, p.z - o.z) < 2.4 && hypot(p.x - f.x, p.z - f.z) > 4.2 && !W.blocked(f.x, f.z, p.x, p.z)) barrel = p.id;
   }
+  // a brazier beside them (its oil spills ~1.25 m around it) that I can reach and knock over
+  let ignite = -1;
+  if (AI_TUNING.arenaTactics)
+    for (const p of W.props) {
+      if (p.state !== PS_REST || p.kind !== 'brazier') continue;
+      if (hypot(p.x - o.x, p.z - o.z) > 1.15 + o.def.stats.radius) continue;
+      if (hypot(p.x - f.x, p.z - f.z) < 1.6) continue; // not under my own feet
+      ignite = p.id;
+    }
+  // a still chain weight I can strike so that it swings through them
+  let chain = -1;
+  if (AI_TUNING.arenaTactics)
+    for (let i = 0; i < m.arena.hazards.length; i++) {
+      const h = m.arena.hazards[i];
+      if (h.kind !== 'chains' || W.haz[i].state !== 0) continue;
+      const ax = sin(h.phase),
+        az = cos(h.phase);
+      const sm = (f.x - h.x) * ax + (f.z - h.z) * az,
+        so = (o.x - h.x) * ax + (o.z - h.z) * az;
+      const pm = Math.abs((f.x - h.x) * az - (f.z - h.z) * ax),
+        po = Math.abs((o.x - h.x) * az - (o.z - h.z) * ax);
+      if (sm * so < 0 && Math.abs(so) < 2.2 && po < 0.9 && pm < 1.6 && hypot(h.x - f.x, h.z - f.z) < 2.6) chain = i;
+    }
   return {
     gap,
     my: hpf(f),
@@ -600,6 +633,8 @@ function perceive(m: Match, f: FighterState, o: FighterState): Percept {
     topple,
     blocker,
     barrel,
+    ignite,
+    chain,
   };
 }
 
@@ -627,7 +662,7 @@ function scoreGoals(m: Match, f: FighterState, o: FighterState, q: Percept): Rec
     // arena play: grab something to throw (melee vs a kiter / opponent hiding / brutes showing off)
     grab:
       AI_TUNING.arenaTactics && q.prop >= 0 && !q.oppPressing && safeToLift(m, f, o, q)
-        ? (q.ranged ? 0.35 : 1) * (1.2 + q.doc.usesProps * 1.6 + ((o.state === 'knockdown' || o.state === 'launched') ? 0.8 : 0) + (q.oppRanged && !q.ranged ? 1.0 : 0) + (!q.los ? 0.4 : 0) + (m.world.props[q.prop].explosive ? 0.4 : 0) + onTheWay(f, o, m.world.props[q.prop]) * 0.6) * pow(0.8, f.ai.pickups)
+        ? (q.ranged ? 0.45 : 1) * (ENV_AI.grabBase + q.doc.usesProps * ENV_AI.grabProps + ((o.state === 'knockdown' || o.state === 'launched') ? 0.8 : 0) + (q.oppRanged && !q.ranged ? 1.0 : 0) + (!q.los ? 0.4 : 0) + (m.world.props[q.prop].explosive ? 0.4 : 0) + onTheWay(f, o, m.world.props[q.prop]) * 0.6) * pow(ENV_AI.grabDecay, f.ai.pickups)
         : 0,
     // bring the cover down: topple it onto them, or smash the cover a shooter hides behind
     smash: !AI_TUNING.arenaTactics ? 0 : (q.topple >= 0 ? 0.8 + q.doc.envCunning * 1.6 : 0) + (q.blocker >= 0 && q.oppRanged && !q.ranged && q.gap < 7 ? 0.3 + q.doc.envCunning * 0.6 : 0) + (q.blocker >= 0 && q.ranged ? 0.2 + q.doc.envCunning * 0.5 : 0),
@@ -690,6 +725,16 @@ function think(m: Match, f: FighterState, o: FighterState) {
       remember(f, shot);
       return;
     }
+  }
+  // A2b: knock the brazier beside them over (burning oil under their feet): a melee swing or a shot at it
+  if (q.ignite >= 0 && ai.goal !== 'punish' && m.rng.chance(ENV_AI.igniteChance * (0.4 + q.doc.envCunning))) {
+    const b = m.world.props[q.ignite];
+    if (smashAt(m, f, b.x, b.z, b.r, 'tip_brazier')) return;
+  }
+  // A2b: send the chain weight swinging through them
+  if (q.chain >= 0 && ai.goal !== 'punish' && m.rng.chance(0.3 + q.doc.envCunning * 0.4)) {
+    const h = m.arena.hazards[q.chain];
+    if (smashAt(m, f, h.x, h.z, 0.4, 'swing_chain')) return;
   }
   // arena goals act directly
   if (ai.goal === 'grab' && q.prop >= 0) {
@@ -1063,8 +1108,9 @@ function steer(m: Match, f: FighterState, o: FighterState) {
     }
     // pressure / punish into hazards: approach from the side opposite the danger behind them
     if (AI_TUNING.arenaTactics && (ai.goal === 'pressure' || ai.goal === 'close') && !isRangedFighter(f)) {
-      for (const h of m.arena.hazards) {
-        if (h.kind === 'water') continue;
+      for (let hi = 0; hi < m.arena.hazards.length; hi++) {
+        const h = m.arena.hazards[hi];
+        if (h.kind === 'water' || h.kind === 'chains' || (h.kind === 'flamejet' && m.world.haz[hi].state === 0)) continue;
         const hx = o.x - h.x,
           hz = o.z - h.z;
         const hl = hypot(hx, hz);
@@ -1119,6 +1165,8 @@ function steer(m: Match, f: FighterState, o: FighterState) {
     else if (h.kind === 'geyser') w = st >= 1 ? 2 : 0.4;
     else if (h.kind === 'chandelier') w = st === 1 || st === 2 ? 2.5 : 0;
     else if (h.kind === 'water') w = 0.15;
+    else if (h.kind === 'flamejet') w = st >= 1 ? 2.2 : 0.35;
+    else if (h.kind === 'crumble') w = st === 1 || st === 2 ? 2.6 : st === 3 ? 2.2 : 0;
     if (w <= 0) continue;
     const qx = f.x - h.x,
       qz = f.z - h.z;
@@ -1128,6 +1176,37 @@ function steer(m: Match, f: FighterState, o: FighterState) {
       const push = ((reach - d) / reach) * w * 2;
       vx += (qx / d) * push;
       vz += (qz / d) * push;
+    }
+  }
+  // A2b: burning oil, and the sweep of a swinging chain weight
+  for (const fr of m.world.fires) {
+    const qx = f.x - fr.x,
+      qz = f.z - fr.z;
+    const d = hypot(qx, qz) || 1e-3;
+    const reach = fr.r + S.radius + 0.7;
+    if (d < reach) {
+      const push = ((reach - d) / reach) * 3.5;
+      vx += (qx / d) * push;
+      vz += (qz / d) * push;
+    }
+  }
+  for (let i = 0; i < m.arena.hazards.length; i++) {
+    const h = m.arena.hazards[i];
+    if (h.kind !== 'chains' || m.world.haz[i].state !== 1) continue;
+    const ax = sin(h.phase),
+      az = cos(h.phase);
+    // distance to the sweep line, pushed out sideways
+    const qx = f.x - h.x,
+      qz = f.z - h.z;
+    const along = qx * ax + qz * az;
+    if (Math.abs(along) > 3.3) continue;
+    const px = qx - ax * along,
+      pz = qz - az * along;
+    const d = hypot(px, pz) || 1e-3;
+    const reach = S.radius + 1.0;
+    if (d < reach) {
+      vx += (px / d) * (reach - d) * 3;
+      vz += (pz / d) * (reach - d) * 3;
     }
   }
   for (const p of m.world.props) {
@@ -1186,6 +1265,29 @@ function smashObstacle(m: Match, f: FighterState, i: number, topple: boolean): b
   if (!best) return false;
   if (!m.startAttack(f, best, { x: ob.x, z: ob.z })) return false;
   tactic(f, topple ? 'topple_attempt' : 'smash_cover');
+  remember(f, best);
+  return true;
+}
+
+/** A2b: strike a point target (a brazier) with the best move that reaches it; false when nothing reaches. */
+function smashAt(m: Match, f: FighterState, x: number, z: number, r: number, tag: string): boolean {
+  const d = hypot(x - f.x, z - f.z) - r - f.def.stats.radius;
+  let best: MoveDef | null = null;
+  let bu = -1;
+  for (const mv of f.def.moves) {
+    if (mv.kind === 'ultimate' || mv.kind === 'combo' || mv.feint || mv.furyCost) continue;
+    if (f.stamina < mv.stamina * 0.6) continue;
+    if (mv.ranged) {
+      if (d > mv.range - 0.6 || m.world.blocked(f.x, f.z, x, z, -0.3)) continue;
+    } else if (d > edgeReach(f.def.id, mv, f.def.stats.radius) - 0.1) continue;
+    const u = mv.damage - mv.windup * 30;
+    if (u > bu) {
+      bu = u;
+      best = mv;
+    }
+  }
+  if (!best || !m.startAttack(f, best, { x, z })) return false;
+  tactic(f, tag);
   remember(f, best);
   return true;
 }

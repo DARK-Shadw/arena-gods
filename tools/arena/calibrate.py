@@ -133,7 +133,10 @@ def main():
                     heights[f['id']] = max(heights.get(f['id'], 0), f['topY'])
     out = []
     report = []
-    RXZ = {'pit': (12.3, 12.3), 'oval': (14.5, 10.5), 'gauntlet': (15.5, 7.8), 'split': (12.6, 12.6), 'cross': (12.3, 12.3)}
+    # pre-A2b semi-axes times ARENA_SCALE (src/sim/arenaGen.ts, A2b: arenas grew)
+    gen = open(os.path.join(ROOT, 'src', 'sim', 'arenaGen.ts'), encoding='utf-8').read()
+    sc = float(re.search(r'export const ARENA_SCALE = ([0-9.]+);', gen).group(1))
+    RXZ = {k: (v[0] * sc, v[1] * sc) for k, v in {'pit': (12.3, 12.3), 'oval': (14.5, 10.5), 'gauntlet': (15.5, 7.8), 'split': (12.6, 12.6), 'cross': (12.3, 12.3)}.items()}
     for p in rows:
         t = T[p['id']]
         w, h = t['size']

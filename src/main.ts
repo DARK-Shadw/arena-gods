@@ -8,7 +8,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import './style.css';
 import { simulate } from './sim/match';
 import { getFighter, FIGHTERS } from './sim/fighters';
-import { generateArena, LAYOUTS, THEMES, type ArenaSpec, type LayoutId, type ThemeId } from './sim/arenaGen';
+import { CHAIN_LEN, CHAIN_PIVOT_H, generateArena, LAYOUTS, THEMES, type ArenaSpec, type LayoutId, type ThemeId } from './sim/arenaGen';
 import type { FighterDef, Frame, MatchRecord, MoveDef, SimEvent } from './sim/types';
 import { Arena } from './render/arena/arenaView';
 import { ArenaAssets, arenaMode, arenaTexOverride, type ArenaPack } from './render/arena/assets';
@@ -270,6 +270,8 @@ class App {
       };
     }
     camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: 6.2, z: h.z, r: 1.3 }));
+    // A2b: hanging chain weights (chain + swing zone) are camera obstacles too
+    for (const h of L.hazards) if (h.kind === 'chains') camWorld.hanging.push({ x: h.x, y: CHAIN_PIVOT_H - CHAIN_LEN * 0.5, z: h.z, r: 1.0 });
     this.ui.setArenaLabel?.(`${T.name} · ${L.layout} · #${L.seed}`);
     console.info(`[arena] built ${spec.theme}/${spec.layout}#${spec.seed} in ${(performance.now() - t0).toFixed(0)}ms` + (pack ? ` (kit ${pack.tier}/${this.arenaAssets.format}: ${pack.assets.size} assets in ${pack.ms.toFixed(0)}ms${pack.missing.length ? `, missing ${pack.missing.join(',')}` : ''})` : ' (legacy dressing)'));
   }
@@ -1086,7 +1088,26 @@ class App {
         toast('FROM ABOVE!', '', '#ffcf8a', 1.4);
         break;
       }
+      // A2b interactables
+      case 'brazier_tip':
+        audio.fire(true);
+        minorToast('SET ALIGHT', a ? name(e.a) : '', '#ff8a40', 1.1);
+        break;
+      case 'obstacle_break':
+        audio.play('wood_break', { pos: { x: Number(d.x), z: Number(d.z) }, hitNow: true, rate: 0.8, vol: 1.0 });
+        minorToast('SMASHED THROUGH', a ? name(e.a) : '', '#e8d8b0', 1.1);
+        break;
+      case 'floor_collapse':
+        audio.play('stone_slam', { pos: { x: Number(d.x), z: Number(d.z) }, hitNow: true, rate: 0.5, vol: 1.1 });
+        audio.boom(0.8);
+        toast('THE FLOOR GIVES WAY', '', '#e8d8b0', 1.4);
+        break;
       case 'hazard_hit': {
+        if (d.kind === 'oil' && b) {
+          audio.fire(true);
+          minorToast('BURNING OIL', name(e.b), '#ff7a30', 1.2);
+          break;
+        }
         const h = L.hazards[Number(d.haz)];
         if (!h || !b) break;
         const p = b.position;
@@ -1098,6 +1119,14 @@ class App {
           minorToast('SPIKE TRAP', name(e.b), '#ffb070', 1.2);
         } else if (h.kind === 'geyser') {
           minorToast('LAUNCHED', name(e.b), '#bfe8ff', 1.2);
+        } else if (h.kind === 'chains') {
+          audio.play('hit_blunt', { pos: { x: p.x, z: p.z }, hitNow: true, rate: 0.6 });
+          minorToast('WRECKING CHAIN', name(e.b), '#d8d8e0', 1.2);
+        } else if (h.kind === 'flamejet') {
+          audio.fire(true);
+          minorToast('FIRE TRAP', name(e.b), '#ff7a30', 1.2);
+        } else if (h.kind === 'crumble') {
+          minorToast('INTO THE PIT', name(e.b), '#e8d8b0', 1.2);
         }
         break;
       }
@@ -1161,6 +1190,12 @@ class App {
           break;
         case 'knockdown':
           D.crack(fp(e.a).x, fp(e.a).z, 0.8, 4, 0.3);
+          break;
+        case 'brazier_tip':
+          D.scorch(Number(d.x), Number(d.z), Number(d.r ?? 1.2) * 1.3);
+          break;
+        case 'floor_collapse':
+          D.crack(Number(d.x), Number(d.z), Number(d.r ?? 1.5) * 1.5, 9, 0.6);
           break;
       }
     }

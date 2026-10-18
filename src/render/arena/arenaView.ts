@@ -9,8 +9,8 @@
  * dressing.ts.
  */
 import * as THREE from 'three';
-import type { ArenaLayout, HazardDef, Obstacle } from '../../sim/arenaGen';
-import { boundR } from '../../sim/arenaGen';
+import type { ArenaLayout, HazardDef, Obstacle, ObstacleKind } from '../../sim/arenaGen';
+import { boundR, chainSwing, CHAIN_LEN, CHAIN_PIVOT_H } from '../../sim/arenaGen';
 import type { Frame, SimEvent } from '../../sim/types';
 import { THEME_DEFS, type ThemeDef } from './themes';
 import { bakeEnvironment, makeSky } from './sky';
@@ -133,6 +133,8 @@ export class Arena {
   private propMats: Record<string, THREE.Material> = {};
   private propGeos: Record<string, THREE.BufferGeometry> = {};
   private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number }[] = [];
+  /** A2b: pre-built burning-oil patches (tipped braziers), driven by Frame.fires */
+  private oilFires: { g: THREE.Group; disc: THREE.Mesh }[] = [];
   private updaters: ((t: number, dt: number) => void)[] = [];
   private lastFrameT = -1;
 
@@ -207,6 +209,9 @@ export class Arena {
     for (const o of layout.obstacles) this.addObstacle(o);
     for (const p of layout.props) this.addProp(p.kind);
     for (const h of layout.hazards) this.addHazard(h);
+    // A2b: burning-oil patches for tipped braziers (built now so the reflection tagging below sees them; hidden)
+    const nBraziers = layout.props.filter((p) => p.kind === 'brazier').length;
+    for (let k = 0; k < Math.min(4, nBraziers); k++) this.addOilFire();
 
     // ---------------- ring of fire (ellipse)
     const flameTex = canvasTexture(256, (g, s) => {
@@ -323,10 +328,77 @@ export class Arena {
     return this.dressing.mats[name] ?? this.dressing.mats.stone;
   }
 
+  /** debris material of an obstacle kind (A2b features are wood / cloth) */
+  private debrisOf(kind: ObstacleKind): DebrisMat {
+    return kind === 'banner' || kind === 'barricade' ? 'wood' : this.dressing.debrisOf(kind);
+  }
+
+  /** A2b placeholder features until the art kit (A3-A5): a banner pole with a hanging cloth, a plank barricade */
+  private featureMesh(o: Obstacle): THREE.Object3D {
+    const D = this.dressing;
+    const g = new THREE.Group();
+    const wood = D.propMat('crate');
+    const r = new R(o.id * 31 + 7);
+    if (o.kind === 'banner') {
+      const metal = D.mats.metal ?? wood;
+      const base = new THREE.Mesh(new THREE.CylinderGeometry(0.26, 0.32, 0.3, 8), D.mats.rim ?? D.mats.stone);
+      base.position.y = 0.15;
+      const pole = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.08, o.h, 8), metal);
+      pole.position.y = o.h / 2;
+      const bar = new THREE.Mesh(new THREE.BoxGeometry(1.25, 0.07, 0.07), metal);
+      bar.position.y = o.h - 0.25;
+      const clothMat = new THREE.MeshStandardMaterial({ color: BANNER_COLOR[this.layout.theme] ?? '#7a1a1a', roughness: 0.85, side: THREE.DoubleSide });
+      const cg = new THREE.PlaneGeometry(1.05, 2.5, 4, 8);
+      cg.translate(0, -1.25, 0);
+      // ragged bottom edge
+      const pos = cg.attributes.position as THREE.BufferAttribute;
+      for (let i = 0; i < pos.count; i++) if (pos.getY(i) < -2.45) pos.setY(i, pos.getY(i) + r.range(0, 0.45));
+      cg.computeVertexNormals();
+      const cloth = new THREE.Mesh(cg, clothMat);
+      cloth.position.set(0, o.h - 0.28, 0.06);
+      const ph = r.range(0, 6);
+      this.onUpdate((t) => {
+        cloth.rotation.x = Math.sin(t * 1.3 + ph) * 0.06 + 0.04;
+        cloth.rotation.y = Math.sin(t * 0.7 + ph) * 0.08;
+      });
+      for (const m of [base, pole, bar, cloth]) {
+        m.castShadow = m.receiveShadow = true;
+        g.add(m);
+      }
+      // cloth faces the arena centre
+      g.rotation.y = Math.atan2(-o.x, -o.z);
+    } else {
+      // barricade / gate: posts, planks, cross braces, facing the centre
+      const W = 1.3; // planks span about +-0.78 m, close to the sim radius 0.7
+      for (const x of [-W / 2, 0, W / 2]) {
+        const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, o.h + 0.15, 0.16), wood);
+        post.position.set(x, (o.h + 0.15) / 2, 0);
+        g.add(post);
+      }
+      for (let k = 0; k < 4; k++) {
+        const plank = new THREE.Mesh(new THREE.BoxGeometry(W + 0.25, 0.22, 0.07), wood);
+        plank.position.set(r.range(-0.05, 0.05), 0.25 + k * 0.33, 0.1);
+        plank.rotation.z = r.range(-0.05, 0.05);
+        g.add(plank);
+      }
+      for (const s of [-1, 1]) {
+        const brace = new THREE.Mesh(new THREE.BoxGeometry(Math.hypot(W, o.h) * 0.95, 0.14, 0.06), wood);
+        brace.position.set(0, o.h / 2, -0.1);
+        brace.rotation.z = s * Math.atan2(o.h, W);
+        g.add(brace);
+      }
+      g.traverse((m) => {
+        if ((m as THREE.Mesh).isMesh) m.castShadow = m.receiveShadow = true;
+      });
+      g.rotation.y = Math.atan2(-o.x, -o.z);
+    }
+    return g;
+  }
+
   private addObstacle(o: Obstacle) {
     const D = this.dressing;
     const crack = { value: 0 };
-    const mesh = D.obstacle(o, crack);
+    const mesh = o.kind === 'banner' || o.kind === 'barricade' ? this.featureMesh(o) : D.obstacle(o, crack);
     const pivot = new THREE.Group();
     pivot.position.set(o.x, 0, o.z);
     pivot.add(mesh);
@@ -575,6 +647,7 @@ export class Arena {
       }
       case 'chandelier': {
         const ch = D.chandelier(h);
+        ch.position.y = 6.2; // hanging from the start (before the first frame: the entrance validator / reveal saw it on the floor)
         g.add(ch);
         const chain = new THREE.Mesh(chainGeo(14), D.mats.metal);
         chain.position.y = 6.2 + 14;
@@ -612,21 +685,183 @@ export class Arena {
         };
         break;
       }
+      case 'chains': {
+        // A2b: an iron weight on a chain hanging from the dark above; swings along the sim's axis (chainSwing)
+        const metal = D.mats.metal ?? D.mats.stone;
+        const up = new THREE.Mesh(chainGeo(14), metal);
+        up.position.y = CHAIN_PIVOT_H + 14;
+        g.add(up);
+        const pivot = new THREE.Group();
+        pivot.position.y = CHAIN_PIVOT_H;
+        g.add(pivot);
+        const chain = new THREE.Mesh(chainGeo(CHAIN_LEN - 0.3), metal);
+        chain.castShadow = true;
+        pivot.add(chain);
+        const ball = new THREE.Mesh(new THREE.IcosahedronGeometry(0.36, 1), metal);
+        ball.position.y = -CHAIN_LEN;
+        ball.castShadow = true;
+        pivot.add(ball);
+        const { spikes } = spikeGeo(0.3);
+        const sp = new THREE.Mesh(spikes, D.mats.spike ?? metal);
+        sp.position.y = -CHAIN_LEN - 0.2;
+        sp.scale.setScalar(0.6);
+        pivot.add(sp);
+        // swing axis: weight offset along (sin phase, cos phase) -> rotate about (-cos, 0, sin)
+        const axis = new THREE.Vector3(-Math.cos(h.phase), 0, Math.sin(h.phase));
+        update = (s, t) => {
+          const neg = s > 127;
+          const tau = s === 0 ? -1 : ((neg ? s - 127 : s) - 0.5) / 40; // mid-bin: within 12.5 ms of the sim
+          const th = tau < 0 ? Math.sin(t * 0.9 + h.id) * 0.015 : chainSwing(tau).theta * (neg ? -1 : 1);
+          pivot.setRotationFromAxisAngle(axis, th);
+        };
+        break;
+      }
+      case 'flamejet': {
+        // A2b: a floor vent (grate) that glows, then shoots a column of fire (geyser timing)
+        const grate = new THREE.Mesh(new THREE.CylinderGeometry(h.r * 0.9, h.r, 0.08, 20), D.mats.metal ?? D.mats.stone);
+        grate.position.y = 0.04;
+        grate.receiveShadow = true;
+        g.add(grate);
+        const glow = new THREE.Mesh(new THREE.CircleGeometry(h.r * 0.75, 20), glowMat('#ff6a20', 0));
+        glow.rotation.x = -Math.PI / 2;
+        glow.position.y = 0.09;
+        g.add(glow);
+        const column = new THREE.Mesh(new THREE.CylinderGeometry(h.r * 0.3, h.r * 0.65, 1, 16, 1, true), glowMat('#ff8a30', 0, plumeSprite()));
+        column.position.y = 0.5;
+        g.add(column);
+        const holder = new THREE.Group();
+        holder.add(this.flame(new THREE.Vector3(0, 0.05, 0), h.r * 1.8, '#ff8a30', true));
+        holder.visible = false;
+        g.add(holder);
+        update = (s, t) => {
+          const m = column.material as THREE.MeshBasicMaterial;
+          (glow.material as THREE.MeshBasicMaterial).opacity = s === 1 ? 0.45 + Math.sin(t * 24) * 0.25 : s === 2 ? 0.9 : 0;
+          holder.visible = s === 2;
+          if (s === 2) {
+            column.scale.set(1 + Math.sin(t * 23) * 0.1, 4.2, 1 + Math.cos(t * 19) * 0.1);
+            column.position.y = 2.1;
+            m.opacity = 0.8;
+            holder.scale.set(1, 2.2, 1);
+          } else m.opacity = 0;
+          if (m.map) m.map.offset.y = -t * 2.5;
+        };
+        break;
+      }
+      case 'crumble': {
+        // A2b: cracked floor -> shakes -> drops into a dark pit with a broken rim
+        const crackTex = canvasTexture(256, (c, s) => {
+          const rr = new R(h.id * 13 + 5);
+          c.clearRect(0, 0, s, s);
+          c.strokeStyle = 'rgba(10,8,6,0.9)';
+          c.lineCap = 'round';
+          for (let k = 0; k < 9; k++) {
+            let x = s / 2,
+              y = s / 2;
+            let a = (k / 9) * Math.PI * 2 + rr.range(-0.3, 0.3);
+            c.lineWidth = rr.range(2, 5);
+            c.beginPath();
+            c.moveTo(x, y);
+            for (let j = 0; j < 7; j++) {
+              a += rr.range(-0.5, 0.5);
+              x += Math.cos(a) * s * 0.07;
+              y += Math.sin(a) * s * 0.07;
+              c.lineTo(x, y);
+            }
+            c.stroke();
+          }
+          c.beginPath();
+          c.arc(s / 2, s / 2, s * 0.46, 0, Math.PI * 2);
+          c.lineWidth = 3;
+          c.stroke();
+        });
+        const cracks = new THREE.Mesh(new THREE.CircleGeometry(h.r, 32), new THREE.MeshBasicMaterial({ map: crackTex, transparent: true, opacity: 0.55, depthWrite: false }));
+        cracks.rotation.x = -Math.PI / 2;
+        cracks.position.y = 0.035;
+        cracks.userData.floor = true;
+        g.add(cracks);
+        const hole = new THREE.Mesh(blobDisc(h.r * 0.95, h.id + 21, 40), new THREE.MeshBasicMaterial({ color: '#030202' }));
+        hole.position.y = 0.03;
+        hole.visible = false;
+        hole.userData.floor = true;
+        g.add(hole);
+        const rim = new THREE.Mesh(blobRing(h.r * 0.9, h.r + 0.3, h.id + 21), D.mats.rim ?? D.mats.stone);
+        rim.position.y = 0.02;
+        rim.receiveShadow = true;
+        rim.visible = false;
+        g.add(rim);
+        // slabs that drop into the hole
+        const slabs: THREE.Mesh[] = [];
+        const rr = new R(h.id * 7 + 1);
+        for (let k = 0; k < 6; k++) {
+          const a = (k / 6) * Math.PI * 2 + rr.range(-0.3, 0.3),
+            d = h.r * rr.range(0.25, 0.65);
+          const sl = new THREE.Mesh(new THREE.BoxGeometry(h.r * 0.55, 0.16, h.r * 0.45), D.mats.rim ?? D.mats.stone);
+          sl.position.set(Math.cos(a) * d, -0.05, Math.sin(a) * d);
+          sl.rotation.y = a;
+          sl.visible = false;
+          g.add(sl);
+          slabs.push(sl);
+        }
+        let t0 = -1;
+        update = (s, t) => {
+          const cm = cracks.material as THREE.MeshBasicMaterial;
+          if (s === 0) {
+            cracks.visible = true;
+            cm.opacity = 0.55;
+            cracks.position.set(0, 0.035, 0);
+            hole.visible = rim.visible = false;
+            for (const sl of slabs) sl.visible = false;
+            t0 = -1;
+          } else if (s === 1) {
+            cracks.visible = true;
+            cm.opacity = 0.75 + Math.sin(t * 30) * 0.2;
+            cracks.position.set(Math.sin(t * 47) * 0.03, 0.035, Math.cos(t * 41) * 0.03);
+          } else {
+            if (t0 < 0) t0 = t;
+            const k = s === 2 ? Math.min(1, (t - t0) / 0.45) : 1;
+            cracks.visible = false;
+            hole.visible = rim.visible = true;
+            for (const sl of slabs) {
+              sl.visible = k < 1;
+              sl.position.y = -0.05 - k * k * 1.5;
+              sl.rotation.x = k * 0.8;
+            }
+          }
+        };
+        break;
+      }
     }
     this.hazards.push({ def: h, group: g, update });
+  }
+
+  /** A2b: one burning-oil patch (glowing pool + three flames), hidden until Frame.fires uses it */
+  private addOilFire() {
+    const g = new THREE.Group();
+    const disc = new THREE.Mesh(blobDisc(1.0, 77 + this.oilFires.length, 32), glowMat('#ff5a10', 0.55));
+    disc.position.y = 0.04;
+    g.add(disc);
+    for (let k = 0; k < 3; k++) {
+      const a = (k / 3) * Math.PI * 2;
+      g.add(this.flame(new THREE.Vector3(Math.cos(a) * 0.45, 0.02, Math.sin(a) * 0.45), 0.85 - k * 0.12, this.theme.fire, k === 0));
+    }
+    g.visible = false;
+    this.group.add(g);
+    this.oilFires.push({ g, disc });
   }
 
   // ------------------------------------------------------------------ runtime
   /** shared shadow/occlusion data for the camera: standing obstacles */
   standing(): { x: number; z: number; r: number; h: number }[] {
     // visual radius for the camera: plinths, statues, crystal clusters and lantern roofs stick out past the sim radius
-    const k = (kind: string) => (kind === 'statue' || kind === 'crystal' || kind === 'obelisk' ? 1.55 : kind === 'lantern_post' ? 1.4 : 1.2);
+    const k = (kind: string) => (kind === 'statue' || kind === 'crystal' || kind === 'obelisk' ? 1.55 : kind === 'lantern_post' ? 1.4 : kind === 'banner' ? 2.0 : 1.2);
     return this.obstacles.filter((o) => !o.fallen).map((o) => ({ x: o.def.x, z: o.def.z, r: o.def.r * k(o.def.kind), h: o.def.h }));
   }
   /** chandeliers still hanging (for camera avoidance) */
   hangingNow(): { x: number; y: number; z: number; r: number }[] {
     const out: { x: number; y: number; z: number; r: number }[] = [];
     for (const h of this.hazards) if (h.def.kind === 'chandelier' && h.group.children[0]?.visible !== false) out.push({ x: h.def.x, y: 6.2, z: h.def.z, r: 1.3 });
+    // A2b: chain weights (the chain and the weight's swing zone)
+    for (const h of this.hazards) if (h.def.kind === 'chains') out.push({ x: h.def.x, y: CHAIN_PIVOT_H - CHAIN_LEN * 0.5, z: h.def.z, r: 1.0 });
     return out;
   }
   boundR(x: number, z: number) {
@@ -707,6 +942,12 @@ export class Arena {
         continue;
       }
       const fallT = -v - 1;
+      if (!ov.def.toppleable) {
+        // A2b barricades shatter in place (debris comes from the obstacle_break event)
+        ov.fallen = ov.landed = true;
+        ov.mesh.visible = false;
+        continue;
+      }
       const k = Math.max(0, Math.min(1, (t - fallT) / 0.9));
       if (!ov.fallen) this.startFall(ov, fallT);
       if (k < 1) {
@@ -761,6 +1002,22 @@ export class Arena {
     }
     // hazards
     for (let i = 0; i < this.hazards.length; i++) this.hazards[i].update(fr.haz[i] ?? 0, t, simDt);
+    // A2b: burning oil from tipped braziers
+    const F = fr.fires;
+    const nf = F ? Math.floor(F.length / 4) : 0;
+    for (let k = 0; k < this.oilFires.length; k++) {
+      const of = this.oilFires[k];
+      if (k >= nf) {
+        of.g.visible = false;
+        continue;
+      }
+      const life = F[k * 4 + 3];
+      const s = F[k * 4 + 2] * Math.min(1, life * 4);
+      of.g.visible = true;
+      of.g.position.set(F[k * 4], 0, F[k * 4 + 1]);
+      of.g.scale.set(s, Math.max(0.2, Math.min(1, life * 4)), s);
+      (of.disc.material as THREE.MeshBasicMaterial).opacity = 0.55 * Math.min(1, life * 3);
+    }
     this.lastFrameT = t;
   }
   camQuat = new THREE.Quaternion();
@@ -796,14 +1053,14 @@ export class Arena {
         const i = Number(d.obs);
         this.toppleDir.set(i, { dx: Number(d.dx), dz: Number(d.dz) });
         const o = L.obstacles[i];
-        this.debris.burst(D.debrisOf(o.kind), new THREE.Vector3(o.x, 0.5, o.z), 10, 0.18, 2.5);
+        this.debris.burst(this.debrisOf(o.kind), new THREE.Vector3(o.x, 0.5, o.z), 10, 0.18, 2.5);
         return 0.25;
       }
       case 'topple_impact': {
         const i = Number(d.obs);
         const o = L.obstacles[i];
         const dir = this.toppleDir.get(i) ?? { dx: 1, dz: 0 };
-        const mat = D.debrisOf(o.kind);
+        const mat = this.debrisOf(o.kind);
         for (let k = 0.15; k <= 1.0; k += 0.17) {
           const p = new THREE.Vector3(o.x + dir.dx * o.h * k, 0.4, o.z + dir.dz * o.h * k);
           this.debris.burst(mat, p, 5, o.r * 0.5, 3.2, new THREE.Vector3(dir.dx, 0.3, dir.dz));
@@ -814,7 +1071,7 @@ export class Arena {
       case 'cover_hit': {
         const o = L.obstacles[Number(d.obs)];
         if (!o) break;
-        this.debris.burst(D.debrisOf(o.kind), new THREE.Vector3(o.x, 1.2 + Math.random() * 1.5, o.z), 4, 0.1, 2.2);
+        this.debris.burst(this.debrisOf(o.kind), new THREE.Vector3(o.x, 1.2 + Math.random() * 1.5, o.z), 4, 0.1, 2.2);
         break;
       }
       case 'prop_break': {
@@ -833,6 +1090,22 @@ export class Arena {
         this.decals.scorch(at.x, at.z, 2.4);
         return 1.0;
       }
+      case 'obstacle_break': {
+        const o = L.obstacles[Number(d.obs)];
+        if (!o) break;
+        this.debris.burst('wood', new THREE.Vector3(o.x, 0.7, o.z), 22, 0.16, 4.5);
+        return 0.35;
+      }
+      case 'brazier_tip': {
+        this.decals.scorch(Number(d.x), Number(d.z), Number(d.r ?? 1.2) * 1.3);
+        return 0.2;
+      }
+      case 'floor_collapse': {
+        const at = new THREE.Vector3(Number(d.x), 0.2, Number(d.z));
+        this.debris.burst(this.debrisOf(L.obstacles[0]?.kind ?? 'rock'), at, 20, Number(d.r ?? 1.5) * 0.5, 3.5);
+        this.decals.crack(at.x, at.z, Number(d.r ?? 1.5) * 1.5, 9, 0.6);
+        return 0.8;
+      }
       case 'chandelier_impact': {
         const at = new THREE.Vector3(Number(d.x), 0.3, Number(d.z));
         this.debris.burst(D.chandelierDebris, at, 18, 0.14, 4.5);
@@ -841,7 +1114,7 @@ export class Arena {
       }
       case 'hazard_hit': {
         const h = L.hazards[Number(d.haz)];
-        if (h?.kind === 'lava' || h?.kind === 'firepit') this.decals.scorch(pos(e.b ?? 0).x, pos(e.b ?? 0).z, 0.6);
+        if (h?.kind === 'lava' || h?.kind === 'firepit' || h?.kind === 'flamejet' || d.kind === 'oil') this.decals.scorch(pos(e.b ?? 0).x, pos(e.b ?? 0).z, 0.6);
         break;
       }
       case 'wall_slam':
@@ -972,6 +1245,8 @@ export class Arena {
 }
 
 const LAVA_COL = new THREE.Color('#ff5a1a');
+/** A2b placeholder banner cloth per theme (until the art kit) */
+const BANNER_COLOR: Record<string, string> = { colosseum: '#7a1414', skytemple: '#d8c48a', sakura: '#b8202e', forge: '#3a2418', glacier: '#24426e', moonlake: '#3a2e62', desert: '#9a4818' };
 /** A2: streak-card gain on medium / high, where the planar reflection carries most of the image */
 const STREAK_ACCENT = 0.6;
 /** A2: moon-path streak brightness (before the streak gain) */

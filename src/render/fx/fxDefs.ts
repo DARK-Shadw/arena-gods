@@ -632,6 +632,13 @@ def({ id: 'cover.hit', desc: 'strike lands on cover', at: 'obstacle', y: 1.2, pr
 def({ id: 'hazard.spikes.trigger', desc: 'spike trap fires', at: 'hazard', y: 0.2, priority: 30, layers: [{ op: { k: 'sparks', n: 10, color: '#ffb070', speed: 4 } }] });
 def({ id: 'hazard.geyser.trigger', desc: 'geyser erupts', at: 'hazard', y: 0.2, priority: 30, layers: [{ op: { k: 'smoke', n: 8, color: '#e8f0f8', size: 1.0, rise: 0.6 } }] });
 def({ id: 'hazard.chandelier.trigger', desc: 'chandelier chain snaps', at: 'hazard', y: 6.5, priority: 30, layers: [{ op: { k: 'dust', n: 12, spread: 1.0 } }] });
+// A2b interactables (built from the existing ops; placeholders until F4 / A20)
+def({ id: 'hazard.chains.trigger', desc: 'chain weight starts to swing', at: 'hazard', y: 3.0, priority: 25, layers: [{ op: { k: 'dust', n: 6, spread: 0.4 } }] });
+def({ id: 'hazard.flamejet.trigger', desc: 'fire-jet vent starts to glow', at: 'hazard', y: 0.15, priority: 30, layers: [{ op: { k: 'sparks', n: 12, color: '#ff9a40', speed: 3 } }, { op: { k: 'smoke', n: 5, color: '#3a2a20', size: 0.8, rise: 0.8 } }] });
+def({ id: 'hazard.crumble.trigger', desc: 'cracked floor starts to give way', at: 'hazard', y: 0.1, priority: 30, layers: [{ op: { k: 'dust', n: 16, spread: 1.4 } }] });
+def({ id: 'floor.collapse', desc: 'floor section drops into a pit', at: 'event', y: 0.1, priority: 60, layers: [{ op: { k: 'dust', n: 40, spread: 2.2 } }, { op: { k: 'smoke', n: 10, color: '#8a7a6a', size: 2.0, rise: 1.2 } }] });
+def({ id: 'oil.ignite', desc: 'tipped brazier spills burning oil', at: 'event', y: 0.2, priority: 50, layers: [{ op: { k: 'fireBurst', n: 18, shape: 'box', box: [2.4, 0.6, 2.4], size: 0.5, spread: 0.6 } }, { op: { k: 'sparks', n: 20, color: '#ffb060', speed: 5 } }] });
+def({ id: 'barricade.break', desc: 'barricade / gate smashed', at: 'event', y: 0.8, priority: 45, layers: [{ op: { k: 'dust', n: 18, spread: 1.4 } }] });
 def({
   id: 'chandelier.impact',
   desc: 'chandelier hits the floor',
@@ -755,6 +762,9 @@ export const RESOLVE: Partial<Record<SimEvent['type'], (e: SimEvent, c: ResolveC
     return [fin ? 'kill.finisher' : 'kill.plain', bleeds && (fin ? 'blood.pool' : 'blood.kill'), !bleeds && !fin && 'impact.any.pumpkin'];
   },
   explosion: () => ['explosion.keg'],
+  brazier_tip: () => ['oil.ignite'],
+  obstacle_break: () => ['barricade.break', 'prop.break'],
+  floor_collapse: () => ['floor.collapse'],
   prop_hit: () => ['prop.hit'],
   prop_batted: () => ['prop.batted'],
   topple: () => ['topple.start'],
@@ -763,12 +773,12 @@ export const RESOLVE: Partial<Record<SimEvent['type'], (e: SimEvent, c: ResolveC
   cover_hit: () => ['cover.hit'],
   hazard_trigger: (e, c) => {
     const k = c.hazardKind?.(Number(e.data?.haz));
-    return [k === 'spikes' ? 'hazard.spikes.trigger' : k === 'geyser' ? 'hazard.geyser.trigger' : k === 'chandelier' ? 'hazard.chandelier.trigger' : null];
+    return [k === 'spikes' ? 'hazard.spikes.trigger' : k === 'geyser' ? 'hazard.geyser.trigger' : k === 'chandelier' ? 'hazard.chandelier.trigger' : k === 'chains' ? 'hazard.chains.trigger' : k === 'flamejet' ? 'hazard.flamejet.trigger' : k === 'crumble' ? 'hazard.crumble.trigger' : null];
   },
   chandelier_impact: () => ['chandelier.impact'],
   hazard_hit: (e, c) => {
-    const k = c.hazardKind?.(Number(e.data?.haz));
-    return [k === 'lava' || k === 'firepit' ? 'hazard.fire.hit' : k === 'spikes' ? 'hazard.spikes.hit' : k === 'geyser' ? 'hazard.geyser.hit' : null];
+    const k = e.data?.kind === 'oil' ? 'oil' : c.hazardKind?.(Number(e.data?.haz));
+    return [k === 'lava' || k === 'firepit' || k === 'flamejet' || k === 'oil' ? 'hazard.fire.hit' : k === 'spikes' ? 'hazard.spikes.hit' : k === 'geyser' ? 'hazard.geyser.hit' : k === 'chains' ? 'prop.hit' : k === 'crumble' ? 'crush' : null];
   },
 };
 

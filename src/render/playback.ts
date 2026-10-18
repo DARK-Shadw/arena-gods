@@ -77,6 +77,7 @@ export class Playback {
       props: lerpProps(a.props, b.props, k),
       obs: k < 0.5 ? a.obs : b.obs,
       haz: k < 0.5 ? a.haz : b.haz,
+      fires: k < 0.5 ? a.fires : b.fires,
       proj: a.proj.map((pa) => {
         const pb = b.proj.find((x) => x.id === pa.id);
         return pb ? { ...pa, x: pa.x + (pb.x - pa.x) * k, y: pa.y + (pb.y - pa.y) * k, z: pa.z + (pb.z - pa.z) * k } : pa;

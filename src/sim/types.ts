@@ -163,6 +163,10 @@ export type EventType =
   | 'hazard_hit'
   | 'chandelier_fall'
   | 'chandelier_impact'
+  // A2b interactables
+  | 'brazier_tip'
+  | 'obstacle_break'
+  | 'floor_collapse'
   | 'ability_used'
   | 'exhausted'
   | 'taunt'
@@ -251,8 +255,13 @@ export interface Frame {
   props: Float32Array;
   /** obstacles: hp fraction while standing, or -(1 + topple start time) once toppled */
   obs: Float32Array;
-  /** hazard state codes (spikes 0 idle 1 warn 2 up 3 cooldown; geyser 0/1 warn/2 erupt; chandelier 0 hang 1 shake 2 fall 3 down) */
+  /**
+   * hazard state codes (spikes 0 idle 1 warn 2 up 3 cooldown; geyser / flamejet 0 / 1 warn / 2 erupt; chandelier 0 hang
+   * 1 shake 2 fall 3 down; crumble 0 intact 1 cracking 2 collapsing 3 hole; chains 0 still, else 1 + swing time in 1/40 s, +127 for a negative swing)
+   */
   haz: Uint8Array;
+  /** A2b: burning-oil patches from tipped braziers: 4 floats each [x, z, r, life fraction left] */
+  fires: Float32Array;
   /** live projectiles */
   proj: { x: number; y: number; z: number; fx: string; o: number; id: number }[];
 }

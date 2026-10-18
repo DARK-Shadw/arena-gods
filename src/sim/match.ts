@@ -9,7 +9,7 @@
  */
 import { atan2, cos, exp, hypot, sin } from './dmath';
 import { Rng } from './rng';
-import { ARENA, ringRadiusAt } from './arena';
+import { ARENA, ringScaleAt } from './arena';
 import { arenaForSeed, generateArena, type ArenaLayout, type ArenaSpec } from './arenaGen';
 import { LIFT_DUR, LIFT_GRAB, PS_REST, THROW_DUR, THROW_RELEASE, World } from './world';
 import { getFighter } from './fighters';
@@ -568,7 +568,7 @@ export class Match {
   step() {
     const dt = DT;
     this.t += dt;
-    this.ringS = ringRadiusAt(this.t) / ARENA.fightR;
+    this.ringS = ringScaleAt(this.t, this.arena);
     this.drama.preTick();
 
     if (this.fin) this.tickFinisher(dt);
@@ -1097,6 +1097,16 @@ export class Match {
       if (test(p.x, p.z, p.r, p.top) <= 0) {
         f.worldHits.push(1000 + i);
         W.damageProp(this, i, m.damage * heavy, f.idx);
+      }
+    }
+    // A2b: a swing that strikes a hanging chain weight sends it swinging away from the striker
+    for (let i = 0; i < this.arena.hazards.length; i++) {
+      const h = this.arena.hazards[i];
+      if (h.kind !== 'chains' || W.haz[i].state !== 0 || f.worldHits.includes(2000 + i)) continue;
+      if (!near(h.x, h.z, 0.4)) continue;
+      if (test(h.x, h.z, 0.4, 1.5) <= 0) {
+        f.worldHits.push(2000 + i);
+        W.swingChain(this, i, (h.x - f.x) * sin(h.phase) + (h.z - f.z) * cos(h.phase) >= 0 ? 1 : -1, f.idx);
       }
     }
     for (let i = 0; i < this.arena.obstacles.length; i++) {

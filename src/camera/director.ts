@@ -318,6 +318,17 @@ export class Director {
         case 'chandelier_impact':
           this.rig.addShake(0.7);
           break;
+        // A2b interactables
+        case 'floor_collapse':
+          // shake only: a 'destruct' cut to the hole lost both fighters in the camera audit when nobody stood on it
+          this.rig.addShake(0.75);
+          break;
+        case 'obstacle_break':
+          this.rig.addShake(0.4);
+          break;
+        case 'brazier_tip':
+          this.rig.addShake(0.25);
+          break;
         case 'throw_start':
           if (simT < this.killStart - 1.5 || this.killStart < 0) this.request(e.a === 0 ? 'throw_0' : 'throw_1', 55, 1.5, realT);
           break;
@@ -595,7 +606,8 @@ export class Director {
         P.y = 2.4;
         L.copy(me).lerp(them, 0.6);
         L.y = 1.3;
-        this.fov = 50;
+        // A2b: more (and longer) throws in the bigger arenas: open up for a far target so it stays in frame
+        this.fov = 50 + Math.min(10, Math.max(0, (me.distanceTo(them) - 6) * 1.5));
         break;
       }
       case 'launch_0':
