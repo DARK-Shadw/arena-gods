@@ -14,6 +14,7 @@ import { boundR, chainSwing, CHAIN_LEN, CHAIN_PIVOT_H } from '../../sim/arenaGen
 import type { Frame, SimEvent } from '../../sim/types';
 import { THEME_DEFS, type ThemeDef } from './themes';
 import { bakeEnvironment, makeSky } from './sky';
+import { Backdrop } from './backdrop';
 import { ArenaFog, installHeightFog } from './fog';
 import { Ambient } from './ambient';
 import { Debris, Decals, FracSet, type DebrisMat } from './debris';
@@ -149,6 +150,8 @@ export class Arena {
   reflection: PlanarReflection | null = null;
   lightMap: FloorLightMap | null = null;
   streaks: StreakCards | null = null;
+  /** A6: the baked landmark panorama (depth-displaced layers, AOV animation, fog match, hero inset, shaft / fog cards) */
+  backdrop: Backdrop | null = null;
   private floorSrc: FloorLightSource[] = [];
   private streakSrc: FloorLightSource[] = [];
 
@@ -168,6 +171,11 @@ export class Arena {
     this.group.add(this.sky);
     this.dressing = buildDressing(this);
     this.drawCallsMerged = mergeStatic(this.group);
+    // A6: baked panorama layers (kit mode, when the theme art has one and it loaded); not merged (userData.dyn)
+    if (kit?.backdrop && kit.art.backdrop) {
+      this.backdrop = new Backdrop(kit.backdrop, quality, kit.art.backdrop.tune);
+      this.group.add(this.backdrop.group);
+    }
     this.env = bakeEnvironment(renderer, T.sky, this.dressing.envExtras);
     scene.environment = this.env;
     scene.background = null;
@@ -314,7 +322,7 @@ export class Arena {
     if (this.streaks) skip.add(this.streaks.mesh);
     this.group.updateMatrixWorld(true);
     const visit = (o: THREE.Object3D) => {
-      if (skip.has(o) || o.userData.floor) return;
+      if (skip.has(o) || o.userData.floor || o.userData.noReflect) return;
       const m = o as THREE.Mesh;
       if (m.isMesh) {
         if (o.layers.isEnabled(LAYER.FX_ALPHA) || o.layers.isEnabled(LAYER.FX_ADD)) o.layers.enable(LAYER_REFLECT);
@@ -1399,6 +1407,7 @@ export class Arena {
       this.ringThrough += (through - this.ringThrough) * Math.min(1, dt * 10);
       this.fireRingMat.opacity *= 1 - 0.8 * this.ringThrough;
     }
+    this.backdrop?.update(this.fog);
     if (cam) {
       this.sky.position.copy(cam.position);
       this.camQuat.copy(cam.quaternion);

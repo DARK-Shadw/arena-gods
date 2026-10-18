@@ -1,0 +1,231 @@
+{
+ "_doc": "Arena backdrop (tools/arena/build_backdrop.mjs, plan 5.6). Loaded by src/render/arena/backdrop.ts. Panorama u = 0.5 + az / 360 (game azimuth, 0 = +x, + toward +z), v = 0 at latMax; depth grids: uint16 decimetres, (grid[1] + 1) rows x (grid[0] + 1) columns, row 0 = latMax.",
+ "id": "moongate",
+ "scene": "moongate",
+ "latMin": -12,
+ "latMax": 48.1172,
+ "origin": [
+  0,
+  1.6,
+  0
+ ],
+ "tiers": {
+  "q2": {
+   "layers": [
+    {
+     "name": "far",
+     "size": [
+      2048,
+      344
+     ],
+     "tex": {
+      "ktx2": "backdrop/moongate/q2/far.ktx2",
+      "webp": "backdrop/moongate/q2/far.webp"
+     },
+     "aov": {
+      "ktx2": "backdrop/moongate/q2/far_aov.ktx2",
+      "webp": "backdrop/moongate/q2/far_aov.webp"
+     },
+     "aovSize": [
+      1024,
+      172
+     ],
+     "aovUsed": [
+      false,
+      false,
+      true
+     ],
+     "depth": "backdrop/moongate/q2/far_depth.bin",
+     "cover": "backdrop/moongate/q2/far_cover.bin",
+     "coverShare": 0.797,
+     "grid": [
+      128,
+      24
+     ],
+     "depthMin": 825.9,
+     "depthMax": 1306.8
+    },
+    {
+     "name": "mid",
+     "size": [
+      8192,
+      1368
+     ],
+     "tex": {
+      "ktx2": "backdrop/moongate/q2/mid.ktx2",
+      "webp": "backdrop/moongate/q2/mid.webp"
+     },
+     "aov": {
+      "ktx2": "backdrop/moongate/q2/mid_aov.ktx2",
+      "webp": "backdrop/moongate/q2/mid_aov.webp"
+     },
+     "aovSize": [
+      4096,
+      684
+     ],
+     "aovUsed": [
+      true,
+      true,
+      false
+     ],
+     "depth": "backdrop/moongate/q2/mid_depth.bin",
+     "cover": "backdrop/moongate/q2/mid_cover.bin",
+     "coverShare": 0.224,
+     "grid": [
+      256,
+      48
+     ],
+     "depthMin": 147.5,
+     "depthMax": 400.5
+    },
+    {
+     "name": "near",
+     "size": [
+      8192,
+      1368
+     ],
+     "tex": {
+      "ktx2": "backdrop/moongate/q2/near.ktx2",
+      "webp": "backdrop/moongate/q2/near.webp"
+     },
+     "aov": {
+      "ktx2": "backdrop/moongate/q2/near_aov.ktx2",
+      "webp": "backdrop/moongate/q2/near_aov.webp"
+     },
+     "aovSize": [
+      4096,
+      684
+     ],
+     "aovUsed": [
+      true,
+      false,
+      false
+     ],
+     "depth": "backdrop/moongate/q2/near_depth.bin",
+     "cover": "backdrop/moongate/q2/near_cover.bin",
+     "coverShare": 0.47,
+     "grid": [
+      512,
+      96
+     ],
+     "depthMin": 35,
+     "depthMax": 137.5
+    }
+   ],
+   "gpuMB": 36.74,
+   "downloadMB": 1.42
+  },
+  "q1": {
+   "layers": [
+    {
+     "name": "farc",
+     "size": [
+      3072,
+      512
+     ],
+     "tex": {
+      "ktx2": "backdrop/moongate/q1/farc.ktx2",
+      "webp": "backdrop/moongate/q1/farc.webp"
+     },
+     "aov": {
+      "ktx2": "backdrop/moongate/q1/farc_aov.ktx2",
+      "webp": "backdrop/moongate/q1/farc_aov.webp"
+     },
+     "aovSize": [
+      1024,
+      172
+     ],
+     "aovUsed": [
+      true,
+      true,
+      true
+     ],
+     "depth": "backdrop/moongate/q1/farc_depth.bin",
+     "cover": "backdrop/moongate/q1/farc_cover.bin",
+     "coverShare": 0.731,
+     "grid": [
+      256,
+      48
+     ],
+     "depthMin": 167.9,
+     "depthMax": 1319
+    },
+    {
+     "name": "near",
+     "size": [
+      4096,
+      684
+     ],
+     "tex": {
+      "ktx2": "backdrop/moongate/q1/near.ktx2",
+      "webp": "backdrop/moongate/q1/near.webp"
+     },
+     "aov": {
+      "ktx2": "backdrop/moongate/q1/near_aov.ktx2",
+      "webp": "backdrop/moongate/q1/near_aov.webp"
+     },
+     "aovSize": [
+      2048,
+      344
+     ],
+     "aovUsed": [
+      true,
+      false,
+      false
+     ],
+     "depth": "backdrop/moongate/q1/near_depth.bin",
+     "cover": "backdrop/moongate/q1/near_cover.bin",
+     "coverShare": 0.47,
+     "grid": [
+      512,
+      96
+     ],
+     "depthMin": 35,
+     "depthMax": 137.5
+    }
+   ],
+   "gpuMB": 6.68,
+   "downloadMB": 0.72
+  },
+  "q0": {
+   "layers": [
+    {
+     "name": "all",
+     "size": [
+      2048,
+      344
+     ],
+     "tex": {
+      "ktx2": "backdrop/moongate/q0/all.ktx2",
+      "webp": "backdrop/moongate/q0/all.webp"
+     },
+     "aov": {
+      "ktx2": "backdrop/moongate/q0/all_aov.ktx2",
+      "webp": "backdrop/moongate/q0/all_aov.webp"
+     },
+     "aovSize": [
+      1024,
+      172
+     ],
+     "aovUsed": [
+      true,
+      true,
+      true
+     ],
+     "depth": "backdrop/moongate/q0/all_depth.bin",
+     "cover": "backdrop/moongate/q0/all_cover.bin",
+     "coverShare": 0.738,
+     "grid": [
+      256,
+      48
+     ],
+     "depthMin": 37.4,
+     "depthMax": 950
+    }
+   ],
+   "gpuMB": 1.12,
+   "downloadMB": 0.2
+  }
+ },
+ "cards": {}
+}

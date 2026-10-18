@@ -6119,5 +6119,63 @@
    }
   }
  },
- "generated": "2026-10-18"
+ "generated": "2026-10-18",
+ "backdrops": {
+  "moongate": {
+   "json": "backdrop/moongate/backdrop.json",
+   "files": [
+    "backdrop/moongate/backdrop.json",
+    "backdrop/moongate/q0/all.ktx2",
+    "backdrop/moongate/q0/all.webp",
+    "backdrop/moongate/q0/all_aov.ktx2",
+    "backdrop/moongate/q0/all_aov.webp",
+    "backdrop/moongate/q0/all_cover.bin",
+    "backdrop/moongate/q0/all_depth.bin",
+    "backdrop/moongate/q1/farc.ktx2",
+    "backdrop/moongate/q1/farc.webp",
+    "backdrop/moongate/q1/farc_aov.ktx2",
+    "backdrop/moongate/q1/farc_aov.webp",
+    "backdrop/moongate/q1/farc_cover.bin",
+    "backdrop/moongate/q1/farc_depth.bin",
+    "backdrop/moongate/q1/near.ktx2",
+    "backdrop/moongate/q1/near.webp",
+    "backdrop/moongate/q1/near_aov.ktx2",
+    "backdrop/moongate/q1/near_aov.webp",
+    "backdrop/moongate/q1/near_cover.bin",
+    "backdrop/moongate/q1/near_depth.bin",
+    "backdrop/moongate/q2/far.ktx2",
+    "backdrop/moongate/q2/far.webp",
+    "backdrop/moongate/q2/far_aov.ktx2",
+    "backdrop/moongate/q2/far_aov.webp",
+    "backdrop/moongate/q2/far_cover.bin",
+    "backdrop/moongate/q2/far_depth.bin",
+    "backdrop/moongate/q2/mid.ktx2",
+    "backdrop/moongate/q2/mid.webp",
+    "backdrop/moongate/q2/mid_aov.ktx2",
+    "backdrop/moongate/q2/mid_aov.webp",
+    "backdrop/moongate/q2/mid_cover.bin",
+    "backdrop/moongate/q2/mid_depth.bin",
+    "backdrop/moongate/q2/near.ktx2",
+    "backdrop/moongate/q2/near.webp",
+    "backdrop/moongate/q2/near_aov.ktx2",
+    "backdrop/moongate/q2/near_aov.webp",
+    "backdrop/moongate/q2/near_cover.bin",
+    "backdrop/moongate/q2/near_depth.bin"
+   ],
+   "tiers": {
+    "q2": {
+     "gpuMB": 36.74,
+     "downloadMB": 1.42
+    },
+    "q1": {
+     "gpuMB": 6.68,
+     "downloadMB": 0.72
+    },
+    "q0": {
+     "gpuMB": 1.12,
+     "downloadMB": 0.2
+    }
+   }
+  }
+ }
 }

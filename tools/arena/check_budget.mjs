@@ -314,17 +314,52 @@ async function main() {
       }
     }
   }
+  // A6: backdrop panoramas (manifest `backdrops`, build_backdrop.mjs): files listed + present, GPU memory per quality tier
+  // (q0 low / q1 medium / q2 high) added to the kit's for that tier: KTX2 ETC1S RGBA layers transcode to 1 B/px (BC7)
+  const bdGpu = { low: 0, medium: 0, high: 0 };
+  const TIER_OF = { q0: 'low', q1: 'medium', q2: 'high' };
+  const BD_DOWNLOAD_MB = { q0: 2, q1: 6, q2: 16 };
+  for (const [id, B] of Object.entries(man.backdrops ?? {})) {
+    for (const file of B.files) {
+      listed.add(file.replace(/\//g, path.sep));
+      if (!fs.existsSync(path.join(PUB, file))) fails.push(`${file}: missing (backdrop ${id})`);
+    }
+    const J = JSON.parse(fs.readFileSync(path.join(PUB, B.json), 'utf8'));
+    for (const [tier, T] of Object.entries(J.tiers)) {
+      let g = 0;
+      const texs = [];
+      for (const l of T.layers) texs.push(l.tex.ktx2, l.aov.ktx2);
+      if (T.inset) texs.push(T.inset.tex.ktx2);
+      if (tier !== 'q0') for (const c of Object.values(J.cards ?? {})) texs.push(c.tex.ktx2);
+      let dl = 0;
+      for (const t of texs) {
+        const buf = fs.readFileSync(path.join(PUB, t));
+        const w = buf.readUInt32LE(20), h = buf.readUInt32LE(24);
+        if (w % 4 || h % 4) fails.push(`${t}: ${w}x${h} not a multiple of 4 (block compression)`);
+        g += w * h * (4 / 3);
+        dl += buf.length;
+      }
+      for (const l of T.layers) {
+        const n = fs.statSync(path.join(PUB, l.depth)).size;
+        if (n !== (l.grid[0] + 1) * (l.grid[1] + 1) * 2) fails.push(`${l.depth}: ${n} bytes != grid ${l.grid}`);
+        dl += n;
+      }
+      if (dl > BD_DOWNLOAD_MB[tier] * MB) fails.push(`backdrop ${id} ${tier}: download ${(dl / MB).toFixed(1)} MB > ${BD_DOWNLOAD_MB[tier]} MB`);
+      bdGpu[TIER_OF[tier]] = Math.max(bdGpu[TIER_OF[tier]], g);
+      rows.push([`backdrop/${id}`, tier, '-', String(T.layers.length), '-', '-', texs.length + ' tex', (g / MB).toFixed(2), (dl / 1024).toFixed(0)]);
+    }
+  }
   // stray files in public/arena (everything shipped must be in the manifest, so the ledger covers it)
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.relative(PUB, path.join(d, e.name))]));
   for (const f of walk(PUB)) if (!listed.has(f)) fails.push(`${f}: in public/arena but not in the manifest`);
   // whole-kit texture memory per tier (low uses the low files, medium / high the full ones; KTX2 is the shipped default)
-  const tiers = { low: gpu.low.ktx2, medium: gpu.full.ktx2, high: gpu.full.ktx2 };
+  const tiers = { low: gpu.low.ktx2 + bdGpu.low, medium: gpu.full.ktx2 + bdGpu.medium, high: gpu.full.ktx2 + bdGpu.high };
   for (const [t, v] of Object.entries(tiers)) if (v > TIER_TEX_MB[t] * MB) fails.push(`kit texture memory ${t} ${(v / MB).toFixed(1)} MB > ${TIER_TEX_MB[t]} MB`);
   const head = ['file', 'variant', 'tris', 'prims', 'radius', 'y', 'textures', 'GPU MB', 'KB'];
   const w = head.map((h, i) => Math.max(h.length, ...rows.map((r) => r[i].length)));
   console.log(head.map((h, i) => h.padEnd(w[i])).join('  '));
   for (const r of rows) console.log(r.map((c, i) => c.padEnd(w[i])).join('  '));
-  console.log(`kit texture GPU memory (KTX2): low ${(tiers.low / MB).toFixed(2)} MB / ${TIER_TEX_MB.low}, medium+high ${(tiers.high / MB).toFixed(2)} MB / ${TIER_TEX_MB.medium}-${TIER_TEX_MB.high}; WebP fallback: low ${(gpu.low.webp / MB).toFixed(2)}, full ${(gpu.full.webp / MB).toFixed(2)} MB`);
+  console.log(`arena texture GPU memory (KTX2, kit + backdrop): low ${(tiers.low / MB).toFixed(2)} MB / ${TIER_TEX_MB.low}, medium ${(tiers.medium / MB).toFixed(2)} MB / ${TIER_TEX_MB.medium}, high ${(tiers.high / MB).toFixed(2)} MB / ${TIER_TEX_MB.high} (backdrop low ${(bdGpu.low / MB).toFixed(2)}, medium ${(bdGpu.medium / MB).toFixed(2)}, high ${(bdGpu.high / MB).toFixed(2)}); WebP fallback: low ${(gpu.low.webp / MB).toFixed(2)}, full ${(gpu.full.webp / MB).toFixed(2)} MB`);
   console.log(`sim contract: PROP_BASE r ${JSON.stringify(sim.base)}; TOP ${JSON.stringify(sim.top)}`);
   if (args.includes('--json')) console.log(JSON.stringify({ rows, tiers, fails }, null, 1));
   if (fails.length) {

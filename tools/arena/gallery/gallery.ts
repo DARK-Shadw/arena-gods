@@ -124,7 +124,7 @@ async function main() {
   const ids = Object.keys(man.assets).filter((id) => id.startsWith('kit/'));
   const loaded = new Map<string, KitAsset>();
   await Promise.all(ids.map((id) => assets.asset(id, tier).then((a) => void loaded.set(id, a), (e) => console.warn(id, e))));
-  const pack: ArenaPack = { theme: 'colosseum', tier, art: { id: 'colosseum' }, assets: loaded, missing: [], ms: 0 };
+  const pack: ArenaPack = { theme: 'colosseum', tier, art: { id: 'colosseum' }, assets: loaded, missing: [], ms: 0, backdrop: null };
   const trim = trimMaterial(pack, 'kit/stone_trim');
   const inst = (id: string) => {
     const a = loaded.get(id);

@@ -7,6 +7,7 @@
  */
 import * as THREE from 'three';
 import type { ThemeArt } from './types';
+import { discRadius } from '../sky';
 
 const dirFrom = (elevDeg: number, azDeg: number) => {
   const e = (elevDeg * Math.PI) / 180,
@@ -42,6 +43,19 @@ export const COLOSSEUM_ART: ThemeArt = {
     // the stands); render-only, merged with the ring (A7 moves them to the stair / dais)
     guardians: { asset: 'kit/statue_hooded', scale: 1.4, offset: 1.2, side: 6.0 },
   },
+  // A6: the Moon Gate test backdrop (arch blockout + ruined arcade ring + outer ruins + clouds, Cycles panorama layers);
+  // A8 replaces the scene with the full one and tunes these
+  backdrop: {
+    id: 'moongate',
+    tune: {
+      gain: 1.25,
+      emitGain: 3.2,
+      fogRange: 140,
+      fogMax: 0.8,
+      shafts: { count: 3, color: '#aaa6ff', opacity: 0.32, az: -1.7, dist: 66 },
+      fogBanks: { count: [8, 16], radius: 52, opacity: 0.6, lift: 1.3 },
+    },
+  },
   look: {
     sky: {
       sunDir: MOON,
@@ -58,7 +72,9 @@ export const COLOSSEUM_ART: ThemeArt = {
       cloudShade: C('#1a1934'),
       stars: 0.45,
       moonDir: MOON,
-      moonSize: 0.08,
+      // A6: ref-3's moon is about 12 deg wide (plan 3.1), framed by the backdrop's ring arch; halo scaled to the disc
+      moonSize: discRadius(12),
+      moonHalo: 1,
       moonColor: hdr('#ece8ff', 2.4),
     },
     sunIntensity: 1.5,

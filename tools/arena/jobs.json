@@ -1090,6 +1090,164 @@
    "timeoutMin": 60,
    "note": "A5: A6 backdrop source: hooded seated colossus (ref-5), 9 m weathered high -> colossus_seated_hi.blend",
    "startMinFreeMb": 3000
+  },
+  {
+   "id": "backdrop_quick",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "layers",
+    "--quick",
+    "--markers",
+    "--device",
+    "ONEAPI"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 3000,
+   "timeoutMin": 20,
+   "note": "A6: pipeline test of the panorama renderer at 1024x172 with azimuth / distance markers (mapping + depth check)"
+  },
+  {
+   "id": "backdrop_moongate_preview",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "preview"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "startMinFreeMb": 3000,
+   "timeoutMin": 20,
+   "note": "A6: EEVEE 8-slice preview of the Moon Gate test backdrop (EEVEE has no panoramic camera)"
+  },
+  {
+   "id": "backdrop_moongate",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "layers",
+    "--device",
+    "ONEAPI",
+    "--w",
+    "8192",
+    "--h",
+    "1368",
+    "--samples",
+    "128",
+    "--strips",
+    "4",
+    "--far-scale",
+    "0.5",
+    "--far-samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 4500,
+   "timeoutMin": 90,
+   "note": "A6: Moon Gate test backdrop, 3 Cycles panorama layers (near / mid 8192x1368 128 spp as 4 longitude strips for memory, far 4096x684 128 spp with cloud volumes) + Depth + AOV on the Arc iGPU"
+  },
+  {
+   "id": "backdrop_moongate_inset",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "inset",
+    "--device",
+    "ONEAPI",
+    "--inset-w",
+    "4096",
+    "--inset-h",
+    "2048",
+    "--samples",
+    "128"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 4500,
+   "timeoutMin": 60,
+   "note": "A6: hero inset 4096x2048 of the near layer from the ref-3 concept camera"
+  },
+  {
+   "id": "backdrop_cards",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "cards",
+    "--card-px",
+    "256",
+    "--frames",
+    "32"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "startMinFreeMb": 3000,
+   "timeoutMin": 30,
+   "note": "A6: EEVEE volumetric card sequences (moon light shaft, fog bank), 32 looped frames each, 8x4 atlas of 256 px"
+  },
+  {
+   "id": "backdrop_look",
+   "script": "tools/arena/blender/backdrop_pano.py",
+   "args": [
+    "--scene",
+    "moongate",
+    "--mode",
+    "layers",
+    "--device",
+    "ONEAPI",
+    "--w",
+    "2048",
+    "--h",
+    "344",
+    "--samples",
+    "32",
+    "--far-scale",
+    "1.0",
+    "--far-samples",
+    "24",
+    "--strips",
+    "4"
+   ],
+   "inputs": [
+    "tools/arena/blender/backdrop_moongate.py",
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 3500,
+   "timeoutMin": 20,
+   "note": "A6: look-development render of the Moon Gate test backdrop at 2048x344 (fast iteration before the full-size layers)"
   }
  ],
  "groups": {
@@ -1206,6 +1364,12 @@
   "a5-colossi": [
    "colossus_goddess",
    "colossus_seated"
+  ],
+  "a6": [
+   "backdrop_moongate_preview",
+   "backdrop_moongate",
+   "backdrop_moongate_inset",
+   "backdrop_cards"
   ]
  }
 }

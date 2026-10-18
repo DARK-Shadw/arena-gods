@@ -14,6 +14,7 @@ import type { RtPropKind } from '../../../sim/world';
 import type { SkyParams } from '../sky';
 import type { AmbientKind, Grade } from '../themes';
 import type { DebrisMat } from '../debris';
+import type { BackdropTuning } from '../backdrop';
 
 /** id of a kit or theme asset in public/arena/manifest.json, e.g. 'kit/brazier_tripod' */
 export type AssetId = string;
@@ -112,10 +113,14 @@ export interface GateArt {
   asset: AssetId;
 }
 
+/**
+ * A6: the baked landmark panorama (backdrop.ts): `id` = public/arena/backdrop/<id>/backdrop.json (build_backdrop.mjs), the
+ * layers / inset / cards for the quality tier are picked there; `tune` = gain, emission, fog match, shafts, fog banks.
+ * `?backdrop=0` skips it (A/B and perf checks).
+ */
 export interface BackdropArt {
-  /** panorama layers far -> near (A6), hero inset */
-  layers: AssetId[];
-  inset?: AssetId;
+  id: string;
+  tune?: BackdropTuning;
 }
 
 export interface ThemeArt {

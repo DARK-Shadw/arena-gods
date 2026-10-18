@@ -20,6 +20,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.js';
 import type { ArenaLayout, ThemeId } from '../../sim/arenaGen';
 import { artFor, assetsOf, tierOf, type AssetId, type AssetTier, type KitSocket, type ThemeArt } from './art';
+import { backdropTier, type BackdropData, type BackdropJson, type TexFiles } from './backdrop';
 
 export type TexFormat = 'ktx2' | 'webp';
 
@@ -126,6 +127,8 @@ export interface ArenaPack {
   /** ids that failed to load (the dressing falls back to the legacy builder for those slots) */
   missing: AssetId[];
   ms: number;
+  /** A6: the baked landmark panorama for this quality (null: none in the art, or it failed: the legacy skyline stays) */
+  backdrop: BackdropData | null;
 }
 
 export class ArenaAssets {
@@ -136,6 +139,11 @@ export class ArenaAssets {
   private done = new Map<string, KitAsset>();
   private loader = new GLTFLoader();
   private ktx2Ready: Promise<boolean> | null = null;
+  /** A6: KTX2 loader for standalone textures (backdrop layers), shared with the GLTF loader */
+  private ktx2: import('three/examples/jsm/loaders/KTX2Loader.js').KTX2Loader | null = null;
+  /** A6: loaded backdrops per id + tier + format (textures owned here, disposed by release) */
+  private backdrops = new Map<string, Promise<BackdropData>>();
+  private backdropDone = new Map<string, BackdropData>();
 
   constructor(
     private renderer: THREE.WebGLRenderer | null,
@@ -161,6 +169,7 @@ export class ArenaAssets {
         const { KTX2Loader } = await import('three/examples/jsm/loaders/KTX2Loader.js');
         const k = new KTX2Loader().setTranscoderPath(this.basisPath).detectSupport(this.renderer);
         this.loader.setKTX2Loader(k);
+        this.ktx2 = k;
         return true;
       } catch (e) {
         console.warn('[arena assets] KTX2 unavailable, using WebP', e);
@@ -219,7 +228,80 @@ export class ArenaAssets {
         ),
       ),
     );
-    return { theme, tier, art, assets, missing, ms: performance.now() - t0 };
+    let backdrop: BackdropData | null = null;
+    if (art.backdrop) {
+      try {
+        backdrop = await this.loadBackdrop(art.backdrop.id, quality);
+      } catch (e) {
+        console.warn(`[arena assets] backdrop ${art.backdrop.id} unavailable`, e);
+        missing.push(`backdrop/${art.backdrop.id}`);
+      }
+    }
+    return { theme, tier, art, assets, missing, ms: performance.now() - t0, backdrop };
+  }
+
+  /** one texture file (KTX2 or WebP by the session format; KTX2 failures fall back to WebP like the GLBs) */
+  private async texture(f: TexFiles, srgb: boolean): Promise<THREE.Texture> {
+    if (this.format === 'ktx2' && f.ktx2 && (await this.initKtx2()) && this.ktx2) {
+      try {
+        const t = await this.ktx2.loadAsync(this.base + f.ktx2);
+        t.wrapS = THREE.RepeatWrapping;
+        return t;
+      } catch (e) {
+        console.warn('[arena assets] KTX2 texture failed, using WebP', f.ktx2, e);
+        this.format = 'webp';
+      }
+    }
+    if (!f.webp) throw new Error('no WebP fallback');
+    const t = await new THREE.TextureLoader().loadAsync(this.base + f.webp);
+    t.flipY = false;
+    t.colorSpace = srgb ? THREE.SRGBColorSpace : THREE.NoColorSpace;
+    t.wrapS = THREE.RepeatWrapping;
+    t.generateMipmaps = true;
+    t.minFilter = THREE.LinearMipmapLinearFilter;
+    t.needsUpdate = true;
+    return t;
+  }
+
+  /** A6: a backdrop (backdrop.json + the quality tier's textures and depth grids), cached per id + tier */
+  loadBackdrop(id: string, quality: number): Promise<BackdropData> {
+    const tier = backdropTier(quality);
+    const key = `${id}|${tier}`;
+    let p = this.backdrops.get(key);
+    if (!p) {
+      p = (async () => {
+        const t0 = performance.now();
+        const r = await fetch(`${this.base}backdrop/${id}/backdrop.json`);
+        if (!r.ok) throw new Error(`backdrop ${id}: HTTP ${r.status}`);
+        const json = (await r.json()) as BackdropJson;
+        const T = json.tiers[tier];
+        if (!T) throw new Error(`backdrop ${id}: no tier ${tier}`);
+        const bin = async (f: string) => new Uint16Array(await (await fetch(this.base + f)).arrayBuffer());
+        const layers = await Promise.all(
+          T.layers.map(async (def) => {
+            const [map, aov, depth, cover] = await Promise.all([
+              this.texture(def.tex, true),
+              this.texture(def.aov, false),
+              bin(def.depth),
+              def.cover ? fetch(this.base + def.cover).then(async (r) => new Uint8Array(await r.arrayBuffer())) : Promise.resolve(null),
+            ]);
+            if (cover && cover.length !== def.grid[0] * def.grid[1]) throw new Error(`backdrop ${id}: cover ${def.cover} has ${cover.length} cells`);
+            if (depth.length !== (def.grid[0] + 1) * (def.grid[1] + 1)) throw new Error(`backdrop ${id}: depth grid ${def.depth} has ${depth.length} values`);
+            return { def, map, aov, depth, cover };
+          }),
+        );
+        const inset = T.inset ? { map: await this.texture(T.inset.tex, true), camera: T.inset.camera } : undefined;
+        const cards: BackdropData['cards'] = {};
+        if (tier !== 'q0') for (const [k, c] of Object.entries(json.cards ?? {})) cards[k] = { map: await this.texture(c.tex, true), grid: c.grid, frames: c.frames };
+        const textures = [...layers.flatMap((l) => [l.map, l.aov]), ...(inset ? [inset.map] : []), ...Object.values(cards).map((c) => c.map)];
+        const d: BackdropData = { id, tier, json, layers, inset, cards, textures, ms: performance.now() - t0 };
+        this.backdropDone.set(key, d);
+        return d;
+      })();
+      p.catch(() => this.backdrops.delete(key));
+      this.backdrops.set(key, p);
+    }
+    return p;
   }
 
   /** start downloading a theme's assets early (select screen, A21); errors are left to the real load */
@@ -229,6 +311,13 @@ export class ArenaAssets {
 
   /** dispose every loaded asset the kept pack does not use (call after the new arena is built) */
   release(keep: ArenaPack | null) {
+    // A6: backdrops the kept pack does not use
+    for (const [key, d] of this.backdropDone) {
+      if (keep?.backdrop === d) continue;
+      for (const t of d.textures) t.dispose();
+      this.backdropDone.delete(key);
+      this.backdrops.delete(key);
+    }
     const used = new Set(keep ? [...keep.assets.values()] : []);
     for (const [key, a] of this.done) {
       if (used.has(a)) continue;

@@ -59,6 +59,8 @@ export function artFor(theme: ThemeId): ThemeArt {
     delete art.look;
     delete art.ringFlames;
   }
+  // A6: `?backdrop=0` drops the baked panorama (before / after shots, perf A/B)
+  if (typeof location !== 'undefined' && new URLSearchParams(location.search).get('backdrop') === '0') delete art.backdrop;
   // A2: `?floorset=slate_slabs` previews another floor set on a theme that has a kit floor
   const fs = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('floorset') : null;
   if (fs && art.floor && /^[a-z0-9_]+$/.test(fs)) art.floor = { ...art.floor, set: `floor/${fs}` };
@@ -75,7 +77,7 @@ export function withLook(T: ThemeDef, look?: LookArt): ThemeDef {
 /**
  * the assets a ThemeArt needs for one generated layout (what ArenaAssets.load fetches): props / obstacles /
  * hazards only for kinds the layout contains (rubble `chunk` props spawn at runtime from topples, so always),
- * everything else (floor, ring, gates, backdrop, extra) always. Without a layout: every referenced asset.
+ * everything else (floor, ring, gates, extra) always (the A6 backdrop is not a manifest asset: ArenaAssets.loadBackdrop). Without a layout: every referenced asset.
  */
 export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
   const ids = new Set<AssetId>();
@@ -105,8 +107,6 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
     add(R.rubble?.asset);
   }
   add(art.gates?.asset);
-  for (const l of art.backdrop?.layers ?? []) add(l);
-  add(art.backdrop?.inset);
   for (const e of art.extra ?? []) add(e);
   return [...ids];
 }

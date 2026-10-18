@@ -28,7 +28,15 @@ export interface SkyParams {
   moonDir: THREE.Vector3;
   moonSize: number;
   moonColor: THREE.Color;
+  /**
+   * A6: moon halo scaled to the disc size (> 0 = on, the value scales the glow). 0 / undefined keeps the original fixed
+   * halo (tuned for small moons; a 12 deg concept moon hid it under the disc), so every legacy theme renders identically.
+   */
+  moonHalo?: number;
 }
+
+/** A6: moon / sun angular RADIUS (rad) from the apparent DIAMETER in degrees (ref-3's moon is about 12 deg wide) */
+export const discRadius = (diameterDeg: number) => (diameterDeg * Math.PI) / 360;
 
 const vert = /* glsl */ `
 varying vec3 vDir;
@@ -43,7 +51,7 @@ uniform vec3 uSunDir; uniform vec3 uSunColor; uniform float uSunSize; uniform fl
 uniform vec3 uZenith; uniform vec3 uHorizon; uniform vec3 uGround; uniform vec3 uHorizonGlow;
 uniform float uCloudCover; uniform float uCloudScale; uniform vec3 uCloudColor; uniform vec3 uCloudShade; uniform float uCloudSpeed;
 uniform float uStars; uniform float uAurora; uniform vec3 uAuroraA; uniform vec3 uAuroraB;
-uniform vec3 uMoonDir; uniform float uMoonSize; uniform vec3 uMoonColor;
+uniform vec3 uMoonDir; uniform float uMoonSize; uniform vec3 uMoonColor; uniform float uMoonHalo;
 uniform float uTime;
 varying vec3 vDir;
 ${GLSL_NOISE}
@@ -114,7 +122,14 @@ void main(){
     vec2 mp = vec2(dot(d - uMoonDir, mt), dot(d - uMoonDir, mb)) / max(1e-4, uMoonSize);
     float crater = an_fbm(vec3(mp * 3.0, 1.0));
     col = mix(col, uMoonColor * (0.75 + crater * 0.5), m);
-    col += uMoonColor * (pow(max(md, 0.0), 900.0) * 0.6 + pow(max(md, 0.0), 60.0) * 0.06);
+    if (uMoonHalo > 0.0) {
+      // halo widths relative to the disc: a tight corona (about 1.6 radii) for bloom + a wide soft glow (about 6 radii)
+      float k1 = 0.693 / max(1e-5, 1.0 - cos(uMoonSize * 1.6));
+      float k2 = 0.693 / max(1e-5, 1.0 - cos(uMoonSize * 6.0));
+      col += uMoonColor * uMoonHalo * (pow(max(md, 0.0), k1) * 0.35 + pow(max(md, 0.0), k2) * 0.07) * (1.0 - m);
+    } else {
+      col += uMoonColor * (pow(max(md, 0.0), 900.0) * 0.6 + pow(max(md, 0.0), 60.0) * 0.06);
+    }
   }
   gl_FragColor = vec4(max(col, vec3(0.0)), 1.0);
 }`;
@@ -148,6 +163,7 @@ export function makeSkyMaterial(p: SkyParams): THREE.ShaderMaterial {
       uMoonDir: { value: p.moonDir },
       uMoonSize: { value: p.moonSize },
       uMoonColor: { value: p.moonColor },
+      uMoonHalo: { value: p.moonHalo ?? 0 },
       uTime: shaderTime,
     },
   });

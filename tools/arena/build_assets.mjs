@@ -39,8 +39,10 @@ const opt = (k, d) => {
 const FORMATS = opt('formats', 'ktx2,webp').split(',');
 const PY = process.env.PYTHON || 'python';
 
-const KTX_ARGS = {
+export const KTX_ARGS = {
   // A4: colour + alpha (banner tear masks, alphaMode MASK)
+  // A6: backdrop panorama layers / hero inset (large smooth gradients: higher ETC1S quality)
+  colorAhq: ['--format', 'R8G8B8A8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '220', '--generate-mipmap'],
   colorA: ['--format', 'R8G8B8A8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '128', '--generate-mipmap'],
   color: ['--format', 'R8G8B8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '128', '--generate-mipmap'],
   data: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'basis-lz', '--qlevel', '192', '--generate-mipmap'],
@@ -48,7 +50,7 @@ const KTX_ARGS = {
 };
 
 let KTX = null;
-function ktxEncode(png, dst, kind) {
+export function ktxEncode(png, dst, kind) {
   KTX ??= findKtx();
   if (!KTX) throw new Error('KTX-Software (ktx.exe) not found: install it or run with --formats=webp');
   const t = Date.now();
@@ -62,7 +64,7 @@ function ktxEncode(png, dst, kind) {
   return { bytes: fs.statSync(dst).size, seconds: (Date.now() - t) / 1000, codec: kind === 'linear' ? 'uastc+zstd' : 'etc1s' };
 }
 
-function pillow(script, ...a) {
+export function pillow(script, ...a) {
   const r = spawnSync(PY, ['-c', script, ...a], { encoding: 'utf8' });
   if (r.status !== 0 || /Traceback|Error/.test(r.stderr || '')) throw new Error(`python/Pillow failed: ${r.stderr}`);
   return (r.stdout || '').trim();
@@ -201,7 +203,9 @@ async function main() {
   console.log(`manifest: ${path.relative(ROOT, manPath)} (${Object.keys(man.assets).length} assets)`);
 }
 
-main().catch((e) => {
-  console.error(e.message || e);
-  process.exit(1);
-});
+// A6: build_backdrop.mjs imports the encoders; run the asset build only when this file is the entry point
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url))
+  main().catch((e) => {
+    console.error(e.message || e);
+    process.exit(1);
+  });
