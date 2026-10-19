@@ -1,0 +1,1818 @@
+{
+ "q": 1,
+ "intro": true,
+ "marks": {
+  "arena": 7132,
+  "start": 10152,
+  "settled": 18156
+ },
+ "totalMB": 34.85,
+ "beforeStartMB": 34.85,
+ "rows": [
+  {
+   "group": "arena/kit",
+   "files": 31,
+   "MB": 15.37,
+   "wireMB": 14.97,
+   "beforeStartMB": 14.97
+  },
+  {
+   "group": "arena/floor",
+   "files": 2,
+   "MB": 4.39,
+   "wireMB": 4.38,
+   "beforeStartMB": 4.38
+  },
+  {
+   "group": "models",
+   "files": 5,
+   "MB": 5.28,
+   "wireMB": 3.93,
+   "beforeStartMB": 3.93
+  },
+  {
+   "group": "audio",
+   "files": 187,
+   "MB": 3.89,
+   "wireMB": 3.69,
+   "beforeStartMB": 3.69
+  },
+  {
+   "group": "anim",
+   "files": 4,
+   "MB": 8.54,
+   "wireMB": 3.66,
+   "beforeStartMB": 3.66
+  },
+  {
+   "group": "fx",
+   "files": 12,
+   "MB": 1.65,
+   "wireMB": 1.61,
+   "beforeStartMB": 1.61
+  },
+  {
+   "group": "arena/sky",
+   "files": 2,
+   "MB": 1.33,
+   "wireMB": 1.33,
+   "beforeStartMB": 1.33
+  },
+  {
+   "group": "arena/backdrop",
+   "files": 11,
+   "MB": 0.7,
+   "wireMB": 0.54,
+   "beforeStartMB": 0.54
+  },
+  {
+   "group": "assets",
+   "files": 3,
+   "MB": 1.7,
+   "wireMB": 0.5,
+   "beforeStartMB": 0.5
+  },
+  {
+   "group": "basis",
+   "files": 2,
+   "MB": 0.56,
+   "wireMB": 0.25,
+   "beforeStartMB": 0.25
+  },
+  {
+   "group": "arena/manifest.json",
+   "files": 1,
+   "MB": 0.12,
+   "wireMB": 0.01,
+   "beforeStartMB": 0.01
+  },
+  {
+   "group": "index.html",
+   "files": 1,
+   "MB": 0,
+   "wireMB": 0,
+   "beforeStartMB": 0
+  },
+  {
+   "group": "favicon.svg",
+   "files": 2,
+   "MB": 0,
+   "wireMB": 0,
+   "beforeStartMB": 0
+  }
+ ],
+ "top": [
+  {
+   "rel": "arena/kit/stone_trim.glb",
+   "MB": 3.97,
+   "t": 947
+  },
+  {
+   "rel": "arena/floor/slabs_moongate.glb",
+   "MB": 3.59,
+   "t": 946
+  },
+  {
+   "rel": "models/gorak.glb",
+   "MB": 3.09,
+   "t": 664
+  },
+  {
+   "rel": "anim/core.bin",
+   "MB": 2.65,
+   "t": 745
+  },
+  {
+   "rel": "audio/music/boss_battle.ogg",
+   "MB": 1.7,
+   "t": 2154
+  },
+  {
+   "rel": "arena/kit/pillar_square.glb",
+   "MB": 1.68,
+   "t": 934
+  },
+  {
+   "rel": "arena/sky/moongate/q1/sky.ktx2",
+   "MB": 1.32,
+   "t": 952
+  },
+  {
+   "rel": "arena/kit/statue_hooded.glb",
+   "MB": 0.87,
+   "t": 950
+  },
+  {
+   "rel": "arena/floor/inlay_moongate.glb",
+   "MB": 0.79,
+   "t": 946
+  },
+  {
+   "rel": "models/maw.glb",
+   "MB": 0.77,
+   "t": 666
+  },
+  {
+   "rel": "arena/kit/rubble_scatter.glb",
+   "MB": 0.65,
+   "t": 949
+  },
+  {
+   "rel": "arena/kit/crate.glb",
+   "MB": 0.55,
+   "t": 932
+  },
+  {
+   "rel": "anim/entrance.bin",
+   "MB": 0.55,
+   "t": 746
+  },
+  {
+   "rel": "arena/kit/brazier_pedestal.glb",
+   "MB": 0.55,
+   "t": 944
+  },
+  {
+   "rel": "arena/kit/rubble_pile.glb",
+   "MB": 0.54,
+   "t": 935
+  },
+  {
+   "rel": "arena/kit/spike_grate.glb",
+   "MB": 0.53,
+   "t": 936
+  },
+  {
+   "rel": "arena/kit/keg.glb",
+   "MB": 0.51,
+   "t": 934
+  },
+  {
+   "rel": "assets/index-BaEXZILi.js",
+   "MB": 0.48,
+   "t": 90
+  },
+  {
+   "rel": "arena/kit/column_ruin.glb",
+   "MB": 0.47,
+   "t": 935
+  },
+  {
+   "rel": "arena/kit/crumble.glb",
+   "MB": 0.44,
+   "t": 936
+  },
+  {
+   "rel": "anim/finisher.bin",
+   "MB": 0.44,
+   "t": 1138
+  },
+  {
+   "rel": "arena/kit/barricade.glb",
+   "MB": 0.43,
+   "t": 943
+  },
+  {
+   "rel": "arena/kit/banners.glb",
+   "MB": 0.43,
+   "t": 943
+  },
+  {
+   "rel": "arena/kit/brazier_tripod.glb",
+   "MB": 0.41,
+   "t": 928
+  },
+  {
+   "rel": "arena/kit/bone_pile.glb",
+   "MB": 0.38,
+   "t": 946
+  }
+ ],
+ "files": [
+  {
+   "rel": "index.html",
+   "bytes": 718,
+   "t": 25,
+   "gz": 419
+  },
+  {
+   "rel": "assets/index-BaEXZILi.js",
+   "bytes": 1709490,
+   "t": 90,
+   "gz": 498633
+  },
+  {
+   "rel": "assets/index-C40K7TAo.css",
+   "bytes": 13087,
+   "t": 91,
+   "gz": 3660
+  },
+  {
+   "rel": "fx/atlas.json",
+   "bytes": 46499,
+   "t": 663,
+   "gz": 6007
+  },
+  {
+   "rel": "arena/manifest.json",
+   "bytes": 122919,
+   "t": 664,
+   "gz": 9816
+  },
+  {
+   "rel": "models/gorak.glb",
+   "bytes": 3904676,
+   "t": 664,
+   "gz": 3236013
+  },
+  {
+   "rel": "models/gorak.json",
+   "bytes": 25781,
+   "t": 665,
+   "gz": 4593
+  },
+  {
+   "rel": "models/maw.glb",
+   "bytes": 1329536,
+   "t": 666,
+   "gz": 812156
+  },
+  {
+   "rel": "models/maw.json",
+   "bytes": 17629,
+   "t": 668,
+   "gz": 3034
+  },
+  {
+   "rel": "anim/index.json",
+   "bytes": 189441,
+   "t": 669,
+   "gz": 16675
+  },
+  {
+   "rel": "arena/backdrop/moongate/backdrop.json",
+   "bytes": 5277,
+   "t": 741,
+   "gz": 1030
+  },
+  {
+   "rel": "arena/sky/moongate/sky.json",
+   "bytes": 2120,
+   "t": 742,
+   "gz": 921
+  },
+  {
+   "rel": "assets/KTX2Loader-AsTmJYQp.js",
+   "bytes": 58076,
+   "t": 743,
+   "gz": 23513
+  },
+  {
+   "rel": "fx/decals.webp",
+   "bytes": 122606,
+   "t": 743,
+   "gz": 122606
+  },
+  {
+   "rel": "fx/decals_nrm.webp",
+   "bytes": 109366,
+   "t": 743,
+   "gz": 109366
+  },
+  {
+   "rel": "fx/noise_a.webp",
+   "bytes": 122588,
+   "t": 744,
+   "gz": 122588
+  },
+  {
+   "rel": "fx/unity_flame02.webp",
+   "bytes": 194596,
+   "t": 744,
+   "gz": 194596
+  },
+  {
+   "rel": "fx/unity_flame03.webp",
+   "bytes": 194156,
+   "t": 745,
+   "gz": 194156
+  },
+  {
+   "rel": "fx/unity_wispysmoke01.webp",
+   "bytes": 193640,
+   "t": 745,
+   "gz": 193640
+  },
+  {
+   "rel": "anim/core.bin",
+   "bytes": 6430036,
+   "t": 745,
+   "gz": 2783350
+  },
+  {
+   "rel": "anim/entrance.bin",
+   "bytes": 1284952,
+   "t": 746,
+   "gz": 573388
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/farc_depth.bin",
+   "bytes": 25186,
+   "t": 914,
+   "gz": 13783
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/farc_cover.bin",
+   "bytes": 12288,
+   "t": 915,
+   "gz": 312
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/near_depth.bin",
+   "bytes": 99522,
+   "t": 916,
+   "gz": 16989
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/near_cover.bin",
+   "bytes": 49152,
+   "t": 916,
+   "gz": 782
+  },
+  {
+   "rel": "arena/kit/brazier_tripod.glb",
+   "bytes": 443216,
+   "t": 928,
+   "gz": 432965
+  },
+  {
+   "rel": "arena/kit/crate.glb",
+   "bytes": 601240,
+   "t": 932,
+   "gz": 575017
+  },
+  {
+   "rel": "arena/kit/barrel.glb",
+   "bytes": 416656,
+   "t": 933,
+   "gz": 394639
+  },
+  {
+   "rel": "arena/kit/urn.glb",
+   "bytes": 249176,
+   "t": 933,
+   "gz": 230018
+  },
+  {
+   "rel": "arena/kit/keg.glb",
+   "bytes": 559524,
+   "t": 934,
+   "gz": 530578
+  },
+  {
+   "rel": "arena/kit/chunk.glb",
+   "bytes": 301776,
+   "t": 934,
+   "gz": 292206
+  },
+  {
+   "rel": "arena/kit/pillar_square.glb",
+   "bytes": 1774440,
+   "t": 934,
+   "gz": 1758596
+  },
+  {
+   "rel": "arena/kit/column_ruin.glb",
+   "bytes": 506680,
+   "t": 935,
+   "gz": 491290
+  },
+  {
+   "rel": "arena/kit/rubble_pile.glb",
+   "bytes": 570980,
+   "t": 935,
+   "gz": 565350
+  },
+  {
+   "rel": "arena/kit/spike_grate.glb",
+   "bytes": 574568,
+   "t": 936,
+   "gz": 555870
+  },
+  {
+   "rel": "arena/kit/chain_weight.glb",
+   "bytes": 321896,
+   "t": 936,
+   "gz": 316505
+  },
+  {
+   "rel": "arena/kit/crumble.glb",
+   "bytes": 479448,
+   "t": 936,
+   "gz": 464647
+  },
+  {
+   "rel": "arena/kit/banner_pole.glb",
+   "bytes": 315788,
+   "t": 937,
+   "gz": 298443
+  },
+  {
+   "rel": "arena/kit/barricade.glb",
+   "bytes": 472464,
+   "t": 943,
+   "gz": 452622
+  },
+  {
+   "rel": "arena/kit/banners.glb",
+   "bytes": 460180,
+   "t": 943,
+   "gz": 449608
+  },
+  {
+   "rel": "arena/kit/chain_link.glb",
+   "bytes": 243340,
+   "t": 943,
+   "gz": 236562
+  },
+  {
+   "rel": "arena/kit/brazier_pedestal.glb",
+   "bytes": 581680,
+   "t": 944,
+   "gz": 571911
+  },
+  {
+   "rel": "arena/kit/brazier_wall.glb",
+   "bytes": 285360,
+   "t": 944,
+   "gz": 277134
+  },
+  {
+   "rel": "arena/kit/candles.glb",
+   "bytes": 320916,
+   "t": 945,
+   "gz": 305819
+  },
+  {
+   "rel": "arena/kit/skull.glb",
+   "bytes": 276128,
+   "t": 945,
+   "gz": 270410
+  },
+  {
+   "rel": "arena/kit/bone_pile.glb",
+   "bytes": 412700,
+   "t": 946,
+   "gz": 401986
+  },
+  {
+   "rel": "arena/floor/slabs_moongate.glb",
+   "bytes": 3773036,
+   "t": 946,
+   "gz": 3768272
+  },
+  {
+   "rel": "arena/floor/inlay_moongate.glb",
+   "bytes": 827172,
+   "t": 946,
+   "gz": 824253
+  },
+  {
+   "rel": "arena/kit/stone_trim.glb",
+   "bytes": 4170476,
+   "t": 947,
+   "gz": 4163616
+  },
+  {
+   "rel": "arena/kit/wall_a.glb",
+   "bytes": 13844,
+   "t": 947,
+   "gz": 5454
+  },
+  {
+   "rel": "arena/kit/wall_b.glb",
+   "bytes": 15700,
+   "t": 948,
+   "gz": 6373
+  },
+  {
+   "rel": "arena/kit/wall_broken.glb",
+   "bytes": 15052,
+   "t": 948,
+   "gz": 6603
+  },
+  {
+   "rel": "arena/kit/arcade_bay.glb",
+   "bytes": 21944,
+   "t": 949,
+   "gz": 11636
+  },
+  {
+   "rel": "arena/kit/arcade_broken.glb",
+   "bytes": 17912,
+   "t": 949,
+   "gz": 9573
+  },
+  {
+   "rel": "arena/kit/rubble_scatter.glb",
+   "bytes": 687672,
+   "t": 949,
+   "gz": 681703
+  },
+  {
+   "rel": "arena/kit/statue_hooded.glb",
+   "bytes": 960768,
+   "t": 950,
+   "gz": 911879
+  },
+  {
+   "rel": "arena/kit/plinth.glb",
+   "bytes": 6968,
+   "t": 950,
+   "gz": 2762
+  },
+  {
+   "rel": "arena/kit/arch.glb",
+   "bytes": 40368,
+   "t": 951,
+   "gz": 20530
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/farc.ktx2",
+   "bytes": 104974,
+   "t": 951,
+   "gz": 103079
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/farc_aov.ktx2",
+   "bytes": 4291,
+   "t": 951,
+   "gz": 3865
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/near.ktx2",
+   "bytes": 252480,
+   "t": 952,
+   "gz": 249434
+  },
+  {
+   "rel": "arena/backdrop/moongate/q1/near_aov.ktx2",
+   "bytes": 2420,
+   "t": 952,
+   "gz": 1920
+  },
+  {
+   "rel": "arena/sky/moongate/q1/sky.ktx2",
+   "bytes": 1389433,
+   "t": 952,
+   "gz": 1388533
+  },
+  {
+   "rel": "favicon.svg",
+   "bytes": 244,
+   "t": 959,
+   "gz": 183
+  },
+  {
+   "rel": "audio/voice/manifest.json",
+   "bytes": 52726,
+   "t": 1138,
+   "gz": 8964
+  },
+  {
+   "rel": "anim/finisher.bin",
+   "bytes": 1048812,
+   "t": 1138,
+   "gz": 460873
+  },
+  {
+   "rel": "audio/sfx/manifest.json",
+   "bytes": 11618,
+   "t": 1330,
+   "gz": 1538
+  },
+  {
+   "rel": "basis/basis_transcoder.js",
+   "bytes": 57529,
+   "t": 1331,
+   "gz": 15169
+  },
+  {
+   "rel": "basis/basis_transcoder.wasm",
+   "bytes": 527333,
+   "t": 1332,
+   "gz": 247619
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.entrance.0.ogg",
+   "bytes": 70612,
+   "t": 1530,
+   "gz": 69842
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.entrance.1.ogg",
+   "bytes": 74827,
+   "t": 1530,
+   "gz": 73997
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.victory.0.ogg",
+   "bytes": 18001,
+   "t": 1531,
+   "gz": 17503
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.victory.1.ogg",
+   "bytes": 25990,
+   "t": 1531,
+   "gz": 25450
+  },
+  {
+   "rel": "audio/voice/maw/maw.entrance.0.ogg",
+   "bytes": 58721,
+   "t": 1532,
+   "gz": 57635
+  },
+  {
+   "rel": "audio/voice/maw/maw.entrance.1.ogg",
+   "bytes": 46156,
+   "t": 1532,
+   "gz": 45272
+  },
+  {
+   "rel": "audio/voice/maw/maw.victory.0.ogg",
+   "bytes": 17180,
+   "t": 1533,
+   "gz": 16553
+  },
+  {
+   "rel": "audio/voice/maw/maw.victory.1.ogg",
+   "bytes": 18564,
+   "t": 1537,
+   "gz": 17933
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.faceoff.0.ogg",
+   "bytes": 22361,
+   "t": 1537,
+   "gz": 21822
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.faceoff.1.ogg",
+   "bytes": 28296,
+   "t": 1537,
+   "gz": 27742
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.taunt.0.ogg",
+   "bytes": 35454,
+   "t": 1538,
+   "gz": 34824
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.taunt.1.ogg",
+   "bytes": 17784,
+   "t": 1538,
+   "gz": 17295
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.taunt.2.ogg",
+   "bytes": 18009,
+   "t": 1538,
+   "gz": 17477
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.ultimate.0.ogg",
+   "bytes": 13849,
+   "t": 1539,
+   "gz": 13355
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.ultimate.1.ogg",
+   "bytes": 15934,
+   "t": 1540,
+   "gz": 15427
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.hurt.0.ogg",
+   "bytes": 11089,
+   "t": 1541,
+   "gz": 10591
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.hurt.1.ogg",
+   "bytes": 12084,
+   "t": 1541,
+   "gz": 11585
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.hurt.2.ogg",
+   "bytes": 6391,
+   "t": 1541,
+   "gz": 5896
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.nearDeath.0.ogg",
+   "bytes": 23112,
+   "t": 1542,
+   "gz": 22501
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.nearDeath.1.ogg",
+   "bytes": 21942,
+   "t": 1542,
+   "gz": 21419
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.comeback.0.ogg",
+   "bytes": 16585,
+   "t": 1542,
+   "gz": 16040
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.comeback.1.ogg",
+   "bytes": 16113,
+   "t": 1542,
+   "gz": 15567
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.kill.0.ogg",
+   "bytes": 14476,
+   "t": 1549,
+   "gz": 13944
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.kill.1.ogg",
+   "bytes": 15626,
+   "t": 1550,
+   "gz": 15098
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.defeat.0.ogg",
+   "bytes": 17371,
+   "t": 1550,
+   "gz": 16869
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.defeat.1.ogg",
+   "bytes": 13248,
+   "t": 1551,
+   "gz": 12754
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.vs_aldric.0.ogg",
+   "bytes": 27634,
+   "t": 1551,
+   "gz": 27082
+  },
+  {
+   "rel": "audio/voice/gorak/gorak.vs_maw.0.ogg",
+   "bytes": 17594,
+   "t": 1552,
+   "gz": 17073
+  },
+  {
+   "rel": "audio/voice/maw/maw.faceoff.0.ogg",
+   "bytes": 15009,
+   "t": 1552,
+   "gz": 14211
+  },
+  {
+   "rel": "audio/voice/maw/maw.faceoff.1.ogg",
+   "bytes": 16631,
+   "t": 1552,
+   "gz": 16004
+  },
+  {
+   "rel": "audio/voice/maw/maw.taunt.0.ogg",
+   "bytes": 14145,
+   "t": 1553,
+   "gz": 13404
+  },
+  {
+   "rel": "audio/voice/maw/maw.taunt.1.ogg",
+   "bytes": 16256,
+   "t": 1553,
+   "gz": 15680
+  },
+  {
+   "rel": "audio/voice/maw/maw.taunt.2.ogg",
+   "bytes": 13398,
+   "t": 1553,
+   "gz": 12856
+  },
+  {
+   "rel": "audio/voice/maw/maw.ultimate.0.ogg",
+   "bytes": 9325,
+   "t": 1553,
+   "gz": 8746
+  },
+  {
+   "rel": "audio/voice/maw/maw.ultimate.1.ogg",
+   "bytes": 13664,
+   "t": 1554,
+   "gz": 13014
+  },
+  {
+   "rel": "audio/voice/maw/maw.hurt.0.ogg",
+   "bytes": 9470,
+   "t": 1554,
+   "gz": 8944
+  },
+  {
+   "rel": "audio/voice/maw/maw.hurt.1.ogg",
+   "bytes": 8369,
+   "t": 1554,
+   "gz": 7832
+  },
+  {
+   "rel": "audio/voice/maw/maw.hurt.2.ogg",
+   "bytes": 8219,
+   "t": 1555,
+   "gz": 7682
+  },
+  {
+   "rel": "audio/voice/maw/maw.nearDeath.0.ogg",
+   "bytes": 16808,
+   "t": 1555,
+   "gz": 16192
+  },
+  {
+   "rel": "audio/voice/maw/maw.nearDeath.1.ogg",
+   "bytes": 17295,
+   "t": 1555,
+   "gz": 16693
+  },
+  {
+   "rel": "audio/voice/maw/maw.comeback.0.ogg",
+   "bytes": 13640,
+   "t": 1556,
+   "gz": 13060
+  },
+  {
+   "rel": "audio/voice/maw/maw.comeback.1.ogg",
+   "bytes": 16274,
+   "t": 1556,
+   "gz": 15536
+  },
+  {
+   "rel": "audio/voice/maw/maw.kill.0.ogg",
+   "bytes": 11805,
+   "t": 1556,
+   "gz": 11244
+  },
+  {
+   "rel": "audio/voice/maw/maw.kill.1.ogg",
+   "bytes": 16423,
+   "t": 1557,
+   "gz": 15821
+  },
+  {
+   "rel": "audio/voice/maw/maw.defeat.0.ogg",
+   "bytes": 16508,
+   "t": 1557,
+   "gz": 15788
+  },
+  {
+   "rel": "audio/voice/maw/maw.defeat.1.ogg",
+   "bytes": 20345,
+   "t": 1558,
+   "gz": 19710
+  },
+  {
+   "rel": "audio/voice/maw/maw.vs_fenrik.0.ogg",
+   "bytes": 33585,
+   "t": 1558,
+   "gz": 32758
+  },
+  {
+   "rel": "audio/voice/maw/maw.vs_gorak.0.ogg",
+   "bytes": 24082,
+   "t": 1558,
+   "gz": 23422
+  },
+  {
+   "rel": "audio/sfx/whoosh_light_0.ogg",
+   "bytes": 11101,
+   "t": 1636,
+   "gz": 9748
+  },
+  {
+   "rel": "audio/sfx/whoosh_light_1.ogg",
+   "bytes": 11431,
+   "t": 1637,
+   "gz": 10073
+  },
+  {
+   "rel": "audio/sfx/whoosh_light_2.ogg",
+   "bytes": 9988,
+   "t": 1638,
+   "gz": 8586
+  },
+  {
+   "rel": "audio/sfx/whoosh_light_3.ogg",
+   "bytes": 10432,
+   "t": 1639,
+   "gz": 8995
+  },
+  {
+   "rel": "audio/sfx/whoosh_light_4.ogg",
+   "bytes": 10827,
+   "t": 1639,
+   "gz": 9469
+  },
+  {
+   "rel": "audio/sfx/whoosh_light_5.ogg",
+   "bytes": 7472,
+   "t": 1640,
+   "gz": 6777
+  },
+  {
+   "rel": "audio/sfx/whoosh_heavy_0.ogg",
+   "bytes": 10081,
+   "t": 1640,
+   "gz": 8724
+  },
+  {
+   "rel": "audio/sfx/whoosh_heavy_1.ogg",
+   "bytes": 12511,
+   "t": 1640,
+   "gz": 11182
+  },
+  {
+   "rel": "audio/sfx/whoosh_heavy_2.ogg",
+   "bytes": 10050,
+   "t": 1641,
+   "gz": 8691
+  },
+  {
+   "rel": "audio/sfx/whoosh_heavy_3.ogg",
+   "bytes": 10705,
+   "t": 1641,
+   "gz": 9376
+  },
+  {
+   "rel": "audio/sfx/whoosh_heavy_4.ogg",
+   "bytes": 12574,
+   "t": 1642,
+   "gz": 11156
+  },
+  {
+   "rel": "audio/sfx/whoosh_heavy_5.ogg",
+   "bytes": 7040,
+   "t": 1642,
+   "gz": 6342
+  },
+  {
+   "rel": "audio/sfx/clang_0.ogg",
+   "bytes": 10563,
+   "t": 1642,
+   "gz": 9227
+  },
+  {
+   "rel": "audio/sfx/clang_1.ogg",
+   "bytes": 12838,
+   "t": 1643,
+   "gz": 11517
+  },
+  {
+   "rel": "audio/sfx/clang_2.ogg",
+   "bytes": 9501,
+   "t": 1643,
+   "gz": 8143
+  },
+  {
+   "rel": "audio/sfx/clang_3.ogg",
+   "bytes": 11211,
+   "t": 1643,
+   "gz": 9834
+  },
+  {
+   "rel": "audio/sfx/clang_4.ogg",
+   "bytes": 10450,
+   "t": 1644,
+   "gz": 9086
+  },
+  {
+   "rel": "audio/sfx/clang_5.ogg",
+   "bytes": 11203,
+   "t": 1644,
+   "gz": 9760
+  },
+  {
+   "rel": "audio/sfx/clang_6.ogg",
+   "bytes": 10262,
+   "t": 1645,
+   "gz": 8885
+  },
+  {
+   "rel": "audio/sfx/clang_7.ogg",
+   "bytes": 9702,
+   "t": 1645,
+   "gz": 8354
+  },
+  {
+   "rel": "audio/sfx/clang_8.ogg",
+   "bytes": 8874,
+   "t": 1646,
+   "gz": 7497
+  },
+  {
+   "rel": "audio/sfx/clang_9.ogg",
+   "bytes": 11361,
+   "t": 1646,
+   "gz": 10002
+  },
+  {
+   "rel": "audio/sfx/clang_10.ogg",
+   "bytes": 11246,
+   "t": 1646,
+   "gz": 10548
+  },
+  {
+   "rel": "audio/sfx/clang_11.ogg",
+   "bytes": 7691,
+   "t": 1647,
+   "gz": 6983
+  },
+  {
+   "rel": "audio/sfx/parry_0.ogg",
+   "bytes": 14443,
+   "t": 1647,
+   "gz": 13059
+  },
+  {
+   "rel": "audio/sfx/parry_1.ogg",
+   "bytes": 14416,
+   "t": 1648,
+   "gz": 12858
+  },
+  {
+   "rel": "audio/sfx/parry_2.ogg",
+   "bytes": 13706,
+   "t": 1648,
+   "gz": 12257
+  },
+  {
+   "rel": "audio/sfx/parry_3.ogg",
+   "bytes": 13038,
+   "t": 1649,
+   "gz": 11610
+  },
+  {
+   "rel": "audio/sfx/parry_4.ogg",
+   "bytes": 13361,
+   "t": 1650,
+   "gz": 11967
+  },
+  {
+   "rel": "audio/sfx/ring_0.ogg",
+   "bytes": 12124,
+   "t": 1650,
+   "gz": 11093
+  },
+  {
+   "rel": "audio/sfx/ring_1.ogg",
+   "bytes": 15017,
+   "t": 1650,
+   "gz": 13908
+  },
+  {
+   "rel": "audio/sfx/ring_2.ogg",
+   "bytes": 17781,
+   "t": 1651,
+   "gz": 16293
+  },
+  {
+   "rel": "audio/sfx/hit_blade_0.ogg",
+   "bytes": 8232,
+   "t": 1651,
+   "gz": 7549
+  },
+  {
+   "rel": "audio/sfx/hit_blade_1.ogg",
+   "bytes": 8185,
+   "t": 1651,
+   "gz": 7494
+  },
+  {
+   "rel": "audio/sfx/hit_blade_2.ogg",
+   "bytes": 8417,
+   "t": 1652,
+   "gz": 7729
+  },
+  {
+   "rel": "audio/sfx/hit_blade_3.ogg",
+   "bytes": 8990,
+   "t": 1652,
+   "gz": 7570
+  },
+  {
+   "rel": "audio/sfx/hit_blade_4.ogg",
+   "bytes": 10191,
+   "t": 1652,
+   "gz": 8752
+  },
+  {
+   "rel": "audio/sfx/hit_heavy_0.ogg",
+   "bytes": 16242,
+   "t": 1729,
+   "gz": 14695
+  },
+  {
+   "rel": "audio/sfx/hit_heavy_1.ogg",
+   "bytes": 16359,
+   "t": 1730,
+   "gz": 14836
+  },
+  {
+   "rel": "audio/sfx/hit_heavy_2.ogg",
+   "bytes": 15815,
+   "t": 1731,
+   "gz": 14343
+  },
+  {
+   "rel": "audio/sfx/hit_heavy_3.ogg",
+   "bytes": 14893,
+   "t": 1731,
+   "gz": 13541
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_0.ogg",
+   "bytes": 7727,
+   "t": 1731,
+   "gz": 7039
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_1.ogg",
+   "bytes": 7209,
+   "t": 1753,
+   "gz": 6518
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_2.ogg",
+   "bytes": 6373,
+   "t": 1754,
+   "gz": 5667
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_3.ogg",
+   "bytes": 6849,
+   "t": 1754,
+   "gz": 6163
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_4.ogg",
+   "bytes": 7065,
+   "t": 1754,
+   "gz": 6377
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_5.ogg",
+   "bytes": 6079,
+   "t": 1755,
+   "gz": 5385
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_6.ogg",
+   "bytes": 6055,
+   "t": 1755,
+   "gz": 5352
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_7.ogg",
+   "bytes": 6949,
+   "t": 1756,
+   "gz": 6268
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_8.ogg",
+   "bytes": 6282,
+   "t": 1756,
+   "gz": 5596
+  },
+  {
+   "rel": "audio/sfx/hit_blunt_9.ogg",
+   "bytes": 6747,
+   "t": 1756,
+   "gz": 6052
+  },
+  {
+   "rel": "audio/sfx/body_thud_0.ogg",
+   "bytes": 5943,
+   "t": 1757,
+   "gz": 5176
+  },
+  {
+   "rel": "audio/sfx/body_thud_1.ogg",
+   "bytes": 6235,
+   "t": 1757,
+   "gz": 5475
+  },
+  {
+   "rel": "audio/sfx/body_thud_2.ogg",
+   "bytes": 6238,
+   "t": 1757,
+   "gz": 5482
+  },
+  {
+   "rel": "audio/sfx/body_thud_3.ogg",
+   "bytes": 5953,
+   "t": 1757,
+   "gz": 5172
+  },
+  {
+   "rel": "audio/sfx/body_thud_4.ogg",
+   "bytes": 5793,
+   "t": 1757,
+   "gz": 5036
+  },
+  {
+   "rel": "audio/sfx/arrow_hit_0.ogg",
+   "bytes": 7260,
+   "t": 1758,
+   "gz": 6580
+  },
+  {
+   "rel": "audio/sfx/arrow_hit_1.ogg",
+   "bytes": 8076,
+   "t": 1758,
+   "gz": 7401
+  },
+  {
+   "rel": "audio/sfx/arrow_hit_2.ogg",
+   "bytes": 4249,
+   "t": 1758,
+   "gz": 3508
+  },
+  {
+   "rel": "audio/sfx/arrow_hit_3.ogg",
+   "bytes": 4401,
+   "t": 1758,
+   "gz": 3662
+  },
+  {
+   "rel": "audio/sfx/arrow_hit_4.ogg",
+   "bytes": 4221,
+   "t": 1759,
+   "gz": 3478
+  },
+  {
+   "rel": "audio/sfx/cloth_0.ogg",
+   "bytes": 8796,
+   "t": 1759,
+   "gz": 8129
+  },
+  {
+   "rel": "audio/sfx/cloth_1.ogg",
+   "bytes": 6839,
+   "t": 1759,
+   "gz": 6161
+  },
+  {
+   "rel": "audio/sfx/cloth_2.ogg",
+   "bytes": 7834,
+   "t": 1759,
+   "gz": 7161
+  },
+  {
+   "rel": "audio/sfx/cloth_3.ogg",
+   "bytes": 7243,
+   "t": 1760,
+   "gz": 6565
+  },
+  {
+   "rel": "audio/sfx/cloth_4.ogg",
+   "bytes": 11500,
+   "t": 1760,
+   "gz": 10817
+  },
+  {
+   "rel": "audio/sfx/cloth_5.ogg",
+   "bytes": 10168,
+   "t": 1760,
+   "gz": 9482
+  },
+  {
+   "rel": "audio/sfx/footstep_0.ogg",
+   "bytes": 5746,
+   "t": 1760,
+   "gz": 5050
+  },
+  {
+   "rel": "audio/sfx/footstep_1.ogg",
+   "bytes": 5724,
+   "t": 1760,
+   "gz": 5031
+  },
+  {
+   "rel": "audio/sfx/footstep_2.ogg",
+   "bytes": 5816,
+   "t": 1761,
+   "gz": 5119
+  },
+  {
+   "rel": "audio/sfx/footstep_3.ogg",
+   "bytes": 6496,
+   "t": 1761,
+   "gz": 5802
+  },
+  {
+   "rel": "audio/sfx/footstep_4.ogg",
+   "bytes": 6412,
+   "t": 1761,
+   "gz": 5713
+  },
+  {
+   "rel": "audio/sfx/footstep_5.ogg",
+   "bytes": 6640,
+   "t": 1761,
+   "gz": 5951
+  },
+  {
+   "rel": "audio/sfx/footstep_6.ogg",
+   "bytes": 6512,
+   "t": 1762,
+   "gz": 5813
+  },
+  {
+   "rel": "audio/sfx/footstep_7.ogg",
+   "bytes": 6038,
+   "t": 1762,
+   "gz": 5335
+  },
+  {
+   "rel": "audio/sfx/footstep_8.ogg",
+   "bytes": 5606,
+   "t": 1762,
+   "gz": 4908
+  },
+  {
+   "rel": "audio/sfx/footstep_9.ogg",
+   "bytes": 6158,
+   "t": 1762,
+   "gz": 5463
+  },
+  {
+   "rel": "audio/sfx/footstep_heavy_0.ogg",
+   "bytes": 4608,
+   "t": 1763,
+   "gz": 3888
+  },
+  {
+   "rel": "audio/sfx/footstep_heavy_1.ogg",
+   "bytes": 4737,
+   "t": 1763,
+   "gz": 4022
+  },
+  {
+   "rel": "audio/sfx/footstep_heavy_2.ogg",
+   "bytes": 4842,
+   "t": 1763,
+   "gz": 4128
+  },
+  {
+   "rel": "audio/sfx/footstep_heavy_3.ogg",
+   "bytes": 4607,
+   "t": 1763,
+   "gz": 3892
+  },
+  {
+   "rel": "audio/sfx/footstep_heavy_4.ogg",
+   "bytes": 4627,
+   "t": 1763,
+   "gz": 3916
+  },
+  {
+   "rel": "audio/sfx/wall_slam_0.ogg",
+   "bytes": 7556,
+   "t": 1764,
+   "gz": 6867
+  },
+  {
+   "rel": "audio/sfx/wall_slam_1.ogg",
+   "bytes": 6629,
+   "t": 1764,
+   "gz": 5943
+  },
+  {
+   "rel": "audio/sfx/wall_slam_2.ogg",
+   "bytes": 7794,
+   "t": 1764,
+   "gz": 7113
+  },
+  {
+   "rel": "audio/sfx/wall_slam_3.ogg",
+   "bytes": 6463,
+   "t": 1764,
+   "gz": 5754
+  },
+  {
+   "rel": "audio/sfx/wall_slam_4.ogg",
+   "bytes": 8380,
+   "t": 1764,
+   "gz": 7715
+  },
+  {
+   "rel": "audio/sfx/stone_slam_0.ogg",
+   "bytes": 7136,
+   "t": 1765,
+   "gz": 6236
+  },
+  {
+   "rel": "audio/sfx/stone_slam_1.ogg",
+   "bytes": 6913,
+   "t": 1765,
+   "gz": 6048
+  },
+  {
+   "rel": "audio/sfx/stone_slam_2.ogg",
+   "bytes": 6951,
+   "t": 1765,
+   "gz": 6118
+  },
+  {
+   "rel": "audio/sfx/stone_slam_3.ogg",
+   "bytes": 7251,
+   "t": 1766,
+   "gz": 6315
+  },
+  {
+   "rel": "audio/sfx/stone_slam_4.ogg",
+   "bytes": 7203,
+   "t": 1766,
+   "gz": 6348
+  },
+  {
+   "rel": "audio/sfx/wood_break_0.ogg",
+   "bytes": 5360,
+   "t": 1766,
+   "gz": 4626
+  },
+  {
+   "rel": "audio/sfx/wood_break_1.ogg",
+   "bytes": 5405,
+   "t": 1766,
+   "gz": 4676
+  },
+  {
+   "rel": "audio/sfx/wood_break_2.ogg",
+   "bytes": 5216,
+   "t": 1766,
+   "gz": 4486
+  },
+  {
+   "rel": "audio/sfx/wood_break_3.ogg",
+   "bytes": 5503,
+   "t": 1767,
+   "gz": 4782
+  },
+  {
+   "rel": "audio/sfx/wood_break_4.ogg",
+   "bytes": 5514,
+   "t": 1767,
+   "gz": 4802
+  },
+  {
+   "rel": "audio/sfx/wood_break_5.ogg",
+   "bytes": 6608,
+   "t": 1767,
+   "gz": 5899
+  },
+  {
+   "rel": "audio/sfx/wood_break_6.ogg",
+   "bytes": 6701,
+   "t": 1772,
+   "gz": 5985
+  },
+  {
+   "rel": "audio/sfx/wood_break_7.ogg",
+   "bytes": 6715,
+   "t": 1774,
+   "gz": 5995
+  },
+  {
+   "rel": "audio/sfx/wood_break_8.ogg",
+   "bytes": 6779,
+   "t": 1774,
+   "gz": 6078
+  },
+  {
+   "rel": "audio/sfx/wood_break_9.ogg",
+   "bytes": 6687,
+   "t": 1774,
+   "gz": 5988
+  },
+  {
+   "rel": "audio/sfx/grunt_effort_0.ogg",
+   "bytes": 7740,
+   "t": 1775,
+   "gz": 7046
+  },
+  {
+   "rel": "audio/sfx/grunt_effort_1.ogg",
+   "bytes": 7813,
+   "t": 1776,
+   "gz": 7127
+  },
+  {
+   "rel": "audio/sfx/grunt_effort_2.ogg",
+   "bytes": 7684,
+   "t": 1776,
+   "gz": 6999
+  },
+  {
+   "rel": "audio/sfx/grunt_effort_3.ogg",
+   "bytes": 7157,
+   "t": 1777,
+   "gz": 6457
+  },
+  {
+   "rel": "audio/sfx/grunt_effort_4.ogg",
+   "bytes": 9575,
+   "t": 1777,
+   "gz": 8896
+  },
+  {
+   "rel": "audio/sfx/grunt_pain_0.ogg",
+   "bytes": 7972,
+   "t": 1777,
+   "gz": 7270
+  },
+  {
+   "rel": "audio/sfx/grunt_pain_1.ogg",
+   "bytes": 11569,
+   "t": 1778,
+   "gz": 10874
+  },
+  {
+   "rel": "audio/sfx/grunt_pain_2.ogg",
+   "bytes": 7966,
+   "t": 1779,
+   "gz": 7266
+  },
+  {
+   "rel": "audio/sfx/grunt_pain_3.ogg",
+   "bytes": 7733,
+   "t": 1779,
+   "gz": 7022
+  },
+  {
+   "rel": "audio/sfx/creature_roar_0.ogg",
+   "bytes": 9744,
+   "t": 1779,
+   "gz": 9079
+  },
+  {
+   "rel": "audio/sfx/creature_roar_1.ogg",
+   "bytes": 11860,
+   "t": 1780,
+   "gz": 11194
+  },
+  {
+   "rel": "audio/sfx/creature_roar_2.ogg",
+   "bytes": 9662,
+   "t": 1780,
+   "gz": 8998
+  },
+  {
+   "rel": "audio/sfx/creature_roar_3.ogg",
+   "bytes": 7845,
+   "t": 1791,
+   "gz": 7167
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_0.ogg",
+   "bytes": 6562,
+   "t": 1792,
+   "gz": 5862
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_1.ogg",
+   "bytes": 8369,
+   "t": 1792,
+   "gz": 7696
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_2.ogg",
+   "bytes": 6923,
+   "t": 1792,
+   "gz": 6237
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_3.ogg",
+   "bytes": 5992,
+   "t": 1793,
+   "gz": 5290
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_4.ogg",
+   "bytes": 7957,
+   "t": 1793,
+   "gz": 7255
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_5.ogg",
+   "bytes": 6515,
+   "t": 1794,
+   "gz": 5818
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_6.ogg",
+   "bytes": 10148,
+   "t": 1795,
+   "gz": 9462
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_7.ogg",
+   "bytes": 10458,
+   "t": 1797,
+   "gz": 9773
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_8.ogg",
+   "bytes": 8697,
+   "t": 1797,
+   "gz": 8007
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_9.ogg",
+   "bytes": 10102,
+   "t": 1797,
+   "gz": 9411
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_10.ogg",
+   "bytes": 8493,
+   "t": 1798,
+   "gz": 7798
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_11.ogg",
+   "bytes": 9733,
+   "t": 1805,
+   "gz": 9022
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_12.ogg",
+   "bytes": 7742,
+   "t": 1806,
+   "gz": 7062
+  },
+  {
+   "rel": "audio/sfx/creature_grunt_13.ogg",
+   "bytes": 7911,
+   "t": 1806,
+   "gz": 7221
+  },
+  {
+   "rel": "audio/sfx/announcer_0.ogg",
+   "bytes": 10595,
+   "t": 1807,
+   "gz": 9932
+  },
+  {
+   "rel": "audio/sfx/announcer_1.ogg",
+   "bytes": 21103,
+   "t": 1808,
+   "gz": 20405
+  },
+  {
+   "rel": "audio/sfx/announcer_2.ogg",
+   "bytes": 16899,
+   "t": 1812,
+   "gz": 16219
+  },
+  {
+   "rel": "audio/sfx/announcer_3.ogg",
+   "bytes": 16951,
+   "t": 1813,
+   "gz": 16269
+  },
+  {
+   "rel": "audio/sfx/announcer_4.ogg",
+   "bytes": 20602,
+   "t": 1813,
+   "gz": 19928
+  },
+  {
+   "rel": "audio/sfx/announcer_5.ogg",
+   "bytes": 20112,
+   "t": 1813,
+   "gz": 19419
+  },
+  {
+   "rel": "audio/sfx/announcer_6.ogg",
+   "bytes": 19100,
+   "t": 1814,
+   "gz": 18398
+  },
+  {
+   "rel": "favicon.svg",
+   "bytes": 244,
+   "t": 1815,
+   "gz": 183
+  },
+  {
+   "rel": "arena/backdrop/moongate/card_shaft.ktx2",
+   "bytes": 91560,
+   "t": 2070,
+   "gz": 90984
+  },
+  {
+   "rel": "audio/music/boss_battle.ogg",
+   "bytes": 1786712,
+   "t": 2154,
+   "gz": 1782587
+  },
+  {
+   "rel": "arena/backdrop/moongate/card_fogbank.ktx2",
+   "bytes": 82281,
+   "t": 2343,
+   "gz": 81834
+  },
+  {
+   "rel": "models/shared_clips.json",
+   "bytes": 257508,
+   "t": 7107,
+   "gz": 62248
+  },
+  {
+   "rel": "fx/fx_sprites.webp",
+   "bytes": 211616,
+   "t": 8293,
+   "gz": 210172
+  },
+  {
+   "rel": "fx/dust_puff.webp",
+   "bytes": 109354,
+   "t": 8294,
+   "gz": 109138
+  },
+  {
+   "rel": "fx/dust_ring.webp",
+   "bytes": 187058,
+   "t": 8294,
+   "gz": 186877
+  },
+  {
+   "rel": "fx/unity_explosion00.webp",
+   "bytes": 122368,
+   "t": 8294,
+   "gz": 122273
+  },
+  {
+   "rel": "fx/unity_explosion01_nofire.webp",
+   "bytes": 114204,
+   "t": 8295,
+   "gz": 114109
+  }
+ ],
+ "notFound": [],
+ "errors": [],
+ "console": [
+  "6951 [arena] built colosseum/oval#7 in 6293ms (kit full/ktx2: 33 assets in 1865ms)",
+  "7047 [arena] simulated gorak vs maw seed=4242 in 97ms {winner: 0, duration: 67.13, timeout: false, swings: 1, leadChanges: 1}",
+  "10013 [arena] shader warm-up: 49 programs in 2873ms"
+ ]
+}

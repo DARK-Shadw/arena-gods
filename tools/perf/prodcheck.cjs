@@ -136,7 +136,7 @@ async function live(browser) {
   const [a, b] = opt('pairs', 'gorak:maw').split(':');
   const skip = opt('skip', '1') === '1';
   const qp = opt('q', '') === '' ? '' : `&q=${Q}`;
-  const url = `http://arena.local${PREFIX}index.html?auto=1${skip ? '&skip=1' : ''}${qp}&a=${a}&b=${b}&seed=${seed}&theme=${opt('theme', 'colosseum')}&layout=oval&aseed=7`;
+  const url = `${REMOTE || 'http://arena.local' + PREFIX}index.html?auto=1${skip ? '&skip=1' : ''}${qp}&a=${a}&b=${b}&seed=${seed}&theme=${opt('theme', 'colosseum')}&layout=oval&aseed=7`;
   const { page, ctx, log } = await openPage(browser, url, Number(opt('w', 960)), Number(opt('h', 540)));
   try {
     await page.waitForFunction(() => window.__arena && window.__arena.arena && window.__arena.views && window.__arena.views.length === 2, null, { timeout: 180000 });
@@ -213,7 +213,7 @@ async function live(browser) {
 async function net(browser) {
   const intro = opt('intro', '1') === '1';
   const theme = opt('theme', 'colosseum');
-  const url = `http://arena.local${PREFIX}index.html?manual=1&auto=1&q=${Q}&a=gorak&b=maw&seed=4242&theme=${theme}&layout=oval&aseed=7${intro ? '' : '&skip=1'}`;
+  const url = `${REMOTE || 'http://arena.local' + PREFIX}index.html?manual=1&auto=1&q=${Q}&a=gorak&b=maw&seed=4242&theme=${theme}&layout=oval&aseed=7${intro ? '' : '&skip=1'}`;
   const { page, ctx, log, t0 } = await openPage(browser, url, 960, 540);
   const marks = {};
   try {
