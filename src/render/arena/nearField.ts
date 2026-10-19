@@ -499,6 +499,13 @@ function eastGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
   void rnd;
   // the legacy gate dressing and tunnel box go (portcullis, light and anchors stay)
   legacyGateParts(gate.group, out, true);
+  if (G.portcullis) {
+    const iron = new THREE.MeshStandardMaterial({ color: G.portcullis.color, roughness: G.portcullis.roughness, metalness: G.portcullis.metalness });
+    iron.name = 'kit.portcullisIron';
+    gate.portcullis.traverse((o) => {
+      if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).material = iron;
+    });
+  }
 }
 
 // ------------------------------------------------------------------ the west gate: kit arch around the legacy portcullis / tunnel

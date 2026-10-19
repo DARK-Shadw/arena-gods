@@ -135,6 +135,9 @@ export interface RingArt {
  * fight ellipse), anchors are re-declared for the new geometry and still pass through snapAnchors.
  */
 export interface GateArt {
+  /** A8b: kit mode recolours the legacy portcullis bars (dark iron instead of the bright bronze that pulled the eye off
+   * the arch in the ref-3 frame) */
+  portcullis?: { color: string; roughness: number; metalness: number };
   /** gate asset with BARRIER, ANCHOR_*, TUNNEL nodes (plan 4.2; not used yet) */
   asset?: AssetId;
   /** plain gates (west): this arch module frames the opening (kit/arch: 3.2 m opening, the legacy tunnel stays) */

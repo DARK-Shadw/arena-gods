@@ -178,7 +178,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 3037708,
+      "bytes": 3773036,
       "primitives": 1,
       "textures": [
        {
@@ -187,7 +187,7 @@
         "w": 2048,
         "h": 2048,
         "codec": "etc1s",
-        "bytes": 424732
+        "bytes": 510061
        },
        {
         "material": "floor_slabs_moongate",
@@ -195,7 +195,7 @@
         "w": 2048,
         "h": 2048,
         "codec": "uastc+zstd",
-        "bytes": 2175964
+        "bytes": 2716889
        },
        {
         "material": "floor_slabs_moongate",
@@ -203,12 +203,12 @@
         "w": 2048,
         "h": 2048,
         "codec": "etc1s",
-        "bytes": 433773
+        "bytes": 542845
        }
       ]
      },
      "webp": {
-      "bytes": 1042360,
+      "bytes": 1572260,
       "primitives": 1,
       "textures": [
        {
@@ -217,7 +217,7 @@
         "w": 2048,
         "h": 2048,
         "codec": "webp",
-        "bytes": 207202
+        "bytes": 255896
        },
        {
         "material": "floor_slabs_moongate",
@@ -225,7 +225,7 @@
         "w": 2048,
         "h": 2048,
         "codec": "webp",
-        "bytes": 465100
+        "bytes": 759804
        },
        {
         "material": "floor_slabs_moongate",
@@ -233,14 +233,14 @@
         "w": 2048,
         "h": 2048,
         "codec": "webp",
-        "bytes": 366832
+        "bytes": 553336
        }
       ]
      }
     },
     "low": {
      "ktx2": {
-      "bytes": 945728,
+      "bytes": 1135444,
       "primitives": 1,
       "textures": [
        {
@@ -249,7 +249,7 @@
         "w": 1024,
         "h": 1024,
         "codec": "etc1s",
-        "bytes": 141819
+        "bytes": 156947
        },
        {
         "material": "floor_slabs_moongate",
@@ -257,7 +257,7 @@
         "w": 1024,
         "h": 1024,
         "codec": "uastc+zstd",
-        "bytes": 655492
+        "bytes": 802213
        },
        {
         "material": "floor_slabs_moongate",
@@ -265,12 +265,12 @@
         "w": 1024,
         "h": 1024,
         "codec": "etc1s",
-        "bytes": 145180
+        "bytes": 173046
        }
       ]
      },
      "webp": {
-      "bytes": 380580,
+      "bytes": 552652,
       "primitives": 1,
       "textures": [
        {
@@ -279,7 +279,7 @@
         "w": 1024,
         "h": 1024,
         "codec": "webp",
-        "bytes": 91638
+        "bytes": 113426
        },
        {
         "material": "floor_slabs_moongate",
@@ -287,7 +287,7 @@
         "w": 1024,
         "h": 1024,
         "codec": "webp",
-        "bytes": 163466
+        "bytes": 260706
        },
        {
         "material": "floor_slabs_moongate",
@@ -295,7 +295,7 @@
         "w": 1024,
         "h": 1024,
         "codec": "webp",
-        "bytes": 122252
+        "bytes": 175290
        }
       ]
      }
@@ -6119,7 +6119,7 @@
    }
   }
  },
- "generated": "2026-10-18",
+ "generated": "2026-10-19",
  "backdrops": {
   "moongate": {
    "json": "backdrop/moongate/backdrop.json",
