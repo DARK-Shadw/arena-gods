@@ -29,6 +29,8 @@ export const COLOSSEUM_ART: ThemeArt = {
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
   // rubble piles for the indestructible boulders; podium wall, gallery arcade and wall-foot rubble from the trim-sheet
   // modules. A7 replaces the rest of the legacy ring (stands, gates) and places stairs / dais / statues by the east gate.
+  // A8b: the shared kit's terracotta urns were the most saturated non-fire objects in the frame
+  propTint: { urn: [0.2, 0.21, 0.27] },
   obstacles: { column: ['kit/pillar_square', 'kit/pillar_square', 'kit/column_ruin'], rock: 'kit/rubble_pile' },
   ring: {
     trim: 'kit/stone_trim',
@@ -83,7 +85,7 @@ export const COLOSSEUM_ART: ThemeArt = {
           braziers: { asset: 'kit/brazier_pedestal', lateral: 7.8, z: 1.6, scale: 1.8, flame: 1.8 },
         },
       },
-      west: { zoneHalf: 4.6, arch: 'kit/arch', braziers: { asset: 'kit/brazier_tripod', lateral: 4.3, z: -0.3, scale: 1.0, flame: 0.95 } },
+      west: { zoneHalf: 4.6, portcullis: { color: '#26252b', roughness: 0.55, metalness: 0.6 }, arch: 'kit/arch', braziers: { asset: 'kit/brazier_tripod', lateral: 4.3, z: -0.3, scale: 1.0, flame: 0.95 } },
     },
   },
   // A6: the Moon Gate test backdrop (arch blockout + ruined arcade ring + outer ruins + clouds, Cycles panorama layers);

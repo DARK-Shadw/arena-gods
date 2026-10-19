@@ -501,13 +501,17 @@ function eastGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
   void rnd;
   // the legacy gate dressing and tunnel box go (portcullis, light and anchors stay)
   legacyGateParts(gate.group, out, true);
-  if (G.portcullis) {
-    const iron = new THREE.MeshStandardMaterial({ color: G.portcullis.color, roughness: G.portcullis.roughness, metalness: G.portcullis.metalness });
-    iron.name = 'kit.portcullisIron';
-    gate.portcullis.traverse((o) => {
-      if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).material = iron;
-    });
-  }
+  ironPortcullis(gate, G);
+}
+
+/** A8b: recolour the legacy portcullis bars (GateArt.portcullis) */
+function ironPortcullis(gate: { portcullis: THREE.Object3D }, G: GateArt) {
+  if (!G.portcullis) return;
+  const iron = new THREE.MeshStandardMaterial({ color: G.portcullis.color, roughness: G.portcullis.roughness, metalness: G.portcullis.metalness });
+  iron.name = 'kit.portcullisIron';
+  gate.portcullis.traverse((o) => {
+    if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).material = iron;
+  });
 }
 
 // ------------------------------------------------------------------ the west gate: kit arch around the legacy portcullis / tunnel
@@ -517,6 +521,7 @@ function westGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
   if (!gate) return;
   const L = a.layout;
   const F = gateFrame(L, 0);
+  ironPortcullis(gate, G);
   // forecourt ground under the arch and the braziers
   tb.setMatrix(F.m);
   tb.aoMin = 1;

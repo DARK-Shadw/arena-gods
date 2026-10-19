@@ -247,6 +247,9 @@ export interface ThemeArt {
   id: ThemeId | 'default';
   /** sim props -> kit asset (authored to PROP_BASE radius / TOP height, origin at the base centre) */
   props?: Partial<Record<RtPropKind, AssetId>>;
+  /** A8b: per-theme colour multiplier on a prop kind's materials (the shared kit's terracotta urns are off the Moon Gate
+   * palette); a tinted copy of each material, made once per arena */
+  propTint?: Partial<Record<RtPropKind, [number, number, number]>>;
   /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h, or A5 statue fit); a list = variants picked by obstacle id */
   obstacles?: Partial<Record<ObstacleKind, AssetId | AssetId[]>>;
   /** A4: hazard visuals (spike grate, chain weight, fire-jet vent, crumbling floor), scaled to the hazard radius by r0 */

@@ -57,6 +57,7 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
   const chainAsset = art.chains ? pack.assets.get(art.chains) : undefined;
   if (art.ring) buildRing(a, pack, D, banners, chainAsset ?? null);
   const legacyObstacle = D.obstacle;
+  const tinted = new Map<THREE.Material, THREE.MeshStandardMaterial>();
   const seed = a.layout.seed;
   return {
     ...D,
@@ -98,7 +99,25 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
     propAsset(kind: string): KitInstance | null {
       const id = art.props?.[kind as keyof NonNullable<typeof art.props>];
       const asset = id ? pack.assets.get(id) : undefined;
-      return asset ? asset.instantiate() : null;
+      if (!asset) return null;
+      const inst = asset.instantiate();
+      const tint = art.propTint?.[kind as keyof NonNullable<typeof art.propTint>];
+      if (tint) {
+        inst.obj.traverse((o) => {
+          const m = o as THREE.Mesh;
+          const src = m.isMesh ? (m.material as THREE.MeshStandardMaterial) : null;
+          if (!src || Array.isArray(src) || !src.color) return;
+          let t = tinted.get(src);
+          if (!t) {
+            t = src.clone();
+            t.color.multiply(new THREE.Color(...tint));
+            tinted.set(src, t);
+          }
+          m.material = t;
+          m.userData.ownMat = true;
+        });
+      }
+      return inst;
     },
   };
 }
