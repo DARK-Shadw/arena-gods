@@ -15,6 +15,7 @@
  */
 import * as THREE from 'three';
 import { LAYER } from './fxLayers';
+import { assetUrl } from '../baseUrl';
 import { SOFT_DEPTH_PARS, softDepthUniforms } from './softDepth';
 
 export interface AtlasTier { file: string; w: number; h: number; frame?: number; frameW?: number; frameH?: number; bytes: number; ktx2?: string; ktx2Encoding?: string; scale?: number }
@@ -77,7 +78,7 @@ export class FxAtlases {
   private ktx2: { load: (url: string) => Promise<THREE.Texture> } | null = null;
   private loading: Promise<AtlasManifest> | null = null;
 
-  constructor(private renderer: THREE.WebGLRenderer | null, private base = '/fx/') {}
+  constructor(private renderer: THREE.WebGLRenderer | null, private base = assetUrl('fx/')) {}
 
   /** fetch the manifest once (later calls share the promise) */
   load(): Promise<AtlasManifest> {

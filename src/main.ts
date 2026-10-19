@@ -39,6 +39,7 @@ import { initLib } from './render/animLib';
 import { validateEntrances } from './cinematic/validateEntrances';
 import { FinisherFx } from './render/finisherFx';
 import { ContactWarp } from './render/contactWarp';
+import { assetUrl } from './render/baseUrl';
 import { BEHEAD_CLEAN, FIN_BY_ID, fxOf } from './sim/finishers';
 import { auditMatch, type CamMatchScore } from './camera/cameraAudit';
 import { applyCamPose, conceptPreset, extraViewPose, faceTowards, HIDDEN_B, renderTheme, type CamPose, type ConceptPreset, type ExtraView } from './render/arena/conceptCams';
@@ -131,7 +132,7 @@ class App {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.localClippingEnabled = true; // finisher plane cuts
     this.renderer.toneMappingExposure = 1.3;
-    this.arenaAssets = new ArenaAssets(this.renderer, '/arena/', '/basis/', arenaTexOverride());
+    this.arenaAssets = new ArenaAssets(this.renderer, assetUrl('arena/'), assetUrl('basis/'), arenaTexOverride());
     this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1400);
     this.camera.position.set(10, 7, 10);
     this.rig = new CameraRig(this.camera);
@@ -274,7 +275,7 @@ class App {
     camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: CHANDELIER_H, z: h.z, r: 1.3 }));
     // A2b: hanging chain weights (chain + swing zone) are camera obstacles too
     for (const h of L.hazards) if (h.kind === 'chains') camWorld.hanging.push({ x: h.x, y: CHAIN_PIVOT_H - CHAIN_LEN * 0.5, z: h.z, r: 1.0 });
-    this.ui.setArenaLabel?.(`${T.name} · ${L.layout} · #${L.seed}`);
+    this.ui.setArenaLabel?.(`${T.name} Â· ${L.layout} Â· #${L.seed}`);
     console.info(`[arena] built ${spec.theme}/${spec.layout}#${spec.seed} in ${(performance.now() - t0).toFixed(0)}ms` + (pack ? ` (kit ${pack.tier}/${this.arenaAssets.format}: ${pack.assets.size} assets in ${pack.ms.toFixed(0)}ms${pack.missing.length ? `, missing ${pack.missing.join(',')}` : ''})` : ' (legacy dressing)'));
   }
 
@@ -304,7 +305,7 @@ class App {
     this.victoryShown = false;
     const token = ++this.startToken;
     this.state = 'loading';
-    this.ui.splashText('<small>THE GATES OPEN…</small>', 'victory');
+    this.ui.splashText('<small>THE GATES OPENâ€¦</small>', 'victory');
     let assets;
     try {
       [assets] = await Promise.all([Promise.all([loadCharacter(c.a), loadCharacter(c.b)]), initLib('core', 'entrance', 'finisher')]);

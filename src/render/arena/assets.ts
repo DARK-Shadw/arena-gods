@@ -22,6 +22,7 @@ import type { ArenaLayout, ThemeId } from '../../sim/arenaGen';
 import { artFor, assetsOf, tierOf, type AssetId, type AssetTier, type KitSocket, type ThemeArt } from './art';
 import { backdropTier, type BackdropData, type BackdropJson, type TexFiles } from './backdrop';
 import type { SkyLook } from './sky';
+import { assetUrl } from '../baseUrl';
 
 export type TexFormat = 'ktx2' | 'webp';
 
@@ -170,8 +171,8 @@ export class ArenaAssets {
 
   constructor(
     private renderer: THREE.WebGLRenderer | null,
-    readonly base = '/arena/',
-    readonly basisPath = '/basis/',
+    readonly base = assetUrl('arena/'),
+    readonly basisPath = assetUrl('basis/'),
     format?: TexFormat,
   ) {
     this.loader.setMeshoptDecoder(MeshoptDecoder);
