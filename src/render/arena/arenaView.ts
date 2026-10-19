@@ -35,6 +35,8 @@ import { THEME_FLOOR, type FloorSurface } from '../fx/fxSurfaces';
 import { swayOn, swayTime } from './cloth';
 import type { KitInstance } from './assets';
 import { gateZoneTest } from './nearField';
+import { FireField, fireFlicker, fireWind, type FireKind, type FireSrc } from '../fx/fireField';
+import type { FxAtlases } from '../fx/atlas';
 
 /**
  * A7: the hang height of every chandelier hazard (the cage's top ring), shared by the hazard builder, the camera's
@@ -159,7 +161,17 @@ export class Arena {
   private scene: THREE.Scene;
   private propMats: Record<string, THREE.Material> = {};
   private propGeos: Record<string, THREE.BufferGeometry> = {};
-  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number; k: number }[] = [];
+  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number; k: number; src?: FireSrc; seed?: number; follow?: boolean }[] = [];
+  /** A19: the layered fire field (kit Moon Gate, ThemeArt.fire): every arena fire's flames, glow, smoke, embers, heat */
+  fire: FireField | null = null;
+  /** A19: the wind (render only; seeded from the arena seed): flames lean, smoke / embers drift, banners and chains sway */
+  readonly wind = { x: 0, z: 0, gust: 0.5 };
+  /** A19: the fire clock (match time in a fight: the same flicker on a replay / seek; the arena clock otherwise) */
+  fireT = 0;
+  private swayT = 0;
+  private fireOff = 0;
+  private lastMatchT = -1;
+  private swayMats: { u: { value: number }; base: number }[] = [];
   /** A2b: pre-built burning-oil patches (tipped braziers), driven by Frame.fires */
   private oilFires: { g: THREE.Group; disc: THREE.Mesh }[] = [];
   private updaters: ((t: number, dt: number) => void)[] = [];
@@ -222,6 +234,11 @@ export class Arena {
     this.sky = makeSky(T.sky);
     this.sky.userData.dyn = true;
     this.group.add(this.sky);
+    // A19: the fire field exists before the dressing places its fires (kit Moon Gate only: ThemeArt.fire)
+    if (kit?.art.fire) {
+      this.fire = new FireField(Arena.fxAtlases ?? null, quality, kit.art.fire, T.fire);
+      this.lightBudget = kit.art.fire.lights[Math.max(0, Math.min(2, quality))];
+    }
     this.dressing = buildDressing(this);
     this.drawCallsMerged = mergeStatic(this.group);
     // A6: baked panorama layers (kit mode, when the theme art has one and it loaded); not merged (userData.dyn)
@@ -331,6 +348,15 @@ export class Arena {
 
     // ---------------- A2: decorative boundary braziers, wet floor (reflection, light map, streaks)
     if (kit?.art.ringFlames) this.addRingFlames(kit);
+    // A19: the fire field's draws (after every fire is placed; before the reflection tagging: its flames reflect)
+    if (this.fire) {
+      this.group.add(this.fire.build());
+      this.group.traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.Material & { userData: { sway?: { uSwayAmp: { value: number } } } };
+        const u = m && !Array.isArray(m) ? m.userData?.sway?.uSwayAmp : undefined;
+        if (u && !this.swayMats.some((x) => x.u === u)) this.swayMats.push({ u, base: u.value });
+      });
+    }
     this.wetFloor = this.dressing.wetFloor ?? null;
     if (this.wetFloor) {
       const F = this.wetFloor;
@@ -593,7 +619,8 @@ export class Arena {
   }
 
   /** billboard-ish flame: two crossed additive quads + optional light */
-  flame(at: THREE.Vector3, size: number, color: string, light = false): THREE.Object3D {
+  flame(at: THREE.Vector3, size: number, color: string, light = false, opts?: { kind?: FireKind; wid?: number }): THREE.Object3D {
+    if (this.fire) return this.fieldFlame(at, size, color, light, opts);
     const tex = flameSprite();
     const g = new THREE.Group();
     g.position.copy(at);
@@ -624,7 +651,37 @@ export class Arena {
     this.flames.push(entry);
     return g;
   }
+  /**
+   * A19: a fire of the fire field (kit Moon Gate): the returned group only carries position / visibility (its owner's
+   * scale sizes oil pools); the field draws it. Real lights (per-tier budget) hang off the arena root and follow it, so
+   * hiding a fire (jets, oil, a smashed brazier) dims its light instead of changing the scene's light count (a shader
+   * recompile hitch every time a jet fired).
+   */
+  private fieldFlame(at: THREE.Vector3, size: number, color: string, light: boolean, opts?: { kind?: FireKind; wid?: number }): THREE.Object3D {
+    const g = new THREE.Group();
+    g.position.copy(at);
+    g.name = 'fireSrc';
+    const n = this.flames.length;
+    const kind: FireKind = opts?.kind ?? (size <= 0.42 ? 'candle' : 'bowl');
+    const wid = opts?.wid ?? (kind === 'candle' ? 0 : size * (size >= 1.2 ? 0.55 : 0.32));
+    const src = this.fire!.add(g, size, kind, wid) ?? undefined;
+    const seed = (this.layout.seed * 131 + n * 7 + 11) | 0;
+    const entry: (typeof this.flames)[number] = { obj: g, ph: (n * 7.31) % 10, base: 1, size, k: 1, src, seed };
+    if (light && this.lightBudget > 0) {
+      this.lightBudget--;
+      const L = new THREE.PointLight(color, size * 6, size * 14, 1.6);
+      L.name = 'fireLight';
+      this.group.add(L);
+      entry.light = L;
+      entry.li = L.intensity;
+      entry.follow = true;
+    }
+    this.flames.push(entry);
+    return g;
+  }
   lightBudget = 7;
+  /** A19: the FX atlases for the fire field (set by the app, like fxFlame) */
+  static fxAtlases?: FxAtlases;
   drawCallsMerged = 0;
   /** FX hook (F3, src/render/fx/flames.ts): builds the flame visual; null / unset = the old crossed quads */
   static fxFlame?: (size: number, color: string, n: number) => THREE.Object3D | null;
@@ -907,6 +964,31 @@ export class Arena {
         column.position.y = 0.5;
         g.add(column);
         const holder = new THREE.Group();
+        if (this.fire) {
+          // A19: the vent breathes fire through the fire field: sputtering tongues while it glows (state 1), a roaring
+          // column of stacked flames with embers, smoke and heat when it fires (state 2); the light dims, never vanishes
+          const jf = this.flame(new THREE.Vector3(0, 0.05, 0), h.r * 1.5, '#ff8a30', true, { kind: 'jet', wid: h.r * 0.35 });
+          g.add(jf);
+          const src = this.flames[this.flames.length - 1].src;
+          column.visible = false;
+          if (src) src.amp = 0;
+          let fireAt = -1;
+          update = (s, t) => {
+            (glow.material as THREE.MeshBasicMaterial).opacity = s === 1 ? 0.45 + Math.sin(t * 24) * 0.25 : s === 2 ? 0.9 : 0;
+            if (!src) return;
+            if (s === 2) {
+              if (fireAt < 0 || t < fireAt) fireAt = t;
+              const k = Math.min(1, (t - fireAt) / 0.18);
+              src.amp = 1;
+              src.h = 0.6 + 2.2 * k;
+            } else {
+              fireAt = -1;
+              src.amp = s === 1 ? 0.35 : 0;
+              src.h = s === 1 ? 0.35 : 0.3;
+            }
+          };
+          break;
+        }
         holder.add(this.flame(new THREE.Vector3(0, 0.05, 0), h.r * 1.8, '#ff8a30', true));
         holder.visible = false;
         g.add(holder);
@@ -1059,6 +1141,7 @@ export class Arena {
 
   /** A2b: one burning-oil patch (glowing pool + three flames), hidden until Frame.fires uses it */
   private addOilFire() {
+    if (this.fire) return this.addOilFireField();
     const g = new THREE.Group();
     const disc = new THREE.Mesh(blobDisc(1.0, 77 + this.oilFires.length, 32), glowMat('#ff5a10', 0.55));
     disc.position.y = 0.04;
@@ -1067,6 +1150,31 @@ export class Arena {
       const a = (k / 3) * Math.PI * 2;
       g.add(this.flame(new THREE.Vector3(Math.cos(a) * 0.45, 0.02, Math.sin(a) * 0.45), 0.85 - k * 0.12, this.theme.fire, k === 0));
     }
+    g.visible = false;
+    this.group.add(g);
+    this.oilFires.push({ g, disc });
+  }
+
+  /**
+   * A19: a burning-oil pool of the fire field: a dark, glossy spill whose surface burns in moving tongues (procedural, no
+   * texture), five low wide fires spread over it (one with a light), the same Frame.fires drive as before
+   */
+  private addOilFireField() {
+    const g = new THREE.Group();
+    const k0 = this.oilFires.length;
+    const disc = new THREE.Mesh(blobDisc(1.0, 77 + k0, 40), burningOilMat(k0));
+    disc.position.y = 0.035;
+    disc.renderOrder = 1;
+    disc.userData.dyn = true;
+    g.add(disc);
+    const spots: [number, number, number][] = [
+      [0, 0, 0.8],
+      [0.5, 0.15, 0.6],
+      [-0.42, 0.3, 0.55],
+      [0.1, -0.5, 0.55],
+      [-0.25, -0.35, 0.45],
+    ];
+    spots.forEach(([x, z, s], k) => g.add(this.flame(new THREE.Vector3(x, 0.03, z), s, this.theme.fire, k === 0, { kind: 'oil', wid: s * 0.45 })));
     g.visible = false;
     this.group.add(g);
     this.oilFires.push({ g, disc });
@@ -1265,6 +1373,17 @@ export class Arena {
       const s = F[k * 4 + 2] * Math.min(1, life * 4);
       of.g.visible = true;
       of.g.position.set(F[k * 4], 0, F[k * 4 + 1]);
+      if (this.fire) {
+        // A19: the field sizes the fires by the group's x / z scale; life fades the burn (the spill stays dark and wet)
+        of.g.scale.set(s, 1, s);
+        const u = (of.disc.material as THREE.ShaderMaterial).uniforms;
+        u.uBurn.value = Math.min(1, life * 3);
+        for (const c of of.g.children) {
+          const f = this.flames.find((x) => x.obj === c);
+          if (f?.src) f.src.amp = Math.min(1, life * 3);
+        }
+        continue;
+      }
       of.g.scale.set(s, Math.max(0.2, Math.min(1, life * 4)), s);
       (of.disc.material as THREE.MeshBasicMaterial).opacity = 0.55 * Math.min(1, life * 3);
     }
@@ -1531,27 +1650,83 @@ export class Arena {
       for (const f of this.flames) f.obj.quaternion.copy(cam.quaternion);
       if (viewportH) this.ambient.setViewport(viewportH, (cam as THREE.PerspectiveCamera).fov ?? 50);
     }
-    for (const f of this.flames) {
-      const k = 0.88 + Math.sin(t * 13 + f.ph) * 0.07 + Math.sin(t * 29 + f.ph * 2) * 0.05;
-      f.obj.scale.set(1, k, 1);
-      if (f.light && f.li) f.light.intensity = f.li * k;
-      f.k = k;
-    }
+    let floorFl = 0.9 + Math.sin(t * 11.3) * 0.06 + Math.sin(t * 23.7 + 1.3) * 0.04;
+    if (this.fire) floorFl = this.updateFire(dt, cam);
+    else
+      for (const f of this.flames) {
+        const k = 0.88 + Math.sin(t * 13 + f.ph) * 0.07 + Math.sin(t * 29 + f.ph * 2) * 0.05;
+        f.obj.scale.set(1, k, 1);
+        if (f.light && f.li) f.light.intensity = f.li * k;
+        f.k = k;
+      }
     this.stage?.update(cam, this.flames, this.fog);
-    // A2: one global flicker for the floor light map and the streak cards (plan 6.2)
+    // A2: one global flicker for the floor light map and the streak cards (plan 6.2); A19: the fires nearest the camera
     if (this.wetFloor) {
-      const fl = 0.9 + Math.sin(t * 11.3) * 0.06 + Math.sin(t * 23.7 + 1.3) * 0.04;
-      this.wetFloor.setLightGain(fl);
-      if (this.streaks) this.streaks.uniforms.uFlicker.value = fl;
+      this.wetFloor.setLightGain(floorFl);
+      if (this.streaks) this.streaks.uniforms.uFlicker.value = floorFl;
     }
     for (const u of this.updaters) u(t, dt);
     // A4: banner sway / chain swing (vertex shaders): the whole CPU side is this shared clock, timed for the A4 budget
     const s0 = performance.now();
-    swayTime.value = t;
+    if (this.fire) {
+      // A19: the wind drives the cloth: gusts speed the sway clock up and swing the banners / swags wider
+      this.swayT += dt * (0.75 + 0.55 * this.wind.gust);
+      swayTime.value = this.swayT;
+      const gain = 0.7 + 0.75 * this.wind.gust;
+      for (const s of this.swayMats) s.u.value = s.base * gain;
+    } else swayTime.value = t;
     swayOn.value = this.quality >= 1 ? 1 : 0;
     this.swayStats.ms += performance.now() - s0;
     this.swayStats.frames++;
   }
+  /**
+   * A19: the fire clock, wind, seeded flicker per fire (lights, stage fire pools, the field), real lights following their
+   * fires; returns the floor light-map flicker (the fires nearest the camera)
+   */
+  private updateFire(dt: number, cam?: THREE.Camera): number {
+    const F = this.fire!;
+    const art = this.kit!.art.fire!;
+    // match time in a fight (seek / replay give the same flicker), the arena clock in menus and cinematics; while the match
+    // clock stands still (hit-stop, pause, the concept harness) the fires keep burning on real time (an offset that a new
+    // match or a seek resets)
+    if (this.time - this.matchSeen < 0.5) {
+      const mt = this.matchT;
+      if (mt < this.lastMatchT - 1e-6 || mt > this.lastMatchT + 1) this.fireOff = 0;
+      else if (mt <= this.lastMatchT + 1e-6) this.fireOff += dt;
+      this.fireT = mt + this.fireOff;
+      this.lastMatchT = mt;
+    } else this.fireT = this.time;
+    const ft = this.fireT;
+    fireClock.value = ft;
+    fireWind(ft, art.wind, this.layout.seed * 17 + 3, this.wind);
+    const gust = this.wind.gust;
+    let wsum = 0,
+      ksum = 0;
+    const cp = cam?.position;
+    for (const f of this.flames) {
+      const k = fireFlicker(ft, f.seed ?? 0, gust);
+      f.k = k;
+      if (f.src) f.src.k = k;
+      if (f.follow && f.light) {
+        let live = (f.src?.amp ?? 1) > 0.001;
+        for (let p: THREE.Object3D | null = f.obj; p && live; p = p.parent) if (!p.visible) live = false;
+        f.obj.getWorldPosition(this._wp);
+        f.light.position.set(this._wp.x, this._wp.y + f.size * 0.5, this._wp.z);
+        f.light.intensity = live ? (f.li ?? 0) * k * Math.min(1, f.src?.amp ?? 1) * (f.src && f.src.kind === 'jet' ? 0.6 + 0.4 * f.src.h : 1) : 0;
+      }
+      if (cp) {
+        f.obj.getWorldPosition(this._wp);
+        const w = f.size / (1 + this._wp.distanceToSquared(cp) / 36);
+        wsum += w;
+        ksum += w * k;
+      }
+    }
+    F.update(ft, this.wind, cam);
+    void dt;
+    const kk = wsum > 0 ? ksum / wsum : 0.92;
+    return 0.9 + (kk - 0.92) * 1.6;
+  }
+
   /** A4: CPU time spent driving the kit banner sway / chain swing (ms total, frames) */
   swayStats = { ms: 0, frames: 0 };
 
@@ -1591,6 +1766,44 @@ export class Arena {
 /** seconds a toppling obstacle takes to reach the floor in the render (the sim lands it at TOPPLE_FALL) */
 const TOPPLE_VIS = 0.9;
 const LAVA_COL = new THREE.Color('#ff5a1a');
+/** A19: the fire clock as a uniform (burning-oil pools) */
+const fireClock = { value: 0 };
+/**
+ * A19: burning oil on the wet stone: a near-black glossy spill (alpha, so the floor's own wet reflections show through at
+ * the thin rim) with a moving net of burning tongues (two scrolling value-noise octaves, sharpened), white-yellow where it
+ * burns hottest, deep red at the edge of the burn; `uBurn` fades the fire as the pool dies, the dark spill stays.
+ */
+function burningOilMat(seed: number): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    name: 'arena.burningOil',
+    uniforms: { uTime: fireClock, uBurn: { value: 1 }, uSeed: { value: seed * 3.17 + 0.5 } },
+    vertexShader: /* glsl */ `
+      varying vec2 vP;
+      void main() { vP = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: /* glsl */ `
+      uniform float uTime; uniform float uBurn; uniform float uSeed;
+      varying vec2 vP;
+      float hh(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+      float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hh(i), hh(i + vec2(1.0, 0.0)), f.x), mix(hh(i + vec2(0.0, 1.0)), hh(i + vec2(1.0, 1.0)), f.x), f.y); }
+      void main() {
+        float r = length(vP);
+        vec2 p = vP * 2.6 + uSeed;
+        float n = vn(p + vec2(0.0, -uTime * 0.9)) * 0.6 + vn(p * 2.3 + vec2(uTime * 0.5, -uTime * 1.4)) * 0.4;
+        float cell = vn(vP * 7.0 + uSeed * 1.7 + vec2(uTime * 0.2, 0.0));
+        float burn = smoothstep(0.42, 0.78, n * 0.85 + cell * 0.25) * (1.0 - smoothstep(0.55, 1.05, r)) * uBurn;
+        vec3 hot = mix(vec3(0.9, 0.12, 0.02), vec3(2.6, 1.3, 0.45), burn * burn);
+        vec3 oil = vec3(0.012, 0.009, 0.008);
+        float a = (1.0 - smoothstep(0.75, 1.0, r)) * 0.92;
+        gl_FragColor = vec4(mix(oil, hot * 2.2, burn), a);
+      }`,
+    transparent: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+  });
+}
 /** A2b placeholder banner cloth per theme (until the art kit) */
 const BANNER_COLOR: Record<string, string> = { colosseum: '#7a1414', skytemple: '#d8c48a', sakura: '#b8202e', forge: '#3a2418', glacier: '#24426e', moonlake: '#3a2e62', desert: '#9a4818' };
 /** A2: streak-card gain on medium / high, where the planar reflection carries most of the image */

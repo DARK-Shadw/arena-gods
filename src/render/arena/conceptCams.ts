@@ -80,9 +80,10 @@ export const CONCEPT_PRESETS: ConceptPreset[] = [
 
 /** Extra game-only views per theme (no concept image): the director orbits, and A-milestones
  *  that make arenas bigger need views that scale with the layout. */
-export type ExtraView = 'counter' | 'flank' | 'overview' | 'pillar' | 'wall' | 'gate' | 'tiers' | 'westgate';
+export type ExtraView = 'counter' | 'flank' | 'overview' | 'pillar' | 'wall' | 'gate' | 'tiers' | 'westgate' | 'fire';
 /** A3 added `pillar` (low look at the pit's north-east pillar) and `wall` (the south ring: wall modules, arcade) */
-export const EXTRA_VIEWS: ExtraView[] = ['counter', 'flank', 'overview', 'pillar', 'wall', 'gate', 'tiers', 'westgate'];
+export const EXTRA_VIEWS: ExtraView[] = ['counter', 'flank', 'overview', 'pillar', 'wall', 'gate', 'tiers', 'westgate', 'fire'];
+/** A19 added `fire` (a close look at the stair's south fire bowl and the tier fires behind it) */
 /** A7 added gate (the hero stair / doorway from mid-arena), 	iers (the ruined tiers and pillars, south-east) and westgate */
 
 export function conceptPreset(id: string): ConceptPreset | undefined {
@@ -142,6 +143,11 @@ export function extraViewPose(v: ExtraView, rx: number, rz: number): CamPose {
     const at = v === 'gate' ? new THREE.Vector3(rx + 5, 4.5, 0) : v === 'tiers' ? new THREE.Vector3(rx * 0.55, 4.5, -rz * 0.95) : new THREE.Vector3(-rx - 4, 3.5, 0);
     const look = at.sub(new THREE.Vector3(...pos));
     return { pos, yaw: Math.atan2(look.z, look.x) / D, pitch: Math.atan2(look.y, Math.hypot(look.x, look.z)) / D, roll: 0, vfov: 55 };
+  }
+  if (v === 'fire') {
+    const pos: [number, number, number] = [rx * 0.42, 2.6, 2.2];
+    const look = new THREE.Vector3(rx - 0.6, 2.9, 7.8).sub(new THREE.Vector3(...pos));
+    return { pos, yaw: Math.atan2(look.z, look.x) / D, pitch: Math.atan2(look.y, Math.hypot(look.x, look.z)) / D, roll: 0, vfov: 45 };
   }
   if (v === 'pillar' || v === 'wall') {
     const pos: [number, number, number] = v === 'pillar' ? [rx * 0.12, 1.3, rz * 0.08] : [rx * 0.15, 1.5, rz * 0.35];

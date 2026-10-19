@@ -117,6 +117,16 @@ export const COLOSSEUM_ART: ThemeArt = {
   // A18: cinematics: the reveal opens on the moon and the arch and cranes down onto the stair; the face-off ends in the
   // ref-3 composition; the fight camera blends in from it
   cine: { reveal: 'landmark', faceoff: 'landmark', handover: true },
+  // A19-A20 (F4): every fire as a layered fire field (flames + white-hot core + glow halo + smoke + embers + heat), seeded
+  // flicker on the match clock, a gusting night wind (flames lean, smoke and embers drift, banners / swags / chains sway),
+  // real fire lights 2 / 4 / 6 per tier (the stage-light loop lights the stone round the rest)
+  fire: {
+    wind: { az: 150, base: 0.55, gust: 0.6 },
+    smoke: { color: '#6a6874', opacity: 0.7 },
+    gain: { body: 2.2, core: 4.5, glow: 0.45, embers: 1.6 },
+    heat: 1.0,
+    lights: [2, 4, 6],
+  },
   // A7c: the authored storm sky (tools/arena/sky/moongate.json -> public/arena/sky/moongate/): a Poly Haven CC0 cloud
   // photo turned into structure / density / rim / shaft data, lit in sky.ts by the moon (glow, silver rims, dark far
   // banks), drifting, with rare distant lightning; replaces the A7b storm deck (look.sky.storm*) when it loads

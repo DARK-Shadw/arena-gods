@@ -16,6 +16,7 @@ import type { AmbientKind, Grade } from '../themes';
 import type { DebrisMat } from '../debris';
 import type { BackdropTuning } from '../backdrop';
 import type { StageLightArt } from '../stageLight';
+import type { FireArt } from '../../fx/fireField';
 
 /** id of a kit or theme asset in public/arena/manifest.json, e.g. 'kit/brazier_tripod' */
 export type AssetId = string;
@@ -297,6 +298,12 @@ export interface ThemeArt {
   look?: LookArt;
   /** A18: cinematic hints (reveal, face-off, handover) */
   cine?: CineArt;
+  /**
+   * A19-A20 (F4): the layered fire field (fx/fireField.ts: flames, glow, smoke, embers, heat) for every arena fire, seeded
+   * flicker on the fire clock, wind (flames, smoke, embers, banners, chains), real fire lights per tier, burning-oil pools,
+   * fire-jet columns, lightning on the stage light and theme FX variants (`<def id>@moongate`)
+   */
+  fire?: FireArt;
   /** extra assets to load with the theme (ambient dressing placed by sockets, A4+) */
   extra?: AssetId[];
 }

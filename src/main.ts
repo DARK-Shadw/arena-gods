@@ -143,11 +143,13 @@ class App {
     this.flames = new FxFlames(this.atlases);
     this.flames.setQuality(this.quality);
     Arena.fxFlame = (size, color, n) => this.flames.make(size, color, n);
+    Arena.fxAtlases = this.atlases; // A19: the kit Moon Gate's fire field draws from the same atlases
     this.finFx = new FinisherFx(this.scene, this.vfx);
     this.scene.add(this.keyLight, this.keyLight.target, this.rimLight, this.rimLight.target);
     this.post = new Post(this.renderer, this.scene, this.camera);
     this.post.quality = this.quality;
-    this.post.distActive = () => this.vfx.distActive;
+    // A19: the Moon Gate's fire field keeps heat columns over its fires (high tier)
+    this.post.distActive = () => this.vfx.distActive || !!this.arena?.fire?.heatActive;
     // A2: the arena's planar floor reflection + floor light map run before the scene pass
     this.post.preScene = (r, cam, size, q) => this.arena?.preRender(r, cam, size, q);
     this.ui = new UI(document.getElementById('ui')!);
@@ -179,7 +181,7 @@ class App {
     if (arenaMode() !== 'legacy')
       void this.atlases
         .load()
-        .then(() => Promise.all(['unity_flame02', 'unity_flame03'].filter((id) => this.atlases.has(id)).map((id) => this.atlases.tierTexture(id, this.quality))))
+        .then(() => Promise.all(['unity_flame02', 'unity_flame03', ...(this.choice.arena.theme === 'colosseum' ? ['unity_wispysmoke01'] : [])].filter((id) => this.atlases.has(id)).map((id) => this.atlases.tierTexture(id, this.quality))))
         .catch(() => {});
     this.arenaReady = this.ensureArena(this.resolveArena(this.choice));
     window.addEventListener('resize', () => this.resize());
@@ -1314,6 +1316,7 @@ class App {
     this.concept = null;
     await this.start({ ...this.choice, a: p.a.id, b: p.b?.id ?? HIDDEN_B, seed: p.seed, skipIntro: true, arena: { theme, layout: (o.layout ?? p.layout) as LayoutId, seed: o.aseed ?? p.aseed } });
     if (this.state !== 'fight') this.beginFight();
+    await this.arena.fire?.ready; // A19: the fire field's flame / smoke atlases
     this.paused = true;
     this.freeCam = true;
     this.controls.enabled = false;
