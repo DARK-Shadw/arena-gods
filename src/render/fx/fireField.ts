@@ -19,8 +19,8 @@
  *           with drag, curling, carried by the wind, cooling from yellow-white to deep red; velocity-stretched dots.
  *   heat    FX_DIST (the F1 distortion pass): one shimmer column per large fire within 32 m (high tier only).
  *
- * Tiers scale counts, not the look: flame cards 4 / 5 / 6, smoke puffs 3 / 4 / 6, embers 4 / 7 / 12 per fire (q0 / q1 /
- * q2), heat on q2. Far fires (> 40 m) drop their side licks. Render only: nothing here reads or writes sim state.
+ * Tiers scale counts, not the look: flame cards 5 / 6 / 6 (q0 drops the back lick), smoke puffs 3 / 4 / 6, embers 4 / 7 /
+ * 12 per fire (q0 / q1 / q2), heat on q2; side licks drop beyond 25 / 40 / 55 m. Render only: nothing here reads or writes sim state.
  */
 import * as THREE from 'three';
 import { FLIPBOOK_PARS, type FxAtlases } from './atlas';
@@ -67,7 +67,9 @@ const N_FLAME = 6,
   N_SMOKE = 6,
   N_EMBER = 12;
 const TIER = {
-  flame: [3, 4, 5],
+  flame: [4, 5, 5],
+  /** side / back licks drop beyond this distance (m) */
+  lickFar: [25, 40, 55],
   smoke: [3, 4, 6],
   ember: [4, 7, 12],
 } as const;
@@ -89,6 +91,7 @@ ${COMMON_VS}
 uniform float uFrames;
 uniform float uFps;
 uniform float uMaxRole;
+uniform float uLickFar;
 uniform vec2 uNear;
 varying vec2 vUv;
 varying float vDepth;
@@ -109,7 +112,7 @@ void main() {
   float dist = -c0.z;
   bool cull = size <= 0.002 || role > uMaxRole + 0.5;
   if (candle > 0.5 && role > 0.5 && role != 2.0) cull = true;
-  if (dist > 40.0 && role > 2.5) cull = true;
+  if (dist > uLickFar && role > 2.5) cull = true;
   if (cull) { gl_Position = vec4(2.0, 2.0, 2.0, 1.0); vC = vec4(0.0); return; }
   float flick = B.x, hs = B.y, wid = B.z;
   float r1 = aI.z, r2 = aI.w;
@@ -135,6 +138,10 @@ void main() {
     h = size * (1.2 + 0.6 * r1) * hs * (0.85 + 0.25 * sin(uTime * (2.1 + r2) + r1 * 9.0)) * flick * (1.0 - 0.4 * oil);
     lift = -size * 0.08;
     rate = 0.9 + 0.3 * r2;
+    // a fire jet: the licks ride up the column (breaks the one long stretched card into tongues)
+    lift += jet * h * (0.2 + 0.25 * r1);
+    h *= 1.0 - 0.45 * jet;
+    w *= 1.0 + 0.4 * jet;
   } else {                  // tall back lick
     ox = (r1 - 0.5) * wid * 0.5;
     w = size * 0.6;
@@ -257,7 +264,7 @@ void main() {
   vFr = mod(r1 * uFrames + age * 14.0, uFrames);
   float env = smoothstep(0.0, 0.12, ph) * (1.0 - smoothstep(0.55, 1.0, ph));
   // warm-lit at the base (the fire under it, flickering), cold grey smoke above (moonlit)
-  float warm = (1.0 - smoothstep(0.0, 0.45, ph)) * B.x;
+  float warm = (1.0 - smoothstep(0.0, 0.32, ph)) * B.x * (1.0 - 0.6 * step(2.5, kind) * step(kind, 3.5)) * (1.0 - jet);
   vec3 col = mix(uSmokeCol, uFireCol, warm);
   float near = smoothstep(uNear.x, uNear.y, -mv.z);
   vC = vec4(col, env * near * min(1.0, size * 2.5));
@@ -326,7 +333,7 @@ void main() {
   vec2 curl = vec2(sin(age * 3.3 + r1 * 20.0), cos(age * 2.9 + r2 * 20.0)) * 0.16 * age;
   p.xz += drift + curl;
   p.y -= 0.12 * age * age; // the cooling spark sinks a little
-  vec3 vel = vec3(uWind.x + side.x * e + cos(age * 3.3 + r1 * 20.0) * 0.5, v0 * e - 0.24 * age, uWind.y * 0.0 + uWind.z + side.y * e - sin(age * 2.9 + r2 * 20.0) * 0.45);
+  vec3 vel = vec3(uWind.x + side.x * e + cos(age * 3.3 + r1 * 20.0) * 0.5, v0 * e - 0.24 * age, uWind.z + side.y * e - sin(age * 2.9 + r2 * 20.0) * 0.45);
   vec4 mv = modelViewMatrix * vec4(p, 1.0);
   vec2 vv = (modelViewMatrix * vec4(vel, 0.0)).xy;
   float sp = length(vv);
@@ -420,7 +427,7 @@ void main() {
 
 const QUAD = (): THREE.Float32BufferAttribute => new THREE.Float32BufferAttribute([-0.5, -0.5, 0, 0.5, -0.5, 0, 0.5, 0.5, 0, -0.5, 0.5, 0], 3);
 
-/** deterministic per-fire seeds (no Math.random: the pixel-identical gates replace it, and seeks must match) */
+/** deterministic per-fire seeds (hashed, never the unseeded random source: seeks and the pixel-identical gates must match) */
 function hash01(a: number, b: number): number {
   let h = (Math.imul(a | 0, 0x9e3779b1) ^ Math.imul((b | 0) + 0x7f4a7c15, 0x85ebca6b)) >>> 0;
   h = Math.imul(h ^ (h >>> 15), 0x2c1b3c6d) >>> 0;
@@ -447,6 +454,8 @@ export class FireField {
   ready: Promise<unknown> = Promise.resolve();
   /** any heat column drawn this frame (Post's distortion pass runs only then) */
   heatActive = false;
+  /** perf probe / debug: false hides every draw of the field (the arena keeps its lights and flicker) */
+  enabled = true;
 
   constructor(
     private atlases: FxAtlases | null,
@@ -496,6 +505,7 @@ export class FireField {
         uFrames: { value: 64 },
         uFps: { value: 30 },
         uMaxRole: { value: TIER.flame[q] },
+        uLickFar: { value: TIER.lickFar[q] },
         uNear: { value: new THREE.Vector2(0.3, 1.2) },
         uGlowCol: { value: fire.clone().multiplyScalar(0.55) },
         uGain: { value: new THREE.Vector3(A.gain.body, A.gain.core, A.gain.glow) },
@@ -513,7 +523,7 @@ export class FireField {
         uFrames: { value: 64 },
         uMaxRole: { value: TIER.smoke[q] - 1 },
         uNear: { value: new THREE.Vector2(0.6, 2.4) },
-        uFireCol: { value: fire.clone().multiplyScalar(1.6) },
+        uFireCol: { value: fire.clone().multiplyScalar(1.1) },
         uSmokeCol: { value: new THREE.Color(A.smoke.color) },
         uOpacity: { value: A.smoke.opacity },
       },
@@ -572,7 +582,14 @@ export class FireField {
     const per = [N_SMOKE, N_FLAME, N_EMBER, 1];
     this.meshes.forEach((m, mi) => {
       const n = per[mi];
-      const arr = new Float32Array(this.srcs.length * n * 4);
+      const g = m.geometry as THREE.InstancedBufferGeometry;
+      // one attribute for the whole capacity (three caches the instanced attribute's count as the draw's maximum)
+      let at = g.getAttribute('aI') as THREE.InstancedBufferAttribute | undefined;
+      if (!at) {
+        at = new THREE.InstancedBufferAttribute(new Float32Array(MAXS * n * 4), 4);
+        g.setAttribute('aI', at);
+      }
+      const arr = at.array as Float32Array;
       let o = 0;
       for (const s of this.srcs)
         for (let r = 0; r < n; r++) {
@@ -581,8 +598,7 @@ export class FireField {
           arr[o++] = hash01(s.i * 31 + mi, r * 7 + 1);
           arr[o++] = hash01(s.i * 17 + 5 + mi, r * 13 + 3);
         }
-      const g = m.geometry as THREE.InstancedBufferGeometry;
-      g.setAttribute('aI', new THREE.InstancedBufferAttribute(arr, 4));
+      at.needsUpdate = true;
       g.instanceCount = this.srcs.length * n;
     });
   }
@@ -649,9 +665,9 @@ export class FireField {
       if (s.size * sc >= 0.45 && s.kind !== 'candle' && cam && this.wp.distanceToSquared(cam.position) < 32 * 32) heat = true;
     }
     this.tex.needsUpdate = true;
-    for (const m of this.meshes) m.visible = !!m.userData.ready && this.srcs.length > 0;
+    for (const m of this.meshes) m.visible = this.enabled && !!m.userData.ready && this.srcs.length > 0;
     const hm = this.meshes[3];
-    this.heatActive = !!hm && this.quality >= 2 && heat;
+    this.heatActive = this.enabled && !!hm && this.quality >= 2 && heat;
     if (hm) hm.visible = this.heatActive;
   }
 

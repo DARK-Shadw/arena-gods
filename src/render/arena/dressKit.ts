@@ -81,7 +81,7 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
       return inst;
     },
     chainKit(): ChainKit | null {
-      return chainAsset ? new ChainKit(chainAsset) : null;
+      return chainAsset ? new ChainKit(chainAsset, { wind: !!art.fire }) : null;
     },
     // A7: the Moon Gate's iron fire cage for the chandelier hazard (legacy: the bronze ring on velarium cables)
     chandelier: art.ring?.ruins?.fireCage ? () => fireCage(a) : D.chandelier,
@@ -414,7 +414,7 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
   const bannerList: BannerSpec[] = [];
   const rodList: { m: THREE.Matrix4; w: number }[] = [];
   // A7: one chain builder for the whole ring (banner hangers, the pillar chains)
-  const chains = chainAsset ? new ChainKit(chainAsset) : null;
+  const chains = chainAsset ? new ChainKit(chainAsset, { wind: !!pack.art.fire }) : null;
   // A7: ring dressing stays out of the kit gate structures (and decor off the pillars)
   const inZone = gateZoneTest(a, pack, false);
   const blocked = gateZoneTest(a, pack, true);

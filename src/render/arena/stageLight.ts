@@ -61,11 +61,14 @@ const U = {
   uMgRimAway: { value: 0.3 },
   uMgFireP: { value: Array.from({ length: MAXF }, () => new THREE.Vector4(0, -1000, 0, 1)) },
   uMgFireC: { value: Array.from({ length: MAXF }, () => new THREE.Vector3()) },
+  /** A19: a lightning flash: direction toward the strike (xyz) and its light colour x level (0 = none) */
+  uMgFlashD: { value: new THREE.Vector3(1, 0.3, 0) },
+  uMgFlashC: { value: new THREE.Color(0, 0, 0) },
 };
 
 const FRAG_PARS = /* glsl */ `
 uniform float uMgOn; uniform vec3 uMgMoon; uniform vec3 uMgRim; uniform float uMgRimPow; uniform float uMgRimAway;
-uniform vec4 uMgFireP[${MAXF}]; uniform vec3 uMgFireC[${MAXF}];
+uniform vec4 uMgFireP[${MAXF}]; uniform vec3 uMgFireC[${MAXF}]; uniform vec3 uMgFlashD; uniform vec3 uMgFlashC;
 `;
 
 const fragLight = (n: number) => /* glsl */ `
@@ -81,6 +84,8 @@ if (uMgOn > 0.5) {
   float mgSide = clamp(dot(mgN, uMgMoon) * 0.6 + 0.55, 0.0, 1.0);
   float mgRim = pow(1.0 - mgNdV, uMgRimPow) * mgBack * mgSide;
   reflectedLight.directDiffuse += uMgRim * mgRim * (diffuseColor.rgb * 0.7 + 0.06);
+  // A19: lightning: a cold wash from the strike's side of the sky, plus a brighter rim for a moment
+  reflectedLight.directDiffuse += uMgFlashC * (diffuseColor.rgb * (clamp(dot(mgN, uMgFlashD), 0.0, 1.0) * 0.8 + 0.2) + pow(1.0 - mgNdV, 2.0) * 0.08);
 #if ${n} > 0
   for (int i = 0; i < ${n}; i++) {
     vec4 P = uMgFireP[i];
@@ -316,6 +321,12 @@ export class StageLight {
     }
   }
 
+  /** A19: lightning on the stone (0 = none); dir = toward the strike */
+  setFlash(level: number, dir: THREE.Vector3, color: THREE.Color, gain: number) {
+    U.uMgFlashD.value.copy(dir).normalize();
+    U.uMgFlashC.value.copy(color).multiplyScalar(level * gain);
+  }
+
   /** perf probe: switch the rim / fire-pool shader block (all patched materials) */
   set shaderOn(v: boolean) {
     U.uMgOn.value = v ? 1 : 0;
@@ -323,6 +334,7 @@ export class StageLight {
 
   dispose() {
     U.uMgOn.value = 1;
+    U.uMgFlashC.value.setRGB(0, 0, 0);
     for (const P of this.patched) {
       if (P.hadOwn) P.m.onBeforeCompile = P.prev;
       else delete (P.m as { onBeforeCompile?: unknown }).onBeforeCompile;

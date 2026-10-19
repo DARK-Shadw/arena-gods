@@ -890,9 +890,12 @@ class App {
       hasWeapon: (i) => this.views[i].hasWeapon,
       height: (i) => this.views[i].height,
       floorAt: (x, z): FloorSurface => {
+        // A20: the kit Moon Gate's wet floor knows its puddles and damp stone (footsteps splash in the water)
+        if (this.arena?.kit?.art.fire) return this.arena.surfaceAt(x, z);
         for (const h of L().hazards) if (h.kind === 'water' && (x - h.x) ** 2 + (z - h.z) ** 2 < h.r * h.r) return 'water';
         return THEME_FLOOR[L().theme] ?? 'stone';
       },
+      variant: () => (this.arena?.kit?.art.fire ? 'moongate' : undefined),
       trail: (i, base, tip) => {
         const v = this.views[i];
         base.copy(v.trailBase);

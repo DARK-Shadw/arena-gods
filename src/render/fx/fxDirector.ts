@@ -73,6 +73,9 @@ export interface FxWorld {
   bone?(i: number, name: string): THREE.Object3D | undefined;
   /** fighter i's model (afterimage source) and its materials + world metres per model unit (wounds) */
   fighter?(i: number): { model: THREE.Object3D; materials: THREE.Material[]; objScale: number } | undefined;
+  // ---- A19-A20 (optional)
+  /** theme FX variant: a def `<id>@<variant>` replaces `<id>` when it exists (the Moon Gate's stone dust, splashes) */
+  variant?(): string | undefined;
 }
 
 /** Per-spawn context: who and where. Everything optional for lab spawns. */
@@ -623,6 +626,12 @@ export class FxDirector {
         return f.hp / max;
       },
       fighterId: (i) => this.fighterId(i),
+      variant: W?.variant?.(),
+      floorOf: (i, t) => {
+        if (!W?.floorAt || i < 0 || !this.rec) return undefined;
+        const f = this.fstate(i, t);
+        return W.floorAt(f.x, f.z);
+      },
     };
   }
 
@@ -711,6 +720,9 @@ export class FxDirector {
       if (!sub) return false;
       def = DEFS[sub] ?? def;
     }
+    // A19-A20: theme variant of the def (kit Moon Gate: '<id>@moongate'); everything else keeps the shared row
+    const vr = this.world?.variant?.();
+    if (vr) def = DEFS[`${def.id}@${vr}`] ?? def;
     if (this.persistOnly) {
       // seek pass 1: only what persists (decals, wounds, weapon blood), at its own time, no post kicks
       def.layers.forEach((L, i) => {

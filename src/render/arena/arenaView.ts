@@ -33,6 +33,7 @@ import { LAYER_REFLECT, PlanarReflection, StreakCards, type FloorLightSource } f
 import { LAYER } from '../fx/fxLayers';
 import { THEME_FLOOR, type FloorSurface } from '../fx/fxSurfaces';
 import { swayOn, swayTime } from './cloth';
+import { chainWind } from './chains';
 import type { KitInstance } from './assets';
 import { gateZoneTest } from './nearField';
 import { FireField, fireFlicker, fireWind, type FireKind, type FireSrc } from '../fx/fireField';
@@ -1602,14 +1603,22 @@ export class Arena {
     }
   }
 
+  /** A19: the moon key before the lightning pulse (applyMood / restoreLighting set it) */
+  private get moonNow(): number {
+    return this._moonNow ?? this.base.sun;
+  }
+  private _moonNow?: number;
+
   applyMood(m: Mood) {
     this.moon.intensity = this.base.sun * Math.min(1.3, Math.max(0.35, m.moon / 1.1));
+    this._moonNow = this.moon.intensity;
     this.hemi.intensity = this.base.hemi * Math.min(1.3, Math.max(0.5, m.hemi / 0.55));
     this.fog.density = this.base.fog * Math.min(2, Math.max(0.6, m.fog / 0.022));
     this.centerSpot.intensity = this.base.spot + m.spot * 20;
   }
   restoreLighting() {
     this.moon.intensity = this.base.sun;
+    this._moonNow = this.base.sun;
     this.hemi.intensity = this.base.hemi;
     this.fog.density = this.base.fog;
     this.centerSpot.intensity = this.base.spot;
@@ -1643,6 +1652,11 @@ export class Arena {
       (U.uSkyFlash.value as THREE.Vector4).w = f * L.flashGain;
       (U.uSkyFlashDir.value as THREE.Vector3).copy(this.flashDir);
       this.scene.environmentIntensity = this.envBase * (1 + L.flashEnv * f);
+      // A19: the strike lights the arena too: a cold wash on the stone (stage light) and a pulse of the moon key
+      if (this.fire && this.stage) {
+        this.stage.setFlash(f, this.flashDir, FLASH_COL, 1.6);
+        this.moon.intensity = this.moonNow * (1 + 1.2 * f);
+      }
     }
     if (cam) {
       this.sky.position.copy(cam.position);
@@ -1674,6 +1688,7 @@ export class Arena {
       swayTime.value = this.swayT;
       const gain = 0.7 + 0.75 * this.wind.gust;
       for (const s of this.swayMats) s.u.value = s.base * gain;
+      chainWind.value = 0.75 + 0.6 * this.wind.gust;
     } else swayTime.value = t;
     swayOn.value = this.quality >= 1 ? 1 : 0;
     this.swayStats.ms += performance.now() - s0;
@@ -1706,7 +1721,13 @@ export class Arena {
     for (const f of this.flames) {
       const k = fireFlicker(ft, f.seed ?? 0, gust);
       f.k = k;
-      if (f.src) f.src.k = k;
+      if (f.src) {
+        f.src.k = k;
+        // a fire jet / dying oil fire at zero: hidden for the floor light map, the streak cards and the stage pools too
+        // (only fires whose owner drives amp: hidden legacy gate flames etc. stay hidden)
+        if (f.src.kind === 'jet' || f.src.kind === 'oil') f.obj.visible = f.src.amp > 0.001;
+        f.k = k * Math.min(1, f.src.amp) * (f.src.kind === 'jet' ? 0.7 + 0.3 * f.src.h : 1);
+      }
       if (f.follow && f.light) {
         let live = (f.src?.amp ?? 1) > 0.001;
         for (let p: THREE.Object3D | null = f.obj; p && live; p = p.parent) if (!p.visible) live = false;
@@ -1766,6 +1787,8 @@ export class Arena {
 /** seconds a toppling obstacle takes to reach the floor in the render (the sim lands it at TOPPLE_FALL) */
 const TOPPLE_VIS = 0.9;
 const LAVA_COL = new THREE.Color('#ff5a1a');
+/** A19: lightning colour on the stone */
+const FLASH_COL = new THREE.Color('#b8c4ff');
 /** A19: the fire clock as a uniform (burning-oil pools) */
 const fireClock = { value: 0 };
 /**
