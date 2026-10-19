@@ -234,6 +234,10 @@ export class Arena {
     if (kit && T.sky.storm) T.sky.stormTex = bakeStormTexture(renderer, T.sky, quality >= 1 ? 2048 : 1024, quality >= 2 ? 512 : 256);
     this.sky = makeSky(T.sky);
     this.sky.userData.dyn = true;
+    // A21 (GPU): kit mode draws the sky LAST among the opaque objects instead of first: it writes no depth and sits
+    // behind everything, so the depth test now rejects its (expensive, A7c-lit) fragments wherever the arena covers it
+    // (most of a fight frame) instead of shading the whole screen and painting over it. Same pixels.
+    if (kit) this.sky.renderOrder = 1000;
     this.group.add(this.sky);
     // A19: the fire field exists before the dressing places its fires (kit Moon Gate only: ThemeArt.fire)
     if (kit?.art.fire) {
@@ -1468,6 +1472,18 @@ export class Arena {
       const own = kind === 'stone' || kind === 'wood' || kind === 'ceramic';
       if (bm) this.debris.setChunk(kind, bm.geometry, own ? (bm.material as THREE.Material) : undefined);
     }
+  }
+
+  /**
+   * A21: objects that are otherwise created on the first destruction event (the debris pools: an instanced variant
+   * of the kit material) are created hidden now, so the loading screen's compile pass (main.ts prewarm) covers them.
+   */
+  prewarm() {
+    const D = this.dressing;
+    const kinds = new Set<DebrisMat>(['wood', 'metal', 'paper', D.urnDebris, D.chandelierDebris]);
+    for (const o of this.layout.obstacles) kinds.add(this.debrisOf(o.kind));
+    kinds.add(this.debrisOf(this.layout.obstacles[0]?.kind ?? 'rock'));
+    this.debris.prewarm(kinds);
   }
 
   /** destruction visuals for sim events; returns camera shake amount */

@@ -116,8 +116,21 @@ export class Debris {
   }
 
   /** burst of chunks from a point; dir biases the throw */
+  /**
+   * A21: create the pools of these kinds up front, HIDDEN (no draw until their first burst), so their instanced
+   * programs compile during the loading screen (renderer.compile walks hidden objects too) instead of on the first
+   * break in a fight (a 0.4-0.8 s hitch on the Arc iGPU for a kit material's instanced variant).
+   */
+  prewarm(kinds: Iterable<DebrisMat>) {
+    for (const k of kinds) {
+      if (this.pools.has(k)) continue;
+      this.pool(k).mesh.visible = false;
+    }
+  }
+
   burst(mat: DebrisMat, at: THREE.Vector3, n: number, size: number, speed: number, dir?: THREE.Vector3, life = 4) {
     const pool = this.pool(mat);
+    pool.mesh.visible = true;
     const r = this.rnd;
     for (let i = 0; i < n; i++) {
       const pc = pool.pieces[pool.next];

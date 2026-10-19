@@ -1,10 +1,10 @@
-﻿// A21 production-build checks on a built dist/ (no dev server), ONE headless Chromium.
+// A21 production-build checks on a built dist/ (no dev server), ONE headless Chromium.
 //   node tools/perf/prodcheck.cjs falls [--dist=dist] [--prefix=/arena-gods/] [--q=1] [--seeds=4242,11,7] [--theme=colosseum]
 //     Plays fights (skipIntro) frame by frame and checks that every knockdown / launch / getup / death frame the sim
 //     emits is drawn with the sim-chosen library clip ('lib:<id>') and not a fallback. `--prefix` serves the build
 //     under a sub-path the way GitHub Pages does (https://<user>.github.io/<repo>/), 404 HTML for anything else.
 //   node tools/perf/prodcheck.cjs net [--dist=dist] [--prefix=/] [--q=1] [--intro=1]
-//     First-visit network: every file the page requests (bytes from disk, gzip estimate for text types) with the
+//     First-visit network: every file the page requests (bytes from disk and gzip size: GitHub Pages gzips every response) with the
 //     time it was requested, grouped by phase (before the menu / arena built / fight start / finisher), plus the
 //     time to the first arena frame and to the fight.
 // Writes JSON with --json=<file>. Memory: one browser, one page at a time, closed at the end.
@@ -27,7 +27,7 @@ const JSON_OUT = opt('json', '');
 const REMOTE = opt('remote', '');
 const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234', 'chrome-win64', 'chrome.exe');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.webp': 'image/webp', '.ktx2': 'image/ktx2', '.wasm': 'application/wasm', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.bin': 'application/octet-stream', '.u16': 'application/octet-stream', '.u8': 'application/octet-stream' };
-const GZ = new Set(['.html', '.js', '.css', '.json', '.svg']);
+const GZC = new Map();
 
 async function openPage(browser, url, w = 960, h = 540) {
   const ctx = await browser.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
@@ -52,9 +52,9 @@ async function openPage(browser, url, w = 960, h = 540) {
     if (!(fs.existsSync(p) && fs.statSync(p).isFile())) return notFound();
     const ext = path.extname(p);
     const bytes = fs.statSync(p).size;
-    let gz = bytes;
-    if (GZ.has(ext)) gz = zlib.gzipSync(fs.readFileSync(p), { level: 6 }).length;
-    log.files.push({ rel, bytes, gz, t: Date.now() - t0 });
+    // GitHub Pages gzips every response (also .bin / .glb / .wasm / .ktx2), so the wire size is the gzip size
+    // (gzip sizes are computed after the run: gzipping in the route would slow the serving down)
+    log.files.push({ rel, p, bytes, t: Date.now() - t0 });
     route.fulfill({ path: p, contentType: MIME[ext] || 'application/octet-stream' });
   });
   await page.goto(url);
@@ -113,6 +113,7 @@ async function falls(browser) {
             }
           }
           res.end = app.playback.t;
+          res.spriteLayers = app.vfx?.sprites ? [...app.vfx.sprites.keys()] : [];
           res.clipsSeen = Object.keys(res.clipsSeen).length;
           return res;
         });
@@ -139,7 +140,7 @@ async function live(browser) {
   const { page, ctx, log } = await openPage(browser, url, Number(opt('w', 960)), Number(opt('h', 540)));
   try {
     await page.waitForFunction(() => window.__arena && window.__arena.arena && window.__arena.views && window.__arena.views.length === 2, null, { timeout: 180000 });
-    await page.evaluate(() => {
+    await page.evaluate((opt) => {
       const app = window.__arena;
       const S = ['knockdown', 'launched', 'getup', 'dead'];
       const res = (window.__falls = { frames: 0, byState: {}, hipsMin: {}, fallback: [], states: {}, q: app.quality });
@@ -151,8 +152,21 @@ async function live(browser) {
         return h;
       });
       const wp = new (app.camera.position.constructor)();
+      // shader programs compiled after the first frame (each one is a main-thread hitch) and long frames
+      res.compiles = [];
+      res.long = [];
+      let nProg = -1,
+        lastT = performance.now();
       const tick = () => {
         requestAnimationFrame(tick);
+        const now = performance.now();
+        const dt = now - lastT;
+        lastT = now;
+        const progs = app.renderer.info.programs || [];
+        if (nProg >= 0 && progs.length > nProg) res.compiles.push({ state: app.prewarmAt > now - dt ? 'prewarm' : app.state, t: +(app.playback?.t ?? app.realT ?? 0).toFixed(2), shot: app.director?.shotName, dt: +dt.toFixed(1), names: progs.slice(nProg).map((p) => p.name), keys: opt.keys ? progs.slice(nProg).map((p) => p.name + '|' + p.cacheKey) : undefined });
+        if (nProg >= 0 && dt > 50 && res.long.length < 40) res.long.push({ state: app.prewarmAt > now - dt ? 'prewarm' : app.state, t: +(app.playback?.t ?? 0).toFixed(2), shot: app.director?.shotName, dt: +dt.toFixed(1) });
+        nProg = progs.length;
+        res.progs = nProg;
         if (app.state !== 'fight' || !app.playback) return;
         res.frames++;
         res.t = app.playback.t;
@@ -173,7 +187,7 @@ async function live(browser) {
         }
       };
       requestAnimationFrame(tick);
-    });
+    }, { keys: opt('keys', '0') === '1' });
     await page.waitForFunction(() => window.__arena.state === 'post' || (window.__falls && window.__falls.byState.dead), null, { timeout: Number(opt('timeout', 400000)), polling: 1000 });
     await page.waitForTimeout(1500);
     const r = await page.evaluate(() => window.__falls);
@@ -192,6 +206,9 @@ async function net(browser) {
   const { page, ctx, log, t0 } = await openPage(browser, url, 960, 540);
   const marks = {};
   try {
+    // a user gesture starts the audio engine (sfx + voice downloads), as a real visitor's first click does
+    await page.waitForTimeout(300);
+    await page.mouse.click(5, 5);
     await page.waitForFunction(() => window.__arena && window.__arena.arena, null, { timeout: 180000, polling: 50 });
     marks.arena = Date.now() - t0;
     await page.waitForFunction(() => window.__arena.state === 'intro' || window.__arena.state === 'fight', null, { timeout: 180000, polling: 50 });
@@ -201,6 +218,12 @@ async function net(browser) {
     marks.settled = Date.now() - t0;
   } finally {
     await ctx.close();
+  }
+  for (const f of log.files) {
+    let gz = GZC.get(f.p);
+    if (gz === undefined) GZC.set(f.p, (gz = Math.min(f.bytes, zlib.gzipSync(fs.readFileSync(f.p), { level: 6 }).length)));
+    f.gz = gz;
+    delete f.p;
   }
   const groups = {};
   for (const f of log.files) {
@@ -217,7 +240,7 @@ async function net(browser) {
     .sort((x, y) => y[1].gz - x[1].gz)
     .map(([g, v]) => ({ group: g, files: v.n, MB: MB(v.bytes), wireMB: MB(v.gz), beforeStartMB: MB(v.beforeStart) }));
   const top = [...log.files].sort((x, y) => y.gz - x.gz).slice(0, 25).map((f) => ({ rel: f.rel, MB: MB(f.gz), t: f.t }));
-  const res = { q: Q, intro, marks, totalMB: MB(total), beforeStartMB: MB(log.files.filter((f) => f.t <= marks.start).reduce((s, f) => s + f.gz, 0)), rows, top, notFound: log.notFound, errors: log.errors.slice(0, 10), console: log.console };
+  const res = { q: Q, intro, marks, totalMB: MB(total), beforeStartMB: MB(log.files.filter((f) => f.t <= marks.start).reduce((s, f) => s + f.gz, 0)), rows, top, files: log.files, notFound: log.notFound, errors: log.errors.slice(0, 10), console: log.console };
   console.log(JSON.stringify(res, null, 1));
   return res;
 }

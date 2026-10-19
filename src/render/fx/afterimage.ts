@@ -63,11 +63,26 @@ export class Afterimages {
     this.limit = Math.max(0, Math.min(3, n));
   }
 
+  /** A21: build each fighter's first ghost now (hidden), so its program compiles behind the loading screen; the pool
+   * order and the cursor are the same as when snap() builds it later */
+  prewarm() {
+    for (let i = 0; i < 2; i++) if (this.sources[i] && this.limit > 0 && this.pools[i].length === 0) this.make(i);
+  }
+
   private ghost(i: number): Ghost | null {
     const src = this.sources[i];
     if (!src || this.limit <= 0) return null;
     const pool = this.pools[i];
-    if (pool.length < this.limit) {
+    if (pool.length < this.limit) this.make(i);
+    const g = pool[this.cursor[i] % Math.min(pool.length, this.limit)];
+    this.cursor[i]++;
+    return g;
+  }
+
+  private make(i: number) {
+    const src = this.sources[i]!;
+    const pool = this.pools[i];
+    {
       const model = skClone(src);
       const u = { uOpacity: { value: 0 }, uColor: { value: new THREE.Color() } };
       const mat = ghostMaterial(u);
@@ -93,9 +108,6 @@ export class Afterimages {
       for (let k = 0; k < Math.min(a.length, b.length); k++) if ((a[k] as THREE.Bone).isBone) pairs.push([a[k], b[k]]);
       pool.push({ root, model, pairs, mat, u, t0: 0, life: 0, on: false });
     }
-    const g = pool[this.cursor[i] % Math.min(pool.length, this.limit)];
-    this.cursor[i]++;
-    return g;
   }
 
   /** copy fighter i's current pose into a ghost that shows from t0 for `life` seconds */

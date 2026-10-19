@@ -209,6 +209,15 @@ export class VFX {
     this.bindStatic();
   }
 
+  /**
+   * A21: create these sprite layers now (hidden until they have sprites) so their atlases download and their programs
+   * compile behind the loading screen instead of on the first hit / dust / explosion of the fight
+   */
+  prewarm(keys: string[]) {
+    for (const k of keys) if (k === 'mask' || this.atlases?.has(k)) this.layer(k);
+    this.ghosts.prewarm();
+  }
+
   /** the sprite layer for 'mask' (fx_sprites) or a flipbook atlas id (created on first use) */
   layer(key: string): SpriteLayer {
     let L = this.sprites.get(key);
