@@ -104,6 +104,19 @@ function halfPng(png, alpha = false) {
   return dst;
 }
 
+// A21: a PNG scaled down to fit `size` px (Lanczos, like the low tier's halving), cached in _work by name + size
+const TEX_CAPS = (() => {
+  const p = path.join(ROOT, 'tools', 'arena', 'tex_caps.json');
+  return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')).caps : {};
+})();
+const PY_FIT = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]);' + PY_MODE + 'n=int(sys.argv[3]);k=n/max(im.size);im=im.resize((max(1,round(im.size[0]*k)),max(1,round(im.size[1]*k))),Image.LANCZOS);im.save(sys.argv[2]);print(im.size[0],im.size[1])';
+function fitPng(png, size, alpha = false) {
+  fs.mkdirSync(WORK, { recursive: true });
+  const dst = path.join(WORK, `${path.basename(png, '.png')}_fit${size}.png`);
+  if (!fs.existsSync(dst) || fs.statSync(dst).mtimeMs < fs.statSync(png).mtimeMs) pillow(PY_FIT, png, dst, String(size), alpha ? 'A' : 'N');
+  return dst;
+}
+
 function disposeTree(n) {
   for (const c of n.listChildren()) disposeTree(c);
   const m = n.getMesh();
@@ -146,6 +159,9 @@ async function buildVariant(io, A, dir, tier, fmt) {
       let png = path.join(dir, spec[key]);
       // a low tier that shares the full set gets it at half size
       if (tier === 'low' && !A.lods.LOD1.ownTextures && A.lods.LOD0.materials.includes(mat.getName())) png = halfPng(png, kind === 'colorA');
+      // A21: per-asset download / GPU caps for the full tier (tools/arena/tex_caps.json: asset id -> slot -> max px)
+      const cap = tier === 'full' ? TEX_CAPS[A.id]?.[key] : undefined;
+      if (cap && Math.max(...pngSize(png)) > cap) png = fitPng(png, cap, kind === 'colorA');
       const e = encodeImage(png, kind, fmt);
       const tex = doc.createTexture(`${mat.getName()}_${key}`).setImage(e.data).setMimeType(e.mime).setURI(`${mat.getName()}_${key}.${fmt}`);
       set(tex);

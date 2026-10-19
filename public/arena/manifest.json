@@ -714,7 +714,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 548212,
+      "bytes": 315788,
       "primitives": 5,
       "textures": [
        {
@@ -728,10 +728,10 @@
        {
         "material": "banner_pole",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 337017
+        "bytes": 104596
        },
        {
         "material": "banner_pole",
@@ -744,7 +744,7 @@
       ]
      },
      "webp": {
-      "bytes": 337192,
+      "bytes": 252424,
       "primitives": 5,
       "textures": [
        {
@@ -758,10 +758,10 @@
        {
         "material": "banner_pole",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 124756
+        "bytes": 39988
        },
        {
         "material": "banner_pole",
@@ -855,7 +855,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 521128,
+      "bytes": 460180,
       "primitives": 4,
       "textures": [
        {
@@ -869,10 +869,10 @@
        {
         "material": "banners",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 116387
+        "bytes": 55444
        },
        {
         "material": "banners",
@@ -885,7 +885,7 @@
       ]
      },
      "webp": {
-      "bytes": 474540,
+      "bytes": 283252,
       "primitives": 4,
       "textures": [
        {
@@ -899,10 +899,10 @@
        {
         "material": "banners",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 204730
+        "bytes": 13444
        },
        {
         "material": "banners",
@@ -1005,7 +1005,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 710688,
+      "bytes": 416656,
       "primitives": 10,
       "textures": [
        {
@@ -1019,10 +1019,10 @@
        {
         "material": "barrel",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 436947
+        "bytes": 142918
        },
        {
         "material": "barrel",
@@ -1035,7 +1035,7 @@
       ]
      },
      "webp": {
-      "bytes": 374708,
+      "bytes": 306812,
       "primitives": 10,
       "textures": [
        {
@@ -1049,10 +1049,10 @@
        {
         "material": "barrel",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 110582
+        "bytes": 42688
        },
        {
         "material": "barrel",
@@ -1150,7 +1150,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 750808,
+      "bytes": 472464,
       "primitives": 10,
       "textures": [
        {
@@ -1164,10 +1164,10 @@
        {
         "material": "barricade",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 432982
+        "bytes": 154640
        },
        {
         "material": "barricade",
@@ -1180,7 +1180,7 @@
       ]
      },
      "webp": {
-      "bytes": 381460,
+      "bytes": 315140,
       "primitives": 10,
       "textures": [
        {
@@ -1194,10 +1194,10 @@
        {
         "material": "barricade",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 109720
+        "bytes": 43400
        },
        {
         "material": "barricade",
@@ -1581,7 +1581,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1098880,
+      "bytes": 581680,
       "primitives": 3,
       "textures": [
        {
@@ -1595,10 +1595,10 @@
        {
         "material": "brazier_pedestal",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 737206
+        "bytes": 220012
        },
        {
         "material": "brazier_pedestal",
@@ -1611,7 +1611,7 @@
       ]
      },
      "webp": {
-      "bytes": 708504,
+      "bytes": 558836,
       "primitives": 3,
       "textures": [
        {
@@ -1625,10 +1625,10 @@
        {
         "material": "brazier_pedestal",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 217596
+        "bytes": 67934
        },
        {
         "material": "brazier_pedestal",
@@ -1873,7 +1873,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 726616,
+      "bytes": 443216,
       "primitives": 3,
       "textures": [
        {
@@ -1887,10 +1887,10 @@
        {
         "material": "brazier_iron",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 420896
+        "bytes": 137492
        },
        {
         "material": "brazier_iron",
@@ -1903,7 +1903,7 @@
       ]
      },
      "webp": {
-      "bytes": 502148,
+      "bytes": 450252,
       "primitives": 3,
       "textures": [
        {
@@ -1917,10 +1917,10 @@
        {
         "material": "brazier_iron",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 89970
+        "bytes": 38076
        },
        {
         "material": "brazier_iron",
@@ -2747,7 +2747,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1068748,
+      "bytes": 506680,
       "primitives": 7,
       "textures": [
        {
@@ -2761,10 +2761,10 @@
        {
         "material": "column_ruin_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 783518
+        "bytes": 221470
        },
        {
         "material": "column_ruin_stone",
@@ -2777,7 +2777,7 @@
       ]
      },
      "webp": {
-      "bytes": 626444,
+      "bytes": 442140,
       "primitives": 7,
       "textures": [
        {
@@ -2791,10 +2791,10 @@
        {
         "material": "column_ruin_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 261572
+        "bytes": 77270
        },
        {
         "material": "column_ruin_stone",
@@ -2897,7 +2897,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 970408,
+      "bytes": 601240,
       "primitives": 10,
       "textures": [
        {
@@ -2911,10 +2911,10 @@
        {
         "material": "crate",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 575069
+        "bytes": 205898
        },
        {
         "material": "crate",
@@ -2927,7 +2927,7 @@
       ]
      },
      "webp": {
-      "bytes": 624140,
+      "bytes": 525372,
       "primitives": 10,
       "textures": [
        {
@@ -2941,10 +2941,10 @@
        {
         "material": "crate",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 174100
+        "bytes": 75334
        },
        {
         "material": "crate",
@@ -3040,7 +3040,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 992232,
+      "bytes": 479448,
       "primitives": 9,
       "textures": [
        {
@@ -3054,10 +3054,10 @@
        {
         "material": "crumble",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 731608
+        "bytes": 218819
        },
        {
         "material": "crumble",
@@ -3070,7 +3070,7 @@
       ]
      },
      "webp": {
-      "bytes": 628808,
+      "bytes": 443684,
       "primitives": 9,
       "textures": [
        {
@@ -3084,10 +3084,10 @@
        {
         "material": "crumble",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 271306
+        "bytes": 86192
        },
        {
         "material": "crumble",
@@ -3250,7 +3250,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 967996,
+      "bytes": 559524,
       "primitives": 10,
       "textures": [
        {
@@ -3264,10 +3264,10 @@
        {
         "material": "keg",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 596419
+        "bytes": 187950
        },
        {
         "material": "keg",
@@ -3280,7 +3280,7 @@
       ]
      },
      "webp": {
-      "bytes": 560200,
+      "bytes": 463580,
       "primitives": 10,
       "textures": [
        {
@@ -3294,10 +3294,10 @@
        {
         "material": "keg",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 150970
+        "bytes": 54358
        },
        {
         "material": "keg",
@@ -3687,7 +3687,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1346504,
+      "bytes": 622700,
       "primitives": 9,
       "textures": [
        {
@@ -3701,10 +3701,10 @@
        {
         "material": "lantern_toro",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 999665
+        "bytes": 275891
        },
        {
         "material": "lantern_toro",
@@ -3717,7 +3717,7 @@
       ]
      },
      "webp": {
-      "bytes": 778836,
+      "bytes": 560948,
       "primitives": 9,
       "textures": [
        {
@@ -3731,10 +3731,10 @@
        {
         "material": "lantern_toro",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 311988
+        "bytes": 94100
        },
        {
         "material": "lantern_toro",
@@ -3840,7 +3840,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 3936360,
+      "bytes": 1774440,
       "primitives": 7,
       "textures": [
        {
@@ -3854,10 +3854,10 @@
        {
         "material": "pillar_square_stone",
         "slot": "normal",
-        "w": 2048,
-        "h": 2048,
+        "w": 1024,
+        "h": 1024,
         "codec": "uastc+zstd",
-        "bytes": 3008205
+        "bytes": 846281
        },
        {
         "material": "pillar_square_stone",
@@ -3870,7 +3870,7 @@
       ]
      },
      "webp": {
-      "bytes": 2300292,
+      "bytes": 1608372,
       "primitives": 7,
       "textures": [
        {
@@ -3884,10 +3884,10 @@
        {
         "material": "pillar_square_stone",
         "slot": "normal",
-        "w": 2048,
-        "h": 2048,
+        "w": 1024,
+        "h": 1024,
         "codec": "webp",
-        "bytes": 961864
+        "bytes": 269944
        },
        {
         "material": "pillar_square_stone",
@@ -4048,7 +4048,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1367036,
+      "bytes": 678276,
       "primitives": 2,
       "textures": [
        {
@@ -4062,10 +4062,10 @@
        {
         "material": "rock_prop_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 986476
+        "bytes": 297725
        },
        {
         "material": "rock_prop_stone",
@@ -4078,7 +4078,7 @@
       ]
      },
      "webp": {
-      "bytes": 766880,
+      "bytes": 592904,
       "primitives": 2,
       "textures": [
        {
@@ -4092,10 +4092,10 @@
        {
         "material": "rock_prop_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 284464
+        "bytes": 110486
        },
        {
         "material": "rock_prop_stone",
@@ -4198,7 +4198,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1202716,
+      "bytes": 570980,
       "primitives": 2,
       "textures": [
        {
@@ -4212,10 +4212,10 @@
        {
         "material": "rubble_pile_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 888438
+        "bytes": 256709
        },
        {
         "material": "rubble_pile_stone",
@@ -4228,7 +4228,7 @@
       ]
      },
      "webp": {
-      "bytes": 686388,
+      "bytes": 491068,
       "primitives": 2,
       "textures": [
        {
@@ -4242,10 +4242,10 @@
        {
         "material": "rubble_pile_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 277288
+        "bytes": 81968
        },
        {
         "material": "rubble_pile_stone",
@@ -4346,7 +4346,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1384456,
+      "bytes": 687672,
       "primitives": 2,
       "textures": [
        {
@@ -4360,10 +4360,10 @@
        {
         "material": "rubble_scatter_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 990406
+        "bytes": 293630
        },
        {
         "material": "rubble_scatter_stone",
@@ -4376,7 +4376,7 @@
       ]
      },
      "webp": {
-      "bytes": 967332,
+      "bytes": 741724,
       "primitives": 2,
       "textures": [
        {
@@ -4390,10 +4390,10 @@
        {
         "material": "rubble_scatter_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 341228
+        "bytes": 115622
        },
        {
         "material": "rubble_scatter_stone",
@@ -4691,7 +4691,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1022132,
+      "bytes": 574568,
       "primitives": 3,
       "textures": [
        {
@@ -4705,10 +4705,10 @@
        {
         "material": "spike_grate",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 646031
+        "bytes": 198465
        },
        {
         "material": "spike_grate",
@@ -4721,7 +4721,7 @@
       ]
      },
      "webp": {
-      "bytes": 635188,
+      "bytes": 532828,
       "primitives": 3,
       "textures": [
        {
@@ -4735,10 +4735,10 @@
        {
         "material": "spike_grate",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 163792
+        "bytes": 61430
        },
        {
         "material": "spike_grate",
@@ -4894,7 +4894,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 997760,
+      "bytes": 567272,
       "primitives": 2,
       "textures": [
        {
@@ -4908,10 +4908,10 @@
        {
         "material": "stakes",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 638385
+        "bytes": 207900
        },
        {
         "material": "stakes",
@@ -4924,7 +4924,7 @@
       ]
      },
      "webp": {
-      "bytes": 650940,
+      "bytes": 527996,
       "primitives": 2,
       "textures": [
        {
@@ -4938,10 +4938,10 @@
        {
         "material": "stakes",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 189078
+        "bytes": 66130
        },
        {
         "material": "stakes",
@@ -5045,7 +5045,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1732940,
+      "bytes": 960768,
       "primitives": 11,
       "textures": [
        {
@@ -5059,10 +5059,10 @@
        {
         "material": "statue_hooded_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 1074486
+        "bytes": 302352
        },
        {
         "material": "statue_hooded_stone",
@@ -5075,7 +5075,7 @@
       ]
      },
      "webp": {
-      "bytes": 1236848,
+      "bytes": 988772,
       "primitives": 11,
       "textures": [
        {
@@ -5089,10 +5089,10 @@
        {
         "material": "statue_hooded_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 358856
+        "bytes": 110796
        },
        {
         "material": "statue_hooded_stone",
@@ -5196,7 +5196,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1749540,
+      "bytes": 1014048,
       "primitives": 11,
       "textures": [
        {
@@ -5210,10 +5210,10 @@
        {
         "material": "statue_knight_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 1038138
+        "bytes": 302681
        },
        {
         "material": "statue_knight_stone",
@@ -5226,7 +5226,7 @@
       ]
      },
      "webp": {
-      "bytes": 1349568,
+      "bytes": 1118664,
       "primitives": 11,
       "textures": [
        {
@@ -5240,10 +5240,10 @@
        {
         "material": "statue_knight_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 347322
+        "bytes": 116450
        },
        {
         "material": "statue_knight_stone",
@@ -5347,7 +5347,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 1728968,
+      "bytes": 961388,
       "primitives": 11,
       "textures": [
        {
@@ -5361,10 +5361,10 @@
        {
         "material": "statue_mage_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 1072967
+        "bytes": 305420
        },
        {
         "material": "statue_mage_stone",
@@ -5377,7 +5377,7 @@
       ]
      },
      "webp": {
-      "bytes": 1242120,
+      "bytes": 1003976,
       "primitives": 11,
       "textures": [
        {
@@ -5391,10 +5391,10 @@
        {
         "material": "statue_mage_stone",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 353898
+        "bytes": 115778
        },
        {
         "material": "statue_mage_stone",
@@ -5814,7 +5814,7 @@
    "stats": {
     "full": {
      "ktx2": {
-      "bytes": 798848,
+      "bytes": 417392,
       "primitives": 2,
       "textures": [
        {
@@ -5828,10 +5828,10 @@
        {
         "material": "vent_grate",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "uastc+zstd",
-        "bytes": 543259
+        "bytes": 161808
        },
        {
         "material": "vent_grate",
@@ -5844,7 +5844,7 @@
       ]
      },
      "webp": {
-      "bytes": 435344,
+      "bytes": 333152,
       "primitives": 2,
       "textures": [
        {
@@ -5858,10 +5858,10 @@
        {
         "material": "vent_grate",
         "slot": "normal",
-        "w": 1024,
-        "h": 1024,
+        "w": 512,
+        "h": 512,
         "codec": "webp",
-        "bytes": 159084
+        "bytes": 56892
        },
        {
         "material": "vent_grate",
