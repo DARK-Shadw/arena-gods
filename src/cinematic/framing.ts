@@ -11,7 +11,9 @@ import type { ArenaLayout } from '../sim/arenaGen';
 import { CHAIN_LEN, CHAIN_PIVOT_H } from '../sim/arenaGen';
 import { CHANDELIER_H } from '../render/arena/arenaView';
 
-const probe = new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 500);
+// created on first use: a module-level Object3D would draw a UUID from Math.random at import time and shift the seeded
+// cosmetic randomness of every arena (legacy banner phases), breaking the pixel-identical checks
+let probeCam: THREE.PerspectiveCamera | null = null;
 const tmp = new THREE.Vector3();
 
 /** sample points of every hanging hazard (cage body + its chains up into the dark; the chain weight + its chain) */
@@ -38,6 +40,7 @@ export function hangingPoints(L: ArenaLayout): THREE.Vector3[][] {
  * the frame) counts double.
  */
 export function hazardPenalty(L: ArenaLayout, pos: THREE.Vector3, look: THREE.Vector3, fov: number, aspect: number): number {
+  const probe = (probeCam ??= new THREE.PerspectiveCamera(50, 16 / 9, 0.1, 500));
   probe.fov = fov;
   probe.aspect = aspect;
   probe.position.copy(pos);
