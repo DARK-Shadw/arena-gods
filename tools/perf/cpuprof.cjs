@@ -16,6 +16,8 @@ const DIST = path.resolve(ROOT, opt('dist', 'dist_prof'));
 const Q = Number(opt('q', 2));
 const SEC = Number(opt('sec', 6));
 const PAUSED = opt('paused', '1') === '1';
+const INTRO = opt('intro', '0') === '1';
+const SKIPMS = Number(opt('skipms', 0));
 const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234', 'chrome-win64', 'chrome.exe');
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.webp': 'image/webp', '.ktx2': 'image/ktx2', '.wasm': 'application/wasm', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.bin': 'application/octet-stream' };
 
@@ -30,15 +32,16 @@ const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css
       if (fs.existsSync(p) && fs.statSync(p).isFile()) route.fulfill({ path: p, contentType: MIME[path.extname(p)] || 'application/octet-stream' });
       else route.fulfill({ status: 404, body: '' });
     });
-    await page.goto(`http://arena.local/index.html?manual=1&auto=1&skip=1&a=gorak&b=erika&seed=4242&theme=colosseum&layout=oval&aseed=7&q=${Q}`);
-    await page.waitForFunction(() => window.__arena && window.__arena.state === 'fight' && window.__arena.arena, null, { timeout: 180000 });
-    await page.evaluate((paused) => {
+    await page.goto(`http://arena.local/index.html?${INTRO ? '' : 'manual=1&'}auto=1${INTRO ? '' : '&skip=1'}&a=gorak&b=erika&seed=4242&theme=colosseum&layout=oval&aseed=7&q=${Q}`);
+    await page.waitForFunction((intro) => window.__arena && window.__arena.state === (intro ? 'intro' : 'fight') && window.__arena.arena, INTRO, { timeout: 180000 });
+    if (INTRO) await page.waitForTimeout(SKIPMS);
+    else await page.evaluate((paused) => {
       const A = window.__arena;
       A.debugSeekFight(20);
       A.paused = paused;
       A.manual = false;
     }, PAUSED);
-    await page.waitForTimeout(2000);
+    if (!INTRO) await page.waitForTimeout(2000);
     const cdp = await ctx.newCDPSession(page);
     await cdp.send('Profiler.enable');
     await cdp.send('Profiler.setSamplingInterval', { interval: 200 });

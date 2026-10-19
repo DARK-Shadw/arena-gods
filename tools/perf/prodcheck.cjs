@@ -167,7 +167,9 @@ async function live(browser) {
         if (nProg >= 0 && dt > 50 && res.long.length < 40) res.long.push({ state: app.prewarmAt > now - dt ? 'prewarm' : app.state, t: +(app.playback?.t ?? 0).toFixed(2), shot: app.director?.shotName, dt: +dt.toFixed(1) });
         nProg = progs.length;
         res.progs = nProg;
+        if (app.state === 'intro' || app.state === 'faceoff') (res.ivIntro ??= []).push(+dt.toFixed(2));
         if (app.state !== 'fight' || !app.playback) return;
+        (res.iv ??= []).push(+dt.toFixed(2));
         res.frames++;
         res.t = app.playback.t;
         const fr = app.playback.frameAt(app.playback.t);
@@ -190,7 +192,16 @@ async function live(browser) {
     }, { keys: opt('keys', '0') === '1' });
     await page.waitForFunction(() => window.__arena.state === 'post' || (window.__falls && window.__falls.byState.dead), null, { timeout: Number(opt('timeout', 400000)), polling: 1000 });
     await page.waitForTimeout(1500);
-    const r = await page.evaluate(() => window.__falls);
+    const r = await page.evaluate(() => {
+      const R = window.__falls;
+      const iv = (R.iv || []).slice(2).sort((a, b) => a - b);
+      R.fight = iv.length ? { frames: iv.length, fps: +(1000 / (iv.reduce((a, b) => a + b, 0) / iv.length)).toFixed(1), p50: iv[iv.length >> 1], p95: iv[Math.floor(iv.length * 0.95)], p99: iv[Math.floor(iv.length * 0.99)], over20: +((iv.filter((x) => x > 20).length / iv.length) * 100).toFixed(1), over33: +((iv.filter((x) => x > 33.4).length / iv.length) * 100).toFixed(2) } : null;
+      const ii = (R.ivIntro || []).slice(2).sort((a, b) => a - b);
+      R.intro = ii.length ? { frames: ii.length, fps: +(1000 / (ii.reduce((a, b) => a + b, 0) / ii.length)).toFixed(1), p50: ii[ii.length >> 1], p95: ii[Math.floor(ii.length * 0.95)], over20: +((ii.filter((x) => x > 20).length / ii.length) * 100).toFixed(1), over33: +((ii.filter((x) => x > 33.4).length / ii.length) * 100).toFixed(1) } : null;
+      delete R.iv;
+      delete R.ivIntro;
+      return R;
+    });
     const res = { seed, a, b, skip, ...r, notFound: log.notFound, errors: log.errors.slice(0, 6) };
     console.log(JSON.stringify(res));
     return res;

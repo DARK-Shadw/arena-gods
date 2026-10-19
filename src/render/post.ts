@@ -739,6 +739,20 @@ export class Post {
       scene.matrixWorldAutoUpdate = auto;
     }
   }
+  /** A21: one render with every optional pass the tier allows switched on (DOF, distortion), so their programs compile
+   * behind the loading screen instead of on the first kill cam / cinematic / heavy hit */
+  warm() {
+    const dof = this.dofOn,
+      da = this.distActive;
+    this.dofOn = this.dofEnabled && this.tier.dof;
+    this.distActive = () => true;
+    try {
+      this.render();
+    } finally {
+      this.dofOn = dof;
+      this.distActive = da;
+    }
+  }
   private lightScan = 0;
   private lightKids = -1;
 

@@ -26,6 +26,7 @@ const N = Number(opt('n', 90));
 const ROUNDS = Number(opt('rounds', 8));
 const BLOCK = Number(opt('block', 10));
 const PAIRS = Number(opt('pairs', 120));
+const INTRO = opt('scene', 'fight') === 'intro';
 const JSON_OUT = opt('json', '');
 const SHOTS = opt('shots', '');
 const TOGGLES = opt('toggles', 'events,fireField,backdrop,sky,fighters,reflection,ambient,shadows').split(',').filter(Boolean);
@@ -33,10 +34,15 @@ const exe = path.join(process.env.LOCALAPPDATA, 'ms-playwright', 'chromium-1234'
 const MIME = { '.html': 'text/html', '.js': 'text/javascript', '.css': 'text/css', '.json': 'application/json', '.glb': 'model/gltf-binary', '.png': 'image/png', '.webp': 'image/webp', '.ktx2': 'image/ktx2', '.wasm': 'application/wasm', '.ogg': 'audio/ogg', '.mp3': 'audio/mpeg', '.svg': 'image/svg+xml', '.bin': 'application/octet-stream' };
 const F = { a: 'gorak', b: 'erika', seed: 4242, theme: 'colosseum', layout: 'oval', aseed: 7, t: 20, cam: [4.6, 1.9, 1] };
 
-const PAGE = async ([T, CAM]) => {
+const PAGE = async ([T, CAM, INTRO, INTRO_AT]) => {
   const A = window.__arena;
   const gl = A.renderer.getContext();
   const ext = gl.getExtension('EXT_disjoint_timer_query_webgl2');
+  let setEvents = () => {};
+  if (INTRO) {
+    // --scene=intro: the cinematic as it plays (stepped at 1/60 s per measured frame), from --at=<s> into the intro
+    A.stepFrames(Math.round(INTRO_AT * 60), 1 / 60);
+  } else {
   // --- 1. rebuild the arena with an extra fire jet beside the fighters at time T (same pack: cached assets)
   A.debugSeekFight(T);
   let f = A.playback.frameAt(A.playback.t).f;
@@ -66,7 +72,7 @@ const PAGE = async ([T, CAM]) => {
     haz[jetIndex] = 2;
     return orig({ ...fr, haz, fires: [...(fr.fires ?? []), ...oil] }, ...rest);
   };
-  const setEvents = (on) => {
+  setEvents = (on) => {
     ev.on = on;
     A.arena.skyFlashAt = on ? 40.02 : null;
   };
@@ -75,6 +81,7 @@ const PAGE = async ([T, CAM]) => {
   f = A.playback.frameAt(A.playback.t).f;
   A.debugView([mx - dz * CAM[0] * CAM[2], CAM[1], mz + dx * CAM[0] * CAM[2]], [mx, 1.05, mz], 50);
   A.paused = true;
+  }
   // --- 2. timing
   const pending = [];
   const total = [];
@@ -284,9 +291,9 @@ const PAGE = async ([T, CAM]) => {
         if (fs.existsSync(p) && fs.statSync(p).isFile()) route.fulfill({ path: p, contentType: MIME[path.extname(p)] || 'application/octet-stream' });
         else route.fulfill({ status: 404, body: '' });
       });
-      await page.goto(`http://arena.local/index.html?manual=1&auto=1&skip=1&a=${F.a}&b=${F.b}&seed=${F.seed}&theme=${F.theme}&layout=${F.layout}&aseed=${F.aseed}&q=${q}`);
-      await page.waitForFunction(() => window.__arena && window.__arena.state === 'fight' && window.__arena.arena && window.__arena.arena.kit, null, { timeout: 180000 });
-      await page.evaluate(PAGE, [F.t, F.cam]);
+      await page.goto(`http://arena.local/index.html?manual=1&auto=1${INTRO ? '' : '&skip=1'}&a=${F.a}&b=${F.b}&seed=${F.seed}&theme=${F.theme}&layout=${F.layout}&aseed=${F.aseed}&q=${q}`);
+      await page.waitForFunction((intro) => window.__arena && window.__arena.state === (intro ? 'intro' : 'fight') && window.__arena.arena && window.__arena.arena.kit, INTRO, { timeout: 180000 });
+      await page.evaluate(PAGE, [F.t, F.cam, INTRO, Number(opt('at', 0))]);
       if (SHOTS) {
         fs.mkdirSync(SHOTS, { recursive: true });
         await page.evaluate(() => __arena.stepFrames(2, 1 / 60));

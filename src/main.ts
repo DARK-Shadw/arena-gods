@@ -432,6 +432,26 @@ class App {
     const kegs = this.arena.layout.props.some((p) => p.kind === 'explosive');
     this.vfx.prewarm(['mask', 'dust_puff', 'dust_ring', ...(kegs ? ['unity_explosion00', 'unity_explosion01_nofire'] : [])]);
     const before = r.info.programs?.length ?? 0;
+    // GPU uploads of every loaded texture the scene's materials use (otherwise each one uploads on the first frame that
+    // draws it: a 50-100 ms frame when the camera first turns to a new part of the arena or an effect first plays)
+    if (!this.headless) {
+      const seen = new Set<THREE.Texture>();
+      const up = (v: unknown) => {
+        const t = v as THREE.Texture;
+        if (!t || !t.isTexture || seen.has(t) || (t as THREE.Texture & { isRenderTargetTexture?: boolean }).isRenderTargetTexture) return;
+        seen.add(t);
+        const img = t.image as { complete?: boolean } | null;
+        if (t.version > 0 && img && img.complete !== false) r.initTexture(t);
+      };
+      this.scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        for (const mat of m ? (Array.isArray(m) ? m : [m]) : []) {
+          for (const v of Object.values(mat)) up(v);
+          const u = (mat as THREE.ShaderMaterial).uniforms;
+          if (u) for (const k in u) up(u[k]?.value);
+        }
+      });
+    }
     const prev = r.getRenderTarget();
     r.setRenderTarget(this.post.sceneRT);
     try {
@@ -451,17 +471,14 @@ class App {
         if (!o.visible && !(o as THREE.Light).isLight && (o.name.startsWith('fx.') || o.parent?.name === 'fx.ghosts')) on.push(o);
       });
       for (const o of on) o.visible = true;
-      const da = this.post.distActive,
-        pre = this.post.preScene;
-      this.post.distActive = () => true;
+      const pre = this.post.preScene;
       this.post.preScene = null;
       try {
-        this.post.render();
+        this.post.warm();
       } catch (e) {
         console.warn('[arena] warm-up frame failed', e);
       } finally {
         for (const o of on) o.visible = false;
-        this.post.distActive = da;
         this.post.preScene = pre;
       }
     }
