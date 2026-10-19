@@ -79,6 +79,20 @@ export interface GateAnchors {
   wallH: number;
   /** the barrier's breakable pieces (restored on reset) */
   pieces: { obj: THREE.Object3D; pos: THREE.Vector3; rot: THREE.Euler; vis: boolean }[];
+  /**
+   * A18: the gate stands up a stair (Moon Gate): the ground under the gate axis rises from the floor (z >= z0) up the
+   * flight to the dais (height h at z <= zTop). Every gate-frame y (actor, cameras, anchors) is then RELATIVE to this
+   * ground: the entrance builder adds groundY(z) (the nosing midline of the steps, within half a riser of each tread)
+   */
+  ground?: { z0: number; zTop: number; h: number; rise: number; run: number };
+  /** A18: the same gate as if it stood at floor level (barrier / tunnel): the speed reference for the stair re-timing */
+  flat?: { barrierZ: number; tunnel?: { depth: number; height: number; floorY: number } };
+}
+
+/** A18: ground height (relative to the floor) under a gate-frame z, for gates with anchors.ground */
+export function groundY(gr: GateAnchors['ground'], z: number): number {
+  if (!gr) return 0;
+  return Math.max(0, Math.min(gr.h, gr.rise * ((gr.z0 - z) / gr.run + 0.5)));
 }
 
 export interface Mood {

@@ -94,6 +94,22 @@ export interface LookArt {
   lookId?: string;
   /** A7b: the stage light model (moon rim, fire pools on stone, env probe from the backdrop, sky-driven fog, ground mist) */
   stage?: StageLightArt;
+  /** A18: the arena's display name / tagline in kit mode (the reveal's name card; legacy keeps the theme's own) */
+  name?: string;
+  tagline?: string;
+}
+
+/**
+ * A18: cinematic hints for a theme in kit mode (reveal, entrances, face-off, handover to the fight camera). Without them
+ * the generic cinematics run unchanged (legacy and every other theme).
+ */
+export interface CineArt {
+  /** the reveal opens on the sky and the landmark (azimuth 0), cranes down onto the hero stair, then glides along it */
+  reveal?: 'landmark';
+  /** the face-off's last shot: low behind the west fighter, the east fighter against the stair, the landmark and the moon */
+  faceoff?: 'landmark';
+  /** the fight camera blends in from the face-off's last pose instead of cutting to the establishing crane */
+  handover?: boolean;
 }
 
 export interface RingArt {
@@ -173,6 +189,13 @@ export interface GateArt {
     doorwayScale?: number;
     guardians?: { statue: AssetId; plinth: AssetId; lateral: number; z: number; plinthScale: number; scale: number };
     braziers?: { asset: AssetId; lateral: number; z: number; scale: number; flame: number };
+    /**
+     * A18 (ref-3): ONE wide flight from the floor to the dais across the whole stair width (no portal block between two
+     * flights). The gate moves up onto the dais: slim stone posts + lintel at `topGate.z` (gate frame) frame the portcullis,
+     * every entrance at this gate starts on the dais and comes down the stair (anchors.ground: the stair profile)
+     */
+    wide?: boolean;
+    topGate?: { z: number; postHalf: number; postW: number; postD: number; postH: number; lintelH: number };
   };
   /** lateral half width of the zone around this gate where the ring (walls, tiers, pillars, decor, ring braziers) stays out */
   zoneHalf: number;
@@ -272,6 +295,8 @@ export interface ThemeArt {
   ringFlames?: RingFlamesArt;
   /** A2: display-data overrides in kit mode */
   look?: LookArt;
+  /** A18: cinematic hints (reveal, face-off, handover) */
+  cine?: CineArt;
   /** extra assets to load with the theme (ambient dressing placed by sockets, A4+) */
   extra?: AssetId[];
 }

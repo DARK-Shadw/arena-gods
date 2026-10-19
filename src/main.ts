@@ -420,7 +420,8 @@ class App {
     this.skipping = false;
   }
 
-  beginFight() {
+  /** @param handover A18: the face-off ended on its own: the fight camera may blend in from its last pose (ThemeArt.cine) */
+  beginFight(handover = false) {
     this.state = 'fight';
     this.timelines = [];
     this.restoreLighting();
@@ -432,7 +433,7 @@ class App {
     for (const v of this.views) v.rig.root.visible = true;
     this.playback.seek(0);
     this.realT = 0;
-    this.director = new Director(this.rig, this.rec);
+    this.director = new Director(this.rig, this.rec, { handover: handover && !!this.arena.kit?.art.cine?.handover });
     this.sound = new SoundDirector([this.choice.a, this.choice.b]);
     this.sound.voiceBusy = () => this.dialogue.busy;
     audio.setMusic(true, 'fight');
@@ -608,7 +609,7 @@ class App {
         if (tl.done) {
           this.timelines.shift();
           if (this.timelines.length === 1) this.state = 'faceoff';
-          if (this.timelines.length === 0) this.beginFight();
+          if (this.timelines.length === 0) this.beginFight(true);
         }
       }
       dof = 1;
