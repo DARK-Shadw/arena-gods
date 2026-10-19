@@ -97,7 +97,7 @@ export interface CineLine {
  * Anchors are declared by the dressing; snap them onto the geometry that was
  * actually built (ray cast down) and drop any that do not land on a surface.
  */
-function snapAnchors(arena: CineCtx['arena'], gate: number) {
+export function snapAnchors(arena: CineCtx['arena'], gate: number) {
   const g = arena.gates[gate];
   const A = g.anchors as typeof g.anchors & { snapped?: boolean };
   if (A.snapped) return A;
