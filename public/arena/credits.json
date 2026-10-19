@@ -49,9 +49,7 @@
     "large_grey_tiles_arm_2k.png"
    ],
    "fetched": "2026-10-17",
-   "usedBy": [
-    "floor/flagstone_bluegrey"
-   ]
+   "usedBy": []
   },
   "polyhaven/lichen_rock": {
    "name": "Lichen Rock",
@@ -70,6 +68,7 @@
    ],
    "fetched": "2026-10-18",
    "usedBy": [
+    "floor/slabs_moongate",
     "kit/banner_pole",
     "kit/brazier_pedestal",
     "kit/chunk",

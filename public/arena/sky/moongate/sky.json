@@ -6,8 +6,8 @@
   "polyhaven/quarry_cloudy"
  ],
  "moon": {
-  "az": -1.7,
-  "elev": 27,
+  "az": 0,
+  "elev": 26,
   "diameter": 12
  },
  "palette": [
@@ -118,7 +118,7 @@
     "webp": "sky/moongate/q1/sky.webp"
    },
    "gpuMB": 2.67,
-   "downloadMB": 1.32
+   "downloadMB": 1.33
   },
   "q0": {
    "size": [

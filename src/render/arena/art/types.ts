@@ -25,7 +25,7 @@ export type AssetTier = 'full' | 'low';
 export const tierOf = (quality: number): AssetTier => (quality <= 0 ? 'low' : 'full');
 
 export interface FloorArt {
-  /** floor texture set (A2: role texset, kind floor; e.g. 'floor/flagstone_bluegrey') */
+  /** floor texture set (A2: role texset, kind floor; e.g. 'floor/slabs_moongate') */
   set: AssetId;
   /** inlaid ritual circle at the arena centre (role texset, kind inlay; e.g. 'floor/inlay_moongate') */
   inlay?: AssetId;
@@ -35,6 +35,11 @@ export interface FloorArt {
   puddles?: number;
   /** albedo multiplier (linear RGB) on top of the set's grading */
   tint?: [number, number, number];
+  /** A8: damp (not puddle) roughness = dry x damp[0] + damp[1] (default [0.34, 0.05]: the A2 polished-wet look); higher
+   * keeps the stone dull with the wet glints in the puddles, joints and cracks only */
+  damp?: [number, number];
+  /** A8: gain of the fire-streak cards on medium / high (default STREAK_ACCENT 0.6; the planar reflection carries the rest) */
+  streakGain?: number;
 }
 
 /**
@@ -145,7 +150,8 @@ export interface GateArt {
     /** dais depth behind the flights and half width */
     daisDepth: number;
     daisHalf: number;
-    doorway: AssetId;
+    /** doorway arch on the dais (A8: optional; the Moon Gate leaves the dais open so the backdrop arch's portal is the doorway, as in ref-3) */
+    doorway?: AssetId;
     /** uniform scale of the doorway arch */
     doorwayScale?: number;
     guardians?: { statue: AssetId; plinth: AssetId; lateral: number; z: number; plinthScale: number; scale: number };
@@ -180,7 +186,18 @@ export interface RuinsArt {
   /** sparse hooded watchers standing on the tiers (count per quality tier low / medium / high) */
   watchers?: { count: [number, number, number]; color: string };
   /** small fires on the tiers (kit wall braziers) */
-  fires?: { asset: AssetId; count: number; size: number };
+  fires?: {
+    asset: AssetId;
+    count: number;
+    size: number;
+    /** A8: extra fires on the low broken tiers of the vista sector (ref-3: fires all along the ruins beside the stair) */
+    vista?: number;
+    /** A8: burning debris on the floor just outside the boundary (a rubble cluster + a small flame; ref-3's floor fires) */
+    ground?: { asset: AssetId; count: number; size: number };
+  };
+  /** A8: render-only rubble on the wet floor (ref-3: chunks and debris everywhere): a dense band at the boundary foot and
+   * small scattered pieces inside (kept off gate paths, obstacles, props and hazards). Counts per quality tier. */
+  floorRubble?: { asset: AssetId; band: [number, number, number]; inner: [number, number, number] };
   /** the fire-cage chandelier (procedural iron, hung at CHANDELIER_H) */
   fireCage?: boolean;
   /** east / west gate dressing */

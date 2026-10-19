@@ -16,11 +16,14 @@ const dirFrom = (elevDeg: number, azDeg: number) => {
 };
 const C = (c: string) => new THREE.Color(c);
 const hdr = (c: string, k: number) => new THREE.Color(c).multiplyScalar(k);
-const MOON = dirFrom(27, -1.7);
+// A8: the moon sits centred in the ring arch as in ref-3 (A2-A7c: az -1.7, elev 27)
+const MOON = dirFrom(26, 0);
 
 export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
-  floor: { set: 'floor/flagstone_bluegrey', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.35 },
+  // A8 (owner feedback): big thick broken slabs (procedural, 8 m tile), dull damp stone, wet glints in puddles / joints /
+  // cracks; the ring carved deeper (inlay re-baked at 26 mm)
+  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.35 },
   // A4: ref-3's big bowls on stone pedestals alternate with the tripods (the pedestal flame is bigger: SOCK_flame size)
   ringFlames: { asset: 'kit/brazier_tripod', assets: ['kit/brazier_pedestal', 'kit/brazier_tripod'], count: 10, offset: 0.55, size: 0.95 },
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
@@ -56,7 +59,9 @@ export const COLOSSEUM_ART: ThemeArt = {
         chains: { scale: 2.6, sag: 2.4, swags: true },
       },
       watchers: { count: [8, 14, 18], color: '#1b1722' },
-      fires: { asset: 'kit/brazier_wall', count: 7, size: 0.75 },
+      fires: { asset: 'kit/brazier_wall', count: 14, size: 0.8, vista: 6, ground: { asset: 'kit/rubble_scatter', count: 9, size: 0.55 } },
+      // A8: ref-3's floor is littered with chunks and debris
+      floorRubble: { asset: 'kit/rubble_scatter', band: [12, 22, 30], inner: [10, 22, 30] },
       fireCage: true,
       east: {
         zoneHalf: 11.2,
@@ -69,10 +74,10 @@ export const COLOSSEUM_ART: ThemeArt = {
           z0: -0.9,
           daisDepth: 6,
           daisHalf: 7.6,
-          doorway: 'kit/arch',
-          doorwayScale: 1.25,
-          guardians: { statue: 'kit/statue_hooded', plinth: 'kit/plinth', lateral: 7.5, z: -1.9, plinthScale: 2.0, scale: 2.0 },
-          braziers: { asset: 'kit/brazier_pedestal', lateral: 10.2, z: 1.6, scale: 1.8, flame: 1.8 },
+          // A8: no doorway block on the dais: from the ref-3 camera it hid the backdrop arch's portal, which is
+          // ref-3's doorway (the stair climbs toward it)
+          guardians: { statue: 'kit/statue_hooded', plinth: 'kit/plinth', lateral: 6.9, z: -1.9, plinthScale: 1.3, scale: 1.2 },
+          braziers: { asset: 'kit/brazier_pedestal', lateral: 7.8, z: 1.6, scale: 1.8, flame: 1.8 },
         },
       },
       west: { zoneHalf: 4.6, arch: 'kit/arch', braziers: { asset: 'kit/brazier_tripod', lateral: 4.3, z: -0.3, scale: 1.0, flame: 0.95 } },
@@ -90,10 +95,10 @@ export const COLOSSEUM_ART: ThemeArt = {
       // A7b: the baked Cycles layers are violet; ref-3's stone and cloud are blue-grey
       sat: 0.5,
       tint: [0.94, 0.97, 1.06],
-      shafts: { count: 3, color: '#c4caf0', opacity: 0.22, az: -1.7, dist: 66 },
+      shafts: { count: 3, color: '#c4caf0', opacity: 0.22, az: 0, dist: 66 },
       fogBanks: { count: [8, 16], radius: 52, opacity: 0.5, lift: 1.3 },
-      // A7b: procedural stand-ins until A8 renders the EEVEE shaft / fog-bank atlases
-      proceduralCards: true,
+      // A8: the EEVEE shaft / fog-bank atlases are rendered now (128 px frames; A7b's procedural stand-ins retired)
+      proceduralCards: false,
       // A7b: the baked storm clouds: dark away from the moon, backlit round it
       cloud: { away: 0.24, near: 0.3, power: 8 },
       // A7c: the authored sky draws the storm now; the blockout's Cycles clouds fade out
@@ -137,7 +142,7 @@ export const COLOSSEUM_ART: ThemeArt = {
     sunColor: '#c6cbf2',
     hemi: ['#55566a', '#1a1618', 0.8],
     fog: { color: '#262a3a', density: 0.0068, height: 0.05 },
-    exposure: 1.2,
+    exposure: 1.4,
     bloom: { strength: 0.45, radius: 0.65, threshold: 1.2 },
     grade: { tint: [1.0, 1.0, 1.0], contrast: 1.1, saturation: 0.86, lift: [0.004, 0.003, 0.008], gain: [1.0, 1.0, 1.0], vignette: 1.0 },
     godrays: 0, // moon rays cost about 1.5 ms on high (A2 measurement); the backdrop's shaft cards stand in for them

@@ -336,6 +336,45 @@
    "note": "A2: dark slate slab floor set (Molten Citadel ref-4 and others) from Poly Haven stone_tiles"
   },
   {
+   "id": "floor_slabs_moongate",
+   "script": "tools/arena/blender/floor_set.py",
+   "args": [
+    "--name",
+    "slabs_moongate",
+    "--mode",
+    "slabs",
+    "--cc0",
+    "polyhaven/lichen_rock",
+    "--tile-m",
+    "8.0",
+    "--px",
+    "2048",
+    "--grid",
+    "384",
+    "--scan-m",
+    "5.0",
+    "--device",
+    "ONEAPI",
+    "--cracks",
+    "0.55",
+    "--rough-lo",
+    "0.74",
+    "--rough-hi",
+    "0.95",
+    "--seed",
+    "23"
+   ],
+   "inputs": [
+    "../Assets/arena-src/polyhaven/lichen_rock/meta.json"
+   ],
+   "env": {
+    "CYCLES_ONEAPI_ALL_DEVICES": "1"
+   },
+   "startMinFreeMb": 5000,
+   "timeoutMin": 40,
+   "note": "A8: Moon Gate slab floor (owner feedback on ref-3): procedural running-bond slabs (rows 0.9-1.8 m, slabs 1-2.6 m, warped edges, 40 % broken through) with tilt, chipped rounded edges, 5 cm joints, heavy cracks and wide breaks, soot / blood stains, lichen_rock micro surface, dull roughness; water ranks joints / cracks / low corners; 8 m tile"
+  },
+  {
    "id": "inlay_moongate",
    "script": "tools/arena/blender/inlay_moongate.py",
    "args": [
@@ -346,14 +385,16 @@
     "--ao-samples",
     "96",
     "--device",
-    "ONEAPI"
+    "ONEAPI",
+    "--depth",
+    "0.026"
    ],
    "env": {
     "CYCLES_ONEAPI_ALL_DEVICES": "1"
    },
    "startMinFreeMb": 5000,
    "timeoutMin": 40,
-   "note": "A2: Moon Gate engraved ritual circle (4 rings + rune band + crescents), 16 m disc, numpy SDF height -> displaced grid -> Cycles normal + AO bakes"
+   "note": "A2: Moon Gate engraved ritual circle (4 rings + rune band + crescents), 16 m disc, numpy SDF height -> displaced grid -> Cycles normal + AO bakes (A8: carved deeper, 26 mm grooves instead of 12)"
   },
   {
    "id": "kit_pillar_square",
@@ -1122,7 +1163,8 @@
     "--scene",
     "moongate",
     "--mode",
-    "preview"
+    "preview",
+    "--no-clouds"
    ],
    "inputs": [
     "tools/arena/blender/backdrop_moongate.py",
@@ -1153,7 +1195,8 @@
     "--far-scale",
     "0.5",
     "--far-samples",
-    "128"
+    "128",
+    "--no-clouds"
    ],
    "inputs": [
     "tools/arena/blender/backdrop_moongate.py",
@@ -1164,7 +1207,7 @@
    },
    "startMinFreeMb": 4500,
    "timeoutMin": 90,
-   "note": "A6: Moon Gate test backdrop, 3 Cycles panorama layers (near / mid 8192x1368 128 spp as 4 longitude strips for memory, far 4096x684 128 spp with cloud volumes) + Depth + AOV on the Arc iGPU"
+   "note": "A8: Moon Gate backdrop (rescaled ring arch + 8.5 m-storey arcade + banners / swags), 3 Cycles panorama layers (near / mid 8192x1368 128 spp as 4 longitude strips for memory, far 4096x684 128 spp) + Depth + AOV on the Arc iGPU; no cloud volumes (A7c: the authored sky draws the storm; they were the A6 memory hog)"
   },
   {
    "id": "backdrop_moongate_inset",
@@ -1181,7 +1224,8 @@
     "--inset-h",
     "2048",
     "--samples",
-    "128"
+    "128",
+    "--no-clouds"
    ],
    "inputs": [
     "tools/arena/blender/backdrop_moongate.py",
@@ -1192,7 +1236,7 @@
    },
    "startMinFreeMb": 4500,
    "timeoutMin": 60,
-   "note": "A6: hero inset 4096x2048 of the near layer from the ref-3 concept camera"
+   "note": "A6/A8: hero inset 4096x2048 of the near layer from the ref-3 concept camera (high tier only since A8)"
   },
   {
    "id": "backdrop_cards",
@@ -1203,7 +1247,7 @@
     "--mode",
     "cards",
     "--card-px",
-    "256",
+    "128",
     "--frames",
     "32"
    ],
@@ -1213,7 +1257,7 @@
    ],
    "startMinFreeMb": 3000,
    "timeoutMin": 30,
-   "note": "A6: EEVEE volumetric card sequences (moon light shaft, fog bank), 32 looped frames each, 8x4 atlas of 256 px"
+   "note": "A6/A8: EEVEE volumetric card sequences (moon light shaft, fog bank), 32 looped frames each, 8x4 atlas of 128 px (A8: 128 px so medium keeps its GPU budget)"
   },
   {
    "id": "backdrop_look",
@@ -1236,7 +1280,8 @@
     "--far-samples",
     "24",
     "--strips",
-    "4"
+    "4",
+    "--no-clouds"
    ],
    "inputs": [
     "tools/arena/blender/backdrop_moongate.py",
@@ -1282,7 +1327,8 @@
   "floor": [
    "floor_flagstone",
    "floor_slate",
-   "inlay_moongate"
+   "inlay_moongate",
+   "floor_slabs_moongate"
   ],
   "a2": [
    "floor_flagstone",
@@ -1367,6 +1413,13 @@
   ],
   "a6": [
    "backdrop_moongate_preview",
+   "backdrop_moongate",
+   "backdrop_moongate_inset",
+   "backdrop_cards"
+  ],
+  "a8": [
+   "floor_slabs_moongate",
+   "inlay_moongate",
    "backdrop_moongate",
    "backdrop_moongate_inset",
    "backdrop_cards"

@@ -71,6 +71,7 @@ uniform sampler2D tRefl;
 uniform float uFTile;
 uniform float uFWet;
 uniform float uFPuddle;
+uniform vec2 uFDampR;
 uniform float uFInOn;
 uniform float uFInMetal;
 uniform float uFLmGain;
@@ -120,7 +121,7 @@ diffuseColor.rgb *= fAlb;
 const FRAG_ROUGH = /* glsl */ `
 float roughnessFactor = fOrm.g;
 roughnessFactor = mix( roughnessFactor, mix( fInOrm.g, 0.28, 0.4 ), fGroove * uFInMetal );
-roughnessFactor = mix( roughnessFactor, roughnessFactor * 0.34 + 0.05, fDamp );
+roughnessFactor = mix( roughnessFactor, roughnessFactor * uFDampR.x + uFDampR.y, fDamp );
 roughnessFactor = mix( roughnessFactor, 0.035, fWater );
 `;
 
@@ -200,6 +201,8 @@ export class WetFloor {
   private cpuWater: Uint8Array | null = null;
   private blank: THREE.DataTexture;
   readonly inlayStyle: 'engraved' | 'metal' | 'none';
+  /** A8: fire-streak card gain override on medium / high (FloorArt.streakGain) */
+  readonly streakGain?: number;
 
   constructor(o: WetFloorOpts) {
     const L = o.layout;
@@ -243,6 +246,7 @@ export class WetFloor {
     const inl = o.inlay ? texsetTextures(o.inlay) : null;
     if (inl) for (const t of [inl.alb, inl.nrm, inl.orm]) t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
     this.inlayStyle = inl ? (inl.extras.style === 'metal' ? 'metal' : 'engraved') : 'none';
+    this.streakGain = o.art.streakGain;
     const inSize = inl ? Number(inl.extras.sizeM) || 16 : 16;
     const tint = o.art.tint ?? [1, 1, 1];
     this.uniforms = {
@@ -257,6 +261,7 @@ export class WetFloor {
       uFTile: { value: this.tileM },
       uFWet: { value: o.art.wetness ?? 0.85 },
       uFPuddle: { value: o.art.puddles ?? 0.35 },
+      uFDampR: { value: new THREE.Vector2(...(o.art.damp ?? [0.34, 0.05])) },
       uFInOn: { value: inl ? 1 : 0 },
       uFInMetal: { value: this.inlayStyle === 'metal' ? 1 : 0 },
       uFLmGain: { value: 0 },

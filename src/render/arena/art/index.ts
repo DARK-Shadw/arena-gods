@@ -117,6 +117,8 @@ export function assetsOf(art: ThemeArt, layout?: ArenaLayout): AssetId[] {
       if (N.pillars?.banner) add(art.banners);
       if (N.pillars?.chains) add(art.chains);
       add(N.fires?.asset);
+      add(N.fires?.ground?.asset);
+      add(N.floorRubble?.asset);
       for (const G of [N.east, N.west]) {
         if (!G) continue;
         add(G.arch);

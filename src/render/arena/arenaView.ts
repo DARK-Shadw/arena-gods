@@ -329,7 +329,7 @@ export class Arena {
       {
         this.streaks = new StreakCards();
         const U = this.streaks.uniforms;
-        U.uGain.value = quality <= 0 ? 1 : STREAK_ACCENT;
+        U.uGain.value = quality <= 0 ? 1 : (F.streakGain ?? STREAK_ACCENT);
         U.uOrm.value = F.uniforms.uFOrm.value as THREE.Texture;
         U.uTile.value = F.tileM;
         U.uWater.value = Math.min(0.9, (F.uniforms.uFPuddle.value as number) * 1.6);

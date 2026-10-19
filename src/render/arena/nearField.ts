@@ -329,6 +329,50 @@ export function buildNearField(a: Arena, pack: ArenaPack, N: RuinsArt, banners: 
       const fp = new THREE.Vector3(...(sock?.pos ?? [0, 0.5, 0])).applyMatrix4(m);
       a.group.add(a.flame(fp, F.size, a.theme.fire, false));
     }
+    // A8: fires on the broken low tiers of the vista sector (on the stump tops, any segment)
+    const vc = segs.filter((s) => Math.abs(azOf(s.p)) <= 50 && Math.abs(azOf(s.p)) > 14);
+    for (let n = 0; n < (F.vista ?? 0) && vc.length; n++) {
+      const s = vc.splice(hash(L.seed, n, 63) % vc.length, 1)[0];
+      const m = new THREE.Matrix4().compose(s.p.clone().setY(s.top), new THREE.Quaternion().setFromAxisAngle(UP, s.yaw), new THREE.Vector3(1, 1, 1));
+      out.placed.push({ asset: fireA, m });
+      const fp = new THREE.Vector3(...(sock?.pos ?? [0, 0.5, 0])).applyMatrix4(m);
+      a.group.add(a.flame(fp, F.size * 0.9, a.theme.fire, false));
+    }
+    // A8: burning debris on the floor at the boundary foot (outside the fight ellipse, off the gate axes)
+    const GA = F.ground ? get(F.ground.asset) : undefined;
+    if (F.ground && GA) {
+      for (let n = 0; n < F.ground.count; n++) {
+        const t = ((hash(L.seed, n, 67) % 1000) / 1000) * Math.PI * 2;
+        const p = new THREE.Vector3(Math.cos(t) * (L.rx + 0.3), 0, Math.sin(t) * (L.rz + 0.3));
+        if (Math.abs(p.z) < 4.5 && Math.abs(p.x) > L.rx * 0.6) continue;
+        const sc = 0.7 + (hash(L.seed, n, 69) % 100) / 200;
+        out.placed.push({ asset: GA, m: new THREE.Matrix4().compose(p, new THREE.Quaternion().setFromAxisAngle(UP, t * 3.1), new THREE.Vector3(sc, sc, sc)) });
+        a.group.add(a.flame(p.clone().setY(0.28 * sc), F.ground.size * (0.8 + (hash(L.seed, n, 71) % 40) / 100), a.theme.fire, false));
+      }
+    }
+  }
+
+  // ---- A8: rubble on the floor (render only: no collision, small enough to read as debris under the fighters' feet)
+  const FR = N.floorRubble;
+  const rubA = FR ? get(FR.asset) : undefined;
+  if (FR && rubA) {
+    const q = Math.max(0, Math.min(2, a.quality));
+    const blockers = [...L.obstacles.map((o) => ({ x: o.x, z: o.z, r: o.r + 0.6 })), ...L.props.map((o) => ({ x: o.x, z: o.z, r: o.r + 0.5 })), ...L.hazards.map((o) => ({ x: o.x, z: o.z, r: o.r + 0.8 }))];
+    const free = (x: number, z: number) => !blockers.some((b) => Math.hypot(b.x - x, b.z - z) < b.r) && !(Math.abs(z) < 3.2 && Math.abs(x) > L.rx * 0.55);
+    const put = (n: number, r0: number, r1: number, s0: number, s1: number, salt: number) => {
+      for (let k = 0, tries = 0; k < n && tries < n * 6; tries++) {
+        const t = rnd.next() * Math.PI * 2,
+          rr = Math.sqrt(r0 * r0 + rnd.next() * (r1 * r1 - r0 * r0));
+        const x = Math.cos(t) * L.rx * rr,
+          z = Math.sin(t) * L.rz * rr;
+        if (!free(x, z)) continue;
+        k++;
+        const sc = rnd.range(s0, s1);
+        out.placed.push({ asset: rubA, m: new THREE.Matrix4().compose(new THREE.Vector3(x, 0, z), new THREE.Quaternion().setFromAxisAngle(UP, rnd.next() * 6.28 + salt), new THREE.Vector3(sc, sc * rnd.range(0.7, 1.3), sc)) });
+      }
+    };
+    put(FR.band[q], 0.86, 1.04, 0.6, 1.25, 0);
+    put(FR.inner[q], 0.2, 0.86, 0.22, 0.42, 1);
   }
 
   // ---- hooded watchers on the tiers
@@ -422,11 +466,13 @@ function eastGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
     tb.box([x0, 0, zBack], [x1, H, zTop], { side: 'ashlar', top: 'plain', tint: 0.9 });
   }
   // the doorway on the dais: kit arch + a near-black plate in its opening
-  const arch = pack.assets.get(S.doorway);
+  const arch = S.doorway ? pack.assets.get(S.doorway) : undefined;
   const ds = S.doorwayScale ?? 1;
   const zDoor = zTop - Math.min(2.6, S.daisDepth * 0.45);
-  if (arch) out.placed.push({ asset: arch, m: F.m.clone().multiply(new THREE.Matrix4().makeTranslation(0, H, zDoor)).multiply(new THREE.Matrix4().makeScale(ds, ds, ds)) });
-  tb.box([-1.75 * ds, H, zDoor - 0.95 * ds - 0.2], [1.75 * ds, H + 5.2 * ds, zDoor - 0.75 * ds], { side: 'plain', top: 'plain', tint: 0.03, topTint: 0.03 });
+  if (arch) {
+    out.placed.push({ asset: arch, m: F.m.clone().multiply(new THREE.Matrix4().makeTranslation(0, H, zDoor)).multiply(new THREE.Matrix4().makeScale(ds, ds, ds)) });
+    tb.box([-1.75 * ds, H, zDoor - 0.95 * ds - 0.2], [1.75 * ds, H + 5.2 * ds, zDoor - 0.75 * ds], { side: 'plain', top: 'plain', tint: 0.03, topTint: 0.03 });
+  }
   // guardians on plinths beside the flights, facing the arena centre
   const GU = S.guardians;
   const statue = GU ? pack.assets.get(GU.statue) : undefined;
