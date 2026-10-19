@@ -30,6 +30,8 @@ const KINDS: Record<AmbientKind, Kind> = {
   motes: { color: '#fff6d0', color2: '#cfe8ff', size: 0.06, vel: [0.15, 0.25, 0.05], sway: 0.5, additive: true, sprite: 'dot', box: [34, 10, 34], y0: 0.0, blink: 0.6, opacity: 0.7, count: 1300 },
   petals: { color: '#ffd3e2', color2: '#ffb3cc', size: 0.16, vel: [0.7, -0.55, 0.25], sway: 0.9, additive: false, sprite: 'petal', box: [38, 12, 38], y0: 0.0, blink: 0, opacity: 0.95, count: 1800 },
   embers: { color: '#ff9a3a', color2: '#ffd070', size: 0.06, vel: [0.2, 1.1, 0.1], sway: 0.7, additive: true, sprite: 'dot', box: [36, 14, 36], y0: 0.0, blink: 0.8, opacity: 1, count: 1800 },
+  // A8b: the Moon Gate's embers: fewer, finer and lower (ref-3 has sparse sparks near the fires, not a bokeh field)
+  embersFine: { color: '#ff8a30', color2: '#ffc060', size: 0.03, vel: [0.2, 0.9, 0.1], sway: 0.7, additive: true, sprite: 'dot', box: [36, 8, 36], y0: 0.0, blink: 0.9, opacity: 0.9, count: 700 },
   snow: { color: '#f2f8ff', color2: '#d8ecff', size: 0.075, vel: [0.35, -0.9, 0.15], sway: 0.6, additive: false, sprite: 'dot', box: [40, 14, 40], y0: 0.0, blink: 0, opacity: 0.9, count: 2600 },
   fireflies: { color: '#e8ff8a', color2: '#ffd86a', size: 0.09, vel: [0.05, 0.03, 0.05], sway: 1.2, additive: true, sprite: 'dot', box: [40, 5, 40], y0: 0.3, blink: 1, opacity: 1, count: 700 },
   sand: { color: '#e6b07a', color2: '#f2c89a', size: 0.04, vel: [3.2, 0.05, 0.6], sway: 0.3, additive: false, sprite: 'dot', box: [40, 2.5, 40], y0: 0.0, blink: 0, opacity: 0.5, count: 2400 },

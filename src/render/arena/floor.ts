@@ -86,6 +86,7 @@ uniform vec4 uFMacroXf;
 uniform vec4 uFLmXf;
 uniform vec3 uFInXf;
 uniform vec3 uFTint;
+uniform float uFReflDry;
 `;
 
 /** replaces <map_fragment>: albedo, water, inlay */
@@ -161,6 +162,8 @@ if ( uReflOn > 0.5 ) {
   // concepts' streaks are about as bright as the fires); dim walls are unchanged
   float pl = dot( pr, vec3( 0.2126, 0.7152, 0.0722 ) );
   pr *= 1.0 + uReflHot * smoothstep( 0.35, 1.6, pl );
+  // A8b: dull stone keeps only a share of the reflection outside the water (puddles / joints / cracks stay mirrors)
+  pr *= mix( uFReflDry, 1.0, fWater );
   radiance = mix( radiance, pr, edge );
 }
 #endif
@@ -171,6 +174,7 @@ const FRAG_AO = /* glsl */ `
 float fAO = fOrm.r * fInOrm.r;
 reflectedLight.indirectDiffuse *= fAO;
 reflectedLight.indirectSpecular *= mix( 1.0, fAO, 0.6 );
+reflectedLight.directSpecular *= mix( uFReflDry, 1.0, fWater );
 vec3 fLm = texture2D( uFLm, ( vFWorld.xz - uFLmXf.xy ) * uFLmXf.zw ).rgb * uFLmGain;
 reflectedLight.indirectDiffuse += fLm * diffuseColor.rgb * fAO;
 `;
@@ -204,6 +208,10 @@ export class WetFloor {
   /** A8: fire-streak card gain override on medium / high (FloorArt.streakGain) */
   readonly streakGain?: number;
   readonly streakGainLow?: number;
+  /** A8b: streak brightness on the dry stone (FloorArt.streakDry; default 0.12) */
+  readonly streakDry?: number;
+  /** A8b: streak-card length multiplier (FloorArt.streakLen; default 1) */
+  readonly streakLen?: number;
 
   constructor(o: WetFloorOpts) {
     const L = o.layout;
@@ -249,6 +257,8 @@ export class WetFloor {
     this.inlayStyle = inl ? (inl.extras.style === 'metal' ? 'metal' : 'engraved') : 'none';
     this.streakGain = o.art.streakGain;
     this.streakGainLow = o.art.streakGainLow;
+    this.streakDry = o.art.streakDry;
+    this.streakLen = o.art.streakLen;
     const inSize = inl ? Number(inl.extras.sizeM) || 16 : 16;
     const tint = o.art.tint ?? [1, 1, 1];
     this.uniforms = {
@@ -271,6 +281,7 @@ export class WetFloor {
       uFLmXf: { value: new THREE.Vector4(0, 0, 1, 1) },
       uFInXf: { value: new THREE.Vector3(0, 0, 1 / inSize) },
       uFTint: { value: new THREE.Vector3(...tint) },
+      uFReflDry: { value: o.art.reflDry ?? 1 },
       // reflection (replaced by attachReflection)
       tRefl: { value: this.blank },
       uReflMatrix: { value: new THREE.Matrix4() },

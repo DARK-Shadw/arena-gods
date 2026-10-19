@@ -38,6 +38,14 @@ export interface FloorArt {
   /** A8: damp (not puddle) roughness = dry x damp[0] + damp[1] (default [0.34, 0.05]: the A2 polished-wet look); higher
    * keeps the stone dull with the wet glints in the puddles, joints and cracks only */
   damp?: [number, number];
+  /** A8b: planar-reflection gain on the stone outside the water (default 1); below 1 keeps dull slabs dark and the
+   * puddles / joints / cracks as the mirrors */
+  reflDry?: number;
+  /** A8b: fire / moon streak-card brightness left on the dry slab tops (default 0.12); 0 breaks the streaks into the
+   * puddles, joints and cracks only */
+  streakDry?: number;
+  /** A8b: streak-card length multiplier (default 1) */
+  streakLen?: number;
   /** A8: gain of the fire-streak cards on medium / high (default STREAK_ACCENT 0.6; the planar reflection carries the rest) */
   streakGain?: number;
   /** A8: the same on the low tier (default 1: there the cards are the only fire reflections) */

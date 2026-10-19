@@ -333,6 +333,8 @@ export class Arena {
         U.uOrm.value = F.uniforms.uFOrm.value as THREE.Texture;
         U.uTile.value = F.tileM;
         U.uWater.value = Math.min(0.9, (F.uniforms.uFPuddle.value as number) * 1.6);
+        if (F.streakDry !== undefined) U.uDry.value = F.streakDry;
+        if (F.streakLen !== undefined) U.uStretch.value = F.streakLen;
         this.group.add(this.streaks.mesh);
       }
       this.tagReflect();

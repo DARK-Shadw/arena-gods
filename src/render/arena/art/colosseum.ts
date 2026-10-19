@@ -23,7 +23,7 @@ export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
   // A8 (owner feedback): big thick broken slabs (procedural, 8 m tile), dull damp stone, wet glints in puddles / joints /
   // cracks; the ring carved deeper (inlay re-baked at 26 mm)
-  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.35, streakGainLow: 0.6 },
+  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.42, streakGainLow: 0.8, streakDry: 0.0, streakLen: 0.6, tint: [0.5, 0.5, 0.55], reflDry: 0.3 },
   // A4: ref-3's big bowls on stone pedestals alternate with the tripods (the pedestal flame is bigger: SOCK_flame size)
   ringFlames: { asset: 'kit/brazier_tripod', assets: ['kit/brazier_pedestal', 'kit/brazier_tripod'], count: 10, offset: 0.55, size: 0.95 },
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
@@ -146,7 +146,7 @@ export const COLOSSEUM_ART: ThemeArt = {
     bloom: { strength: 0.45, radius: 0.65, threshold: 1.2 },
     grade: { tint: [1.0, 1.0, 1.0], contrast: 1.1, saturation: 0.86, lift: [0.004, 0.003, 0.008], gain: [1.0, 1.0, 1.0], vignette: 1.0 },
     godrays: 0, // moon rays cost about 1.5 ms on high (A2 measurement); the backdrop's shaft cards stand in for them
-    ambient: ['embers'],
+    ambient: ['embersFine'],
     fire: '#ff7a2a',
     key: '#bcc0dc',
     rim: '#c4c8ff', // the camera rim light sits behind the fighters: on the wet floor it is the moonlit sheen
