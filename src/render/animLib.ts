@@ -6,6 +6,7 @@
  * lives in a separate ROOT curve that the sim / entrance system consumes).
  */
 import * as THREE from 'three';
+import { decodeLib } from './animCodec';
 
 export interface LibIndexClip {
   id: string;
@@ -37,6 +38,8 @@ export interface LibIndexClip {
   };
 }
 interface LibIndex {
+  /** A21: bin transport coding ('tdp1'), absent = raw int16 */
+  enc?: string;
   fps: number;
   boneNames: string[];
   clips: LibIndexClip[];
@@ -59,9 +62,16 @@ export function loadLibIndex(): Promise<LibIndex> {
 }
 export function loadLib(lib: string): Promise<Int16Array> {
   if (!binP[lib])
-    binP[lib] = fetch(`${base()}anim/${lib}.bin`)
-      .then((r) => r.arrayBuffer())
-      .then((b) => new Int16Array(b));
+    binP[lib] = Promise.all([
+      loadLibIndex(),
+      fetch(`${base()}anim/${lib}.bin`).then((r) => {
+        if (!r.ok) throw new Error(`anim/${lib}.bin: HTTP ${r.status}`);
+        return r.arrayBuffer();
+      }),
+    ]).then(([ix, b]) =>
+      // A21: 'tdp1' = lossless planar-delta + byte-split coding (animCodec.ts); older bins are raw int16
+      ix.enc === 'tdp1' ? decodeLib(new Uint8Array(b), ix.clips.filter((c) => c.lib === lib)) : new Int16Array(b),
+    );
   return binP[lib];
 }
 export function libClip(id: string): LibIndexClip | undefined {
