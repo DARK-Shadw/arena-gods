@@ -23,7 +23,7 @@ export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
   // A8 (owner feedback): big thick broken slabs (procedural, 8 m tile), dull damp stone, wet glints in puddles / joints /
   // cracks; the ring carved deeper (inlay re-baked at 26 mm)
-  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.35 },
+  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.35, streakGainLow: 0.6 },
   // A4: ref-3's big bowls on stone pedestals alternate with the tripods (the pedestal flame is bigger: SOCK_flame size)
   ringFlames: { asset: 'kit/brazier_tripod', assets: ['kit/brazier_pedestal', 'kit/brazier_tripod'], count: 10, offset: 0.55, size: 0.95 },
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),

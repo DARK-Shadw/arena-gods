@@ -203,6 +203,7 @@ export class WetFloor {
   readonly inlayStyle: 'engraved' | 'metal' | 'none';
   /** A8: fire-streak card gain override on medium / high (FloorArt.streakGain) */
   readonly streakGain?: number;
+  readonly streakGainLow?: number;
 
   constructor(o: WetFloorOpts) {
     const L = o.layout;
@@ -247,6 +248,7 @@ export class WetFloor {
     if (inl) for (const t of [inl.alb, inl.nrm, inl.orm]) t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
     this.inlayStyle = inl ? (inl.extras.style === 'metal' ? 'metal' : 'engraved') : 'none';
     this.streakGain = o.art.streakGain;
+    this.streakGainLow = o.art.streakGainLow;
     const inSize = inl ? Number(inl.extras.sizeM) || 16 : 16;
     const tint = o.art.tint ?? [1, 1, 1];
     this.uniforms = {

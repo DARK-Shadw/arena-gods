@@ -1,0 +1,36 @@
+{
+ "chunks": {
+  "1": {
+   "kit": {
+    "configs": 20,
+    "failed": 0,
+    "fails": []
+   }
+  },
+  "2": {
+   "kit": {
+    "configs": 20,
+    "failed": 0,
+    "fails": []
+   }
+  },
+  "3": {
+   "kit": {
+    "configs": 30,
+    "failed": 0,
+    "fails": []
+   }
+  },
+  "4": {
+   "kit": {
+    "configs": 25,
+    "failed": 0,
+    "fails": []
+   }
+  }
+ },
+ "total": {
+  "configs": 95,
+  "failed": 0
+ }
+}
