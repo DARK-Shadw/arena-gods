@@ -1,0 +1,177 @@
+{
+ "readable": 95.5,
+ "contact": 96.9,
+ "cutsPerMin": 21.1,
+ "shortShots": 11,
+ "per": [
+  "gorak-aldric#4242 colosseum/pit#7 98.1% c98% cuts18.1",
+  "maw-vex#404 colosseum/pit#7 98.0% c100% cuts20.5",
+  "erika-fenrik#101 forge/cross#11 93.1% c100% cuts21",
+  "ozrel-hollowjack#202 skytemple/oval#5 92.9% c95% cuts25.2",
+  "vex-gorak#303 sakura/gauntlet#9 96.0% c100% cuts21.2",
+  "aldric-maw#505 glacier/split#13 96.7% c97% cuts17.1",
+  "fenrik-erika#606 moonlake/pit#3 94.4% c98% cuts22.7",
+  "hollowjack-ozrel#707 desert/cross#21 93.8% c88% cuts23.1"
+ ],
+ "bad": [
+  "gorak-aldric#4242:two_shot_low 46/799 {\"f0 hidden by arena+f1 hidden by arena\":24,\"f1 hidden by arena\":22}",
+  "maw-vex#404:ots_0 22/357 {\"fighters tiny\":17,\"f1 hidden by fighter\":5}",
+  "erika-fenrik#101:establish 32/71 {\"fighters tiny\":25,\"f1 hidden by arena+fighters tiny\":6,\"f1 hidden by arena\":1}",
+  "erika-fenrik#101:two_shot 29/486 {\"f0 out of frame\":11,\"f1 out of frame\":4,\"f0 out of frame+f1 out of frame\":13,\"f0 hidden by fighter+f1 out of frame\":1}",
+  "erika-fenrik#101:two_shot_low 41/528 {\"fighters tiny\":5,\"f0 out of frame\":7,\"f0 out of frame+f1 out of frame\":5,\"f1 out of frame\":7,\"f1 hidden by arena\":12,\"f1 out of frame+f1 hidden by arena\":2,\"f0 out of frame+f1 out of frame+f1 hidden by fighter\":1,\"f0 hidden by arena+f1 hidden by arena\":2}",
+  "erika-fenrik#101:ots_0 44/418 {\"fighters tiny\":26,\"f1 hidden by arena+fighters tiny\":2,\"f1 hidden by arena\":2,\"f1 hidden by fighter\":7,\"f1 hidden by fighter+fighters tiny\":7}",
+  "ozrel-hollowjack#202:hero_0 28/84 {\"f1 out of frame\":8,\"f0 out of frame\":20}",
+  "ozrel-hollowjack#202:finisher 73/161 {\"f0 out of frame\":73}",
+  "vex-gorak#303:two_shot_low 65/578 {\"f1 hidden by arena\":40,\"f0 hidden by arena\":20,\"f0 hidden by arena+f1 hidden by arena\":5}",
+  "aldric-maw#505:establish 39/69 {\"fighters tiny\":39}",
+  "aldric-maw#505:two_shot 30/694 {\"f0 out of frame\":15,\"f0 out of frame+f1 out of frame\":3,\"f0 hidden by arena\":12}",
+  "fenrik-erika#606:establish 31/47 {\"fighters tiny\":31}",
+  "fenrik-erika#606:ots_0 43/740 {\"fighters tiny\":34,\"f1 hidden by fighter\":9}",
+  "fenrik-erika#606:ots_1 44/517 {\"fighters tiny\":18,\"f0 hidden by fighter\":25,\"f0 hidden by arena\":1}",
+  "hollowjack-ozrel#707:ots_1 45/420 {\"f0 hidden by arena\":32,\"fighters tiny\":13}",
+  "hollowjack-ozrel#707:wide 29/119 {\"f0 out of frame\":4,\"f1 hidden by arena\":13,\"f0 hidden by arena\":12}"
+ ],
+ "worst": [
+  [
+   {
+    "t": 4.47,
+    "why": "f0 hidden by arena:LOD0_body@-0.4,0.8,4.6, f1 hidden by arena:LOD0_body@-0.2,0.8,4.6",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 14.2,
+    "why": "f1 hidden by arena:LOD0_body@-5.2,0.9,3.5",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 14.3,
+    "why": "contact (hit) not visible",
+    "shot": "crane_0"
+   }
+  ],
+  [
+   {
+    "t": 15.54,
+    "why": "f0 out of frame, f1 out of frame",
+    "shot": "destruct"
+   },
+   {
+    "t": 38.48,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   }
+  ],
+  [
+   {
+    "t": 0.4,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 25.61,
+    "why": "f1 hidden by arena:LOD0_body@-10.7,0.6,5.8",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 28.37,
+    "why": "f0 out of frame, f1 out of frame",
+    "shot": "two_shot"
+   },
+   {
+    "t": 39.95,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   }
+  ],
+  [
+   {
+    "t": 19.38,
+    "why": "contact (hit) not visible",
+    "shot": "crane_1"
+   },
+   {
+    "t": 24.3,
+    "why": "f0 out of frame",
+    "shot": "two_shot_low"
+   },
+   {
+    "t": 58.3,
+    "why": "contact (hit) not visible",
+    "shot": "hero_1"
+   },
+   {
+    "t": 58.44,
+    "why": "f1 out of frame",
+    "shot": "hero_1"
+   }
+  ],
+  [
+   {
+    "t": 23.84,
+    "why": "f1 hidden by arena:LOD0_fire@0.4,1.1,-4.4",
+    "shot": "two_shot_low"
+   }
+  ],
+  [
+   {
+    "t": 1.97,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 4.17,
+    "why": "contact (hit) not visible",
+    "shot": "ots_0"
+   },
+   {
+    "t": 26.11,
+    "why": "f0 out of frame",
+    "shot": "two_shot"
+   }
+  ],
+  [
+   {
+    "t": 0.43,
+    "why": "fighters tiny",
+    "shot": "establish"
+   },
+   {
+    "t": 4.5,
+    "why": "fighters tiny",
+    "shot": "ots_0"
+   },
+   {
+    "t": 12.64,
+    "why": "f0 hidden by fighter",
+    "shot": "ots_1"
+   },
+   {
+    "t": 63.88,
+    "why": "contact (hit) not visible",
+    "shot": "two_shot_low"
+   }
+  ],
+  [
+   {
+    "t": 2.35,
+    "why": "contact (hit) not visible",
+    "shot": "ots_1"
+   },
+   {
+    "t": 2.62,
+    "why": "contact (hit) not visible",
+    "shot": "ots_1"
+   },
+   {
+    "t": 7.52,
+    "why": "f0 out of frame",
+    "shot": "destruct"
+   },
+   {
+    "t": 15.85,
+    "why": "f1 hidden by arena:statue_hooded_lod0@2.3,3.0,1.6",
+    "shot": "wide"
+   }
+  ]
+ ]
+}

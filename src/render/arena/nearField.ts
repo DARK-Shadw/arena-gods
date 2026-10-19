@@ -37,6 +37,8 @@ export interface Placed {
 
 export interface BannerSpec {
   shape: BannerShape;
+  /** A8b: torn swag (deepest tear, share of the height; own material) */
+  shred?: number;
   cell: number;
   w: number;
   h: number;
@@ -305,7 +307,7 @@ export function buildNearField(a: Arena, pack: ArenaPack, N: RuinsArt, banners: 
             const fwd = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
             if (fwd.dot(new THREE.Vector3(-c.x, 0, -c.z)) < 0) yaw += Math.PI;
             const m = new THREE.Matrix4().compose(c, new THREE.Quaternion().setFromAxisAngle(UP, yaw), new THREE.Vector3(1, 1, 1));
-            out.banners.push({ shape: 'swag', cell: hash(L.seed, i, t * 10) % 2, w: span * 0.3, h: 1.5, m, phase: (hash(L.seed, i, 23, t * 10) % 628) / 100 });
+            out.banners.push({ shape: 'swag', cell: hash(L.seed, i, t * 10) % 2, w: span * (P.chains.swagSize?.[0] ?? 0.3), h: P.chains.swagSize?.[1] ?? 1.5, m, phase: (hash(L.seed, i, 23, t * 10) % 628) / 100, shred: P.chains.swagShred });
           }
       }
     }
@@ -329,6 +331,50 @@ export function buildNearField(a: Arena, pack: ArenaPack, N: RuinsArt, banners: 
       const fp = new THREE.Vector3(...(sock?.pos ?? [0, 0.5, 0])).applyMatrix4(m);
       a.group.add(a.flame(fp, F.size, a.theme.fire, false));
     }
+    // A8: fires on the broken low tiers of the vista sector (on the stump tops, any segment)
+    const vc = segs.filter((s) => Math.abs(azOf(s.p)) <= 50 && Math.abs(azOf(s.p)) > 14);
+    for (let n = 0; n < (F.vista ?? 0) && vc.length; n++) {
+      const s = vc.splice(hash(L.seed, n, 63) % vc.length, 1)[0];
+      const m = new THREE.Matrix4().compose(s.p.clone().setY(s.top), new THREE.Quaternion().setFromAxisAngle(UP, s.yaw), new THREE.Vector3(1, 1, 1));
+      out.placed.push({ asset: fireA, m });
+      const fp = new THREE.Vector3(...(sock?.pos ?? [0, 0.5, 0])).applyMatrix4(m);
+      a.group.add(a.flame(fp, F.size * 0.9, a.theme.fire, false));
+    }
+    // A8: burning debris on the floor at the boundary foot (outside the fight ellipse, off the gate axes)
+    const GA = F.ground ? get(F.ground.asset) : undefined;
+    if (F.ground && GA) {
+      for (let n = 0; n < F.ground.count; n++) {
+        const t = ((hash(L.seed, n, 67) % 1000) / 1000) * Math.PI * 2;
+        const p = new THREE.Vector3(Math.cos(t) * (L.rx + 0.3), 0, Math.sin(t) * (L.rz + 0.3));
+        if (Math.abs(p.z) < 4.5 && Math.abs(p.x) > L.rx * 0.6) continue;
+        const sc = 0.7 + (hash(L.seed, n, 69) % 100) / 200;
+        out.placed.push({ asset: GA, m: new THREE.Matrix4().compose(p, new THREE.Quaternion().setFromAxisAngle(UP, t * 3.1), new THREE.Vector3(sc, sc, sc)) });
+        a.group.add(a.flame(p.clone().setY(0.28 * sc), F.ground.size * (0.8 + (hash(L.seed, n, 71) % 40) / 100), a.theme.fire, false));
+      }
+    }
+  }
+
+  // ---- A8: rubble on the floor (render only: no collision, small enough to read as debris under the fighters' feet)
+  const FR = N.floorRubble;
+  const rubA = FR ? get(FR.asset) : undefined;
+  if (FR && rubA) {
+    const q = Math.max(0, Math.min(2, a.quality));
+    const blockers = [...L.obstacles.map((o) => ({ x: o.x, z: o.z, r: o.r + 0.6 })), ...L.props.map((o) => ({ x: o.x, z: o.z, r: o.r + 0.5 })), ...L.hazards.map((o) => ({ x: o.x, z: o.z, r: o.r + 0.8 }))];
+    const free = (x: number, z: number) => !blockers.some((b) => Math.hypot(b.x - x, b.z - z) < b.r) && !(Math.abs(z) < 3.2 && Math.abs(x) > L.rx * 0.55);
+    const put = (n: number, r0: number, r1: number, s0: number, s1: number, salt: number) => {
+      for (let k = 0, tries = 0; k < n && tries < n * 6; tries++) {
+        const t = rnd.next() * Math.PI * 2,
+          rr = Math.sqrt(r0 * r0 + rnd.next() * (r1 * r1 - r0 * r0));
+        const x = Math.cos(t) * L.rx * rr,
+          z = Math.sin(t) * L.rz * rr;
+        if (!free(x, z)) continue;
+        k++;
+        const sc = rnd.range(s0, s1);
+        out.placed.push({ asset: rubA, m: new THREE.Matrix4().compose(new THREE.Vector3(x, 0, z), new THREE.Quaternion().setFromAxisAngle(UP, rnd.next() * 6.28 + salt), new THREE.Vector3(sc, sc * rnd.range(0.7, 1.3), sc)) });
+      }
+    };
+    put(FR.band[q], 0.86, 1.04, 0.6, 1.25, 0);
+    put(FR.inner[q], 0.2, 0.86, 0.22, 0.42, 1);
   }
 
   // ---- hooded watchers on the tiers
@@ -386,6 +432,11 @@ function eastGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
   // forecourt ground (under the wet floor; it carries the stair foot, the braziers and the passage)
   tb.aoMin = 1;
   tb.ground(-S.daisHalf - 6, S.daisHalf + 6, zBack - 2, 3.0, -0.04, 'plain', 0.62);
+  if (S.wide) {
+    tb.aoMin = 0.5;
+    wideStair(a, pack, G, tb, out, F, gate);
+    return;
+  }
   tb.ground(-pw, pw, zBack, 0.4, -0.02, 'plain', 0.35);
   tb.aoMin = 0.5;
   // flights (full-height step blocks: the outer cheek reads as solid masonry)
@@ -422,26 +473,14 @@ function eastGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
     tb.box([x0, 0, zBack], [x1, H, zTop], { side: 'ashlar', top: 'plain', tint: 0.9 });
   }
   // the doorway on the dais: kit arch + a near-black plate in its opening
-  const arch = pack.assets.get(S.doorway);
+  const arch = S.doorway ? pack.assets.get(S.doorway) : undefined;
   const ds = S.doorwayScale ?? 1;
   const zDoor = zTop - Math.min(2.6, S.daisDepth * 0.45);
-  if (arch) out.placed.push({ asset: arch, m: F.m.clone().multiply(new THREE.Matrix4().makeTranslation(0, H, zDoor)).multiply(new THREE.Matrix4().makeScale(ds, ds, ds)) });
-  tb.box([-1.75 * ds, H, zDoor - 0.95 * ds - 0.2], [1.75 * ds, H + 5.2 * ds, zDoor - 0.75 * ds], { side: 'plain', top: 'plain', tint: 0.03, topTint: 0.03 });
-  // guardians on plinths beside the flights, facing the arena centre
-  const GU = S.guardians;
-  const statue = GU ? pack.assets.get(GU.statue) : undefined;
-  const plinth = GU ? pack.assets.get(GU.plinth) : undefined;
-  if (GU)
-    for (const sx of [-1, 1]) {
-      const wp = new THREE.Vector3(sx * GU.lateral, 0, GU.z).applyMatrix4(F.m);
-      const yaw = Math.atan2(-wp.x, -wp.z);
-      const q = new THREE.Quaternion().setFromAxisAngle(UP, yaw);
-      const ph2 = plinth ? (Number(plinth.extras.height) || 1.2) * GU.plinthScale : 0;
-      if (plinth) out.placed.push({ asset: plinth, m: new THREE.Matrix4().compose(wp, q, new THREE.Vector3(GU.plinthScale, GU.plinthScale, GU.plinthScale)) });
-      if (statue) out.placed.push({ asset: statue, m: new THREE.Matrix4().compose(wp.clone().setY(ph2), q, new THREE.Vector3(GU.scale, GU.scale, GU.scale)) });
-    }
-  // big pedestal braziers at the stair foot
-  gateBraziers(a, pack, F.m, S.braziers, true);
+  if (arch) {
+    out.placed.push({ asset: arch, m: F.m.clone().multiply(new THREE.Matrix4().makeTranslation(0, H, zDoor)).multiply(new THREE.Matrix4().makeScale(ds, ds, ds)) });
+    tb.box([-1.75 * ds, H, zDoor - 0.95 * ds - 0.2], [1.75 * ds, H + 5.2 * ds, zDoor - 0.75 * ds], { side: 'plain', top: 'plain', tint: 0.03, topTint: 0.03 });
+  }
+  stairFlanks(a, pack, S, F.m, out);
   // anchors (GateFrame coordinates: lateral mirrored vs the gate group, every pair is symmetric)
   const A = gate.anchors as typeof gate.anchors & { snapped?: boolean };
   const stepTop = (z: number) => Math.min(S.steps, Math.floor((S.z0 - z) / S.run) + 1) * S.rise;
@@ -453,6 +492,109 @@ function eastGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
   void rnd;
   // the legacy gate dressing and tunnel box go (portcullis, light and anchors stay)
   legacyGateParts(gate.group, out, true);
+  ironPortcullis(gate, G);
+}
+
+/** guardians on plinths beside the stair (facing the arena centre) and the big pedestal braziers at its foot */
+function stairFlanks(a: Arena, pack: ArenaPack, S: NonNullable<GateArt['stair']>, frame: THREE.Matrix4, out: NearFieldOut) {
+  const GU = S.guardians;
+  const statue = GU ? pack.assets.get(GU.statue) : undefined;
+  const plinth = GU ? pack.assets.get(GU.plinth) : undefined;
+  if (GU)
+    for (const sx of [-1, 1]) {
+      const wp = new THREE.Vector3(sx * GU.lateral, 0, GU.z).applyMatrix4(frame);
+      const yaw = Math.atan2(-wp.x, -wp.z);
+      const q = new THREE.Quaternion().setFromAxisAngle(UP, yaw);
+      const ph2 = plinth ? (Number(plinth.extras.height) || 1.2) * GU.plinthScale : 0;
+      if (plinth) out.placed.push({ asset: plinth, m: new THREE.Matrix4().compose(wp, q, new THREE.Vector3(GU.plinthScale, GU.plinthScale, GU.plinthScale)) });
+      if (statue) out.placed.push({ asset: statue, m: new THREE.Matrix4().compose(wp.clone().setY(ph2), q, new THREE.Vector3(GU.scale, GU.scale, GU.scale)) });
+    }
+  gateBraziers(a, pack, frame, S.braziers, true);
+}
+
+/**
+ * A18: ref-3's ONE wide stair. A single flight across the whole width (each step laid as a few worn blocks of
+ * slightly different tint / height), stepped cheek walls at both sides, the dais behind, and the gate moved up onto the
+ * dais: two slim stone posts with caps and a frieze lintel frame the legacy portcullis (its group is lifted there, so the
+ * barrier events, the gate light and the reset keep working in the group's own frame). Entrances at this gate start on
+ * the dais and come down the stair: anchors.ground carries the stair profile, anchors.flat the old floor-level gate
+ * (the speed reference for the re-timing in cinematic/entrance.ts).
+ */
+function wideStair(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: NearFieldOut, F: ReturnType<typeof gateFrame>, gate: Arena['gates'][number]) {
+  const S = G.stair!;
+  const L = a.layout;
+  const H = S.steps * S.rise;
+  const zTop = S.z0 - S.steps * S.run;
+  const zBack = zTop - S.daisDepth;
+  const W = S.flightOuter;
+  const cw = 0.7;
+  const rnd = new R(L.seed * 7919 + 131);
+  tb.setMatrix(F.m);
+  // the flight: per step a row of blocks (worn: a few sit 2-5 cm low, tints vary), full height so the faces read as masonry
+  for (let i = 0; i < S.steps; i++) {
+    const zf = S.z0 - i * S.run,
+      zb = S.z0 - (i + 1) * S.run;
+    let x = -W;
+    let k = 0;
+    while (x < W - 1e-3) {
+      const w = Math.min(W - x, rnd.range(1.3, 2.7));
+      const x1 = W - (x + w) < 0.8 ? W : x + w;
+      const sink = rnd.next() < 0.18 ? rnd.range(0.02, 0.05) : 0;
+      const t = 0.46 + rnd.next() * 0.14;
+      tb.box([x, 0, zb], [x1, (i + 1) * S.rise - sink, zf], { side: 'plain', top: 'plain', tint: t, topTint: 1.0 + rnd.next() * 0.25, u0: i * 1.7 + k * 3.3, noBack: true, noSides: true });
+      x = x1;
+      k++;
+    }
+  }
+  // stepped cheek walls (a low parapet riding the flight), the outer faces solid masonry
+  for (const sx of [-1, 1])
+    for (let i = 0; i < S.steps; i++) {
+      const x0 = sx < 0 ? -W - cw : W,
+        x1 = sx < 0 ? -W : W + cw;
+      tb.box([x0, 0, S.z0 - (i + 1) * S.run], [x1, (i + 1) * S.rise + 0.55, S.z0 - i * S.run], { side: 'ashlar', top: 'rough', tint: 0.72, topTint: 0.9, u0: i * 0.9, noBack: true });
+    }
+  // the dais
+  tb.box([-S.daisHalf, 0, zBack], [S.daisHalf, H, zTop], { side: 'ashlar', top: 'plain', tint: 0.9 });
+  // the gate on the dais: posts, caps, frieze lintel (the portcullis bars: x +-1.35, 3.6 m tall)
+  const TG = S.topGate ?? { z: zTop - 1.1, postHalf: 1.55, postW: 0.6, postD: 0.8, postH: 4.4, lintelH: 0.65 };
+  const pz0 = TG.z - TG.postD / 2,
+    pz1 = TG.z + TG.postD / 2;
+  for (const sx of [-1, 1]) {
+    const x0 = sx < 0 ? -TG.postHalf - TG.postW : TG.postHalf,
+      x1 = sx < 0 ? -TG.postHalf : TG.postHalf + TG.postW;
+    tb.box([x0, H, pz0], [x1, H + TG.postH, pz1], { side: 'ashlar', top: 'plain', tint: 0.8, u0: sx * 2.1 });
+    tb.box([x0 - 0.08, H + TG.postH, pz0 - 0.08], [x1 + 0.08, H + TG.postH + 0.22, pz1 + 0.08], { side: 'moulding', top: 'rough', tint: 0.85 });
+  }
+  tb.box([-TG.postHalf, H + TG.postH - TG.lintelH, pz0 + 0.06], [TG.postHalf, H + TG.postH, pz1 - 0.06], { side: 'frieze', top: 'plain', tint: 0.95, noSides: true });
+  stairFlanks(a, pack, S, F.m, out);
+  // the gate group (portcullis + light) moves up onto the dais: its local z 0.2 (the bars) lands on the posts' centre line
+  const zg = TG.z - 0.2;
+  gate.group.position.copy(new THREE.Vector3(0, H, zg).applyMatrix4(F.m));
+  gate.group.updateMatrixWorld(true);
+  const A = gate.anchors as typeof gate.anchors & { snapped?: boolean };
+  A.flat = { barrierZ: A.barrierZ, tunnel: A.tunnel };
+  A.ground = { z0: S.z0, zTop, h: H, rise: S.rise, run: S.run };
+  A.barrierZ = TG.z;
+  // the open dais behind the gate is the walk-out space (no roof)
+  A.tunnel = { depth: TG.z - zBack - 0.4, height: 9, floorY: 0 };
+  // perches: the post caps (heights relative to the dais, see anchors.ground)
+  A.perches = [-1, 1].map((s) => ({ id: s < 0 ? 'post_l' : 'post_r', pos: [s * (TG.postHalf + TG.postW / 2), TG.postH + 0.22, TG.z] as V3, depth: TG.postD }));
+  A.stands = [];
+  A.rims = [];
+  A.lowWall = undefined;
+  A.snapped = false;
+  legacyGateParts(gate.group, out, true);
+  ironPortcullis(gate, G);
+}
+
+/** A8b: recolour the legacy portcullis bars (GateArt.portcullis) */
+function ironPortcullis(gate: { portcullis: THREE.Object3D }, G: GateArt) {
+  if (!G.portcullis) return;
+  const iron = new THREE.MeshStandardMaterial({ color: G.portcullis.color, roughness: G.portcullis.roughness, metalness: G.portcullis.metalness });
+  iron.name = 'kit.portcullisIron';
+  gate.portcullis.traverse((o) => {
+    if ((o as THREE.Mesh).isMesh) (o as THREE.Mesh).material = iron;
+  });
 }
 
 // ------------------------------------------------------------------ the west gate: kit arch around the legacy portcullis / tunnel
@@ -462,6 +604,7 @@ function westGate(a: Arena, pack: ArenaPack, G: GateArt, tb: TrimBuilder, out: N
   if (!gate) return;
   const L = a.layout;
   const F = gateFrame(L, 0);
+  ironPortcullis(gate, G);
   // forecourt ground under the arch and the braziers
   tb.setMatrix(F.m);
   tb.aoMin = 1;

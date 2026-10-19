@@ -87,6 +87,15 @@ export interface BackdropTuning {
   /** light shafts: count, colour, opacity; fog banks: count per tier [q1, q2], colour lift over the fog colour, opacity */
   shafts?: { count: number; color: string; opacity: number; az: number; dist: number };
   fogBanks?: { count: [number, number]; radius: number; opacity: number; lift: number };
+  /** A7b: linear colour multiplier and saturation applied to the baked layers (1 = as baked) */
+  tint?: [number, number, number];
+  sat?: number;
+  /** A7b: procedural stand-in atlases for the shaft / fog-bank cards while their EEVEE atlases are not rendered (A8) */
+  proceduralCards?: boolean;
+  /** A7b: baked cloud (AOV B) gain away from the moon / round it, and the falloff exponent (moon direction: setMoon) */
+  cloud?: { away: number; near: number; power: number };
+  /** A7c: fade the baked cloud texels (AOV B) out, 0..1, where an authored sky (ThemeArt.sky) draws the clouds */
+  cloudHide?: number;
 }
 
 const DEG = Math.PI / 180;
@@ -119,6 +128,12 @@ uniform float uGain;
 uniform float uEmitGain;
 uniform float uFogRange;
 uniform float uFogMax;
+uniform vec3 uTint;
+uniform float uSat;
+uniform vec3 uMoon;
+uniform vec3 uCloudK;
+uniform float uCloudHide;
+uniform vec3 uOrigin;
 uniform vec2 uAovGrid;
 uniform vec3 fogColor;
 uniform float fogNear;
@@ -150,12 +165,16 @@ void main(){
     // clouds: a slow sway of the texture inside the cloud mask (no drift out of it); second fetch only there
     vec2 uv2 = vUv + vec2(m.b * 0.0012 * sin(uTime * 0.05 + vUv.y * 9.0 + vUv.x * 40.0), 0.0);
     c = texture2D(uMap, uv2);
+    // A7c: the authored sky carries the clouds now; the baked Cycles cloud texels fade out (tune.cloudHide)
+    c.a *= 1.0 - uCloudHide * smoothstep(0.05, 0.6, m.b);
   }
 #endif
   // fade the top rows of the band (clouds touching the latitude limit)
   c.a *= smoothstep(0.0, 0.035, vUv.y);
   if (c.a < 0.004) discard;
   vec3 col = c.rgb * uGain;
+  // A7b grade of the baked layers (desaturate the Cycles violet towards ref-3's blue-grey)
+  col = mix(vec3(dot(col, vec3(0.2126, 0.7152, 0.0722))), col, uSat) * uTint;
 #ifdef USE_AOV
   if (m.g > 0.02) {
     // waterfall: streaks scrolling down, foam where the noise peaks
@@ -176,6 +195,11 @@ void main(){
     // storm light breathing inside the clouds (cheap: two slow sines across the band, no noise per fragment)
     float b = 0.5 + 0.25 * sin(vUv.x * 41.0 + uTime * 0.11) + 0.25 * sin(vUv.x * 17.0 - vUv.y * 9.0 + uTime * 0.07);
     col *= mix(1.0, 0.85 + 0.3 * b, m.b);
+    // A7b: grade the baked clouds by the moon: dark storm cloud away from it, bright backlit cloud round it
+    if (uCloudK.x > 0.0) {
+      float g = pow(max(dot(normalize(vWorld - uOrigin), uMoon), 0.0), uCloudK.z);
+      col *= mix(1.0, mix(uCloudK.x, uCloudK.y, g), m.b);
+    }
   }
 #endif
   // fog match (fog.ts formula, true depth compressed)
@@ -287,11 +311,73 @@ function insetMatrix(c: BackdropCamJson): THREE.Matrix4 {
   return new THREE.Matrix4().multiplyMatrices(cam.projectionMatrix, cam.matrixWorldInverse);
 }
 
+/**
+ * A7b: a procedural stand-in for the unrendered EEVEE card atlases (A6 ran out of memory before `cards`): 2 x 2 frames of
+ * 128 px, white RGB, the card shape in alpha. `shaft`: soft vertical rays fading at both ends; `fogbank`: a low rolling
+ * band of value noise. Deterministic (no Math.random). A8 replaces them with the real volumetric sequences.
+ */
+function proceduralCard(kind: string): { map: THREE.Texture; grid: [number, number]; frames: number } {
+  const S = 128,
+    G = 2,
+    W = S * G;
+  const data = new Uint8Array(W * W * 4);
+  const hash = (x: number, y: number) => {
+    const s = Math.sin(x * 127.1 + y * 311.7) * 43758.5453;
+    return s - Math.floor(s);
+  };
+  const vnoise = (x: number, y: number) => {
+    const xi = Math.floor(x),
+      yi = Math.floor(y),
+      fx = x - xi,
+      fy = y - yi;
+    const sx = fx * fx * (3 - 2 * fx),
+      sy = fy * fy * (3 - 2 * fy);
+    return (hash(xi, yi) * (1 - sx) + hash(xi + 1, yi) * sx) * (1 - sy) + (hash(xi, yi + 1) * (1 - sx) + hash(xi + 1, yi + 1) * sx) * sy;
+  };
+  for (let f = 0; f < G * G; f++) {
+    const ox = (f % G) * S,
+      oy = Math.floor(f / G) * S;
+    for (let y = 0; y < S; y++)
+      for (let x = 0; x < S; x++) {
+        const u = x / (S - 1),
+          v = y / (S - 1); // v = 0 at the frame's top row
+        let a: number;
+        if (kind === 'shaft') {
+          const rays = 0.55 * vnoise(u * 9 + f * 0.35, 0.5) + 0.45 * vnoise(u * 23 - f * 0.6, 3.5);
+          const side = Math.pow(Math.sin(Math.PI * u), 1.5);
+          const ends = Math.min(1, v * 5) * Math.pow(1 - v, 0.8);
+          a = Math.max(0, rays - 0.25) * 1.5 * side * ends;
+        } else {
+          let n = 0,
+            amp = 0.55,
+            fr = 1;
+          for (let o = 0; o < 4; o++) {
+            n += amp * vnoise(u * 5 * fr + f * 0.4, v * 3 * fr + f * 0.25);
+            fr *= 2;
+            amp *= 0.5;
+          }
+          const prof = Math.pow(Math.sin(Math.PI * v), 1.1) * Math.min(1, (1 - v) * 3);
+          a = Math.max(0, Math.min(1, (n - 0.3) * 1.8)) * prof * Math.pow(Math.sin(Math.PI * u), 0.6);
+        }
+        const i = ((oy + y) * W + ox + x) * 4;
+        data[i] = data[i + 1] = data[i + 2] = 255;
+        data[i + 3] = Math.round(Math.max(0, Math.min(1, a)) * 255);
+      }
+  }
+  const t = new THREE.DataTexture(data, W, W, THREE.RGBAFormat);
+  t.magFilter = THREE.LinearFilter;
+  t.minFilter = THREE.LinearFilter;
+  t.needsUpdate = true;
+  return { map: t, grid: [G, G], frames: G * G };
+}
+
 export class Backdrop {
   readonly group = new THREE.Group();
   readonly materials: THREE.ShaderMaterial[] = [];
   private cards: THREE.Mesh[] = [];
   private shafts: THREE.Mesh[] = [];
+  /** A7b: procedural card atlases this backdrop owns (disposed with it) */
+  private ownTex: THREE.Texture[] = [];
 
   constructor(
     readonly data: BackdropData,
@@ -328,6 +414,11 @@ export class Backdrop {
             uEmitGain: { value: tune.emitGain ?? 3.0 },
             uFogRange: { value: tune.fogRange ?? 140 },
             uFogMax: { value: tune.fogMax ?? 0.85 },
+            uTint: { value: new THREE.Color(...(tune.tint ?? [1, 1, 1])) },
+            uSat: { value: tune.sat ?? 1 },
+            uMoon: { value: new THREE.Vector3(1, 0.45, 0).normalize() },
+            uCloudHide: { value: tune.cloudHide ?? 0 },
+            uCloudK: { value: new THREE.Vector3(...(tune.cloud ? [tune.cloud.away, tune.cloud.near, tune.cloud.power] : [0, 1, 1])) },
             uAovGrid: { value: new THREE.Vector2(L.def.aovSize[0] / 3, L.def.aovSize[1] / 3) },
           },
         ]),
@@ -357,8 +448,16 @@ export class Backdrop {
 
   /** moon light shafts through the arch + fog banks on a ring at the foot of the ruins (q1 / q2) */
   private buildCards(J: BackdropJson, tune: BackdropTuning, quality: number) {
+    const proc: Record<string, ReturnType<typeof proceduralCard>> = {};
     const mk = (kind: string, color: THREE.Color, opacity: number, rate: number, phase: number, blending: THREE.Blending) => {
-      const c = this.data.cards[kind];
+      let c = this.data.cards[kind];
+      if (!c && tune.proceduralCards) {
+        if (!proc[kind]) {
+          proc[kind] = proceduralCard(kind);
+          this.ownTex.push(proc[kind].map);
+        }
+        c = proc[kind];
+      }
       if (!c) return null;
       return new THREE.ShaderMaterial({
         vertexShader: cardVert,
@@ -427,6 +526,11 @@ export class Backdrop {
     }
   }
 
+  /** A7b: the moon direction the cloud grade glows round */
+  setMoon(dir: THREE.Vector3) {
+    for (const m of this.materials) (m.uniforms.uMoon.value as THREE.Vector3).copy(dir).normalize();
+  }
+
   set visible(v: boolean) {
     this.group.visible = v;
   }
@@ -449,6 +553,7 @@ export class Backdrop {
       m.geometry?.dispose();
       (m.material as THREE.Material | undefined)?.dispose();
     });
+    for (const t of this.ownTex) t.dispose();
   }
 }
 

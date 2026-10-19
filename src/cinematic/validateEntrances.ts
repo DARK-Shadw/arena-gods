@@ -17,7 +17,7 @@ import * as THREE from 'three';
 import type { Arena } from '../render/arena/arenaView';
 import type { FighterView } from '../render/fighterView';
 import type { FighterDef } from '../sim/types';
-import { buildEntrance, type CineCtx, type EntranceMeta } from './entrance';
+import { buildEntrance, snapAnchors, type CineCtx, type EntranceMeta } from './entrance';
 import { ENTRANCE_VARIANTS } from '../data/entranceVariants';
 
 export interface EntranceIssue {
@@ -81,6 +81,9 @@ export async function validateEntrances(opts: {
       arena.group.updateMatrixWorld(true);
       for (const gate of opts.gates ?? [0, 1]) {
         const g = arena.gates[gate];
+        // A18: list the variants on the SNAPPED anchors (what chooseVariant sees in the game): a perch / stand that does not
+        // land on real geometry is dropped first, so its variant is not validated as a legacy fallback the game never plays
+        snapAnchors(arena, gate);
         const solids = staticMeshes(arena, [g.portcullis]);
         for (const fid of opts.fighters) {
           const view = opts.views[fid];

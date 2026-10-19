@@ -16,16 +16,21 @@ const dirFrom = (elevDeg: number, azDeg: number) => {
 };
 const C = (c: string) => new THREE.Color(c);
 const hdr = (c: string, k: number) => new THREE.Color(c).multiplyScalar(k);
-const MOON = dirFrom(27, -1.7);
+// A8: the moon sits centred in the ring arch as in ref-3 (A2-A7c: az -1.7, elev 27)
+const MOON = dirFrom(26, 0);
 
 export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
-  floor: { set: 'floor/flagstone_bluegrey', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.35 },
+  // A8 (owner feedback): big thick broken slabs (procedural, 8 m tile), dull damp stone, wet glints in puddles / joints /
+  // cracks; the ring carved deeper (inlay re-baked at 26 mm)
+  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.36, damp: [0.78, 0.1], streakGain: 0.42, streakGainLow: 0.8, streakDry: 0.0, streakLen: 0.6, streakWater: 0.22, moonPath: { power: 1.6, wid: 1.8, dry: 0.4 }, tint: [1.0, 1.0, 1.04], reflDry: 0.3 },
   // A4: ref-3's big bowls on stone pedestals alternate with the tripods (the pedestal flame is bigger: SOCK_flame size)
   ringFlames: { asset: 'kit/brazier_tripod', assets: ['kit/brazier_pedestal', 'kit/brazier_tripod'], count: 10, offset: 0.55, size: 0.95 },
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
   // rubble piles for the indestructible boulders; podium wall, gallery arcade and wall-foot rubble from the trim-sheet
   // modules. A7 replaces the rest of the legacy ring (stands, gates) and places stairs / dais / statues by the east gate.
+  // A8b: the shared kit's terracotta urns were the most saturated non-fire objects in the frame
+  propTint: { urn: [0.2, 0.21, 0.27] },
   obstacles: { column: ['kit/pillar_square', 'kit/pillar_square', 'kit/column_ruin'], rock: 'kit/rubble_pile' },
   ring: {
     trim: 'kit/stone_trim',
@@ -53,13 +58,18 @@ export const COLOSSEUM_ART: ThemeArt = {
         scale: 2.0,
         height: 14,
         banner: { w: 2.3, h: 8.6, pin: 12.2 },
-        chains: { scale: 2.6, sag: 2.4, swags: true },
+        // A8b: the swags torn into long rags (the baked zigzag hem read as bunting) and hung deeper
+        chains: { scale: 2.6, sag: 2.4, swags: true, swagShred: 0.6, swagSize: [0.36, 2.6] },
       },
       watchers: { count: [8, 14, 18], color: '#1b1722' },
-      fires: { asset: 'kit/brazier_wall', count: 7, size: 0.75 },
+      fires: { asset: 'kit/brazier_wall', count: 14, size: 0.8, vista: 6, ground: { asset: 'kit/rubble_scatter', count: 9, size: 0.55 } },
+      // A8: ref-3's floor is littered with chunks and debris
+      floorRubble: { asset: 'kit/rubble_scatter', band: [12, 22, 30], inner: [10, 22, 30] },
       fireCage: true,
       east: {
         zoneHalf: 11.2,
+        // A8b: dark iron bars: the bronze portcullis was the brightest warm shape under the arch
+        portcullis: { color: '#26252b', roughness: 0.55, metalness: 0.6 },
         stair: {
           portalHalf: 2.4,
           flightOuter: 5.6,
@@ -69,13 +79,17 @@ export const COLOSSEUM_ART: ThemeArt = {
           z0: -0.9,
           daisDepth: 6,
           daisHalf: 7.6,
-          doorway: 'kit/arch',
-          doorwayScale: 1.25,
-          guardians: { statue: 'kit/statue_hooded', plinth: 'kit/plinth', lateral: 7.5, z: -1.9, plinthScale: 2.0, scale: 2.0 },
-          braziers: { asset: 'kit/brazier_pedestal', lateral: 10.2, z: 1.6, scale: 1.8, flame: 1.8 },
+          // A8: no doorway block on the dais: from the ref-3 camera it hid the backdrop arch's portal, which is
+          // ref-3's doorway (the stair climbs toward it)
+          guardians: { statue: 'kit/statue_hooded', plinth: 'kit/plinth', lateral: 6.9, z: -1.9, plinthScale: 1.3, scale: 1.2 },
+          braziers: { asset: 'kit/brazier_pedestal', lateral: 7.8, z: 1.6, scale: 1.8, flame: 1.8 },
+          // A18 (ref-3): one wide flight to the dais (A7-A8b: two flights round a floor-level portal); the gate stands on
+          // the dais between slim posts, the entrances come down the stair
+          wide: true,
+          topGate: { z: -8.1, postHalf: 1.55, postW: 0.45, postD: 0.6, postH: 4.3, lintelH: 0.45 },
         },
       },
-      west: { zoneHalf: 4.6, arch: 'kit/arch', braziers: { asset: 'kit/brazier_tripod', lateral: 4.3, z: -0.3, scale: 1.0, flame: 0.95 } },
+      west: { zoneHalf: 4.6, portcullis: { color: '#26252b', roughness: 0.55, metalness: 0.6 }, arch: 'kit/arch', braziers: { asset: 'kit/brazier_tripod', lateral: 4.3, z: -0.3, scale: 1.0, flame: 0.95 } },
     },
   },
   // A6: the Moon Gate test backdrop (arch blockout + ruined arcade ring + outer ruins + clouds, Cycles panorama layers);
@@ -83,48 +97,94 @@ export const COLOSSEUM_ART: ThemeArt = {
   backdrop: {
     id: 'moongate',
     tune: {
-      gain: 1.25,
+      gain: 1.1,
       emitGain: 3.2,
       fogRange: 140,
       fogMax: 0.8,
-      shafts: { count: 3, color: '#aaa6ff', opacity: 0.32, az: -1.7, dist: 66 },
-      fogBanks: { count: [8, 16], radius: 52, opacity: 0.6, lift: 1.3 },
+      // A7b: the baked Cycles layers are violet; ref-3's stone and cloud are blue-grey
+      sat: 0.5,
+      tint: [0.94, 0.97, 1.06],
+      shafts: { count: 3, color: '#c4caf0', opacity: 0.22, az: 0, dist: 66 },
+      fogBanks: { count: [8, 16], radius: 52, opacity: 0.5, lift: 1.3 },
+      // A8: the EEVEE shaft / fog-bank atlases are rendered now (128 px frames; A7b's procedural stand-ins retired)
+      proceduralCards: false,
+      // A7b: the baked storm clouds: dark away from the moon, backlit round it
+      cloud: { away: 0.24, near: 0.3, power: 8 },
+      // A7c: the authored sky draws the storm now; the blockout's Cycles clouds fade out
+      cloudHide: 1,
     },
   },
+  // A18: cinematics: the reveal opens on the moon and the arch and cranes down onto the stair; the face-off ends in the
+  // ref-3 composition; the fight camera blends in from it
+  cine: { reveal: 'landmark', faceoff: 'landmark', handover: true },
+  // A19-A20 (F4): every fire as a layered fire field (flames + white-hot core + glow halo + smoke + embers + heat), seeded
+  // flicker on the match clock, a gusting night wind (flames lean, smoke and embers drift, banners / swags / chains sway),
+  // real fire lights 2 / 4 / 6 per tier (the stage-light loop lights the stone round the rest)
+  fire: {
+    wind: { az: 150, base: 0.55, gust: 0.6 },
+    smoke: { color: '#6a6874', opacity: 0.7 },
+    gain: { body: 2.2, core: 4.5, glow: 0.45, embers: 1.6 },
+    heat: 1.0,
+    lights: [2, 4, 6],
+  },
+  // A7c: the authored storm sky (tools/arena/sky/moongate.json -> public/arena/sky/moongate/): a Poly Haven CC0 cloud
+  // photo turned into structure / density / rim / shaft data, lit in sky.ts by the moon (glow, silver rims, dark far
+  // banks), drifting, with rare distant lightning; replaces the A7b storm deck (look.sky.storm*) when it loads
+  sky: { id: 'moongate' },
+  // A7b: the real night look (light / fog / grade pass against ref-3): dark overall with strong accents, a cold moon
+  // back-rim on every stone edge, warm fire pools on stone, desaturated blue-grey stone and storm cloud (warm only at the
+  // fires), the sky + backdrop as the light probe, view-dependent haze, ground mist. See docs/milestones/A7b/README.md.
   look: {
     sky: {
       sunDir: MOON,
-      sunColor: hdr('#d8d4ff', 2),
+      // drives the cloud silver lining and the horizon glow toward the moon (no sun disc at night)
+      sunColor: hdr('#d4d8ff', 2.2),
       sunSize: 0,
       sunGlow: 0,
-      zenith: C('#0a0d26'),
-      horizon: C('#363866'),
-      ground: C('#15132a'),
-      horizonGlow: C('#5c4c9a'),
-      cloudCover: 0.5,
+      zenith: C('#06070d'),
+      horizon: C('#262a3a'),
+      ground: C('#0c0d13'),
+      horizonGlow: C('#2e3346'),
+      cloudCover: 0.0,
       cloudScale: 0.75,
-      cloudColor: C('#8a86b4'),
-      cloudShade: C('#1a1934'),
-      stars: 0.45,
+      cloudColor: C('#7c8098'),
+      cloudShade: C('#15171f'),
+      stars: 0.3,
       moonDir: MOON,
       // A6: ref-3's moon is about 12 deg wide (plan 3.1), framed by the backdrop's ring arch; halo scaled to the disc
       moonSize: discRadius(12),
-      moonHalo: 1,
-      moonColor: hdr('#ece8ff', 2.4),
+      moonHalo: 0.22,
+      moonColor: hdr('#eef0ff', 1.3),
+      storm: 1,
+      stormLit: hdr('#a8aee8', 0.15),
+      stormDark: C('#121428'),
+      stormScale: 3.4,
     },
-    sunIntensity: 1.5,
-    sunColor: '#c9c4ff',
-    hemi: ['#4c4a8c', '#1c1828', 0.6],
-    fog: { color: '#3b3462', density: 0.0065, height: 0.07 },
-    exposure: 1.15,
+    sunIntensity: 2.4,
+    sunColor: '#c6cbf2',
+    hemi: ['#55566a', '#1a1618', 0.8],
+    fog: { color: '#262a3a', density: 0.0068, height: 0.05 },
+    exposure: 1.4,
     bloom: { strength: 0.45, radius: 0.65, threshold: 1.2 },
-    grade: { tint: [0.99, 0.98, 1.04], contrast: 1.12, saturation: 1.04, lift: [0.0, 0.0, 0.02], gain: [1.02, 1.0, 1.0], vignette: 0.95 },
-    godrays: 0, // moon rays cost about 1.5 ms on high (A2 measurement); A7 decides
-    ambient: ['embers'],
+    grade: { tint: [1.0, 1.0, 1.0], contrast: 1.1, saturation: 0.86, lift: [0.004, 0.003, 0.008], gain: [1.0, 1.0, 1.0], vignette: 1.0 },
+    godrays: 0, // moon rays cost about 1.5 ms on high (A2 measurement); the backdrop's shaft cards stand in for them
+    ambient: ['embersFine'],
     fire: '#ff7a2a',
-    key: '#c8c8ff',
-    rim: '#b4b0ff', // the camera rim light sits behind the fighters: on the wet floor it is the moonlit sheen
+    key: '#bcc0dc',
+    rim: '#c4c8ff', // the camera rim light sits behind the fighters: on the wet floor it is the moonlit sheen
     accent: '#ff8a40',
-    lookId: 'moonlake',
+    lookId: 'moongate',
+    // A18: the reveal's name card (legacy keeps "The Gilded Colosseum")
+    name: 'The Moon Gate',
+    tagline: 'where the moon watches the ring and the old gods keep score',
+    stage: {
+      envIntensity: 1.2,
+      envBackdrop: true,
+      keyGain: 1.8,
+      rim: { color: '#b4bcff', intensity: 3.2, power: 2.6, away: 0.35 },
+      fires: { count: [4, 8, 12], gain: 3.5, reach: 7, color: '#ff8a3a' },
+      fogSky: { toward: '#56556e', away: '#1a1a26', power: 2.0 },
+      mist: { count: [8, 14], offset: 1.2, w: 9, h: 2.6, opacity: 0.8, color: '#7a80a4' },
+    },
   },
 };

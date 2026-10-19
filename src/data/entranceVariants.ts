@@ -158,8 +158,8 @@ const vexPerch: EntranceVariant = {
       { dur: 2.1, state: 'crouch', move: { type: 'hold' }, cues: [{ at: 0.2, sfx: 'whisper' }, { at: 1.1, fx: 'eyes_glint' }] },
       // takeoff off the real edge (root curve from the clip, still on the perch)
       { dur: 0.3, state: 'clip', clip: takeoff, from: 0.95, rate: 1, move: { type: 'root' }, air: true, cues: [{ at: 0.05, sfx: 'whoosh' }] },
-      // the fall (as long as the real drop needs)
-      { dur: fallT, state: 'airborne', move: { type: 'lerp', to: [top[0], 0, Math.max(top[2] + 0.8, 0.7)], ease: 'in' }, air: true },
+      // the fall (as long as the real drop needs; A18: a perch up a stair lands on the dais in front of it)
+      { dur: fallT, state: 'airborne', move: { type: 'lerp', to: [top[0], 0, c.A.ground ? top[2] + 0.8 : Math.max(top[2] + 0.8, 0.7)], ease: 'in' }, air: true },
       // landing: the clip's own landing, impact cue on the measured foot contact
       {
         dur: 2.45 - 1.48,

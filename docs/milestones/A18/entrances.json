@@ -1,0 +1,36 @@
+{
+ "chunks": {
+  "1 gorak,vex": {
+   "kit": {
+    "configs": 30,
+    "failed": 0,
+    "fails": []
+   }
+  },
+  "2 hollowjack,aldric": {
+   "kit": {
+    "configs": 20,
+    "failed": 0,
+    "fails": []
+   }
+  },
+  "3 erika,ozrel": {
+   "kit": {
+    "configs": 20,
+    "failed": 0,
+    "fails": []
+   }
+  },
+  "4 fenrik,maw": {
+   "kit": {
+    "configs": 20,
+    "failed": 0,
+    "fails": []
+   }
+  }
+ },
+ "total": {
+  "configs": 90,
+  "failed": 0
+ }
+}

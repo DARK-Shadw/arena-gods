@@ -57,6 +57,7 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
   const chainAsset = art.chains ? pack.assets.get(art.chains) : undefined;
   if (art.ring) buildRing(a, pack, D, banners, chainAsset ?? null);
   const legacyObstacle = D.obstacle;
+  const tinted = new Map<THREE.Material, THREE.MeshStandardMaterial>();
   const seed = a.layout.seed;
   return {
     ...D,
@@ -80,7 +81,7 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
       return inst;
     },
     chainKit(): ChainKit | null {
-      return chainAsset ? new ChainKit(chainAsset) : null;
+      return chainAsset ? new ChainKit(chainAsset, { wind: !!art.fire }) : null;
     },
     // A7: the Moon Gate's iron fire cage for the chandelier hazard (legacy: the bronze ring on velarium cables)
     chandelier: art.ring?.ruins?.fireCage ? () => fireCage(a) : D.chandelier,
@@ -98,7 +99,25 @@ export function dressKit(a: Arena, pack: ArenaPack, legacy: (a: Arena) => Dressi
     propAsset(kind: string): KitInstance | null {
       const id = art.props?.[kind as keyof NonNullable<typeof art.props>];
       const asset = id ? pack.assets.get(id) : undefined;
-      return asset ? asset.instantiate() : null;
+      if (!asset) return null;
+      const inst = asset.instantiate();
+      const tint = art.propTint?.[kind as keyof NonNullable<typeof art.propTint>];
+      if (tint) {
+        inst.obj.traverse((o) => {
+          const m = o as THREE.Mesh;
+          const src = m.isMesh ? (m.material as THREE.MeshStandardMaterial) : null;
+          if (!src || Array.isArray(src) || !src.color) return;
+          let t = tinted.get(src);
+          if (!t) {
+            t = src.clone();
+            t.color.multiply(new THREE.Color(...tint));
+            tinted.set(src, t);
+          }
+          m.material = t;
+          m.userData.ownMat = true;
+        });
+      }
+      return inst;
     },
   };
 }
@@ -395,7 +414,7 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
   const bannerList: BannerSpec[] = [];
   const rodList: { m: THREE.Matrix4; w: number }[] = [];
   // A7: one chain builder for the whole ring (banner hangers, the pillar chains)
-  const chains = chainAsset ? new ChainKit(chainAsset) : null;
+  const chains = chainAsset ? new ChainKit(chainAsset, { wind: !!pack.art.fire }) : null;
   // A7: ring dressing stays out of the kit gate structures (and decor off the pillars)
   const inZone = gateZoneTest(a, pack, false);
   const blocked = gateZoneTest(a, pack, true);
@@ -536,8 +555,13 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
   removeLegacy(a, D, toRemove);
   // banners (wall + pillar + swags): ONE merged swaying mesh; rods merged; chains instanced
   if (banners && bannerList.length) {
-    const mesh = banners.merged(bannerList);
+    // A8b: shredded swags (their own material) go in a second merged mesh
+    const torn = bannerList.filter((b) => b.shred);
+    const mesh = banners.merged(torn.length ? bannerList.filter((b) => !b.shred) : bannerList);
     if (mesh) a.group.add(mesh);
+    const sm = torn.length ? banners.shredMaterial(torn[0].shred!) : null;
+    const tm = sm ? banners.merged(torn, sm) : null;
+    if (tm) a.group.add(tm);
   }
   const rod = rodList.length && banners ? banners.rod() : null;
   if (rod) {

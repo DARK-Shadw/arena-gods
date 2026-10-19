@@ -658,6 +658,100 @@ def({
 def({ id: 'hazard.spikes.hit', desc: 'thrown onto spikes', at: 'bFeet', y: 0.4, priority: 55, layers: [{ op: { k: 'sparks', n: 30, color: '#ffd0a0', speed: 8 } }] });
 def({ id: 'hazard.geyser.hit', desc: 'launched by a geyser', at: 'bFeet', y: 0.4, priority: 55, layers: [{ op: { k: 'smoke', n: 30, color: '#eef6ff', size: 2.2, rise: 2.5 } }] });
 
+// ================================================================== A19-A20 (F4): Moon Gate variants ('<id>@moongate')
+// Used only when FxWorld.variant() says 'moongate' (the kit Moon Gate); every other theme and ?arena=legacy keep the rows
+// above. Realistic dark-fantasy destruction: cold grey stone dust that rolls along the floor and hangs, grit and chips,
+// lingering plumes (the Unity smoke plume flipbook as a slow dust cloud), burning coals from the fire cage, splashes in
+// the wet floor's puddles. Smoke / dust at scene level (<= 1), sparks and embers HDR.
+const MG_DUST = '#5f5c58';
+const MG_DUST_DARK = '#3e3c3a';
+const MG_PLUME = (n: number, size: [number, number], alpha: number, life: [number, number], jitter: number, minY = 1): L => ({
+  op: { k: 'sp', tex: '@unity_explosion01_nofire', n, color: MG_DUST_DARK, alpha, dir: 'up', cone: 0.6, speed: [0.15, 0.45], size, grow: 1.7, life, drag: 0.7, jitter, rot: false, minQ: 1 },
+  minY,
+});
+const MG_RING = (size: number, alpha = 0.7, life = 1.5): L => ({ op: { k: 'sp', tex: '@dust_ring', n: 1, color: MG_DUST, alpha, dir: 'none', speed: [0, 0], size: [size, size], grow: 1.6, life: [life, life], rot: false }, y: 0 });
+const MG_PUFF = (n: number, size: [number, number], speed: [number, number], jitter: number, alpha = 0.5, life: [number, number] = [1.4, 2.2]): L => ({
+  op: { k: 'sp', tex: '@dust_puff', n, color: MG_DUST, alpha, dir: 'none', cone: 1, speed, size, grow: 1.7, life, drag: 1.8, jitter, rot: false },
+});
+const MG_GRIT = (n: number, y: number, spread = 0.5): L => ({
+  op: { k: 'sp', tex: 'dirt_02', n, color: MG_DUST_DARK, alpha: 0.9, hdr: 0.7, dir: 'none', cone: 1, speed: [0.1, 0.6], vy: [-0.2, 0.4], size: [0.025, 0.055], grav: 9, drag: 0.4, jitter: spread, spin: 5, life: [0.7, 1.3] },
+  y,
+});
+const MG_CHIPS = (n: number, scale = 0.28, speed = 1.1): L => ({ op: { k: 'chips', n, color: '#55524e', scale, speed }, y: 0.15 });
+const MG_SPARKS = (n: number, speed: [number, number] = [3, 8], hdr = 8): L => ({
+  op: { k: 'sp', tex: 'trace_07', n, color: '#ffb468', hdr, add: true, dir: 'up', cone: 0.9, speed, vy: [1, 4], size: [0.04, 0.08], aspect: 0.2, stretch: 0.03, grav: 9, drag: 1.2, life: [0.4, 0.9] },
+});
+const MG_COALS = (n: number): L => ({
+  op: { k: 'sp', tex: 'circle_05', n, color: '#ff7a30', hdr: 6, add: true, dir: 'none', cone: 1, speed: [1.5, 4.5], vy: [1, 3.5], size: [0.03, 0.06], stretch: 0.02, grav: 9, drag: 0.8, life: [0.9, 1.8] },
+});
+def({ id: 'topple.start@moongate', desc: 'A20 cover starts to fall: dust shaken from the base, grit raining from the top', at: 'obstacle', y: 0.2, priority: 40, layers: [MG_PUFF(4, [0.7, 0.9], [0.3, 0.9], 0.6, 0.45), MG_GRIT(12, 3.2, 0.7)] });
+def({
+  id: 'topple.impact@moongate',
+  desc: 'A20 fallen pillar / statue hits the floor: a rolling ring of stone dust, billowing puffs, a hanging plume, chips',
+  at: 'event',
+  y: 0.2,
+  priority: 60,
+  layers: [MG_RING(5, 0.75, 1.7), MG_PUFF(8, [1.0, 1.4], [1.5, 3.5], 1.6, 0.5, [1.6, 2.6]), MG_PLUME(2, [3.0, 3.8], 0.5, [3.2, 4.2], 1.4), MG_CHIPS(16), MG_GRIT(14, 0.6, 1.4), { op: { k: 'ripple', size: 5, life: 0.5, strength: 1.1 }, y: 0.4 }],
+});
+def({ id: 'cover.hit@moongate', desc: 'A20 a strike chips the stone cover', at: 'obstacle', y: 1.2, priority: 20, layers: [MG_PUFF(1, [0.35, 0.45], [0.3, 0.8], 0.2, 0.4, [0.8, 1.1]), MG_CHIPS(4, 0.18, 0.7), MG_GRIT(6, 0, 0.2)] });
+def({ id: 'prop.break@moongate', desc: 'A20 prop destroyed: a dust puff and grit', at: 'event', priority: 30, layers: [MG_PUFF(3, [0.5, 0.7], [0.6, 1.4], 0.4, 0.45, [1.0, 1.5]), MG_GRIT(8, 0.5, 0.4)] });
+def({ id: 'barricade.break@moongate', desc: 'A20 barricade smashed: dust and grit', at: 'event', y: 0.8, priority: 45, layers: [MG_PUFF(5, [0.6, 0.8], [0.8, 2.0], 0.8, 0.45), MG_GRIT(14, 0, 0.8)] });
+def({
+  id: 'floor.collapse@moongate',
+  desc: 'A20 a floor section drops into the pit: dust ring, a plume rising out of the hole, chips and grit',
+  at: 'event',
+  y: 0.1,
+  priority: 60,
+  layers: [MG_RING(4.2, 0.7, 1.6), MG_PUFF(7, [0.9, 1.2], [1.0, 2.6], 1.4, 0.5), MG_PLUME(3, [2.6, 3.4], 0.55, [3.0, 4.0], 1.2, 0.6), MG_CHIPS(14, 0.26, 1.0), MG_GRIT(16, 0.3, 1.2)],
+});
+def({ id: 'hazard.crumble.trigger@moongate', desc: 'A20 cracked floor starts to give way: dust trickles from the cracks', at: 'hazard', y: 0.1, priority: 30, layers: [MG_PUFF(4, [0.5, 0.7], [0.2, 0.6], 1.0, 0.35, [1.2, 1.8]), MG_GRIT(10, 0.2, 1.0)] });
+def({ id: 'hazard.chandelier.trigger@moongate', desc: 'A20 the fire cage chain snaps: rust grit and sparks from the chain', at: 'hazard', y: 6.6, priority: 30, layers: [MG_GRIT(14, 6.6, 0.5), MG_SPARKS(10, [2, 5], 7), MG_COALS(6)] });
+def({
+  id: 'chandelier.impact@moongate',
+  desc: 'A20 the burning fire cage hits the floor: burning coals scatter, sparks, a dust ring, smoke, a flash of fire light',
+  at: 'event',
+  y: 0.3,
+  priority: 70,
+  layers: [
+    MG_SPARKS(40, [3, 9], 9),
+    MG_COALS(26),
+    MG_RING(4, 0.65, 1.4),
+    MG_PUFF(5, [0.8, 1.1], [1.0, 2.4], 1.0, 0.45),
+    { op: { k: 'sp', tex: '@unity_wispysmoke01', n: 3, color: '#3a3532', alpha: 0.5, dir: 'up', cone: 0.4, speed: [0.3, 0.7], size: [1.2, 1.6], grow: 1.8, life: [2.2, 3.0], drag: 0.8, fps: 24, frame0: [0, 40], jitter: 0.6, rot: false, minQ: 1 }, y: 0.4 },
+    { op: { k: 'light', color: '#ff9a4a', i: 14, dur: 0.6, radius: 9 }, y: 1 },
+    MG_CHIPS(10, 0.22, 1.0),
+  ],
+});
+def({
+  id: 'oil.ignite@moongate',
+  desc: 'A20 a tipped brazier spills burning oil: a whoosh of flame over the spill, sparks, a flash of fire light, heat',
+  at: 'event',
+  y: 0.2,
+  priority: 50,
+  layers: [
+    { op: { k: 'sp', tex: '@unity_fireball01', n: 4, color: '#ffffff', hdr: 1.8, add: true, dir: 'up', cone: 0.9, speed: [0.6, 1.6], size: [0.9, 1.3], grow: 1.4, life: [0.5, 0.7], drag: 1.5, jitter: 0.9, rot: false } },
+    MG_SPARKS(24, [2, 6], 8),
+    { op: { k: 'light', color: '#ff8a3a', i: 12, dur: 0.7, radius: 8 }, y: 0.8 },
+    { op: { k: 'heat', size: 2.2, height: 2.4, life: 1.6, strength: 1.1, tier: 2 }, y: 0.1 },
+  ],
+});
+def({
+  id: 'hazard.flamejet.trigger@moongate',
+  desc: 'A20 the fire-jet vent starts to glow: sparks spit from the grate, smoke curls out',
+  at: 'hazard',
+  y: 0.15,
+  priority: 30,
+  layers: [MG_SPARKS(14, [1.5, 4], 7), { op: { k: 'sp', tex: '@unity_wispysmoke01', n: 2, color: '#2e2a28', alpha: 0.45, dir: 'up', cone: 0.3, speed: [0.4, 0.8], size: [0.7, 0.9], grow: 1.6, life: [1.4, 1.9], drag: 0.8, fps: 24, frame0: [0, 40], jitter: 0.3, rot: false, minQ: 1 } }],
+});
+const SPLASH = (scale: number, alpha: number): L[] => [
+  { op: { k: 'sp', tex: 'trace_07', n: Math.round(16 * scale), color: '#cfdcea', alpha, hdr: 1.3, dir: 'up', cone: 0.55, speed: [2.2 * scale, 4.2 * scale], size: [0.06, 0.1], aspect: 0.3, stretch: 0.035, grav: 9, drag: 0.5, jitter: 0.25, life: [0.4, 0.75] } },
+  { op: { k: 'sp', tex: 'circle_05', n: Math.round(22 * scale), color: '#c6d6e8', alpha, hdr: 1.2, dir: 'up', cone: 0.8, speed: [1.6 * scale, 3.6 * scale], size: [0.016, 0.03], stretch: 0.02, grav: 9, drag: 0.5, jitter: 0.35, life: [0.45, 0.85] } },
+  { op: { k: 'sp', tex: 'smoke_07', n: 2, color: '#d8e2ee', alpha: alpha * 0.4, dir: 'up', cone: 0.3, speed: [0.3, 0.6], size: [0.5 * scale, 0.7 * scale], grow: 2.2, drag: 3, jitter: 0.3, life: [0.6, 0.8], minQ: 1 } },
+  { op: { k: 'ripple', size: 1.2 * scale, life: 0.45, strength: 0.6, tier: 2 }, y: 0.05 },
+];
+def({ id: 'splash.body', desc: 'A20 a fighter hits the floor in a puddle: a crown of droplets, spray mist', at: 'aFeet', priority: 35, layers: SPLASH(1, 0.75) });
+def({ id: 'splash.body.wet', desc: 'A20 a fighter hits wet stone: a low spray of droplets', at: 'aFeet', priority: 30, layers: SPLASH(0.5, 0.55).slice(0, 2) });
+
 // ---- attack phase observations (render-side, keyed by fighter + attack id)
 def({
   id: 'active.nova',
@@ -704,6 +798,9 @@ export interface ResolveCtx {
   hpFrac?: (i: number, t: number) => number;
   /** F3: fighter id */
   fighterId?: (i: number) => string;
+  /** A20: theme FX variant (FxWorld.variant) and the floor under fighter i at sim time t (recorded frames) */
+  variant?: string;
+  floorOf?: (i: number, t: number) => string | undefined;
 }
 
 /** impact group of a strike class */
@@ -745,7 +842,7 @@ export const RESOLVE: Partial<Record<SimEvent['type'], (e: SimEvent, c: ResolveC
   parry: () => ['parry.flash'],
   guard_break: () => ['guard.break'],
   dodge: () => ['dodge.dust'],
-  knockdown: (e, c) => ['knockdown.dust', (c.hpFrac?.(e.a, e.t) ?? 1) < 0.4 && BLEEDS[c.surface?.(e.a) ?? 'flesh'] && 'blood.down'],
+  knockdown: (e, c) => ['knockdown.dust', (c.hpFrac?.(e.a, e.t) ?? 1) < 0.4 && BLEEDS[c.surface?.(e.a) ?? 'flesh'] && 'blood.down', splashAt(c, e.a, e.t)],
   wall_slam: () => ['slam.wall'],
   pillar_slam: () => ['slam.wall'],
   prop_break: () => ['prop.break'],
@@ -755,7 +852,7 @@ export const RESOLVE: Partial<Record<SimEvent['type'], (e: SimEvent, c: ResolveC
   hazard_burn: () => ['hazard.burn'],
   finisher_start: () => ['finisher.start'],
   finisher_contact: (e) => [e.data?.kind === 'kill' ? 'finisher.kill' : 'finisher.graze'],
-  launch_land: () => ['launch.land'],
+  launch_land: (e, c) => ['launch.land', splashAt(c, e.a, e.t)],
   kill: (e, c) => {
     const fin = c.isFinisher?.(String(e.data?.move ?? ''));
     const bleeds = BLEEDS[c.surface?.(e.b ?? -1) ?? 'flesh'];
@@ -781,6 +878,13 @@ export const RESOLVE: Partial<Record<SimEvent['type'], (e: SimEvent, c: ResolveC
     return [k === 'lava' || k === 'firepit' || k === 'flamejet' || k === 'oil' ? 'hazard.fire.hit' : k === 'spikes' ? 'hazard.spikes.hit' : k === 'geyser' ? 'hazard.geyser.hit' : k === 'chains' ? 'prop.hit' : k === 'crumble' ? 'crush' : null];
   },
 };
+
+/** A20: a body hitting the floor in a puddle splashes (theme variants only: the shared rows stay as they were) */
+function splashAt(c: ResolveCtx, i: number, t: number): string | false {
+  if (!c.variant || !c.floorOf) return false;
+  const s = c.floorOf(i, t);
+  return s === 'water' ? 'splash.body' : s === 'wet' ? 'splash.body.wet' : false;
+}
 
 /** Attack-phase observations: fired once when a fighter's attack enters its active phase. */
 export const ON_ACTIVE: ((mv: MoveDef) => Ids)[] = [(mv) => [mv.fx === 'nova' && 'active.nova'], (mv) => [(mv.lunge ?? 0) > 3 && 'active.lunge']];

@@ -47,6 +47,8 @@ export const KTX_ARGS = {
   color: ['--format', 'R8G8B8_SRGB', '--assign-tf', 'srgb', '--encode', 'basis-lz', '--qlevel', '128', '--generate-mipmap'],
   data: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'basis-lz', '--qlevel', '192', '--generate-mipmap'],
   linear: ['--format', 'R8G8B8_UNORM', '--assign-tf', 'linear', '--encode', 'uastc', '--uastc-quality', '2', '--uastc-rdo', '--uastc-rdo-l', '1.0', '--zstd', '18', '--generate-mipmap'],
+  // A7c: the authored sky's data texture (4 independent channels: ETC1S would bleed them into each other)
+  dataA: ['--format', 'R8G8B8A8_UNORM', '--assign-tf', 'linear', '--encode', 'uastc', '--uastc-quality', '2', '--uastc-rdo', '--uastc-rdo-l', '1.0', '--zstd', '18', '--generate-mipmap'],
 };
 
 let KTX = null;
@@ -61,7 +63,7 @@ export function ktxEncode(png, dst, kind) {
   const bad = log.split(/\r?\n/).filter((l) => /error|fatal|fail|invalid|not exist|unrecognized|warning/i.test(l));
   const ok = fs.existsSync(dst) && fs.readFileSync(dst).subarray(0, 12).toString('latin1') === '«KTX 20»\r\n\u001a\n';
   if (bad.length || !ok) throw new Error(`ktx create ${path.basename(png)} (${kind}) failed (exit ${r.status}, output ${ok ? 'ok' : 'missing / not KTX2'}):\n  ${bad.join('\n  ') || log.slice(0, 400)}`);
-  return { bytes: fs.statSync(dst).size, seconds: (Date.now() - t) / 1000, codec: kind === 'linear' ? 'uastc+zstd' : 'etc1s' };
+  return { bytes: fs.statSync(dst).size, seconds: (Date.now() - t) / 1000, codec: kind === 'linear' || kind === 'dataA' ? 'uastc+zstd' : 'etc1s' };
 }
 
 export function pillow(script, ...a) {
@@ -99,6 +101,19 @@ function halfPng(png, alpha = false) {
   fs.mkdirSync(WORK, { recursive: true });
   const dst = path.join(WORK, path.basename(png, '.png') + '_half.png');
   if (!fs.existsSync(dst) || fs.statSync(dst).mtimeMs < fs.statSync(png).mtimeMs) pillow(PY_HALF, png, dst, alpha ? 'A' : 'N');
+  return dst;
+}
+
+// A21: a PNG scaled down to fit `size` px (Lanczos, like the low tier's halving), cached in _work by name + size
+const TEX_CAPS = (() => {
+  const p = path.join(ROOT, 'tools', 'arena', 'tex_caps.json');
+  return fs.existsSync(p) ? JSON.parse(fs.readFileSync(p, 'utf8')).caps : {};
+})();
+const PY_FIT = 'import sys;from PIL import Image;im=Image.open(sys.argv[1]);' + PY_MODE + 'n=int(sys.argv[3]);k=n/max(im.size);im=im.resize((max(1,round(im.size[0]*k)),max(1,round(im.size[1]*k))),Image.LANCZOS);im.save(sys.argv[2]);print(im.size[0],im.size[1])';
+function fitPng(png, size, alpha = false) {
+  fs.mkdirSync(WORK, { recursive: true });
+  const dst = path.join(WORK, `${path.basename(png, '.png')}_fit${size}.png`);
+  if (!fs.existsSync(dst) || fs.statSync(dst).mtimeMs < fs.statSync(png).mtimeMs) pillow(PY_FIT, png, dst, String(size), alpha ? 'A' : 'N');
   return dst;
 }
 
@@ -144,6 +159,9 @@ async function buildVariant(io, A, dir, tier, fmt) {
       let png = path.join(dir, spec[key]);
       // a low tier that shares the full set gets it at half size
       if (tier === 'low' && !A.lods.LOD1.ownTextures && A.lods.LOD0.materials.includes(mat.getName())) png = halfPng(png, kind === 'colorA');
+      // A21: per-asset download / GPU caps for the full tier (tools/arena/tex_caps.json: asset id -> slot -> max px)
+      const cap = tier === 'full' ? TEX_CAPS[A.id]?.[key] : undefined;
+      if (cap && Math.max(...pngSize(png)) > cap) png = fitPng(png, cap, kind === 'colorA');
       const e = encodeImage(png, kind, fmt);
       const tex = doc.createTexture(`${mat.getName()}_${key}`).setImage(e.data).setMimeType(e.mime).setURI(`${mat.getName()}_${key}.${fmt}`);
       set(tex);

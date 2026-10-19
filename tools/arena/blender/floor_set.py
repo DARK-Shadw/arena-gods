@@ -58,6 +58,27 @@ def extra(ap):
     ap.add_argument('--rough-lo', type=float, default=0.62)
     ap.add_argument('--rough-hi', type=float, default=0.92)
     ap.add_argument('--preview', type=int, default=640, help='preview height (0 = none)')
+    # A8: procedural slab mode (the owner's ref-3 floor: big thick irregular broken slabs, deep joints, chips, cracks,
+    # soot / blood stains, rough dull stone); --cc0 then only lends its micro surface (disp / diff / rough)
+    ap.add_argument('--mode', default='scan', choices=['scan', 'slabs'])
+    ap.add_argument('--scan-m', type=float, default=2.0, help='metres covered by the scan (micro surface)')
+    ap.add_argument('--albedo', default='0.105,0.112,0.135', help='mean linear stone albedo before AO')
+    ap.add_argument('--stains', type=float, default=1.0)
+    # A8b (independent ref-3 review: darker, rougher, thicker broken slabs, deep joints, rubble, blood / soot); the
+    # defaults reproduce the A8 set
+    ap.add_argument('--slab-var', default='0.74,1.2', help='per-slab albedo multiplier range')
+    ap.add_argument('--joint-scale', type=float, default=1.0, help='joint width multiplier (A8: 1.6-4.4 cm wide)')
+    ap.add_argument('--joint-depth', type=float, default=0.05, help='joint depth (m)')
+    ap.add_argument('--chip-m', type=float, default=0.16, help='largest chip bitten out of a slab edge (m)')
+    ap.add_argument('--soot', type=float, default=0.55, help='soot darkening')
+    ap.add_argument('--soot-cover', default='0.58,0.78', help='soot noise thresholds (lower = more soot)')
+    ap.add_argument('--blood', default='0.72,0.88', help='blood noise thresholds (lower = more blood)')
+    ap.add_argument('--pebbles', type=int, default=0, help='loose stones per tile, gathered in joints and breaks')
+    ap.add_argument('--layout', default='bond', choices=['bond', 'flag'], help='bond = A8 running bond; flag = irregular flagstones (rotated Chebyshev Voronoi)')
+    ap.add_argument('--flag-grid', default='6,5', help='flag layout: jittered seed grid (columns, rows) per tile')
+    ap.add_argument('--micro', type=float, default=1.0, help='contrast of the scan micro surface in the albedo')
+    ap.add_argument('--break-share', type=float, default=0.4, help='share of slabs broken straight through')
+    ap.add_argument('--lift', type=float, default=0.025, help='largest per-slab height offset (m)')
 
 
 job = abake.Job(extra, __doc__)
@@ -254,6 +275,273 @@ def synth():
     return {'heightRangeM': a.disp_m, 'jointShare': float((joint > 0.5).mean()), 'crackShare': float((crack > 0.5).mean()), 'albedoMeanSrgb': float(to_srgb(S['albedo_lin']).mean())}
 
 
+def rect_cells(n, T, seed, warp_m=0.09):
+    """periodic running-bond slab layout: rows of 0.9-1.8 m, each split into slabs of 1.0-2.6 m with a random row
+    offset, the coordinates warped by a few cm so no edge is ruler-straight. Per pixel: slab id, distance to the
+    nearest slab edge (m), slab centre (m), slab size (m)"""
+    r = np.random.default_rng(seed)
+    hs = []
+    while sum(hs) < T - 0.6:
+        hs.append(r.uniform(0.9, 1.8))
+    hs = np.array(hs) * T / sum(hs)
+    y_edges = np.concatenate([[0], np.cumsum(hs)])
+    rows = []
+    for i in range(len(hs)):
+        ls = []
+        while sum(ls) < T - 0.7:
+            ls.append(r.uniform(1.0, 2.6))
+        ls = np.array(ls) * T / sum(ls)
+        rows.append((np.concatenate([[0], np.cumsum(ls)]), r.uniform(0, T)))
+    t = (np.arange(n, dtype=np.float32) + 0.5) / n * T
+    X, Y = np.meshgrid(t, t)
+    wx = (upsample(fourier_noise(128, 6, 40, 1.2, seed + 101), n) - 0.5) * 2 * warp_m
+    wy = (upsample(fourier_noise(128, 6, 40, 1.2, seed + 102), n) - 0.5) * 2 * warp_m
+    Xw, Yw = (X + wx) % T, (Y + wy) % T
+    ri = np.clip(np.searchsorted(y_edges, Yw, side='right') - 1, 0, len(hs) - 1)
+    cid = np.zeros((n, n), np.int32)
+    dist = np.zeros((n, n), np.float32)
+    cx = np.zeros((n, n), np.float32)
+    cy = np.zeros((n, n), np.float32)
+    sz = np.zeros((n, n), np.float32)
+    base = 0
+    for i, (xe, sh) in enumerate(rows):
+        m = ri == i
+        xs = (Xw[m] + sh) % T
+        si = np.clip(np.searchsorted(xe, xs, side='right') - 1, 0, len(xe) - 2)
+        x0, x1 = xe[si], xe[si + 1]
+        y0, y1 = y_edges[i], y_edges[i + 1]
+        yy = Yw[m]
+        # a third of the slabs split once more (across or along), so the joints do not read as a regular bond
+        nsl = len(xe) - 1
+        cut = r.random(nsl)
+        frac = r.uniform(0.35, 0.65, nsl)
+        ys = y0 + (y1 - y0) * frac[si]
+        xc = x0 + (x1 - x0) * frac[si]
+        splitY = (cut[si] < 0.2) & ((y1 - y0) > 1.15)
+        splitX = (cut[si] > 0.82) & ((x1 - x0) > 1.6)
+        lo_y = np.where(splitY & (yy >= ys), ys, y0)
+        hi_y = np.where(splitY & (yy < ys), ys, y1)
+        lo_x = np.where(splitX & (xs >= xc), xc, x0)
+        hi_x = np.where(splitX & (xs < xc), xc, x1)
+        x0, x1, y0, y1 = lo_x, hi_x, lo_y, hi_y
+        dist[m] = np.minimum(np.minimum(xs - x0, x1 - xs), np.minimum(yy - y0, y1 - yy))
+        cid[m] = (base + si) * 4 + (splitY & (yy >= ys)) * 1 + (splitX & (xs >= xc)) * 2
+        cx[m] = X[m] + ((x0 + x1) / 2 - xs)
+        cy[m] = Y[m] + ((y0 + y1) / 2 - yy)
+        sz[m] = np.minimum(x1 - x0, y1 - y0)
+        base += len(xe) - 1
+    return cid, dist, cx, cy, sz, base * 4
+
+
+def flag_cells(n, T, seed, grid):
+    """A8b: periodic irregular flagstones: a jittered seed grid, each seed with its own rotation (+-14 deg) and aspect,
+    nearest seed by a rotated Chebyshev metric (rectangular-ish polygons of varied size, no continuous joint lines).
+    Same outputs as rect_cells: slab id, distance to the nearest slab edge (m), slab centre (m), slab size (m)"""
+    r = np.random.default_rng(seed)
+    gx, gy = grid
+    P = []
+    for j in range(gy):
+        for i in range(gx):
+            P.append(((i + 0.5 + r.uniform(-0.38, 0.38)) / gx * T, (j + 0.5 + r.uniform(-0.38, 0.38)) / gy * T))
+    P = np.array(P, np.float32)
+    nc = len(P)
+    th = r.uniform(-0.25, 0.25, nc).astype(np.float32)
+    asp = r.uniform(0.75, 1.33, nc).astype(np.float32)
+    wgt = r.uniform(0.85, 1.15, nc).astype(np.float32)
+    off = np.array([(dx, dy) for dx in (-1, 0, 1) for dy in (-1, 0, 1)], np.float32) * T
+    PP = (P[None] + off[:, None]).reshape(-1, 2)
+    TH, AS, WG = np.tile(th, 9), np.tile(asp, 9), np.tile(wgt, 9)
+    ID = np.tile(np.arange(nc), 9)
+    c, sn = np.cos(TH), np.sin(TH)
+    t = (np.arange(n, dtype=np.float32) + 0.5) / n * T
+    wx = (upsample(fourier_noise(128, 7, 40, 1.1, seed + 101), n) - 0.5) * 0.16
+    wy = (upsample(fourier_noise(128, 7, 40, 1.1, seed + 102), n) - 0.5) * 0.16
+    cid = np.zeros((n, n), np.int32)
+    dist = np.zeros((n, n), np.float32)
+    cx = np.zeros((n, n), np.float32)
+    cy = np.zeros((n, n), np.float32)
+    rows = 16
+    for r0 in range(0, n, rows):
+        yy = t[r0:r0 + rows]
+        X = np.broadcast_to(t[None, :], (len(yy), n)).reshape(-1) + wx[r0:r0 + rows].reshape(-1)
+        Y = np.broadcast_to(yy[:, None], (len(yy), n)).reshape(-1) + wy[r0:r0 + rows].reshape(-1)
+        dx = X[:, None] - PP[None, :, 0]
+        dy = Y[:, None] - PP[None, :, 1]
+        u = (c[None] * dx + sn[None] * dy) * AS[None]
+        v = (-sn[None] * dx + c[None] * dy) / AS[None]
+        d = np.maximum(np.abs(u), np.abs(v)) * WG[None]
+        idx = np.argpartition(d, 1, axis=1)[:, :2]
+        a0 = np.take_along_axis(d, idx, 1)
+        o = np.argsort(a0, axis=1)
+        idx = np.take_along_axis(idx, o, 1)
+        a0 = np.take_along_axis(a0, o, 1)
+        k = idx[:, 0]
+        sl = slice(r0, r0 + len(yy))
+        dist[sl] = ((a0[:, 1] - a0[:, 0]) * 0.5).reshape(len(yy), n)
+        cid[sl] = ID[k].reshape(len(yy), n)
+        # centre of the nearest copy, expressed in the pixel's own (unwarped) frame
+        cx[sl] = (PP[k, 0] - wx[r0:r0 + rows].reshape(-1)).reshape(len(yy), n)
+        cy[sl] = (PP[k, 1] - wy[r0:r0 + rows].reshape(-1)).reshape(len(yy), n)
+    sz = np.full((n, n), T / math.sqrt(nc), np.float32)
+    return cid, dist, cx, cy, sz, nc
+
+
+def synth_slabs():
+    """A8 procedural slab floor: running-bond slabs (rows 0.9-1.8 m, slabs 1.0-2.6 m, warped edges), each with its own height offset and tilt,
+    rounded and chipped edges, deep wide joints, heavy cracks (some slabs broken through), a rock scan for the
+    micro surface (random offset per slab), soot / blood stains; water ranks joints, cracks, chips and the low
+    corners of tilted slabs first"""
+    src = abake.load_cc0(a.cc0, need=('diff', 'rough', 'disp'))
+    S['src'] = src
+    T = a.tile_m
+    pxm = T / N
+    if a.layout == 'flag':
+        cid, em, ccx, ccy, csz, ncell = flag_cells(N, T, a.seed, [int(x) for x in a.flag_grid.split(',')])
+    else:
+        cid, em, ccx, ccy, csz, ncell = rect_cells(N, T, a.seed)
+    r = np.random.default_rng(a.seed + 1)
+    h0 = r.uniform(0, a.lift, ncell).astype(np.float32)
+    tx, ty = (r.uniform(-0.016, 0.016, (2, ncell))).astype(np.float32)
+    sv = [float(x) for x in a.slab_var.split(',')]
+    tint = r.uniform(sv[0], sv[1], ncell).astype(np.float32)
+    ox, oy = r.integers(0, 4096, (2, ncell))
+    t = (np.arange(N, dtype=np.float32) + 0.5) / N * T
+    X, Y = np.meshgrid(t, t)
+    dx = X - ccx
+    dy = Y - ccy
+    # broken slabs: a third of them carry a break line straight through (random angle, wobbly)
+    brk = r.random(ncell) < a.break_share
+    ang = r.uniform(0, np.pi, ncell).astype(np.float32)
+    offb = r.uniform(-0.25, 0.25, ncell).astype(np.float32)
+    wobB = (upsample(fourier_noise(256, 24, 80, 0.7, a.seed + 41), N) - 0.5) * 0.06
+    dline = np.abs(np.cos(ang[cid]) * dx + np.sin(ang[cid]) * dy - offb[cid] * csz + wobB)
+    bw = 0.004 + 0.008 * upsample(fourier_noise(128, 8, 30, 0.8, a.seed + 43), N)
+    breakL = ((1 - smoothstep(bw * 0.5, bw, dline)) * brk[cid]).astype(np.float32)
+    # chips: noise bites out of the slab edges (up to 7 cm); irregular joint half-width 0.6-1.6 cm
+    chipN = upsample(fourier_noise(512, 26, 140, 0.75, a.seed + 3), N)
+    chip = smoothstep(0.58, 0.85, chipN) * a.chip_m
+    jw = (0.008 + 0.014 * upsample(fourier_noise(128, 10, 40, 0.8, a.seed + 5), N)) * a.joint_scale
+    e2 = em - chip * smoothstep(0.2, 0.0, em)
+    joint = (1 - smoothstep(jw, jw + 0.006, e2)).astype(np.float32)
+    chipped = ((e2 < jw + 0.004) & (em > jw)).astype(np.float32)
+    bevel = smoothstep(jw, jw + 0.045, e2)
+    # micro surface from the scan (per-slab offset; the scan covers --scan-m metres)
+    sd = img_np_native(src['disp'])[..., 0]
+    Nsc = sd.shape[0]
+    stp = Nsc / (a.scan_m / pxm)
+    ii = ((np.arange(N)[:, None] * stp + oy[cid]) % Nsc).astype(np.int64)
+    jj = ((np.arange(N)[None, :] * stp + ox[cid]) % Nsc).astype(np.int64)
+    lo_, hi_ = np.percentile(sd, [1, 99])
+    det = np.clip((sd[ii, jj] - lo_) / max(1e-6, hi_ - lo_), 0, 1).astype(np.float32)
+    det = blur(det, 1.0)
+    dl = to_lin(img_np_native(src['diff'])[..., :3])
+    dlum = (dl * np.array([0.2126, 0.7152, 0.0722], np.float32)).sum(-1)[ii, jj]
+    dlum = dlum / max(1e-6, float(np.median(dlum)))
+    dlum = np.clip(1 + (dlum - 1) * a.micro, 0.8 - 0.25 * (a.micro - 1), 1.25 + 0.3 * (a.micro - 1)) if a.micro != 1.0 else np.clip(dlum, 0.8, 1.25)
+    dlum = blur(dlum.astype(np.float32), 2.5)
+    srough = img_np_native(src['rough'])[..., 0][ii, jj]
+    # cracks: a coarser periodic Voronoi, wobbly, a share kept; a few wide breaks straight through slabs
+    edgeC, eidC = voronoi_edges(N, 26, a.seed + 11)
+    wob = upsample(fourier_noise(256, 30, 80, 0.6, a.seed + 13), N) - 0.5
+    ec = np.abs(edgeC + wob * 0.010) * T
+    cw = 0.003 + 0.005 * upsample(fourier_noise(128, 8, 30, 0.8, a.seed + 15), N)
+    wide = (eidC < 0.18).astype(np.float32)
+    cw = cw + wide * 0.006
+    crack = (1 - smoothstep(cw * 0.4, cw, ec)) * (eidC < a.cracks) * (1 - joint)
+    taper = smoothstep(0.2, 0.5, upsample(fourier_noise(128, 5, 24, 0.8, a.seed + 9), N))
+    crack = np.maximum(np.maximum(crack * taper, crack * wide), breakL * (1 - joint)).astype(np.float32)
+    # height (m, 0 = highest): slab offset + tilt + micro surface + rounded edge; joints 5 cm, chips 1-2.5 cm, cracks
+    H = h0[cid] + (tx[cid] * dx + ty[cid] * dy) + det * 0.008
+    # the two halves of a broken slab settle differently
+    side = (np.cos(ang[cid]) * dx + np.sin(ang[cid]) * dy - offb[cid] * csz) > 0
+    H += np.where(side & brk[cid], -0.012, 0.0).astype(np.float32)
+    H -= (1 - bevel) * 0.014
+    H -= chipped * (0.012 + 0.012 * chipN)
+    H -= crack * (0.008 + 0.012 * wide)
+    H = H * (1 - joint) + (-a.joint_depth) * joint
+    # A8b: loose stones and grit in the joints and breaks (height bumps + their own albedo)
+    peb = np.zeros_like(H)
+    pebA = np.ones_like(H)
+    if a.pebbles > 0:
+        rp = np.random.default_rng(a.seed + 61)
+        near = (joint > 0.3) | (breakL > 0.3) | (chipped > 0.5)
+        cand = np.flatnonzero(near.ravel())
+        pick = rp.choice(cand, size=min(a.pebbles, cand.size), replace=False) if cand.size else []
+        for k in pick:
+            cy_, cx_ = divmod(int(k), N)
+            rad = rp.uniform(0.012, 0.06) * (2.2 if rp.random() < 0.08 else 1.0)
+            rpx = int(math.ceil(rad / pxm)) + 1
+            ys = np.arange(cy_ - rpx, cy_ + rpx + 1) % N
+            xs = np.arange(cx_ - rpx, cx_ + rpx + 1) % N
+            oy_ = (np.arange(-rpx, rpx + 1) * pxm)[:, None]
+            ox_ = (np.arange(-rpx, rpx + 1) * pxm)[None, :]
+            th = rp.uniform(0, np.pi)
+            el = rp.uniform(0.55, 1.0)
+            u_ = (np.cos(th) * ox_ + np.sin(th) * oy_) / rad
+            v_ = (-np.sin(th) * ox_ + np.cos(th) * oy_) / (rad * el)
+            q = 1 - (u_ * u_ + v_ * v_)
+            bump = np.where(q > 0, np.sqrt(np.maximum(q, 0)) * rad * 0.7, 0).astype(np.float32)
+            blk = np.ix_(ys, xs)
+            # a stone rests on the floor under it: its top is the local level + its own height
+            top = H[blk] + bump
+            old = peb[blk]
+            peb[blk] = np.maximum(old, np.where(bump > 0, top - H[blk], 0))
+            pebA[blk] = np.where(bump > 0, rp.uniform(0.6, 1.7), pebA[blk])
+        H = H + peb
+    H = H.astype(np.float32)
+    H -= H.max()
+    a.disp_m = float(-H.min()) - 0.005
+    S['Hm'] = H
+    # normal (OpenGL; row 0 = bottom, +row = +y)
+    gx = (np.roll(H, -1, 1) - np.roll(H, 1, 1)) / (2 * pxm)
+    gy = (np.roll(H, -1, 0) - np.roll(H, 1, 0)) / (2 * pxm)
+    n = np.stack([-gx, -gy, np.ones_like(H)], -1)
+    n /= np.linalg.norm(n, axis=-1, keepdims=True)
+    S['normal'] = n.astype(np.float32)
+    # albedo (linear): base stone x per-slab tint x scan luminance, joints / cracks dark, chips paler, stains
+    base = np.array([float(x) for x in a.albedo.split(',')], np.float32)
+    alb = base[None, None, :] * (tint[cid] * dlum)[..., None]
+    alb *= (0.9 + 0.2 * upsample(fourier_noise(128, 4, 30, 1.0, a.seed + 21), N))[..., None]
+    alb *= (1 + 0.18 * chipped)[..., None]
+    alb *= (1 - 0.85 * joint)[..., None]
+    alb *= (1 - 0.7 * crack)[..., None]
+    alb *= np.where(peb > 0, pebA, 1.0)[..., None]
+    sc = [float(x) for x in a.soot_cover.split(',')]
+    soot = smoothstep(sc[0], sc[1], upsample(fourier_noise(256, 9, 60, 0.9, a.seed + 23), N)) * a.stains
+    soot = np.maximum(soot, smoothstep(0.1, 0.0, em) * 0.5 * a.stains)  # grime along the joints
+    alb *= (1 - a.soot * np.clip(soot, 0, 1))[..., None]
+    bt = [float(x) for x in a.blood.split(',')]
+    blood = smoothstep(bt[0], bt[1], upsample(fourier_noise(256, 14, 70, 0.8, a.seed + 25), N)) * smoothstep(0.35, 0.75, upsample(fourier_noise(512, 50, 120, 0.6, a.seed + 27), N)) * a.stains
+    blood = np.clip(blood, 0, 1)
+    stain = np.array([0.035, 0.012, 0.013], np.float32)
+    alb = alb * (1 - 0.75 * blood[..., None]) + stain * 0.75 * blood[..., None]
+    S['albedo_lin'] = alb.astype(np.float32)
+    # roughness: dull dry stone; joints / cracks rougher (the game's damp / water terms make the puddles)
+    S['rough'] = np.clip(a.rough_lo + (a.rough_hi - a.rough_lo) * np.clip(srough, 0, 1) + 0.08 * joint, 0, 1).astype(np.float32)
+    # water rank: low height first (joints, cracks, chips, low corners of tilted slabs), broken by noise
+    f = blur(H, 2.0) - blur(H, N / 20) * 0.3 + 0.006 * (upsample(fourier_noise(256, 6, 40, 0.9, a.seed + 31), N) - 0.5)
+    S['water'] = 1 - rank01(f)
+    S['crack'] = crack
+    S['joint'] = joint
+    # small-scale cavity AO in numpy (the Cycles AO grid is coarser than the joints)
+    S['cavity'] = np.clip(1 - 18.0 * np.maximum(0, blur(H, 6.0) - H), 0.35, 1).astype(np.float32)
+    S['debug'] = {'breaks': int(brk.sum())}
+    return {'cells': int(ncell), 'brokenSlabs': int(brk.sum()), 'heightRangeM': round(a.disp_m + 0.005, 4), 'jointShare': float((joint > 0.5).mean()), 'crackShare': float((crack > 0.5).mean()),
+            'chipShare': float(chipped.mean()), 'albedoMeanSrgb': float(to_srgb(S['albedo_lin']).mean())}
+
+
+def img_np_native(path):
+    """image at its own (square) size -> float32 (n, n, 4), row 0 = bottom (no resize: the slab mode samples the scan
+    at its own scale)"""
+    im = bpy.data.images.load(path, check_existing=False)
+    im.colorspace_settings.name = 'Non-Color'
+    w, h = im.size
+    px = np.empty(w * h * 4, dtype=np.float32)
+    im.pixels.foreach_get(px)
+    bpy.data.images.remove(im)
+    return px.reshape(h, w, 4)
+
+
 def build_high():
     """3 x 3 displaced tiles (high) + the centre tile (low) for the AO bake"""
     abake.reset()
@@ -299,6 +587,8 @@ def compose():
     """final PNGs: baseColor (sRGB), normal, orm"""
     ao = img_np(S['ao_path'])[..., 0]
     ao = np.clip(ao, 0, 1)
+    if 'cavity' in S:
+        ao = ao * S['cavity']
     S['ao'] = ao
     alb = S['albedo_lin'] * (0.55 + 0.45 * ao)[..., None]
     out = {}
@@ -322,7 +612,7 @@ def export():
     q = bpy.context.active_object
     q.name = 'TEXSET'
     q.data.materials.append(mat)
-    root = abake.empty(f'KIT_{a.name}', id=f'floor/{a.name}', role='texset', kind='floor', tileM=a.tile_m, source=a.cc0)
+    root = abake.empty(f'KIT_{a.name}', id=f'floor/{a.name}', role='texset', kind='floor', tileM=a.tile_m, source=a.cc0, mode=a.mode)
     q.parent = root
     glb = abake.export_glb(os.path.join(job.out, f'{a.name}_raw.glb'), objects=[root, q])
     asset = {
@@ -440,7 +730,7 @@ def preview():
     return {'path': out, 'device': dev.get('used')}
 
 
-job.step('synth', synth)
+job.step('synth', synth_slabs if a.mode == 'slabs' else synth)
 job.step('build_high', build_high)
 job.step('bake_ao', bake)
 job.step('compose', compose)

@@ -6,7 +6,7 @@ import * as THREE from 'three';
 import type { ThemeId } from '../../sim/arenaGen';
 import type { SkyParams } from './sky';
 
-export type AmbientKind = 'dust' | 'motes' | 'petals' | 'embers' | 'snow' | 'fireflies' | 'sand';
+export type AmbientKind = 'dust' | 'motes' | 'petals' | 'embers' | 'snow' | 'fireflies' | 'sand' | 'embersFine';
 
 export interface Grade {
   tint: [number, number, number];

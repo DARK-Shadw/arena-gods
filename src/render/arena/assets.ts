@@ -21,6 +21,8 @@ import { MeshoptDecoder } from 'three/examples/jsm/libs/meshopt_decoder.module.j
 import type { ArenaLayout, ThemeId } from '../../sim/arenaGen';
 import { artFor, assetsOf, tierOf, type AssetId, type AssetTier, type KitSocket, type ThemeArt } from './art';
 import { backdropTier, type BackdropData, type BackdropJson, type TexFiles } from './backdrop';
+import type { SkyLook } from './sky';
+import { assetUrl } from '../baseUrl';
 
 export type TexFormat = 'ktx2' | 'webp';
 
@@ -129,6 +131,25 @@ export interface ArenaPack {
   ms: number;
   /** A6: the baked landmark panorama for this quality (null: none in the art, or it failed: the legacy skyline stays) */
   backdrop: BackdropData | null;
+  /** A7c: the authored sky for this quality (null: none in the art, or it failed: the A7b storm deck stays) */
+  sky?: SkyData | null;
+}
+
+/** A7c: public/arena/sky/<id>/sky.json (tools/arena/build_sky.mjs) */
+export interface SkyJson {
+  id: string;
+  source: string;
+  moon: { az: number; elev: number; diameter: number };
+  palette: number[][];
+  look: SkyLook;
+  tiers: Record<string, { size: [number, number]; tex: TexFiles; gpuMB: number }>;
+}
+export interface SkyData {
+  id: string;
+  tier: string;
+  json: SkyJson;
+  tex: THREE.Texture;
+  ms: number;
 }
 
 export class ArenaAssets {
@@ -144,11 +165,14 @@ export class ArenaAssets {
   /** A6: loaded backdrops per id + tier + format (textures owned here, disposed by release) */
   private backdrops = new Map<string, Promise<BackdropData>>();
   private backdropDone = new Map<string, BackdropData>();
+  /** A7c: loaded skies per id + tier */
+  private skies = new Map<string, Promise<SkyData>>();
+  private skyDone = new Map<string, SkyData>();
 
   constructor(
     private renderer: THREE.WebGLRenderer | null,
-    readonly base = '/arena/',
-    readonly basisPath = '/basis/',
+    readonly base = assetUrl('arena/'),
+    readonly basisPath = assetUrl('basis/'),
     format?: TexFormat,
   ) {
     this.loader.setMeshoptDecoder(MeshoptDecoder);
@@ -209,35 +233,101 @@ export class ArenaAssets {
     return a;
   }
 
-  /** load what a theme's art needs for this layout and quality (assets that fail are listed in `missing`) */
-  async load(theme: ThemeId, quality: number, layout?: ArenaLayout): Promise<ArenaPack> {
+  /**
+   * load what a theme's art needs for this layout and quality (assets that fail are listed in `missing`).
+   * A21: the kit assets, the backdrop and the sky download in parallel (the backdrop and sky used to wait for the
+   * last kit asset); `onProgress(done, total)` reports the expected wire size (MB, from the manifest's per-file
+   * stats; fixed estimates for the backdrop / sky) of what has finished.
+   */
+  async load(theme: ThemeId, quality: number, layout?: ArenaLayout, onProgress?: (done: number, total: number) => void): Promise<ArenaPack> {
     const t0 = performance.now();
     const art = artFor(theme);
     const tier = tierOf(quality);
     const ids = assetsOf(art, layout);
     const assets = new Map<AssetId, KitAsset>();
     const missing: AssetId[] = [];
-    await Promise.all(
+    let man: ArenaManifest | null = null;
+    try {
+      man = await this.manifest();
+    } catch {
+      // the per-asset loads report the failure
+    }
+    const MB = 1048576;
+    const bq = backdropTier(quality);
+    const est = (id: AssetId) => {
+      const s = (man?.assets[id] as { stats?: Record<string, Record<string, { bytes?: number }>> } | undefined)?.stats;
+      return (s?.[tier]?.[this.format]?.bytes ?? s?.full?.[this.format]?.bytes ?? 0.3 * MB) / MB;
+    };
+    const wBackdrop = art.backdrop ? ({ q0: 0.15, q1: 0.6, q2: 2 } as Record<string, number>)[bq] ?? 1 : 0;
+    const wSky = art.sky ? ({ q0: 0.4, q1: 1.3, q2: 4.3 } as Record<string, number>)[bq] ?? 1 : 0;
+    const total = ids.reduce((s, id) => s + est(id), 0) + wBackdrop + wSky;
+    let done = 0;
+    const tick = (w: number) => {
+      done += w;
+      onProgress?.(done, total);
+    };
+    onProgress?.(0, total);
+    const kit = Promise.all(
       ids.map((id) =>
-        this.asset(id, tier).then(
-          (a) => void assets.set(id, a),
-          (e) => {
-            console.warn(`[arena assets] ${id} unavailable, legacy visual used`, e);
-            missing.push(id);
-          },
-        ),
+        this.asset(id, tier)
+          .then(
+            (a) => void assets.set(id, a),
+            (e) => {
+              console.warn(`[arena assets] ${id} unavailable, legacy visual used`, e);
+              missing.push(id);
+            },
+          )
+          .finally(() => tick(est(id))),
       ),
     );
-    let backdrop: BackdropData | null = null;
-    if (art.backdrop) {
-      try {
-        backdrop = await this.loadBackdrop(art.backdrop.id, quality);
-      } catch (e) {
-        console.warn(`[arena assets] backdrop ${art.backdrop.id} unavailable`, e);
-        missing.push(`backdrop/${art.backdrop.id}`);
-      }
+    const backdropP: Promise<BackdropData | null> = art.backdrop
+      ? this.loadBackdrop(art.backdrop.id, quality)
+          .catch((e) => {
+            console.warn(`[arena assets] backdrop ${art.backdrop!.id} unavailable`, e);
+            missing.push(`backdrop/${art.backdrop!.id}`);
+            return null;
+          })
+          .finally(() => tick(wBackdrop))
+      : Promise.resolve(null);
+    const skyP: Promise<SkyData | null> = art.sky
+      ? this.loadSky(art.sky.id, quality)
+          .catch((e) => {
+            console.warn(`[arena assets] sky ${art.sky!.id} unavailable`, e);
+            missing.push(`sky/${art.sky!.id}`);
+            return null;
+          })
+          .finally(() => tick(wSky))
+      : Promise.resolve(null);
+    const [, backdrop, sky] = await Promise.all([kit, backdropP, skyP]);
+    return { theme, tier, art, assets, missing, ms: performance.now() - t0, backdrop, sky };
+  }
+
+  /** A7c: an authored sky (sky.json + the quality tier's data texture: linear, repeat in u, clamped in v), cached */
+  loadSky(id: string, quality: number): Promise<SkyData> {
+    const tier = backdropTier(quality);
+    const key = `${id}|${tier}`;
+    let p = this.skies.get(key);
+    if (!p) {
+      p = (async () => {
+        const t0 = performance.now();
+        const r = await fetch(`${this.base}sky/${id}/sky.json`);
+        if (!r.ok) throw new Error(`sky ${id}: HTTP ${r.status}`);
+        const json = (await r.json()) as SkyJson;
+        const T = json.tiers[tier];
+        if (!T) throw new Error(`sky ${id}: no tier ${tier}`);
+        const tex = await this.texture(T.tex, false);
+        tex.wrapS = THREE.RepeatWrapping;
+        tex.wrapT = THREE.ClampToEdgeWrapping;
+        tex.anisotropy = 1;
+        tex.name = `sky.${id}.${tier}`;
+        const d: SkyData = { id, tier, json, tex, ms: performance.now() - t0 };
+        this.skyDone.set(key, d);
+        return d;
+      })();
+      p.catch(() => this.skies.delete(key));
+      this.skies.set(key, p);
     }
-    return { theme, tier, art, assets, missing, ms: performance.now() - t0, backdrop };
+    return p;
   }
 
   /** one texture file (KTX2 or WebP by the session format; KTX2 failures fall back to WebP like the GLBs) */
@@ -311,6 +401,13 @@ export class ArenaAssets {
 
   /** dispose every loaded asset the kept pack does not use (call after the new arena is built) */
   release(keep: ArenaPack | null) {
+    // A7c: skies the kept pack does not use
+    for (const [key, d] of this.skyDone) {
+      if (keep?.sky === d) continue;
+      d.tex.dispose();
+      this.skyDone.delete(key);
+      this.skies.delete(key);
+    }
     // A6: backdrops the kept pack does not use
     for (const [key, d] of this.backdropDone) {
       if (keep?.backdrop === d) continue;

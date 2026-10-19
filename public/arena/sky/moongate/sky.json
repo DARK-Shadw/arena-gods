@@ -1,0 +1,136 @@
+{
+ "_doc": "Arena authored sky (tools/arena/build_sky.mjs from tools/arena/sky/<id>.json, milestone A7c). Loaded by ArenaAssets.loadSky, drawn by src/render/arena/sky.ts (skyTex). Band: u = 0.5 + az / 360 (game azimuth atan2(z, x)), v = 1 - (dir.y + 0.1) / 1.1 (row 0 = zenith). Channels (linear): R cloud structure, G density, B rim potential, A moon shafts. palette = 6 linear RGB ramp stops (dark -> bright); look = the lighting (sky.ts SkyLook).",
+ "id": "moongate",
+ "source": "polyhaven/quarry_cloudy",
+ "sources": [
+  "polyhaven/quarry_cloudy"
+ ],
+ "moon": {
+  "az": 0,
+  "elev": 26,
+  "diameter": 12
+ },
+ "palette": [
+  [
+   0.02999,
+   0.0285,
+   0.07302
+  ],
+  [
+   0.04134,
+   0.04738,
+   0.1257
+  ],
+  [
+   0.05658,
+   0.06765,
+   0.16634
+  ],
+  [
+   0.08749,
+   0.10625,
+   0.24395
+  ],
+  [
+   0.13125,
+   0.16022,
+   0.34472
+  ],
+  [
+   0.60204,
+   0.69085,
+   0.97398
+  ]
+ ],
+ "look": {
+  "gain": 1,
+  "amb": 0.17,
+  "mid": 1.1,
+  "midDeg": 15,
+  "wide": 0.22,
+  "wideDeg": 45,
+  "hot": 0.9,
+  "hotDeg": 9,
+  "rim": [
+   0.78,
+   0.8,
+   1
+  ],
+  "rimGain": 0.8,
+  "rimDeg": 14,
+  "gapFar": [
+   0.004,
+   0.005,
+   0.01
+  ],
+  "gapNear": [
+   0.025,
+   0.03,
+   0.07
+  ],
+  "bankH": 0.25,
+  "bankDark": 0.65,
+  "bankDens": 0.55,
+  "bankAway": 0.8,
+  "shaft": [
+   0.5,
+   0.54,
+   0.75
+  ],
+  "shaftGain": 0.25,
+  "drift": 0.0003,
+  "flash": [
+   0.75,
+   0.8,
+   1
+  ],
+  "flashEvery": 34,
+  "flashGain": 1.6,
+  "flashEnv": 0.25,
+  "moonOcclude": 0.85,
+  "sat": 0.75,
+  "moonColor": [
+   1.1,
+   1.13,
+   1.35
+  ]
+ },
+ "tiers": {
+  "q2": {
+   "size": [
+    8192,
+    1024
+   ],
+   "tex": {
+    "ktx2": "sky/moongate/q2/sky.ktx2",
+    "webp": "sky/moongate/q2/sky.webp"
+   },
+   "gpuMB": 10.67,
+   "downloadMB": 4.26
+  },
+  "q1": {
+   "size": [
+    4096,
+    512
+   ],
+   "tex": {
+    "ktx2": "sky/moongate/q1/sky.ktx2",
+    "webp": "sky/moongate/q1/sky.webp"
+   },
+   "gpuMB": 2.67,
+   "downloadMB": 1.33
+  },
+  "q0": {
+   "size": [
+    2048,
+    256
+   ],
+   "tex": {
+    "ktx2": "sky/moongate/q0/sky.ktx2",
+    "webp": "sky/moongate/q0/sky.webp"
+   },
+   "gpuMB": 0.67,
+   "downloadMB": 0.41
+  }
+ }
+}

@@ -13,7 +13,7 @@ import type { ArenaLayout, HazardDef, Obstacle, ObstacleKind } from '../../sim/a
 import { boundR, chainSwing, CHAIN_LEN, CHAIN_PIVOT_H } from '../../sim/arenaGen';
 import type { Frame, SimEvent } from '../../sim/types';
 import { THEME_DEFS, type ThemeDef } from './themes';
-import { bakeEnvironment, makeSky } from './sky';
+import { bakeEnvironment, bakeStormTexture, lightningAt, makeSky, type SkyLook } from './sky';
 import { Backdrop } from './backdrop';
 import { ArenaFog, installHeightFog } from './fog';
 import { Ambient } from './ambient';
@@ -26,14 +26,18 @@ import { canvasTexture, softDot } from './textures';
 import { R } from './noise';
 import { alongEllipse } from './common';
 import { withLook } from './art';
+import { StageLight } from './stageLight';
 import type { WetFloor } from './floor';
 import { FloorLightMap } from './lightmap';
 import { LAYER_REFLECT, PlanarReflection, StreakCards, type FloorLightSource } from './reflection';
 import { LAYER } from '../fx/fxLayers';
 import { THEME_FLOOR, type FloorSurface } from '../fx/fxSurfaces';
 import { swayOn, swayTime } from './cloth';
+import { chainWind } from './chains';
 import type { KitInstance } from './assets';
 import { gateZoneTest } from './nearField';
+import { FireField, fireFlicker, fireWind, type FireKind, type FireSrc } from '../fx/fireField';
+import type { FxAtlases } from '../fx/atlas';
 
 /**
  * A7: the hang height of every chandelier hazard (the cage's top ring), shared by the hazard builder, the camera's
@@ -78,6 +82,20 @@ export interface GateAnchors {
   wallH: number;
   /** the barrier's breakable pieces (restored on reset) */
   pieces: { obj: THREE.Object3D; pos: THREE.Vector3; rot: THREE.Euler; vis: boolean }[];
+  /**
+   * A18: the gate stands up a stair (Moon Gate): the ground under the gate axis rises from the floor (z >= z0) up the
+   * flight to the dais (height h at z <= zTop). Every gate-frame y (actor, cameras, anchors) is then RELATIVE to this
+   * ground: the entrance builder adds groundY(z) (the nosing midline of the steps, within half a riser of each tread)
+   */
+  ground?: { z0: number; zTop: number; h: number; rise: number; run: number };
+  /** A18: the same gate as if it stood at floor level (barrier / tunnel): the speed reference for the stair re-timing */
+  flat?: { barrierZ: number; tunnel?: { depth: number; height: number; floorY: number } };
+}
+
+/** A18: ground height (relative to the floor) under a gate-frame z, for gates with anchors.ground */
+export function groundY(gr: GateAnchors['ground'], z: number): number {
+  if (!gr) return 0;
+  return Math.max(0, Math.min(gr.h, gr.rise * ((gr.z0 - z) / gr.run + 0.5)));
 }
 
 export interface Mood {
@@ -144,7 +162,17 @@ export class Arena {
   private scene: THREE.Scene;
   private propMats: Record<string, THREE.Material> = {};
   private propGeos: Record<string, THREE.BufferGeometry> = {};
-  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number }[] = [];
+  private flames: { obj: THREE.Object3D; ph: number; base: number; light?: THREE.PointLight; li?: number; size: number; k: number; src?: FireSrc; seed?: number; follow?: boolean }[] = [];
+  /** A19: the layered fire field (kit Moon Gate, ThemeArt.fire): every arena fire's flames, glow, smoke, embers, heat */
+  fire: FireField | null = null;
+  /** A19: the wind (render only; seeded from the arena seed): flames lean, smoke / embers drift, banners and chains sway */
+  readonly wind = { x: 0, z: 0, gust: 0.5 };
+  /** A19: the fire clock (match time in a fight: the same flicker on a replay / seek; the arena clock otherwise) */
+  fireT = 0;
+  private swayT = 0;
+  private fireOff = 0;
+  private lastMatchT = -1;
+  private swayMats: { u: { value: number }; base: number }[] = [];
   /** A2b: pre-built burning-oil patches (tipped braziers), driven by Frame.fires */
   private oilFires: { g: THREE.Group; disc: THREE.Mesh }[] = [];
   private updaters: ((t: number, dt: number) => void)[] = [];
@@ -190,20 +218,61 @@ export class Arena {
     }
 
     // ---------------- sky, environment, fog
+    // A7c: the authored sky (kit mode, ThemeArt.sky + its loaded texture): replaces the storm deck; lit in sky.ts by the
+    // moon, drifting, with distant lightning (update()); the probe below bakes it (T.sky is withLook's own copy here)
+    if (kit?.sky && kit.art.sky && kit.art.look) {
+      const J = kit.sky.json;
+      T.sky = { ...T.sky, storm: 0, skyTex: kit.sky.tex, skyLook: { ...J.look, ...(kit.art.sky.look ?? {}) }, skyRamp: J.palette };
+      this.skyLook = T.sky.skyLook!;
+      const md = T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir;
+      this.moonAz = Math.atan2(md.z, md.x);
+      // `?skyflash=<t>` (debug): hold the lightning clock at t (e.g. 40.02, the first strike) for stills of a flash
+      const sf = typeof location !== 'undefined' ? new URLSearchParams(location.search).get('skyflash') : null;
+      if (sf !== null && Number.isFinite(Number(sf))) this.skyFlashAt = Number(sf);
+    }
+    // A7b: the kit Moon Gate's storm deck is baked once (sky.ts bakeStormTexture) and sampled by the sky and the probe
+    if (kit && T.sky.storm) T.sky.stormTex = bakeStormTexture(renderer, T.sky, quality >= 1 ? 2048 : 1024, quality >= 2 ? 512 : 256);
     this.sky = makeSky(T.sky);
     this.sky.userData.dyn = true;
+    // A21 (GPU): kit mode draws the sky LAST among the opaque objects instead of first: it writes no depth and sits
+    // behind everything, so the depth test now rejects its (expensive, A7c-lit) fragments wherever the arena covers it
+    // (most of a fight frame) instead of shading the whole screen and painting over it. Same pixels.
+    if (kit) this.sky.renderOrder = 1000;
     this.group.add(this.sky);
+    // A19: the fire field exists before the dressing places its fires (kit Moon Gate only: ThemeArt.fire)
+    if (kit?.art.fire) {
+      this.fire = new FireField(Arena.fxAtlases ?? null, quality, kit.art.fire, T.fire);
+      this.lightBudget = kit.art.fire.lights[Math.max(0, Math.min(2, quality))];
+    }
     this.dressing = buildDressing(this);
     this.drawCallsMerged = mergeStatic(this.group);
     // A6: baked panorama layers (kit mode, when the theme art has one and it loaded); not merged (userData.dyn)
     if (kit?.backdrop && kit.art.backdrop) {
-      this.backdrop = new Backdrop(kit.backdrop, quality, kit.art.backdrop.tune);
+      // (A7c: the baked clouds fade out only when the authored sky that replaces them is drawn)
+      const tune = kit.art.backdrop.tune;
+      this.backdrop = new Backdrop(kit.backdrop, quality, this.skyLook || !tune ? tune : { ...tune, cloudHide: 0 });
+      this.backdrop.setMoon(T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir);
       this.group.add(this.backdrop.group);
     }
-    this.env = bakeEnvironment(renderer, T.sky, this.dressing.envExtras);
-    scene.environment = this.env;
-    scene.background = null;
     this.fog = new ArenaFog(T.fog.color, T.fog.density, T.fog.height);
+    // A7b: kit Moon Gate stage light; its IBL probe also sees the backdrop (sky, storm, arch, ruins light the stone and
+    // the fighters), with the scene fog so the layers' fog match is right in the probe
+    const stageArt = kit?.art.look?.stage;
+    const envExtras = [...(this.dressing.envExtras ?? [])];
+    if (stageArt?.envBackdrop && this.backdrop)
+      this.backdrop.group.traverse((o) => {
+        const m = o as THREE.Mesh;
+        if (m.isMesh && m.userData.backdrop) {
+          const c = new THREE.Mesh(m.geometry, m.material);
+          c.renderOrder = m.renderOrder;
+          c.frustumCulled = false;
+          envExtras.push(c);
+        }
+      });
+    this.env = stageArt ? bakeEnvironment(renderer, T.sky, envExtras, { fog: this.fog, far: 1400 }) : bakeEnvironment(renderer, T.sky, this.dressing.envExtras);
+    scene.environment = this.env;
+    scene.environmentIntensity = this.envBase = stageArt?.envIntensity ?? 1;
+    scene.background = null;
     scene.fog = this.fog;
 
     // ---------------- lights
@@ -284,6 +353,15 @@ export class Arena {
 
     // ---------------- A2: decorative boundary braziers, wet floor (reflection, light map, streaks)
     if (kit?.art.ringFlames) this.addRingFlames(kit);
+    // A19: the fire field's draws (after every fire is placed; before the reflection tagging: its flames reflect)
+    if (this.fire) {
+      this.group.add(this.fire.build());
+      this.group.traverse((o) => {
+        const m = (o as THREE.Mesh).material as THREE.Material & { userData: { sway?: { uSwayAmp: { value: number } } } };
+        const u = m && !Array.isArray(m) ? m.userData?.sway?.uSwayAmp : undefined;
+        if (u && !this.swayMats.some((x) => x.u === u)) this.swayMats.push({ u, base: u.value });
+      });
+    }
     this.wetFloor = this.dressing.wetFloor ?? null;
     if (this.wetFloor) {
       const F = this.wetFloor;
@@ -296,16 +374,40 @@ export class Arena {
       {
         this.streaks = new StreakCards();
         const U = this.streaks.uniforms;
-        U.uGain.value = quality <= 0 ? 1 : STREAK_ACCENT;
+        U.uGain.value = quality <= 0 ? (F.streakGainLow ?? 1) : (F.streakGain ?? STREAK_ACCENT);
         U.uOrm.value = F.uniforms.uFOrm.value as THREE.Texture;
         U.uTile.value = F.tileM;
         U.uWater.value = Math.min(0.9, (F.uniforms.uFPuddle.value as number) * 1.6);
+        if (F.streakDry !== undefined) U.uDry.value = F.streakDry;
+        if (F.streakLen !== undefined) U.uStretch.value = F.streakLen;
+        if (F.streakWater !== undefined) U.uWater.value = F.streakWater;
+        if (F.moonPath?.dry !== undefined) U.uMoonDry.value = F.moonPath.dry;
         this.group.add(this.streaks.mesh);
       }
       this.tagReflect();
       F.readWater(renderer);
     }
+    // A7b: moon rim + fire pools on every standard material of the arena (not the wet floor), ground mist cards
+    if (stageArt) {
+      this.stage = new StageLight(stageArt, quality, T.sky.moonSize > 0 ? T.sky.moonDir : T.sky.sunDir);
+      const skip = new Set<THREE.Object3D>();
+      if (this.wetFloor) skip.add(this.wetFloor.mesh);
+      this.stage.patch(this.group, skip);
+      this.stage.buildMist(this.group, layout.rx, layout.rz, shaderTime);
+    }
   }
+  /** A7b: the kit Moon Gate stage light (moon rim, fire pools, sky fog, mist), null elsewhere */
+  stage: StageLight | null = null;
+  /** A7c: the authored sky's lighting (null: no authored sky) + the lightning state (cosmetic, from match time) */
+  skyLook: SkyLook | null = null;
+  private moonAz = 0;
+  private envBase = 1;
+  private matchT = -1;
+  private matchSeen = -1e9;
+  private flashDir = new THREE.Vector3(1, 0.2, 0);
+  private skyFlashAt: number | null = null;
+  /** A7c: current lightning level 0..1 (read-only, for checks) */
+  flash = 0;
 
   /** A2: render-only braziers along the boundary (ThemeArt.ringFlames), skipping the gates */
   private addRingFlames(kit: ArenaPack) {
@@ -522,7 +624,8 @@ export class Arena {
   }
 
   /** billboard-ish flame: two crossed additive quads + optional light */
-  flame(at: THREE.Vector3, size: number, color: string, light = false): THREE.Object3D {
+  flame(at: THREE.Vector3, size: number, color: string, light = false, opts?: { kind?: FireKind; wid?: number }): THREE.Object3D {
+    if (this.fire) return this.fieldFlame(at, size, color, light, opts);
     const tex = flameSprite();
     const g = new THREE.Group();
     g.position.copy(at);
@@ -541,7 +644,7 @@ export class Arena {
       g.add(core);
     }
     // A7: kit mode takes a deterministic flicker phase (render seed); legacy keeps Math.random (pixel-identical gate)
-    const entry: (typeof this.flames)[number] = { obj: g, ph: this.kit ? ((this.flames.length * 7.31 + at.x * 1.7 + at.z * 2.3) % 10 + 10) % 10 : Math.random() * 10, base: 1, size };
+    const entry: (typeof this.flames)[number] = { obj: g, ph: this.kit ? ((this.flames.length * 7.31 + at.x * 1.7 + at.z * 2.3) % 10 + 10) % 10 : Math.random() * 10, base: 1, size, k: 1 };
     if (light && this.lightBudget > 0) {
       this.lightBudget--;
       const L = new THREE.PointLight(color, size * 6, size * 14, 1.6);
@@ -553,7 +656,37 @@ export class Arena {
     this.flames.push(entry);
     return g;
   }
+  /**
+   * A19: a fire of the fire field (kit Moon Gate): the returned group only carries position / visibility (its owner's
+   * scale sizes oil pools); the field draws it. Real lights (per-tier budget) hang off the arena root and follow it, so
+   * hiding a fire (jets, oil, a smashed brazier) dims its light instead of changing the scene's light count (a shader
+   * recompile hitch every time a jet fired).
+   */
+  private fieldFlame(at: THREE.Vector3, size: number, color: string, light: boolean, opts?: { kind?: FireKind; wid?: number }): THREE.Object3D {
+    const g = new THREE.Group();
+    g.position.copy(at);
+    g.name = 'fireSrc';
+    const n = this.flames.length;
+    const kind: FireKind = opts?.kind ?? (size <= 0.42 ? 'candle' : 'bowl');
+    const wid = opts?.wid ?? (kind === 'candle' ? 0 : size * (size >= 1.2 ? 0.55 : 0.32));
+    const src = this.fire!.add(g, size, kind, wid) ?? undefined;
+    const seed = (this.layout.seed * 131 + n * 7 + 11) | 0;
+    const entry: (typeof this.flames)[number] = { obj: g, ph: (n * 7.31) % 10, base: 1, size, k: 1, src, seed };
+    if (light && this.lightBudget > 0) {
+      this.lightBudget--;
+      const L = new THREE.PointLight(color, size * 6, size * 14, 1.6);
+      L.name = 'fireLight';
+      this.group.add(L);
+      entry.light = L;
+      entry.li = L.intensity;
+      entry.follow = true;
+    }
+    this.flames.push(entry);
+    return g;
+  }
   lightBudget = 7;
+  /** A19: the FX atlases for the fire field (set by the app, like fxFlame) */
+  static fxAtlases?: FxAtlases;
   drawCallsMerged = 0;
   /** FX hook (F3, src/render/fx/flames.ts): builds the flame visual; null / unset = the old crossed quads */
   static fxFlame?: (size: number, color: string, n: number) => THREE.Object3D | null;
@@ -836,6 +969,31 @@ export class Arena {
         column.position.y = 0.5;
         g.add(column);
         const holder = new THREE.Group();
+        if (this.fire) {
+          // A19: the vent breathes fire through the fire field: sputtering tongues while it glows (state 1), a roaring
+          // column of stacked flames with embers, smoke and heat when it fires (state 2); the light dims, never vanishes
+          const jf = this.flame(new THREE.Vector3(0, 0.05, 0), h.r * 1.5, '#ff8a30', true, { kind: 'jet', wid: h.r * 0.35 });
+          g.add(jf);
+          const src = this.flames[this.flames.length - 1].src;
+          column.visible = false;
+          if (src) src.amp = 0;
+          let fireAt = -1;
+          update = (s, t) => {
+            (glow.material as THREE.MeshBasicMaterial).opacity = s === 1 ? 0.45 + Math.sin(t * 24) * 0.25 : s === 2 ? 0.9 : 0;
+            if (!src) return;
+            if (s === 2) {
+              if (fireAt < 0 || t < fireAt) fireAt = t;
+              const k = Math.min(1, (t - fireAt) / 0.18);
+              src.amp = 1;
+              src.h = 0.6 + 2.2 * k;
+            } else {
+              fireAt = -1;
+              src.amp = s === 1 ? 0.35 : 0;
+              src.h = s === 1 ? 0.35 : 0.3;
+            }
+          };
+          break;
+        }
         holder.add(this.flame(new THREE.Vector3(0, 0.05, 0), h.r * 1.8, '#ff8a30', true));
         holder.visible = false;
         g.add(holder);
@@ -988,6 +1146,7 @@ export class Arena {
 
   /** A2b: one burning-oil patch (glowing pool + three flames), hidden until Frame.fires uses it */
   private addOilFire() {
+    if (this.fire) return this.addOilFireField();
     const g = new THREE.Group();
     const disc = new THREE.Mesh(blobDisc(1.0, 77 + this.oilFires.length, 32), glowMat('#ff5a10', 0.55));
     disc.position.y = 0.04;
@@ -996,6 +1155,31 @@ export class Arena {
       const a = (k / 3) * Math.PI * 2;
       g.add(this.flame(new THREE.Vector3(Math.cos(a) * 0.45, 0.02, Math.sin(a) * 0.45), 0.85 - k * 0.12, this.theme.fire, k === 0));
     }
+    g.visible = false;
+    this.group.add(g);
+    this.oilFires.push({ g, disc });
+  }
+
+  /**
+   * A19: a burning-oil pool of the fire field: a dark, glossy spill whose surface burns in moving tongues (procedural, no
+   * texture), five low wide fires spread over it (one with a light), the same Frame.fires drive as before
+   */
+  private addOilFireField() {
+    const g = new THREE.Group();
+    const k0 = this.oilFires.length;
+    const disc = new THREE.Mesh(blobDisc(1.0, 77 + k0, 40), burningOilMat(k0));
+    disc.position.y = 0.035;
+    disc.renderOrder = 1;
+    disc.userData.dyn = true;
+    g.add(disc);
+    const spots: [number, number, number][] = [
+      [0, 0, 0.8],
+      [0.5, 0.15, 0.6],
+      [-0.42, 0.3, 0.55],
+      [0.1, -0.5, 0.55],
+      [-0.25, -0.35, 0.45],
+    ];
+    spots.forEach(([x, z, s], k) => g.add(this.flame(new THREE.Vector3(x, 0.03, z), s, this.theme.fire, k === 0, { kind: 'oil', wid: s * 0.45 })));
     g.visible = false;
     this.group.add(g);
     this.oilFires.push({ g, disc });
@@ -1073,7 +1257,7 @@ export class Arena {
     if (this.streaks && S.moonSize > 0 && S.sunGlow === 0 && S.moonDir.y > 0.05) {
       const hz = Math.hypot(S.moonDir.x, S.moonDir.z) || 1;
       const cp = this.sky.position; // = the camera (update())
-      st.push({ x: cp.x + (S.moonDir.x / hz) * 40, y: 3, z: cp.z + (S.moonDir.z / hz) * 40, size: 4, color: this._moonCol.copy(S.moonColor).multiplyScalar(1 / Math.max(1e-3, S.moonColor.r)), power: MOON_PATH, len: 3, wid: 1 });
+      st.push({ x: cp.x + (S.moonDir.x / hz) * 40, y: 3, z: cp.z + (S.moonDir.z / hz) * 40, size: 4, color: this._moonCol.copy(S.moonColor).multiplyScalar(1 / Math.max(1e-3, S.moonColor.r)), power: this.wetFloor?.moonPath?.power ?? MOON_PATH, len: 3, wid: this.wetFloor?.moonPath?.wid ?? 1 });
     }
     for (const h of this.hazards) {
       if (h.def.kind !== 'lava') continue;
@@ -1084,6 +1268,9 @@ export class Arena {
   /** sync dynamic state to a playback frame (simDt for physics-like visuals) */
   applyFrame(fr: Frame, simDt: number, hands: (i: number) => THREE.Vector3 | null, facing: (i: number) => number) {
     const t = fr.t;
+    // A7c: the sky's lightning follows match time (same flashes on a replay / seek); read only, never written back
+    this.matchT = t;
+    this.matchSeen = this.time;
     // obstacles
     for (let i = 0; i < this.obstacles.length; i++) {
       const ov = this.obstacles[i];
@@ -1191,6 +1378,17 @@ export class Arena {
       const s = F[k * 4 + 2] * Math.min(1, life * 4);
       of.g.visible = true;
       of.g.position.set(F[k * 4], 0, F[k * 4 + 1]);
+      if (this.fire) {
+        // A19: the field sizes the fires by the group's x / z scale; life fades the burn (the spill stays dark and wet)
+        of.g.scale.set(s, 1, s);
+        const u = (of.disc.material as THREE.ShaderMaterial).uniforms;
+        u.uBurn.value = Math.min(1, life * 3);
+        for (const c of of.g.children) {
+          const f = this.flames.find((x) => x.obj === c);
+          if (f?.src) f.src.amp = Math.min(1, life * 3);
+        }
+        continue;
+      }
       of.g.scale.set(s, Math.max(0.2, Math.min(1, life * 4)), s);
       (of.disc.material as THREE.MeshBasicMaterial).opacity = 0.55 * Math.min(1, life * 3);
     }
@@ -1274,6 +1472,18 @@ export class Arena {
       const own = kind === 'stone' || kind === 'wood' || kind === 'ceramic';
       if (bm) this.debris.setChunk(kind, bm.geometry, own ? (bm.material as THREE.Material) : undefined);
     }
+  }
+
+  /**
+   * A21: objects that are otherwise created on the first destruction event (the debris pools: an instanced variant
+   * of the kit material) are created hidden now, so the loading screen's compile pass (main.ts prewarm) covers them.
+   */
+  prewarm() {
+    const D = this.dressing;
+    const kinds = new Set<DebrisMat>(['wood', 'metal', 'paper', D.urnDebris, D.chandelierDebris]);
+    for (const o of this.layout.obstacles) kinds.add(this.debrisOf(o.kind));
+    kinds.add(this.debrisOf(this.layout.obstacles[0]?.kind ?? 'rock'));
+    this.debris.prewarm(kinds);
   }
 
   /** destruction visuals for sim events; returns camera shake amount */
@@ -1409,14 +1619,22 @@ export class Arena {
     }
   }
 
+  /** A19: the moon key before the lightning pulse (applyMood / restoreLighting set it) */
+  private get moonNow(): number {
+    return this._moonNow ?? this.base.sun;
+  }
+  private _moonNow?: number;
+
   applyMood(m: Mood) {
     this.moon.intensity = this.base.sun * Math.min(1.3, Math.max(0.35, m.moon / 1.1));
+    this._moonNow = this.moon.intensity;
     this.hemi.intensity = this.base.hemi * Math.min(1.3, Math.max(0.5, m.hemi / 0.55));
     this.fog.density = this.base.fog * Math.min(2, Math.max(0.6, m.fog / 0.022));
     this.centerSpot.intensity = this.base.spot + m.spot * 20;
   }
   restoreLighting() {
     this.moon.intensity = this.base.sun;
+    this._moonNow = this.base.sun;
     this.hemi.intensity = this.base.hemi;
     this.fog.density = this.base.fog;
     this.centerSpot.intensity = this.base.spot;
@@ -1441,31 +1659,111 @@ export class Arena {
       this.fireRingMat.opacity *= 1 - 0.8 * this.ringThrough;
     }
     this.backdrop?.update(this.fog);
+    // A7c: distant lightning (match time in a fight, the arena clock otherwise): the sky flashes, the probe pulses lightly
+    if (this.skyLook) {
+      const L = this.skyLook;
+      const lt = this.skyFlashAt ?? (this.time - this.matchSeen < 0.5 ? this.matchT : this.time);
+      const f = (this.flash = lightningAt(lt, L.flashEvery, this.flashDir, this.moonAz));
+      const U = (this.sky.material as THREE.ShaderMaterial).uniforms;
+      (U.uSkyFlash.value as THREE.Vector4).w = f * L.flashGain;
+      (U.uSkyFlashDir.value as THREE.Vector3).copy(this.flashDir);
+      this.scene.environmentIntensity = this.envBase * (1 + L.flashEnv * f);
+      // A19: the strike lights the arena too: a cold wash on the stone (stage light) and a pulse of the moon key
+      if (this.fire && this.stage) {
+        this.stage.setFlash(f, this.flashDir, FLASH_COL, 1.6);
+        this.moon.intensity = this.moonNow * (1 + 1.2 * f);
+      }
+    }
     if (cam) {
       this.sky.position.copy(cam.position);
       this.camQuat.copy(cam.quaternion);
       for (const f of this.flames) f.obj.quaternion.copy(cam.quaternion);
       if (viewportH) this.ambient.setViewport(viewportH, (cam as THREE.PerspectiveCamera).fov ?? 50);
     }
-    for (const f of this.flames) {
-      const k = 0.88 + Math.sin(t * 13 + f.ph) * 0.07 + Math.sin(t * 29 + f.ph * 2) * 0.05;
-      f.obj.scale.set(1, k, 1);
-      if (f.light && f.li) f.light.intensity = f.li * k;
-    }
-    // A2: one global flicker for the floor light map and the streak cards (plan 6.2)
+    let floorFl = 0.9 + Math.sin(t * 11.3) * 0.06 + Math.sin(t * 23.7 + 1.3) * 0.04;
+    if (this.fire) floorFl = this.updateFire(dt, cam);
+    else
+      for (const f of this.flames) {
+        const k = 0.88 + Math.sin(t * 13 + f.ph) * 0.07 + Math.sin(t * 29 + f.ph * 2) * 0.05;
+        f.obj.scale.set(1, k, 1);
+        if (f.light && f.li) f.light.intensity = f.li * k;
+        f.k = k;
+      }
+    this.stage?.update(cam, this.flames, this.fog);
+    // A2: one global flicker for the floor light map and the streak cards (plan 6.2); A19: the fires nearest the camera
     if (this.wetFloor) {
-      const fl = 0.9 + Math.sin(t * 11.3) * 0.06 + Math.sin(t * 23.7 + 1.3) * 0.04;
-      this.wetFloor.setLightGain(fl);
-      if (this.streaks) this.streaks.uniforms.uFlicker.value = fl;
+      this.wetFloor.setLightGain(floorFl);
+      if (this.streaks) this.streaks.uniforms.uFlicker.value = floorFl;
     }
     for (const u of this.updaters) u(t, dt);
     // A4: banner sway / chain swing (vertex shaders): the whole CPU side is this shared clock, timed for the A4 budget
     const s0 = performance.now();
-    swayTime.value = t;
+    if (this.fire) {
+      // A19: the wind drives the cloth: gusts speed the sway clock up and swing the banners / swags wider
+      this.swayT += dt * (0.75 + 0.55 * this.wind.gust);
+      swayTime.value = this.swayT;
+      const gain = 0.7 + 0.75 * this.wind.gust;
+      for (const s of this.swayMats) s.u.value = s.base * gain;
+      chainWind.value = 0.75 + 0.6 * this.wind.gust;
+    } else swayTime.value = t;
     swayOn.value = this.quality >= 1 ? 1 : 0;
     this.swayStats.ms += performance.now() - s0;
     this.swayStats.frames++;
   }
+  /**
+   * A19: the fire clock, wind, seeded flicker per fire (lights, stage fire pools, the field), real lights following their
+   * fires; returns the floor light-map flicker (the fires nearest the camera)
+   */
+  private updateFire(dt: number, cam?: THREE.Camera): number {
+    const F = this.fire!;
+    const art = this.kit!.art.fire!;
+    // match time in a fight (seek / replay give the same flicker), the arena clock in menus and cinematics; while the match
+    // clock stands still (hit-stop, pause, the concept harness) the fires keep burning on real time (an offset that a new
+    // match or a seek resets)
+    if (this.time - this.matchSeen < 0.5) {
+      const mt = this.matchT;
+      if (mt < this.lastMatchT - 1e-6 || mt > this.lastMatchT + 1) this.fireOff = 0;
+      else if (mt <= this.lastMatchT + 1e-6) this.fireOff += dt;
+      this.fireT = mt + this.fireOff;
+      this.lastMatchT = mt;
+    } else this.fireT = this.time;
+    const ft = this.fireT;
+    fireClock.value = ft;
+    fireWind(ft, art.wind, this.layout.seed * 17 + 3, this.wind);
+    const gust = this.wind.gust;
+    let wsum = 0,
+      ksum = 0;
+    const cp = cam?.position;
+    for (const f of this.flames) {
+      const k = fireFlicker(ft, f.seed ?? 0, gust);
+      f.k = k;
+      if (f.src) {
+        f.src.k = k;
+        // a fire jet / dying oil fire at zero: hidden for the floor light map, the streak cards and the stage pools too
+        // (only fires whose owner drives amp: hidden legacy gate flames etc. stay hidden)
+        if (f.src.kind === 'jet' || f.src.kind === 'oil') f.obj.visible = f.src.amp > 0.001;
+        f.k = k * Math.min(1, f.src.amp) * (f.src.kind === 'jet' ? 0.7 + 0.3 * f.src.h : 1);
+      }
+      if (f.follow && f.light) {
+        let live = (f.src?.amp ?? 1) > 0.001;
+        for (let p: THREE.Object3D | null = f.obj; p && live; p = p.parent) if (!p.visible) live = false;
+        f.obj.getWorldPosition(this._wp);
+        f.light.position.set(this._wp.x, this._wp.y + f.size * 0.5, this._wp.z);
+        f.light.intensity = live ? (f.li ?? 0) * k * Math.min(1, f.src?.amp ?? 1) * (f.src && f.src.kind === 'jet' ? 0.6 + 0.4 * f.src.h : 1) : 0;
+      }
+      if (cp) {
+        f.obj.getWorldPosition(this._wp);
+        const w = f.size / (1 + this._wp.distanceToSquared(cp) / 36);
+        wsum += w;
+        ksum += w * k;
+      }
+    }
+    F.update(ft, this.wind, cam);
+    void dt;
+    const kk = wsum > 0 ? ksum / wsum : 0.92;
+    return 0.9 + (kk - 0.92) * 1.6;
+  }
+
   /** A4: CPU time spent driving the kit banner sway / chain swing (ms total, frames) */
   swayStats = { ms: 0, frames: 0 };
 
@@ -1474,6 +1772,10 @@ export class Arena {
   }
 
   dispose() {
+    // A7b: undo the stage-light patch on the shared kit materials before anything else builds with them
+    this.stage?.dispose();
+    this.stage = null;
+    (this.theme.sky.stormTex?.userData.rt as THREE.WebGLRenderTarget | undefined)?.dispose();
     this.scene.remove(this.group);
     this.group.traverse((o) => {
       // kit asset clones share geometry / materials with the ArenaAssets cache: it disposes them (release); A3 obstacles own
@@ -1501,6 +1803,46 @@ export class Arena {
 /** seconds a toppling obstacle takes to reach the floor in the render (the sim lands it at TOPPLE_FALL) */
 const TOPPLE_VIS = 0.9;
 const LAVA_COL = new THREE.Color('#ff5a1a');
+/** A19: lightning colour on the stone */
+const FLASH_COL = new THREE.Color('#b8c4ff');
+/** A19: the fire clock as a uniform (burning-oil pools) */
+const fireClock = { value: 0 };
+/**
+ * A19: burning oil on the wet stone: a near-black glossy spill (alpha, so the floor's own wet reflections show through at
+ * the thin rim) with a moving net of burning tongues (two scrolling value-noise octaves, sharpened), white-yellow where it
+ * burns hottest, deep red at the edge of the burn; `uBurn` fades the fire as the pool dies, the dark spill stays.
+ */
+function burningOilMat(seed: number): THREE.ShaderMaterial {
+  return new THREE.ShaderMaterial({
+    name: 'arena.burningOil',
+    uniforms: { uTime: fireClock, uBurn: { value: 1 }, uSeed: { value: seed * 3.17 + 0.5 } },
+    vertexShader: /* glsl */ `
+      varying vec2 vP;
+      void main() { vP = position.xz; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }`,
+    fragmentShader: /* glsl */ `
+      uniform float uTime; uniform float uBurn; uniform float uSeed;
+      varying vec2 vP;
+      float hh(vec2 p) { p = fract(p * vec2(123.34, 456.21)); p += dot(p, p + 45.32); return fract(p.x * p.y); }
+      float vn(vec2 p) { vec2 i = floor(p), f = fract(p); f = f * f * (3.0 - 2.0 * f);
+        return mix(mix(hh(i), hh(i + vec2(1.0, 0.0)), f.x), mix(hh(i + vec2(0.0, 1.0)), hh(i + vec2(1.0, 1.0)), f.x), f.y); }
+      void main() {
+        float r = length(vP);
+        vec2 p = vP * 2.6 + uSeed;
+        float n = vn(p + vec2(0.0, -uTime * 0.9)) * 0.6 + vn(p * 2.3 + vec2(uTime * 0.5, -uTime * 1.4)) * 0.4;
+        float cell = vn(vP * 7.0 + uSeed * 1.7 + vec2(uTime * 0.2, 0.0));
+        float burn = smoothstep(0.42, 0.78, n * 0.85 + cell * 0.25) * (1.0 - smoothstep(0.55, 1.05, r)) * uBurn;
+        vec3 hot = mix(vec3(0.9, 0.12, 0.02), vec3(2.6, 1.3, 0.45), burn * burn);
+        vec3 oil = vec3(0.012, 0.009, 0.008);
+        float a = (1.0 - smoothstep(0.75, 1.0, r)) * 0.92;
+        gl_FragColor = vec4(mix(oil, hot * 2.2, burn), a);
+      }`,
+    transparent: true,
+    depthWrite: false,
+    polygonOffset: true,
+    polygonOffsetFactor: -2,
+    polygonOffsetUnits: -2,
+  });
+}
 /** A2b placeholder banner cloth per theme (until the art kit) */
 const BANNER_COLOR: Record<string, string> = { colosseum: '#7a1414', skytemple: '#d8c48a', sakura: '#b8202e', forge: '#3a2418', glacier: '#24426e', moonlake: '#3a2e62', desert: '#9a4818' };
 /** A2: streak-card gain on medium / high, where the planar reflection carries most of the image */

@@ -19,29 +19,33 @@ interface LinkSpec {
 
 const X = new THREE.Vector3(1, 0, 0);
 
+/** A19: the wind's swing gain for chain kits built with `{ wind: true }` (the kit Moon Gate; others never read it) */
+export const chainWind = { value: 1 };
+
 /** a link material clone that adds the instance swing offset after the instance transform */
-function swingMaterial(src: THREE.MeshStandardMaterial): THREE.MeshStandardMaterial {
+function swingMaterial(src: THREE.MeshStandardMaterial, wind = false): THREE.MeshStandardMaterial {
   const m = src.clone();
   m.name = `${src.name}_swing`;
   m.onBeforeCompile = (sh) => {
     sh.uniforms.uSwayTime = swayTime;
     sh.uniforms.uSwayOn = swayOn;
+    if (wind) sh.uniforms.uSwayWind = chainWind;
     sh.vertexShader = sh.vertexShader
-      .replace('#include <common>', '#include <common>\nuniform float uSwayTime; uniform float uSwayOn; attribute vec4 aSwing;')
+      .replace('#include <common>', '#include <common>\nuniform float uSwayTime; uniform float uSwayOn; attribute vec4 aSwing;' + (wind ? ' uniform float uSwayWind;' : ''))
       .replace(
         '#include <project_vertex>',
         `vec4 mvPosition = vec4( transformed, 1.0 );
 #ifdef USE_INSTANCING
   mvPosition = instanceMatrix * mvPosition;
 #endif
-  float wSw = 4.0 * aSwing.z * (1.0 - aSwing.z) * uSwayOn;
+  float wSw = 4.0 * aSwing.z * (1.0 - aSwing.z) * uSwayOn${wind ? ' * uSwayWind' : ''};
   float sSw = sin(uSwayTime * 0.85 + aSwing.w) + 0.3 * sin(uSwayTime * 1.9 + aSwing.w * 2.3);
   mvPosition.xyz += vec3(aSwing.x, 0.0, aSwing.y) * sSw * wSw + vec3(0.0, -0.25 * abs(aSwing.x + aSwing.y) * (1.0 - cos(sSw * 0.6)) * wSw, 0.0);
   mvPosition = modelViewMatrix * mvPosition;
   gl_Position = projectionMatrix * mvPosition;`,
       );
   };
-  m.customProgramCacheKey = () => `swing|${src.uuid}`;
+  m.customProgramCacheKey = () => `swing|${src.uuid}${wind ? '|wind' : ''}`;
   return m;
 }
 
@@ -52,7 +56,10 @@ export class ChainKit {
   private owned: THREE.Material[] = [];
   private geos: THREE.BufferGeometry[] = [];
 
-  constructor(readonly asset: KitAsset) {
+  constructor(
+    readonly asset: KitAsset,
+    private opts: { wind?: boolean } = {},
+  ) {
     const x = asset.extras;
     for (const [kind, node, pitch] of [
       ['big', 'LINK_big', Number(x.pitchBig) || 0.138],
@@ -65,7 +72,7 @@ export class ChainKit {
       const c = n.geo.boundingBox!.getCenter(new THREE.Vector3());
       n.geo.translate(-c.x, -c.y, -c.z);
       n.geo.computeBoundingSphere();
-      const mat = swingMaterial(n.mat as THREE.MeshStandardMaterial);
+      const mat = swingMaterial(n.mat as THREE.MeshStandardMaterial, !!this.opts.wind);
       this.owned.push(mat);
       this.geos.push(n.geo);
       this.spec.set(kind, { geo: n.geo, mat, pitch });

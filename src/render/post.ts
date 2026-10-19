@@ -30,7 +30,7 @@ import { FullScreenQuad } from 'three/examples/jsm/postprocessing/Pass.js';
 import { GTAOPass } from 'three/examples/jsm/postprocessing/GTAOPass.js';
 import { BokehShader } from 'three/examples/jsm/shaders/BokehShader.js';
 import type { Grade } from './arena/themes';
-import { MASK_DIST, MASK_FX, MASK_WORLD } from './fx/fxLayers';
+import { LAYER, MASK_DIST, MASK_FX, MASK_WORLD } from './fx/fxLayers';
 import { softDepthUniforms } from './fx/softDepth';
 import { GRADE_PRESETS, THEME_LOOK, fallbackLook, type GradeDelta, type RGB, type ThemeLook } from './fx/fxLook';
 
@@ -712,7 +712,51 @@ export class Post {
     return new THREE.WebGLRenderTarget(this.sceneRT.width, this.sceneRT.height, { type: THREE.HalfFloatType, depthBuffer: false });
   }
 
+  /**
+   * A21 (CPU): one frame renders the scene 3-4 times (reflection, world, FX, distortion) and every renderer.render()
+   * walked the whole scene graph recomputing world matrices (about a fifth of the frame's CPU on the Moon Gate). The
+   * scene's matrices are brought up to date once here; the passes then reuse them (nothing moves between passes, so
+   * the frame is identical). Cameras outside the scene still update themselves in each render() as before.
+   * Lights also take the FX layers (rescanned every 30 frames): the FX / distortion passes used to see no lights, so the
+   * renderer's lights-state version changed twice per frame and every lit material re-derived its program parameters
+   * (getProgram) in the next pass. FX materials are unlit, so they draw the same; those passes do not re-render shadows.
+   */
   render() {
+    const scene = this.scene;
+    if (this.lightScan-- <= 0 || scene.children.length !== this.lightKids) {
+      this.lightScan = 30;
+      this.lightKids = scene.children.length;
+      scene.traverse((o) => {
+        if ((o as THREE.Light).isLight) o.layers.enable(LAYER.FX_ADD), o.layers.enable(LAYER.FX_DIST);
+      });
+    }
+    scene.updateMatrixWorld();
+    const auto = scene.matrixWorldAutoUpdate;
+    scene.matrixWorldAutoUpdate = false;
+    try {
+      this.renderPasses();
+    } finally {
+      scene.matrixWorldAutoUpdate = auto;
+    }
+  }
+  /** A21: one render with every optional pass the tier allows switched on (DOF, distortion), so their programs compile
+   * behind the loading screen instead of on the first kill cam / cinematic / heavy hit */
+  warm() {
+    const dof = this.dofOn,
+      da = this.distActive;
+    this.dofOn = this.dofEnabled && this.tier.dof;
+    this.distActive = () => true;
+    try {
+      this.render();
+    } finally {
+      this.dofOn = dof;
+      this.distActive = da;
+    }
+  }
+  private lightScan = 0;
+  private lightKids = -1;
+
+  private renderPasses() {
     const r = this.renderer;
     const T = this.tier;
     const tm = this.timer;
@@ -777,6 +821,9 @@ export class Post {
     SD.uDepthInvRes.value.set(1 / S.width, 1 / S.height);
     r.setRenderTarget(S);
     cam.layers.mask = MASK_FX;
+    // A21: the lights are on the FX layers too (same lights state as the world pass); the shadow map stays as rendered
+    const shadowAuto = r.shadowMap.autoUpdate;
+    r.shadowMap.autoUpdate = false;
     const bg = scene.background;
     scene.background = null;
     r.render(scene, cam);
@@ -798,6 +845,7 @@ export class Post {
       tm.end();
     }
     scene.background = bg;
+    r.shadowMap.autoUpdate = shadowAuto;
     cam.layers.mask = mask;
 
     // 6 god rays (also the NaN sanitise when it runs)

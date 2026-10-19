@@ -26,6 +26,7 @@ import * as path from 'node:path';
 import * as THREE from 'three';
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader.js';
 import { ANIM_LIBRARY, type LibClipSpec } from '../../src/data/animLibrary';
+import { encodeLib } from '../../src/render/animCodec';
 
 (globalThis as any).self ??= globalThis;
 (globalThis as any).window ??= globalThis;
@@ -587,13 +588,14 @@ for (const spec of ANIM_LIBRARY) {
 }
 for (const [lib, arr] of Object.entries(libs)) {
   const i16 = Int16Array.from(arr);
-  fs.writeFileSync(path.join(OUT, `${lib}.bin`), Buffer.from(i16.buffer));
+  // A21: lossless 'tdp1' transport coding (planar deltas + byte split: about 45 % smaller after gzip)
+  fs.writeFileSync(path.join(OUT, `${lib}.bin`), encodeLib(i16, index.filter((c) => c.lib === lib).map((c) => ({ lib: c.lib, off: c.off, n: c.n, bones: c.bones.map(([, st]) => st) }))));
   console.log(`[lib] ${lib}.bin ${(i16.byteLength / 1024).toFixed(0)} KB`);
 }
 if (!ONLY) {
   const names = [...new Set(index.flatMap((c) => c.bones.map((b) => b[0])))];
   const compact = index.map((c) => ({ ...c, bones: c.bones.map(([nm, st]) => names.indexOf(nm) * 2 + st) }));
-  fs.writeFileSync(path.join(OUT, 'index.json'), JSON.stringify({ fps: FPS, generated: 'tools/anim/build-lib.ts', boneNames: names, clips: compact }));
+  fs.writeFileSync(path.join(OUT, 'index.json'), JSON.stringify({ fps: FPS, generated: 'tools/anim/build-lib.ts', boneNames: names, clips: compact, enc: 'tdp1' }));
   const simRows = Object.entries(sim)
     .map(([k, v]) => `  ${JSON.stringify(k)}: ${JSON.stringify(v)},`)
     .join('\n');

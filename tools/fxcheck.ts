@@ -116,17 +116,19 @@ for (const id of probe) {
 //    list and the full particle state; long tails (debris, smoke, pools) started before the warm-up must
 //    be alive after the seek; the seek must stay cheap.
 {
-  const fights: [string, string, number, ArenaSpec][] = [
+  const fights: [string, string, number, ArenaSpec, string?][] = [
     ['gorak', 'vex', 4242, { theme: 'colosseum', layout: 'oval', seed: 7 }],
     ['aldric', 'gorak', 11, { theme: 'forge', layout: 'oval', seed: 2 }],
     ['ozrel', 'maw', 77, { theme: 'forge', layout: 'pit', seed: 3 }],
+    // A20: the Moon Gate variants ('<id>@moongate': stone dust, splashes in puddles) replay exactly too
+    ['maw', 'gorak', 4242, { theme: 'colosseum', layout: 'pit', seed: 7 }, 'moongate'],
   ];
   const moves: Record<string, MoveDef> = {};
   for (const f of FIGHTERS) for (const m of f.moves) moves[`${f.id}:${m.id}`] = m;
   const now = () => performance.now();
   for (const q of [2, 0]) {
     fxSettings.setQuality(q);
-    for (const [a, b, seed, spec] of fights) {
+    for (const [a, b, seed, spec, variant] of fights) {
       const rec = simulate(a, b, seed, true, spec);
       const L = generateArena(spec);
       const world: FxWorld = {
@@ -136,7 +138,15 @@ for (const id of probe) {
         hazard: (i) => L.hazards[i],
         ring: () => ({ rx: L.rx, rz: L.rz }),
         isFinisher: (m) => !!FIN_BY_ID[m],
-        floorAt: (x, z) => (L.hazards.some((h) => h.kind === 'water' && (x - h.x) ** 2 + (z - h.z) ** 2 < h.r * h.r) ? 'water' : THEME_FLOOR[L.theme] ?? 'stone'),
+        floorAt: (x, z) =>
+          variant
+            ? (Math.floor(x * 0.7) + Math.floor(z * 0.7)) % 3 === 0
+              ? 'water'
+              : 'wet'
+            : L.hazards.some((h) => h.kind === 'water' && (x - h.x) ** 2 + (z - h.z) ** 2 < h.r * h.r)
+              ? 'water'
+              : (THEME_FLOOR[L.theme] ?? 'stone'),
+        variant: variant ? () => variant : undefined,
       };
       const dt = 1 / 60;
       const run = (fx: FxDirector, pb: Playback, T: number) => {
@@ -162,7 +172,7 @@ for (const id of probe) {
         run(B, pb, T);
         const sa = A.stats(),
           sb = B.stats();
-        const tag = `${a}-${b}#${seed} q${q} T=${T.toFixed(1)}`;
+        const tag = `${a}-${b}#${seed}${variant ? '@' + variant : ''} q${q} T=${T.toFixed(1)}`;
         ok(A.decalHash(T) === B.decalHash(T), `seek floor decals ${tag}: ${A.decalHash(T)} vs ${B.decalHash(T)}`);
         ok(A.bloodHash() === B.bloodHash(), `seek wounds / weapon blood ${tag}: ${A.bloodHash()} vs ${B.bloodHash()}`);
         ok(A.hash() === B.hash(), `seek live effect list ${tag}: ${A.hash()} vs ${B.hash()}`);
@@ -192,6 +202,12 @@ for (const id of probe) {
     console.log(`gore ${g.padEnd(8)} decals ${s.decals} wounds ${s.wounds} sprites ${JSON.stringify(s.sprites)}`);
     fx.dispose();
   }
+}
+
+// 7b. A20: every theme variant row replaces an existing def
+for (const id of ids) {
+  const at = id.indexOf('@');
+  if (at > 0) ok(id.slice(0, at) in DEFS || id.startsWith('splash.'), `variant ${id} has a base def`);
 }
 
 // 5. grep gate

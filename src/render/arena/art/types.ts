@@ -11,10 +11,12 @@
  */
 import type { HazardKind, ObstacleKind, ThemeId } from '../../../sim/arenaGen';
 import type { RtPropKind } from '../../../sim/world';
-import type { SkyParams } from '../sky';
+import type { SkyLook, SkyParams } from '../sky';
 import type { AmbientKind, Grade } from '../themes';
 import type { DebrisMat } from '../debris';
 import type { BackdropTuning } from '../backdrop';
+import type { StageLightArt } from '../stageLight';
+import type { FireArt } from '../../fx/fireField';
 
 /** id of a kit or theme asset in public/arena/manifest.json, e.g. 'kit/brazier_tripod' */
 export type AssetId = string;
@@ -24,7 +26,7 @@ export type AssetTier = 'full' | 'low';
 export const tierOf = (quality: number): AssetTier => (quality <= 0 ? 'low' : 'full');
 
 export interface FloorArt {
-  /** floor texture set (A2: role texset, kind floor; e.g. 'floor/flagstone_bluegrey') */
+  /** floor texture set (A2: role texset, kind floor; e.g. 'floor/slabs_moongate') */
   set: AssetId;
   /** inlaid ritual circle at the arena centre (role texset, kind inlay; e.g. 'floor/inlay_moongate') */
   inlay?: AssetId;
@@ -34,6 +36,25 @@ export interface FloorArt {
   puddles?: number;
   /** albedo multiplier (linear RGB) on top of the set's grading */
   tint?: [number, number, number];
+  /** A8: damp (not puddle) roughness = dry x damp[0] + damp[1] (default [0.34, 0.05]: the A2 polished-wet look); higher
+   * keeps the stone dull with the wet glints in the puddles, joints and cracks only */
+  damp?: [number, number];
+  /** A8b: planar-reflection gain on the stone outside the water (default 1); below 1 keeps dull slabs dark and the
+   * puddles / joints / cracks as the mirrors */
+  reflDry?: number;
+  /** A8b: fire / moon streak-card brightness left on the dry slab tops (default 0.12); 0 breaks the streaks into the
+   * puddles, joints and cracks only */
+  streakDry?: number;
+  /** A8b: streak-card length multiplier (default 1) */
+  streakLen?: number;
+  /** A8b: water level the streak cards follow (default min(0.9, puddles x 1.6)); lower keeps them in the deepest water */
+  streakWater?: number;
+  /** A8b: the moon-path streak (night themes): power (default 0.6), width multiplier (1), dry-stone brightness (streakDry) */
+  moonPath?: { power?: number; wid?: number; dry?: number };
+  /** A8: gain of the fire-streak cards on medium / high (default STREAK_ACCENT 0.6; the planar reflection carries the rest) */
+  streakGain?: number;
+  /** A8: the same on the low tier (default 1: there the cards are the only fire reflections) */
+  streakGainLow?: number;
 }
 
 /**
@@ -72,6 +93,24 @@ export interface LookArt {
   accent?: string;
   /** fxLook.ts THEME_LOOK row to use instead of the theme's own (bloom knee, split toning) */
   lookId?: string;
+  /** A7b: the stage light model (moon rim, fire pools on stone, env probe from the backdrop, sky-driven fog, ground mist) */
+  stage?: StageLightArt;
+  /** A18: the arena's display name / tagline in kit mode (the reveal's name card; legacy keeps the theme's own) */
+  name?: string;
+  tagline?: string;
+}
+
+/**
+ * A18: cinematic hints for a theme in kit mode (reveal, entrances, face-off, handover to the fight camera). Without them
+ * the generic cinematics run unchanged (legacy and every other theme).
+ */
+export interface CineArt {
+  /** the reveal opens on the sky and the landmark (azimuth 0), cranes down onto the hero stair, then glides along it */
+  reveal?: 'landmark';
+  /** the face-off's last shot: low behind the west fighter, the east fighter against the stair, the landmark and the moon */
+  faceoff?: 'landmark';
+  /** the fight camera blends in from the face-off's last pose instead of cutting to the establishing crane */
+  handover?: boolean;
 }
 
 export interface RingArt {
@@ -117,6 +156,9 @@ export interface RingArt {
  * fight ellipse), anchors are re-declared for the new geometry and still pass through snapAnchors.
  */
 export interface GateArt {
+  /** A8b: kit mode recolours the legacy portcullis bars (dark iron instead of the bright bronze that pulled the eye off
+   * the arch in the ref-3 frame) */
+  portcullis?: { color: string; roughness: number; metalness: number };
   /** gate asset with BARRIER, ANCHOR_*, TUNNEL nodes (plan 4.2; not used yet) */
   asset?: AssetId;
   /** plain gates (west): this arch module frames the opening (kit/arch: 3.2 m opening, the legacy tunnel stays) */
@@ -142,11 +184,19 @@ export interface GateArt {
     /** dais depth behind the flights and half width */
     daisDepth: number;
     daisHalf: number;
-    doorway: AssetId;
+    /** doorway arch on the dais (A8: optional; the Moon Gate leaves the dais open so the backdrop arch's portal is the doorway, as in ref-3) */
+    doorway?: AssetId;
     /** uniform scale of the doorway arch */
     doorwayScale?: number;
     guardians?: { statue: AssetId; plinth: AssetId; lateral: number; z: number; plinthScale: number; scale: number };
     braziers?: { asset: AssetId; lateral: number; z: number; scale: number; flame: number };
+    /**
+     * A18 (ref-3): ONE wide flight from the floor to the dais across the whole stair width (no portal block between two
+     * flights). The gate moves up onto the dais: slim stone posts + lintel at `topGate.z` (gate frame) frame the portcullis,
+     * every entrance at this gate starts on the dais and comes down the stair (anchors.ground: the stair profile)
+     */
+    wide?: boolean;
+    topGate?: { z: number; postHalf: number; postW: number; postD: number; postH: number; lintelH: number };
   };
   /** lateral half width of the zone around this gate where the ring (walls, tiers, pillars, decor, ring braziers) stays out */
   zoneHalf: number;
@@ -172,12 +222,25 @@ export interface RuinsArt {
     /** long vertical banners on the pillars' arena faces (w x h m), every n-th pillar skipped by `skip` */
     banner?: { w: number; h: number; pin: number };
     /** heavy chains between neighbouring pillar tops (link scale, sag m) with swag cloths under them */
-    chains?: { scale: number; sag: number; swags: boolean };
+    /** A8b: `swagShred` tears the swag cloths into long shreds (deepest tear, share of the height); `swagSize` = [width
+     * share of the span, height m] (default [0.3, 1.5]) */
+    chains?: { scale: number; sag: number; swags: boolean; swagShred?: number; swagSize?: [number, number] };
   };
   /** sparse hooded watchers standing on the tiers (count per quality tier low / medium / high) */
   watchers?: { count: [number, number, number]; color: string };
   /** small fires on the tiers (kit wall braziers) */
-  fires?: { asset: AssetId; count: number; size: number };
+  fires?: {
+    asset: AssetId;
+    count: number;
+    size: number;
+    /** A8: extra fires on the low broken tiers of the vista sector (ref-3: fires all along the ruins beside the stair) */
+    vista?: number;
+    /** A8: burning debris on the floor just outside the boundary (a rubble cluster + a small flame; ref-3's floor fires) */
+    ground?: { asset: AssetId; count: number; size: number };
+  };
+  /** A8: render-only rubble on the wet floor (ref-3: chunks and debris everywhere): a dense band at the boundary foot and
+   * small scattered pieces inside (kept off gate paths, obstacles, props and hazards). Counts per quality tier. */
+  floorRubble?: { asset: AssetId; band: [number, number, number]; inner: [number, number, number] };
   /** the fire-cage chandelier (procedural iron, hung at CHANDELIER_H) */
   fireCage?: boolean;
   /** east / west gate dressing */
@@ -195,10 +258,22 @@ export interface BackdropArt {
   tune?: BackdropTuning;
 }
 
+/**
+ * A7c: the authored sky (sky.ts skyTex): `id` = public/arena/sky/<id>/sky.json (tools/arena/build_sky.mjs, from
+ * tools/arena/sky/<id>.json); `look` overrides single keys of the json's lighting. `?sky=0` skips it (A/B, perf).
+ */
+export interface SkyArt {
+  id: string;
+  look?: Partial<SkyLook>;
+}
+
 export interface ThemeArt {
   id: ThemeId | 'default';
   /** sim props -> kit asset (authored to PROP_BASE radius / TOP height, origin at the base centre) */
   props?: Partial<Record<RtPropKind, AssetId>>;
+  /** A8b: per-theme colour multiplier on a prop kind's materials (the shared kit's terracotta urns are off the Moon Gate
+   * palette); a tinted copy of each material, made once per arena */
+  propTint?: Partial<Record<RtPropKind, [number, number, number]>>;
   /** sim obstacles -> kit asset (footprint <= 1.55 r; SHAFT stretched to o.h, or A5 statue fit); a list = variants picked by obstacle id */
   obstacles?: Partial<Record<ObstacleKind, AssetId | AssetId[]>>;
   /** A4: hazard visuals (spike grate, chain weight, fire-jet vent, crumbling floor), scaled to the hazard radius by r0 */
@@ -216,10 +291,19 @@ export interface ThemeArt {
   ring?: RingArt;
   gates?: GateArt;
   backdrop?: BackdropArt;
+  sky?: SkyArt;
   /** A2: decorative boundary braziers (render only) */
   ringFlames?: RingFlamesArt;
   /** A2: display-data overrides in kit mode */
   look?: LookArt;
+  /** A18: cinematic hints (reveal, face-off, handover) */
+  cine?: CineArt;
+  /**
+   * A19-A20 (F4): the layered fire field (fx/fireField.ts: flames, glow, smoke, embers, heat) for every arena fire, seeded
+   * flicker on the fire clock, wind (flames, smoke, embers, banners, chains), real fire lights per tier, burning-oil pools,
+   * fire-jet columns, lightning on the stage light and theme FX variants (`<def id>@moongate`)
+   */
+  fire?: FireArt;
   /** extra assets to load with the theme (ambient dressing placed by sockets, A4+) */
   extra?: AssetId[];
 }

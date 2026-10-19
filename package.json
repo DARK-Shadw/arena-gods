@@ -19,7 +19,8 @@
     "arena:fetch": "node tools/arena/fetch_cc0.mjs",
     "arena:assets": "node tools/arena/build_assets.mjs",
     "arena:budget": "node tools/arena/check_budget.mjs",
-    "arena:backdrop": "node tools/arena/build_backdrop.mjs"
+    "arena:backdrop": "node tools/arena/build_backdrop.mjs",
+    "arena:sky": "node tools/arena/build_sky.mjs"
   },
   "dependencies": {
     "three": "0.170.0"

@@ -12,7 +12,7 @@ import { CHAIN_LEN, CHAIN_PIVOT_H, generateArena, LAYOUTS, THEMES, type ArenaSpe
 import type { FighterDef, Frame, MatchRecord, MoveDef, SimEvent } from './sim/types';
 import { Arena, CHANDELIER_H } from './render/arena/arenaView';
 import { ArenaAssets, arenaMode, arenaTexOverride, type ArenaPack } from './render/arena/assets';
-import { tierOf } from './render/arena/art';
+import { artFor, tierOf } from './render/arena/art';
 import { THEME_DEFS } from './render/arena/themes';
 import { LAYER_REFLECT_HI } from './render/arena/reflection';
 import { camWorld } from './camera/cameraRig';
@@ -35,10 +35,12 @@ import type { Timeline } from './cinematic/timeline';
 import { runAudit } from './render/audit';
 import { runAnimAudit } from './render/animAudit';
 import { runPairAudit } from './render/pairAudit';
-import { initLib } from './render/animLib';
+import { initLib, preloadLibs } from './render/animLib';
+import { LoadingScreen } from './ui/loading';
 import { validateEntrances } from './cinematic/validateEntrances';
 import { FinisherFx } from './render/finisherFx';
 import { ContactWarp } from './render/contactWarp';
+import { assetUrl } from './render/baseUrl';
 import { BEHEAD_CLEAN, FIN_BY_ID, fxOf } from './sim/finishers';
 import { auditMatch, type CamMatchScore } from './camera/cameraAudit';
 import { applyCamPose, conceptPreset, extraViewPose, faceTowards, HIDDEN_B, renderTheme, type CamPose, type ConceptPreset, type ExtraView } from './render/arena/conceptCams';
@@ -74,6 +76,12 @@ class App {
   headless = false;
   post: Post;
   ui: UI;
+  /** A21: match loading screen (progress while fighters / library / arena art load and shaders warm up) */
+  loading: LoadingScreen;
+  /** A21: the arena the constructor started loading for a 'random' menu choice (start() reuses it) */
+  private prefetched: { key: string; spec: ArenaSpec } | null = null;
+  /** A21: performance.now() when the last shader warm-up finished (perf probes tell its frame from real hitches) */
+  prewarmAt = -1;
   controls: OrbitControls;
   freeCam = false;
   state: AppState = 'menu';
@@ -131,7 +139,7 @@ class App {
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.localClippingEnabled = true; // finisher plane cuts
     this.renderer.toneMappingExposure = 1.3;
-    this.arenaAssets = new ArenaAssets(this.renderer, '/arena/', '/basis/', arenaTexOverride());
+    this.arenaAssets = new ArenaAssets(this.renderer, assetUrl('arena/'), assetUrl('basis/'), arenaTexOverride());
     this.camera = new THREE.PerspectiveCamera(50, window.innerWidth / window.innerHeight, 0.1, 1400);
     this.camera.position.set(10, 7, 10);
     this.rig = new CameraRig(this.camera);
@@ -143,14 +151,17 @@ class App {
     this.flames = new FxFlames(this.atlases);
     this.flames.setQuality(this.quality);
     Arena.fxFlame = (size, color, n) => this.flames.make(size, color, n);
+    Arena.fxAtlases = this.atlases; // A19: the kit Moon Gate's fire field draws from the same atlases
     this.finFx = new FinisherFx(this.scene, this.vfx);
     this.scene.add(this.keyLight, this.keyLight.target, this.rimLight, this.rimLight.target);
     this.post = new Post(this.renderer, this.scene, this.camera);
     this.post.quality = this.quality;
-    this.post.distActive = () => this.vfx.distActive;
+    // A19: the Moon Gate's fire field keeps heat columns over its fires (high tier)
+    this.post.distActive = () => this.vfx.distActive || !!this.arena?.fire?.heatActive;
     // A2: the arena's planar floor reflection + floor light map run before the scene pass
     this.post.preScene = (r, cam, size, q) => this.arena?.preRender(r, cam, size, q);
     this.ui = new UI(document.getElementById('ui')!);
+    this.loading = new LoadingScreen(document.getElementById('ui')!);
     this.controls = new OrbitControls(this.camera, canvas);
     this.controls.enabled = false;
     this.controls.target.set(0, 1, 0);
@@ -179,9 +190,14 @@ class App {
     if (arenaMode() !== 'legacy')
       void this.atlases
         .load()
-        .then(() => Promise.all(['unity_flame02', 'unity_flame03'].filter((id) => this.atlases.has(id)).map((id) => this.atlases.tierTexture(id, this.quality))))
+        .then(() => Promise.all(['unity_flame02', 'unity_flame03', ...(this.choice.arena.theme === 'colosseum' ? ['unity_wispysmoke01'] : [])].filter((id) => this.atlases.has(id)).map((id) => this.atlases.tierTexture(id, this.quality))))
         .catch(() => {});
-    this.arenaReady = this.ensureArena(this.resolveArena(this.choice));
+    {
+      // A21: remember the resolved spec so start() with the same (possibly 'random') choice uses the arena already loading
+      const spec = this.resolveArena(this.choice);
+      this.prefetched = { key: JSON.stringify(this.choice.arena), spec };
+      this.arenaReady = this.ensureArena(spec);
+    }
     window.addEventListener('resize', () => this.resize());
     window.addEventListener('keydown', (e) => this.key(e));
     window.addEventListener('pointerdown', () => audio.init(), { once: false });
@@ -215,7 +231,7 @@ class App {
    * this call exactly as before. `force` rebuilds the same spec (quality change). A newer call supersedes a
    * pending one.
    */
-  async ensureArena(spec: ArenaSpec, force = false): Promise<void> {
+  async ensureArena(spec: ArenaSpec, force = false, onProgress?: (done: number, total: number) => void): Promise<void> {
     const legacy = arenaMode() === 'legacy';
     const same =
       this.arena && this.arenaSpec && spec.theme === this.arenaSpec.theme && spec.layout === this.arenaSpec.layout && spec.seed === this.arenaSpec.seed && (legacy || tierOf(this.arenaQuality) === tierOf(this.quality));
@@ -229,7 +245,7 @@ class App {
     let pack: ArenaPack | null = null;
     if (!legacy) {
       try {
-        pack = await this.arenaAssets.load(spec.theme, this.quality, layout);
+        pack = await this.arenaAssets.load(spec.theme, this.quality, layout, onProgress);
       } catch (e) {
         console.warn('[arena] kit art unavailable, legacy dressing', e);
       }
@@ -272,12 +288,13 @@ class App {
     camWorld.hanging = L.hazards.filter((h) => h.kind === 'chandelier').map((h) => ({ x: h.x, y: CHANDELIER_H, z: h.z, r: 1.3 }));
     // A2b: hanging chain weights (chain + swing zone) are camera obstacles too
     for (const h of L.hazards) if (h.kind === 'chains') camWorld.hanging.push({ x: h.x, y: CHAIN_PIVOT_H - CHAIN_LEN * 0.5, z: h.z, r: 1.0 });
-    this.ui.setArenaLabel?.(`${T.name} · ${L.layout} · #${L.seed}`);
+    this.ui.setArenaLabel?.(`${T.name} Â· ${L.layout} Â· #${L.seed}`);
     console.info(`[arena] built ${spec.theme}/${spec.layout}#${spec.seed} in ${(performance.now() - t0).toFixed(0)}ms` + (pack ? ` (kit ${pack.tier}/${this.arenaAssets.format}: ${pack.assets.size} assets in ${pack.ms.toFixed(0)}ms${pack.missing.length ? `, missing ${pack.missing.join(',')}` : ''})` : ' (legacy dressing)'));
   }
 
   openMenu() {
     this.state = 'menu';
+    this.loading.hide(true);
     this.ui.hideResults();
     this.ui.showHud(false);
     this.ui.setLetterbox(false);
@@ -302,27 +319,60 @@ class App {
     this.victoryShown = false;
     const token = ++this.startToken;
     this.state = 'loading';
-    this.ui.splashText('<small>THE GATES OPEN…</small>', 'victory');
+    // A21: the arena of a 'random' choice the constructor already resolved (and started loading) is used once
+    const key = JSON.stringify(c.arena);
+    const spec = this.prefetched?.key === key ? this.prefetched.spec : this.resolveArena(c);
+    this.prefetched = null;
+    // A21: loading screen with weighted progress; the arena art, fighters and animation library load in parallel
+    const L = this.loading;
+    L.show(arenaMode() !== 'legacy' ? (artFor(spec.theme).look?.name ?? THEME_DEFS[spec.theme].name) : THEME_DEFS[spec.theme].name);
+    L.stage('Summoning the fighters');
+    L.part('arena', 0, 6);
+    L.part('shaders', 0, 1.5);
+    const arenaP = this.ensureArena(spec, false, (d, t) => L.part('arena', d, t));
+    // only the bundles the next minute needs block the start: 'core' (+ 'entrance' when the intro plays); the rest
+    // ('finisher', or 'entrance' when skipping) streams in behind the intro / fight
+    const need = c.skipIntro ? ['core'] : ['core', 'entrance'];
+    const later = ['entrance', 'finisher'].filter((l) => !need.includes(l));
+    const W = { core: 2.7, entrance: 0.6, fighter: 2.5 } as Record<string, number>;
+    L.part('fighters', 0, 2 * W.fighter);
+    L.part('anim', 0, need.reduce((s, l) => s + (W[l] ?? 0.5), 0));
+    let fightersDone = 0;
     let assets;
     try {
-      [assets] = await Promise.all([Promise.all([loadCharacter(c.a), loadCharacter(c.b)]), initLib('core', 'entrance', 'finisher')]);
+      [assets] = await Promise.all([
+        Promise.all(
+          [c.a, c.b].map((id) =>
+            loadCharacter(id).then((a) => {
+              L.part('fighters', ++fightersDone * W.fighter, 2 * W.fighter);
+              return a;
+            }),
+          ),
+        ),
+        initLib(...need).then(() => L.part('anim', 1, 1)),
+      ]);
     } catch (e) {
       console.error(e);
+      L.hide();
       this.ui.splashText('<small>failed to load fighter models (see console)</small>', 'victory');
       return;
     }
     if (token !== this.startToken) return; // a newer start() superseded this one
+    const libsLater = preloadLibs(...later).catch((e) => console.warn('[anim] background bundles failed', later, e));
     this.dialogue?.stopAll();
     this.dialogue = new DialogueManager([c.a, c.b], [getFighter(c.a).name, getFighter(c.b).name], c.seed, this.ui);
     this.dialogue.posOf = (i) => this.views[i]?.position ?? { x: 0, z: 0 };
     // voice files are small; wait briefly for them so the intro monologue is ready
+    L.stage('Raising the arena');
     await Promise.race([this.dialogue.preload(), new Promise((r) => setTimeout(r, 2500))]);
     if (token !== this.startToken) return;
     this.sound = new SoundDirector([c.a, c.b]);
     this.sound.voiceBusy = () => this.dialogue.busy;
     this.ui.hideSplash();
-    const spec = this.resolveArena(c);
-    await this.ensureArena(spec);
+    await arenaP;
+    // the constructor's / an earlier call may have built it (same spec): nothing left to wait for
+    if (this.arenaSpec && this.arenaSpec.theme === spec.theme && this.arenaSpec.layout === spec.layout && this.arenaSpec.seed === spec.seed) L.part('arena', 1, 1);
+    else await this.ensureArena(spec);
     if (token !== this.startToken) return;
     const t0 = performance.now();
     this.rec = simulate(c.a, c.b, c.seed, true, spec);
@@ -351,8 +401,89 @@ class App {
     // place both at their marks
     const f0 = this.rec.frames[0];
     for (let i = 0; i < 2; i++) this.views[i].updateFromFrame(f0.f[i], 0.016, f0.f[1 - i]);
+    // A21: compile every program the match can need while the loading screen is up (first-frame / first-event hitches)
+    L.stage('Lighting the braziers');
+    await Promise.all(this.views.map((v) => v.ready));
+    if (token !== this.startToken) return;
+    await this.prewarm();
+    if (token !== this.startToken) return;
+    L.part('shaders', 1.5, 1.5);
+    // a ?t= jump may land in the finisher: wait for the streamed bundles then
+    if (this.jumpT > 0) await libsLater;
+    if (token !== this.startToken) return;
+    L.hide(c.skipIntro);
     if (c.skipIntro) this.beginFight();
     else this.beginIntro();
+  }
+
+  /**
+   * A21: shader warm-up behind the loading screen. renderer.compile walks every object in the scene, hidden ones too
+   * (FX pools, distortion sprites, decals, ghosts, oil pools, fire jets, the debris pools Arena.prewarm adds), with the
+   * lights that are visible now (light counts are fixed per tier, so these are the fight's variants). The scene pass
+   * renders into the post chain's HDR target, so the programs are prepared with that target bound (linear output, no
+   * tone mapping: the variant the frame actually uses). compileAsync lets KHR_parallel_shader_compile finish off the
+   * main thread where the driver supports it.
+   */
+  private async prewarm() {
+    const t0 = performance.now();
+    const r = this.renderer;
+    this.arena.prewarm();
+    // the sprite layers every fight uses (hits, dust) and the explosion flipbooks when the arena has kegs
+    const kegs = this.arena.layout.props.some((p) => p.kind === 'explosive');
+    this.vfx.prewarm(['mask', 'dust_puff', 'dust_ring', ...(kegs ? ['unity_explosion00', 'unity_explosion01_nofire'] : [])]);
+    const before = r.info.programs?.length ?? 0;
+    // GPU uploads of every loaded texture the scene's materials use (otherwise each one uploads on the first frame that
+    // draws it: a 50-100 ms frame when the camera first turns to a new part of the arena or an effect first plays)
+    if (!this.headless) {
+      const seen = new Set<THREE.Texture>();
+      const up = (v: unknown) => {
+        const t = v as THREE.Texture;
+        if (!t || !t.isTexture || seen.has(t) || (t as THREE.Texture & { isRenderTargetTexture?: boolean }).isRenderTargetTexture) return;
+        seen.add(t);
+        const img = t.image as { complete?: boolean } | null;
+        if (t.version > 0 && img && img.complete !== false) r.initTexture(t);
+      };
+      this.scene.traverse((o) => {
+        const m = (o as THREE.Mesh).material;
+        for (const mat of m ? (Array.isArray(m) ? m : [m]) : []) {
+          for (const v of Object.values(mat)) up(v);
+          const u = (mat as THREE.ShaderMaterial).uniforms;
+          if (u) for (const k in u) up(u[k]?.value);
+        }
+      });
+    }
+    const prev = r.getRenderTarget();
+    r.setRenderTarget(this.post.sceneRT);
+    try {
+      await r.compileAsync(this.scene, this.camera);
+    } catch (e) {
+      console.warn('[arena] shader warm-up failed', e);
+    } finally {
+      r.setRenderTarget(prev);
+    }
+    // FX layers render in their own passes (FX / distortion layers, no scene lights), so their program variants differ
+    // from what compile() prepared: one frame through the real post chain with every hidden FX object switched on and
+    // the distortion pass forced, behind the loading screen. Not in ?manual runs (test harnesses: no hitches to hide,
+    // and the frame they render stays exactly as before); the reflection pre-pass is skipped (keeps its frame parity).
+    if (!this.manual && !this.headless) {
+      const on: THREE.Object3D[] = [];
+      this.scene.traverse((o) => {
+        if (!o.visible && !(o as THREE.Light).isLight && (o.name.startsWith('fx.') || o.parent?.name === 'fx.ghosts')) on.push(o);
+      });
+      for (const o of on) o.visible = true;
+      const pre = this.post.preScene;
+      this.post.preScene = null;
+      try {
+        this.post.warm();
+      } catch (e) {
+        console.warn('[arena] warm-up frame failed', e);
+      } finally {
+        for (const o of on) o.visible = false;
+        this.post.preScene = pre;
+      }
+    }
+    this.prewarmAt = performance.now();
+    console.info(`[arena] shader warm-up: ${(r.info.programs?.length ?? 0) - before} programs in ${(this.prewarmAt - t0).toFixed(0)}ms`);
   }
 
   private ctx(): CineCtx {
@@ -420,7 +551,8 @@ class App {
     this.skipping = false;
   }
 
-  beginFight() {
+  /** @param handover A18: the face-off ended on its own: the fight camera may blend in from its last pose (ThemeArt.cine) */
+  beginFight(handover = false) {
     this.state = 'fight';
     this.timelines = [];
     this.restoreLighting();
@@ -432,7 +564,7 @@ class App {
     for (const v of this.views) v.rig.root.visible = true;
     this.playback.seek(0);
     this.realT = 0;
-    this.director = new Director(this.rig, this.rec);
+    this.director = new Director(this.rig, this.rec, { handover: handover && !!this.arena.kit?.art.cine?.handover });
     this.sound = new SoundDirector([this.choice.a, this.choice.b]);
     this.sound.voiceBusy = () => this.dialogue.busy;
     audio.setMusic(true, 'fight');
@@ -547,6 +679,7 @@ class App {
   loop = () => {
     requestAnimationFrame(this.loop);
     const realDt = Math.min(0.05, this.clock.getDelta());
+    this.loading.update(realDt);
     if (!this.manual) this.tick(realDt);
   };
   /** Test hook: advance n frames of dt seconds. */
@@ -608,7 +741,7 @@ class App {
         if (tl.done) {
           this.timelines.shift();
           if (this.timelines.length === 1) this.state = 'faceoff';
-          if (this.timelines.length === 0) this.beginFight();
+          if (this.timelines.length === 0) this.beginFight(true);
         }
       }
       dof = 1;
@@ -676,7 +809,8 @@ class App {
     this.rimLight.position.copy(tgt).addScaledVector(fwd, 4.5).addScaledVector(right, 1.5).add(new THREE.Vector3(0, 3.2, 0));
     this.rimLight.target.position.copy(tgt);
     const cine = this.state === 'intro' || this.state === 'faceoff';
-    this.keyLight.intensity = cine ? 22 : 16;
+    // A7b: the kit Moon Gate's darker look lifts the fighters' key (ThemeArt.look.stage.keyGain; 1 everywhere else)
+    this.keyLight.intensity = (cine ? 22 : 16) * (this.arena?.stage?.art.keyGain ?? 1);
     this.rimLight.intensity = cine ? 55 : 35;
   }
 
@@ -886,9 +1020,12 @@ class App {
       hasWeapon: (i) => this.views[i].hasWeapon,
       height: (i) => this.views[i].height,
       floorAt: (x, z): FloorSurface => {
+        // A20: the kit Moon Gate's wet floor knows its puddles and damp stone (footsteps splash in the water)
+        if (this.arena?.kit?.art.fire) return this.arena.surfaceAt(x, z);
         for (const h of L().hazards) if (h.kind === 'water' && (x - h.x) ** 2 + (z - h.z) ** 2 < h.r * h.r) return 'water';
         return THEME_FLOOR[L().theme] ?? 'stone';
       },
+      variant: () => (this.arena?.kit?.art.fire ? 'moongate' : undefined),
       trail: (i, base, tip) => {
         const v = this.views[i];
         base.copy(v.trailBase);
@@ -1312,6 +1449,7 @@ class App {
     this.concept = null;
     await this.start({ ...this.choice, a: p.a.id, b: p.b?.id ?? HIDDEN_B, seed: p.seed, skipIntro: true, arena: { theme, layout: (o.layout ?? p.layout) as LayoutId, seed: o.aseed ?? p.aseed } });
     if (this.state !== 'fight') this.beginFight();
+    await this.arena.fire?.ready; // A19: the fire field's flame / smoke atlases
     this.paused = true;
     this.freeCam = true;
     this.controls.enabled = false;

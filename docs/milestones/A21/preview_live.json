@@ -1,0 +1,171 @@
+{
+ "seed": 4242,
+ "a": "gorak",
+ "b": "maw",
+ "skip": false,
+ "frames": 4702,
+ "byState": {
+  "launched": {
+   "frames": 86,
+   "lib": 86,
+   "other": 0
+  },
+  "knockdown": {
+   "frames": 489,
+   "lib": 489,
+   "other": 0
+  },
+  "getup": {
+   "frames": 551,
+   "lib": 551,
+   "other": 0
+  },
+  "dead": {
+   "frames": 138,
+   "lib": 138,
+   "other": 0
+  }
+ },
+ "hipsMin": {
+  "launched0": 0.43,
+  "knockdown0": 0.12,
+  "getup0": 0.12,
+  "knockdown1": 0.09,
+  "getup1": 0.1,
+  "dead1": 0.85
+ },
+ "fallback": [],
+ "states": {
+  "idle": 1269,
+  "attack": 4658,
+  "block": 472,
+  "stagger": 1189,
+  "dodge": 277,
+  "winded": 174,
+  "launched": 86,
+  "knockdown": 489,
+  "getup": 551,
+  "roar": 101,
+  "dead": 138
+ },
+ "q": 1,
+ "compiles": [
+  {
+   "state": "prewarm",
+   "t": 0,
+   "shot": "establish",
+   "dt": 613.9,
+   "names": [
+    "",
+    ""
+   ]
+  }
+ ],
+ "long": [
+  {
+   "state": "prewarm",
+   "t": 0,
+   "shot": "establish",
+   "dt": 613.9
+  },
+  {
+   "state": "intro",
+   "t": 0,
+   "shot": "establish",
+   "dt": 178
+  },
+  {
+   "state": "intro",
+   "t": 0,
+   "shot": "establish",
+   "dt": 237.4
+  },
+  {
+   "state": "intro",
+   "t": 0,
+   "shot": "establish",
+   "dt": 139.6
+  },
+  {
+   "state": "intro",
+   "t": 0,
+   "shot": "establish",
+   "dt": 51
+  },
+  {
+   "state": "intro",
+   "t": 0,
+   "shot": "establish",
+   "dt": 454.7
+  },
+  {
+   "state": "intro",
+   "t": 0,
+   "shot": "establish",
+   "dt": 84.3
+  },
+  {
+   "state": "fight",
+   "t": 2.82,
+   "shot": "hero_0",
+   "dt": 54.3
+  },
+  {
+   "state": "fight",
+   "t": 15.65,
+   "shot": "ots_0",
+   "dt": 70.5
+  },
+  {
+   "state": "fight",
+   "t": 34.01,
+   "shot": "two_shot",
+   "dt": 54.7
+  },
+  {
+   "state": "fight",
+   "t": 37.08,
+   "shot": "two_shot",
+   "dt": 53
+  },
+  {
+   "state": "fight",
+   "t": 38.25,
+   "shot": "crane_1",
+   "dt": 89.9
+  },
+  {
+   "state": "fight",
+   "t": 38.76,
+   "shot": "crane_1",
+   "dt": 51.6
+  },
+  {
+   "state": "fight",
+   "t": 57.28,
+   "shot": "two_shot_low",
+   "dt": 64.8
+  }
+ ],
+ "progs": 65,
+ "t": 67.54171415205603,
+ "fight": {
+  "frames": 4700,
+  "fps": 59.4,
+  "p50": 16.7,
+  "p95": 20,
+  "p99": 27.3,
+  "over20": 4.8,
+  "over33": 0.43
+ },
+ "intro": {
+  "frames": 3375,
+  "fps": 59.1,
+  "p50": 16.7,
+  "p95": 19.1,
+  "over20": 1.4,
+  "over33": 0.2
+ },
+ "notFound": [],
+ "errors": []
+}

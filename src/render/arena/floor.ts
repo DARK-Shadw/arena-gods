@@ -71,6 +71,7 @@ uniform sampler2D tRefl;
 uniform float uFTile;
 uniform float uFWet;
 uniform float uFPuddle;
+uniform vec2 uFDampR;
 uniform float uFInOn;
 uniform float uFInMetal;
 uniform float uFLmGain;
@@ -85,6 +86,7 @@ uniform vec4 uFMacroXf;
 uniform vec4 uFLmXf;
 uniform vec3 uFInXf;
 uniform vec3 uFTint;
+uniform float uFReflDry;
 `;
 
 /** replaces <map_fragment>: albedo, water, inlay */
@@ -120,7 +122,7 @@ diffuseColor.rgb *= fAlb;
 const FRAG_ROUGH = /* glsl */ `
 float roughnessFactor = fOrm.g;
 roughnessFactor = mix( roughnessFactor, mix( fInOrm.g, 0.28, 0.4 ), fGroove * uFInMetal );
-roughnessFactor = mix( roughnessFactor, roughnessFactor * 0.34 + 0.05, fDamp );
+roughnessFactor = mix( roughnessFactor, roughnessFactor * uFDampR.x + uFDampR.y, fDamp );
 roughnessFactor = mix( roughnessFactor, 0.035, fWater );
 `;
 
@@ -160,6 +162,8 @@ if ( uReflOn > 0.5 ) {
   // concepts' streaks are about as bright as the fires); dim walls are unchanged
   float pl = dot( pr, vec3( 0.2126, 0.7152, 0.0722 ) );
   pr *= 1.0 + uReflHot * smoothstep( 0.35, 1.6, pl );
+  // A8b: dull stone keeps only a share of the reflection outside the water (puddles / joints / cracks stay mirrors)
+  pr *= mix( uFReflDry, 1.0, fWater );
   radiance = mix( radiance, pr, edge );
 }
 #endif
@@ -170,6 +174,7 @@ const FRAG_AO = /* glsl */ `
 float fAO = fOrm.r * fInOrm.r;
 reflectedLight.indirectDiffuse *= fAO;
 reflectedLight.indirectSpecular *= mix( 1.0, fAO, 0.6 );
+reflectedLight.directSpecular *= mix( uFReflDry, 1.0, fWater );
 vec3 fLm = texture2D( uFLm, ( vFWorld.xz - uFLmXf.xy ) * uFLmXf.zw ).rgb * uFLmGain;
 reflectedLight.indirectDiffuse += fLm * diffuseColor.rgb * fAO;
 `;
@@ -200,6 +205,17 @@ export class WetFloor {
   private cpuWater: Uint8Array | null = null;
   private blank: THREE.DataTexture;
   readonly inlayStyle: 'engraved' | 'metal' | 'none';
+  /** A8: fire-streak card gain override on medium / high (FloorArt.streakGain) */
+  readonly streakGain?: number;
+  readonly streakGainLow?: number;
+  /** A8b: streak brightness on the dry stone (FloorArt.streakDry; default 0.12) */
+  readonly streakDry?: number;
+  /** A8b: streak-card length multiplier (FloorArt.streakLen; default 1) */
+  readonly streakLen?: number;
+  /** A8b: water level the streak cards follow (FloorArt.streakWater; default puddles x 1.6) */
+  readonly streakWater?: number;
+  /** A8b: moon-path streak overrides (FloorArt.moonPath) */
+  readonly moonPath?: { power?: number; wid?: number; dry?: number };
 
   constructor(o: WetFloorOpts) {
     const L = o.layout;
@@ -243,6 +259,12 @@ export class WetFloor {
     const inl = o.inlay ? texsetTextures(o.inlay) : null;
     if (inl) for (const t of [inl.alb, inl.nrm, inl.orm]) t.wrapS = t.wrapT = THREE.ClampToEdgeWrapping;
     this.inlayStyle = inl ? (inl.extras.style === 'metal' ? 'metal' : 'engraved') : 'none';
+    this.streakGain = o.art.streakGain;
+    this.streakGainLow = o.art.streakGainLow;
+    this.streakDry = o.art.streakDry;
+    this.streakLen = o.art.streakLen;
+    this.streakWater = o.art.streakWater;
+    this.moonPath = o.art.moonPath;
     const inSize = inl ? Number(inl.extras.sizeM) || 16 : 16;
     const tint = o.art.tint ?? [1, 1, 1];
     this.uniforms = {
@@ -257,6 +279,7 @@ export class WetFloor {
       uFTile: { value: this.tileM },
       uFWet: { value: o.art.wetness ?? 0.85 },
       uFPuddle: { value: o.art.puddles ?? 0.35 },
+      uFDampR: { value: new THREE.Vector2(...(o.art.damp ?? [0.34, 0.05])) },
       uFInOn: { value: inl ? 1 : 0 },
       uFInMetal: { value: this.inlayStyle === 'metal' ? 1 : 0 },
       uFLmGain: { value: 0 },
@@ -264,6 +287,7 @@ export class WetFloor {
       uFLmXf: { value: new THREE.Vector4(0, 0, 1, 1) },
       uFInXf: { value: new THREE.Vector3(0, 0, 1 / inSize) },
       uFTint: { value: new THREE.Vector3(...tint) },
+      uFReflDry: { value: o.art.reflDry ?? 1 },
       // reflection (replaced by attachReflection)
       tRefl: { value: this.blank },
       uReflMatrix: { value: new THREE.Matrix4() },

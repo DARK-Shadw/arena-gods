@@ -102,7 +102,11 @@ export class Director {
   /** last coverage choices with their scores (debug overlay) */
   lastScores: string[] = [];
 
-  constructor(rig: CameraRig, rec: MatchRecord) {
+  /**
+   * @param opts.handover A18: the cutscene's last camera pose blends into the first coverage shot (over the west fighter's
+   *   shoulder, on the side the camera already is) instead of cutting to the high establishing crane
+   */
+  constructor(rig: CameraRig, rec: MatchRecord, opts: { handover?: boolean } = {}) {
     this.rig = rig;
     this.rec = rec;
     const kill = rec.events.find((e) => e.type === 'kill');
@@ -121,6 +125,12 @@ export class Director {
     this.size = [getFighter(rec.ids[0]).stats.radius, getFighter(rec.ids[1]).stats.radius];
     this.L = generateArena(rec.arena);
     this.shot = { name: 'establish', start: 0, dur: 2.5, priority: 0, smoothPos: 0.6, smoothLook: 0.4, seed: 0.5 };
+    if (opts.handover) {
+      this.side = rig.position.z < 0 ? -1 : 1;
+      this.shot = { name: 'ots_0', start: 0, dur: 3.0, priority: 5, smoothPos: 0.75, smoothLook: 0.45, seed: 0.5 };
+      this.cutNext = false;
+      this.lastCut = 0;
+    }
   }
 
   /** Time scale for the playback clock (slow-mo + hit-stop). */

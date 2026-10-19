@@ -1,0 +1,442 @@
+[
+ {
+  "seed": 4242,
+  "a": "gorak",
+  "b": "maw",
+  "frames": 5163,
+  "byState": {
+   "launched": {
+    "frames": 85,
+    "lib": 85,
+    "other": 0,
+    "noclip": 0
+   },
+   "knockdown": {
+    "frames": 542,
+    "lib": 542,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 564,
+    "lib": 564,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 508,
+    "lib": 508,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 17,
+  "end": 72.10980809078077,
+  "hipsMin": {
+   "launched0": 0.44,
+   "knockdown0": 0.12,
+   "getup0": 0.12,
+   "knockdown1": 0.09,
+   "getup1": 0.1,
+   "dead1": 0.05
+  },
+  "hipsStand": [
+   1.11,
+   0.85
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 4242,
+  "a": "aldric",
+  "b": "erika",
+  "frames": 5584,
+  "byState": {
+   "knockdown": {
+    "frames": 366,
+    "lib": 366,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 442,
+    "lib": 442,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 510,
+    "lib": 510,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 13,
+  "end": 82.75003552970959,
+  "hipsMin": {
+   "knockdown0": 0.1,
+   "knockdown1": 0.1,
+   "getup0": 0.11,
+   "getup1": 0.13,
+   "dead1": 0.16
+  },
+  "hipsStand": [
+   0.92,
+   0.91
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire",
+   "unity_wispysmoke01",
+   "unity_fireball01"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 4242,
+  "a": "vex",
+  "b": "fenrik",
+  "frames": 6583,
+  "byState": {
+   "knockdown": {
+    "frames": 828,
+    "lib": 828,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 850,
+    "lib": 850,
+    "other": 0,
+    "noclip": 0
+   },
+   "launched": {
+    "frames": 85,
+    "lib": 85,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 508,
+    "lib": 508,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 15,
+  "end": 97.16267429557861,
+  "hipsMin": {
+   "knockdown0": 0.1,
+   "getup0": 0.1,
+   "knockdown1": 0.09,
+   "getup1": 0.09,
+   "launched0": 0.43,
+   "dead1": 0.1
+  },
+  "hipsStand": [
+   1.04,
+   0.81
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 4242,
+  "a": "ozrel",
+  "b": "hollowjack",
+  "frames": 4411,
+  "byState": {
+   "knockdown": {
+    "frames": 758,
+    "lib": 758,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 785,
+    "lib": 785,
+    "other": 0,
+    "noclip": 0
+   },
+   "launched": {
+    "frames": 90,
+    "lib": 90,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 508,
+    "lib": 508,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 17,
+  "end": 63.09403544888516,
+  "hipsMin": {
+   "knockdown0": 0.11,
+   "getup0": 0.12,
+   "knockdown1": 0.1,
+   "launched0": 0.83,
+   "getup1": 0.1,
+   "dead0": 0.17
+  },
+  "hipsStand": [
+   1.1,
+   0.9
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire",
+   "unity_fireball01"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 77,
+  "a": "gorak",
+  "b": "maw",
+  "frames": 3859,
+  "byState": {
+   "knockdown": {
+    "frames": 446,
+    "lib": 446,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 606,
+    "lib": 606,
+    "other": 0,
+    "noclip": 0
+   },
+   "launched": {
+    "frames": 94,
+    "lib": 94,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 510,
+    "lib": 510,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 14,
+  "end": 54.251403629115345,
+  "hipsMin": {
+   "knockdown0": 0.12,
+   "getup0": 0.14,
+   "knockdown1": 0.09,
+   "getup1": 0.1,
+   "launched0": 0.41,
+   "dead1": 0.12
+  },
+  "hipsStand": [
+   1.11,
+   0.84
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 77,
+  "a": "aldric",
+  "b": "erika",
+  "frames": 5302,
+  "byState": {
+   "launched": {
+    "frames": 93,
+    "lib": 93,
+    "other": 0,
+    "noclip": 0
+   },
+   "knockdown": {
+    "frames": 306,
+    "lib": 306,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 419,
+    "lib": 419,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 511,
+    "lib": 511,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 11,
+  "end": 73.3856244887081,
+  "hipsMin": {
+   "launched1": 0.28,
+   "knockdown1": 0.17,
+   "getup1": 0.11,
+   "knockdown0": 0.1,
+   "getup0": 0.11,
+   "dead0": 0.05
+  },
+  "hipsStand": [
+   0.95,
+   0.92
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire",
+   "unity_wispysmoke01"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 77,
+  "a": "vex",
+  "b": "fenrik",
+  "frames": 5856,
+  "byState": {
+   "knockdown": {
+    "frames": 625,
+    "lib": 625,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 789,
+    "lib": 789,
+    "other": 0,
+    "noclip": 0
+   },
+   "launched": {
+    "frames": 181,
+    "lib": 181,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 508,
+    "lib": 508,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 18,
+  "end": 81.85435516388155,
+  "hipsMin": {
+   "knockdown1": 0.09,
+   "getup1": 0.09,
+   "knockdown0": 0.11,
+   "launched0": 0.39,
+   "launched1": 0.67,
+   "getup0": 0.14,
+   "dead1": 0.12
+  },
+  "hipsStand": [
+   1.04,
+   0.8
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire"
+  ],
+  "notFound": [],
+  "errors": []
+ },
+ {
+  "seed": 77,
+  "a": "ozrel",
+  "b": "hollowjack",
+  "frames": 4277,
+  "byState": {
+   "knockdown": {
+    "frames": 918,
+    "lib": 918,
+    "other": 0,
+    "noclip": 0
+   },
+   "getup": {
+    "frames": 854,
+    "lib": 854,
+    "other": 0,
+    "noclip": 0
+   },
+   "dead": {
+    "frames": 508,
+    "lib": 508,
+    "other": 0,
+    "noclip": 0
+   }
+  },
+  "fallbackFrames": [],
+  "clipsSeen": 19,
+  "end": 60.833258282223746,
+  "hipsMin": {
+   "knockdown0": 0.12,
+   "knockdown1": 0.12,
+   "getup0": 0.12,
+   "getup1": 0.1,
+   "dead0": 0.13
+  },
+  "hipsStand": [
+   1.1,
+   0.9
+  ],
+  "spriteLayers": [
+   "mask",
+   "dust_puff",
+   "dust_ring",
+   "unity_explosion00",
+   "unity_explosion01_nofire",
+   "unity_fireball01"
+  ],
+  "notFound": [],
+  "errors": []
+ }
+]

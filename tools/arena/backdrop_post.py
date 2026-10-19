@@ -8,7 +8,7 @@ Input (backdrop_pano.py): <layer>_color.png (RGBA, straight alpha), <layer>_aov.
 <layer>_depth.npy (radial metres from the pano origin, row 0 = latMax, >= 1e8 = no surface), backdrop_src.json.
 Per tier (plan 6.6; GPU memory is the limit: the medium tier has about 11 MB left after the kit):
   q2 (high)    near 8192x1368, mid 8192x1368, far 4096x684 + AOV at half size + hero inset 4096x2048
-  q1 (medium)  near 4096x684, 'farc' = mid over far 3072x512 + AOV near 2048x344 / farc 1024x172 + inset 2048x1024
+  q1 (medium)  near 4096x684, 'farc' = mid over far 3072x512 + AOV near 2048x344 / farc 1024x172 (A8: no inset)
   q0 (low)     one composite of all layers 2048x344 + AOV 1024x172, no inset
 Colour: alpha-0 texels are filled from their neighbours (push-pull) so filtering and mipmaps have no dark fringes.
 AOV B (cloud) is derived here: far-layer coverage where the volume has no surface depth.
@@ -46,7 +46,8 @@ GRIDS = {'near': (512, 96), 'mid': (256, 48), 'far': (128, 24), 'farc': (256, 48
 DEFAULT_DEPTH = {'near': 90.0, 'mid': 300.0, 'far': 1100.0, 'farc': 600.0, 'all': 300.0}
 TIERS = {
     'q2': {'layers': {'near': (8192, 1368), 'mid': (8192, 1368), 'far': (4096, 684)}, 'aov': 0.5, 'inset': (4096, 2048)},
-    'q1': {'layers': {'near': (4096, 684), 'farc': (3072, 512)}, 'aovSize': {'near': (2048, 344), 'farc': (1024, 172)}, 'inset': (2048, 1024)},
+    # A8: no hero inset on medium (its GPU texture budget has no headroom: about 126.6 of 128 MB before A8)
+    'q1': {'layers': {'near': (4096, 684), 'farc': (3072, 512)}, 'aovSize': {'near': (2048, 344), 'farc': (1024, 172)}},
     'q0': {'layers': {'all': (2048, 344)}, 'aovSize': {'all': (1024, 172)}},
 }
 
@@ -269,7 +270,7 @@ def preview(layers, out_dir):
     hh = np.clip(dy, 0, 1) ** 0.42
     zen, hor = srgb_to_lin(np.array([0x0a, 0x0d, 0x26]) / 255), srgb_to_lin(np.array([0x36, 0x38, 0x66]) / 255)
     sky = hor * (1 - hh[..., None]) + zen * hh[..., None]
-    me, ma = math.radians(27), math.radians(-1.7)
+    me, ma = math.radians(26), math.radians(0.0)  # A8: moon centred in the ring arch (ref-3)
     md = np.array([math.cos(me) * math.cos(ma), math.sin(me), math.cos(me) * math.sin(ma)])
     cosm = dx * md[0] + dy * md[1] + dz * md[2]
     moon = np.clip((cosm - math.cos(0.105)) / (math.cos(0.102) - math.cos(0.105)), 0, 1)

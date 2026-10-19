@@ -1,0 +1,26 @@
+{
+ "_doc": "A21: full-tier texture caps (max px per slot) applied by build_assets.mjs before encoding. Normal maps are UASTC (about 70 % of a kit GLB's bytes and 1 byte/px on the GPU as BC7); in the Moon Gate's night look the props / statues / pillars read the same with half-size normals (docs/milestones/A21/README.md: before / after renders). Base colour and ORM (ETC1S) keep their size.",
+ "caps": {
+  "kit/pillar_square": { "normal": 1024 },
+  "kit/statue_hooded": { "normal": 512 },
+  "kit/statue_knight": { "normal": 512 },
+  "kit/statue_mage": { "normal": 512 },
+  "kit/rubble_scatter": { "normal": 512 },
+  "kit/rubble_pile": { "normal": 512 },
+  "kit/rock_prop": { "normal": 512 },
+  "kit/lantern_toro": { "normal": 512 },
+  "kit/brazier_pedestal": { "normal": 512 },
+  "kit/column_ruin": { "normal": 512 },
+  "kit/spike_grate": { "normal": 512 },
+  "kit/crumble": { "normal": 512 },
+  "kit/stakes": { "normal": 512 },
+  "kit/crate": { "normal": 512 },
+  "kit/keg": { "normal": 512 },
+  "kit/vent_grate": { "normal": 512 },
+  "kit/barricade": { "normal": 512 },
+  "kit/brazier_tripod": { "normal": 512 },
+  "kit/barrel": { "normal": 512 },
+  "kit/banner_pole": { "normal": 512 },
+  "kit/banners": { "normal": 512 }
+ }
+}

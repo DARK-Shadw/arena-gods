@@ -3,7 +3,8 @@
  * pre-fight face-off. Owns the fx/sfx cue vocabulary used by the specs.
  */
 import * as THREE from 'three';
-import type { Arena } from '../render/arena/arenaView';
+import { anyHit } from './losAccel';
+import { groundY, type Arena, type GateAnchors } from '../render/arena/arenaView';
 import type { VFX } from '../render/vfx';
 import type { FighterView } from '../render/fighterView';
 import type { CameraRig } from '../camera/cameraRig';
@@ -11,7 +12,8 @@ import type { AudioEngine } from '../audio/audio';
 import type { UI } from '../ui/ui';
 import type { FighterDef } from '../sim/types';
 import { ARENA } from '../sim/arena';
-import { ENTRANCES, type CamPose, type EntranceSpec, type V3 } from '../data/entrances';
+import { ENTRANCES, type CamPose, type CamShot, type EntranceSpec, type V3 } from '../data/entrances';
+import { hazardPenalty } from './framing';
 import { ENTRANCE_VARIANTS } from '../data/entranceVariants';
 import { Ease, Timeline } from './timeline';
 import { resolveCamera } from '../camera/cameraRig';
@@ -48,21 +50,35 @@ export interface EntranceMeta {
   shots: [number, number][];
 }
 
-/** Gate-local frame helper. */
+/**
+ * Gate-local frame helper. A18: a gate up a stair (anchors.ground) makes every gate-frame y relative to the ground
+ * under it (floor, stair, dais); without one the ground is the floor (y unchanged).
+ */
 class GateFrame {
   o: THREE.Vector3;
   f: THREE.Vector3;
   r: THREE.Vector3;
   yaw: number;
+  ground: GateAnchors['ground'];
   constructor(arena: Arena, gate: number) {
     const g = arena.gates[gate];
     this.o = g.pos.clone();
     this.f = g.inward.clone();
     this.r = new THREE.Vector3(-this.f.z, 0, this.f.x);
     this.yaw = Math.atan2(this.f.x, this.f.z);
+    this.ground = g.anchors.ground;
   }
-  w(v: V3, out = new THREE.Vector3()) {
-    return out.copy(this.o).addScaledVector(this.r, v[0]).addScaledVector(this.f, v[2]).setY(v[1]);
+  /** ground height under gate-frame z */
+  gy(z: number) {
+    return this.ground ? groundY(this.ground, z) : 0;
+  }
+  /** gate frame -> world; `base` overrides the ground height (an airborne arc between two ground heights) */
+  w(v: V3, out = new THREE.Vector3(), base?: number) {
+    return out
+      .copy(this.o)
+      .addScaledVector(this.r, v[0])
+      .addScaledVector(this.f, v[2])
+      .setY(v[1] + (base ?? this.gy(v[2])));
   }
 }
 
@@ -82,7 +98,7 @@ export interface CineLine {
  * Anchors are declared by the dressing; snap them onto the geometry that was
  * actually built (ray cast down) and drop any that do not land on a surface.
  */
-function snapAnchors(arena: CineCtx['arena'], gate: number) {
+export function snapAnchors(arena: CineCtx['arena'], gate: number) {
   const g = arena.gates[gate];
   const A = g.anchors as typeof g.anchors & { snapped?: boolean };
   if (A.snapped) return A;
@@ -96,17 +112,18 @@ function snapAnchors(arena: CineCtx['arena'], gate: number) {
   });
   const G = new GateFrame(arena, gate);
   const ray = new THREE.Raycaster();
+  // (A18: y relative to the gate's ground; w.y is the world height)
   const snap = (p: V3, tol: number): V3 | null => {
     const w = G.w(p);
-    ray.set(new THREE.Vector3(w.x, p[1] + tol, w.z), new THREE.Vector3(0, -1, 0));
+    ray.set(new THREE.Vector3(w.x, w.y + tol, w.z), new THREE.Vector3(0, -1, 0));
     ray.far = tol * 2;
     const hit = ray.intersectObjects(meshes, false).find((h) => !!h.face && h.face.normal.clone().transformDirection(h.object.matrixWorld).y > 0.6);
-    return hit ? [p[0], +hit.point.y.toFixed(3), p[2]] : null;
+    return hit ? [p[0], +(hit.point.y - G.gy(p[2])).toFixed(3), p[2]] : null;
   };
   // head room above a spot (a crouching / standing fighter must fit under whatever overhangs it)
   const clear = (p: V3, h: number) => {
     const w = G.w(p);
-    ray.set(new THREE.Vector3(w.x, p[1] + 0.15, w.z), new THREE.Vector3(0, 1, 0));
+    ray.set(new THREE.Vector3(w.x, w.y + 0.15, w.z), new THREE.Vector3(0, 1, 0));
     ray.far = h;
     return ray.intersectObjects(meshes, false).length === 0;
   };
@@ -299,7 +316,15 @@ function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: Fighte
     dur: (clip) => (clip.startsWith('lib:') ? (libClip(clip.slice(4))?.meta.dur ?? 1) : view.anim.dur(clip)),
     height: view.height,
   };
-  const C: CompiledEntrance = variant.build(vctx);
+  let C: CompiledEntrance = variant.build(vctx);
+  // A18: a gate up a stair: the choreography starts on the dais, the walk-outs come down the stair; beats that now cover
+  // much more ground are slowed to their floor-level speed (+25 %), every time after them shifts with them, and an
+  // establishing shot of the stair, the gate and the landmark opens the entrance
+  if (A.ground && A.flat) {
+    const C0 = variant.build({ ...vctx, A: { ...A, barrierZ: A.flat.barrierZ, tunnel: A.flat.tunnel, ground: undefined } });
+    C = stairRetime(C, C0, A.ground, view.hipsM);
+    C = stairEstablish(C, A, ctx, gate);
+  }
   // monologue: hold the last beat / shot until the line has finished
   const speakAt = C.title - 0.2;
   const hold = monologue ? Math.max(0, speakAt + monologue.dur + 0.7 - C.duration) : 0;
@@ -343,7 +368,13 @@ function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: Fighte
     const bt = lt - T[i];
     const raw = beatPos(b, startOf[i], bt, view.hipsM);
     const p = b.move.type === 'lerp' ? steer(raw) : raw;
-    G.w(p, pos);
+    if (G.ground && b.air && b.move.type === 'lerp') {
+      // A18: a leap over the stair is one arc between its take-off and landing heights (not a hop that follows the steps)
+      const e = Ease[b.move.ease ?? 'inOut'](Math.max(0, Math.min(1, bt / Math.max(1e-3, b.dur))));
+      const g0 = G.gy(startOf[i][2]),
+        g1 = G.gy(b.move.to[2]);
+      G.w(p, pos, g0 + (g1 - g0) * e);
+    } else G.w(p, pos);
     const speed = first || dt <= 0 ? 0 : Math.hypot(pos.x - prev.x, pos.z - prev.z) / dt;
     first = false;
     prev.copy(pos);
@@ -382,7 +413,10 @@ function buildCompiled(ctx: CineCtx, view: FighterView, gate: 0 | 1, opp: Fighte
     const dist = d.length();
     losRay.set(from, d.normalize());
     losRay.far = Math.max(0.01, dist - 0.3);
-    return losRay.intersectObjects(solids, false).length === 0;
+    // A21: same answer as losRay.intersectObjects(solids, false).length === 0, without testing every triangle of the
+    // big merged arena meshes each frame (losAccel.ts)
+    // (checked against intersectObjects on four full intros: 7560 checks, 0 differences)
+    return !anyHit(losRay, solids);
   };
   const resolve = (cp: CamPose, outPos: THREE.Vector3, outLook: THREE.Vector3) => {
     // low cameras inside the arena step out of cover / props / hazard rims
@@ -534,6 +568,117 @@ function beatPos(b: Beat, p0: V3, bt: number, hipsM: number): V3 {
   return [x, y, z];
 }
 
+/** beat start positions (gate frame) of a compiled entrance */
+function beatStarts(C: CompiledEntrance, hipsM: number): V3[] {
+  const out: V3[] = [];
+  let p: V3 = C.start;
+  for (const b of C.beats) {
+    out.push(p);
+    p = beatPos(b, p, b.dur, hipsM);
+    if (b.exitY !== undefined) p = [p[0], b.exitY, p[2]];
+  }
+  return out;
+}
+
+/**
+ * A18: re-time an entrance at a gate up a stair. `C` is built on the real anchors (dais, stair), `C0` the same variant at
+ * the gate's floor-level equivalent; a moving (lerp) beat that has to cover more ground than its floor-level twin is
+ * slowed so it is at most 25 % faster than authored. Cues inside a slowed beat keep their place along the path; camera
+ * shots, extra cues and the title card follow the piecewise-linear time warp.
+ */
+function stairRetime(C: CompiledEntrance, C0: CompiledEntrance, gr: NonNullable<GateAnchors['ground']>, hipsM: number): CompiledEntrance {
+  if (C.beats.length !== C0.beats.length) return C;
+  const len = (b: Beat, p0: V3, g?: GateAnchors['ground']) => {
+    let L = 0;
+    let prev: THREE.Vector3 | null = null;
+    for (let s = 0; s <= 16; s++) {
+      const q = beatPos(b, p0, (s / 16) * b.dur, hipsM);
+      const v = new THREE.Vector3(q[0], q[1] + groundY(g, q[2]), q[2]);
+      if (prev) L += v.distanceTo(prev);
+      prev = v;
+    }
+    return L;
+  };
+  const s1 = beatStarts(C, hipsM),
+    s0 = beatStarts(C0, hipsM);
+  const f = C.beats.map((b, i) => {
+    if (b.move.type !== 'lerp' || b.dur <= 0) return 1;
+    const L1 = len(b, s1[i], gr),
+      L0 = len(C0.beats[i], s0[i]);
+    if (L0 < 0.05) return L1 > 0.5 ? Math.max(1, L1 / b.dur / 2.2) : 1;
+    return Math.max(1, L1 / L0 / 1.25);
+  });
+  const beats: Beat[] = C.beats.map((b, i) =>
+    f[i] === 1
+      ? b
+      : {
+          ...b,
+          dur: b.dur * f[i],
+          pulses: b.pulses?.map((t) => t * f[i]),
+          cues: b.cues?.map((c) => (typeof c.at === 'number' ? { ...c, at: c.at * f[i] } : c)),
+        },
+  );
+  const T0 = beatTimes(C.beats),
+    T1 = beatTimes(beats);
+  const n = C.beats.length;
+  const warp = (t: number) => {
+    for (let i = 0; i < n; i++) if (t < T0[i + 1]) return T1[i] + Math.max(0, t - T0[i]) * f[i];
+    return T1[n] + (t - T0[n]);
+  };
+  const camera = C.camera.map((s) => {
+    const a = warp(s.t),
+      b = warp(s.t + s.dur);
+    return { ...s, t: a, dur: b - a };
+  });
+  return { ...C, beats, camera, cues: C.cues.map((c) => ({ ...c, t: warp(c.t) })), title: warp(C.title), duration: T1[n] };
+}
+
+/**
+ * A18: open an entrance at a stair gate with an establishing shot: low in the arena, looking up the stair at the gate on
+ * the dais with the landmark and the moon behind it, slowly pushing in while the actor waits in their first pose. The
+ * side (left / right of the gate axis) that keeps the hanging hazards out of the frame wins.
+ */
+function stairEstablish(C: CompiledEntrance, A: GateAnchors, ctx: CineCtx, gate: number, pre = 2.8): CompiledEntrance {
+  const b0 = C.beats[0];
+  const lead: Beat = { dur: pre, state: b0.state, clip: b0.clip, from: b0.from, rate: b0.state === 'clip' ? 0 : 1, move: { type: 'hold' }, yaw: b0.yaw, air: b0.air, hidden: b0.hidden };
+  const bz = A.barrierZ;
+  const G = new GateFrame(ctx.arena, gate);
+  const look: V3 = [0, 2.8, bz - 0.8];
+  // candidates: side of the axis, distance into the arena (closer = past hazards hanging between the centre and the stair)
+  type Cand = { sx: number; d: number };
+  const pose = (c: Cand, k: number): [V3, V3, number] => [[c.sx * (2.6 - 0.8 * k), 0.9 + 0.5 * k, c.d - 2.8 * k], look, (c.d > 9 ? 50 : 54) - 6 * k];
+  const cands: Cand[] = [12.6, 9.4, 6.6].flatMap((d) => [1, -1].map((sx) => ({ sx, d })));
+  const L = ctx.arena.layout;
+  const aspect = ctx.rig.cam.aspect || 16 / 9;
+  let best = cands[0],
+    bestP = Infinity;
+  for (const c of cands) {
+    let pen = c.d === 12.6 ? 0 : 0.08;
+    for (const k of [0, 0.5, 1]) {
+      const [p, l, fov] = pose(c, k);
+      const wp = G.w(p);
+      pen += hazardPenalty(L, wp, G.w(l), fov, aspect);
+      for (const o of L.obstacles) if (Math.hypot(wp.x - o.x, wp.z - o.z) < o.r + 1.1) pen += 2;
+      for (const o of L.props) if (Math.hypot(wp.x - o.x, wp.z - o.z) < o.r + 0.9) pen += 1;
+    }
+    if (pen < bestP - 1e-3) {
+      bestP = pen;
+      best = c;
+    }
+  }
+  const [p0, l0, f0] = pose(best, 0),
+    [p1, l1, f1] = pose(best, 1);
+  const shot: CamShot = { t: 0, dur: pre, from: { pos: p0, look: l0, fov: f0 }, to: { pos: p1, look: l1, fov: f1 }, ease: 'inOut' };
+  return {
+    ...C,
+    beats: [lead, ...C.beats],
+    camera: [shot, ...C.camera.map((s) => ({ ...s, t: s.t + pre }))],
+    cues: [{ t: 0.3, fx: 'gate_light' }, ...C.cues.map((c) => ({ ...c, t: c.t + pre }))],
+    title: C.title + pre,
+    duration: C.duration + pre,
+  };
+}
+
 function playSfx(a: AudioEngine, s: string) {
   switch (s) {
     case 'drum': return a.drum(1);
@@ -609,11 +754,14 @@ function addFx(
       );
       break;
     }
-    case 'gate_open':
+    case 'gate_open': {
+      // A18: a gate on a dais (no gatehouse over it) lowers its bars into the dais instead of lifting them into the sky
+      const dir = gateObj.anchors.ground ? -1 : 1;
       tl.span('vfx', t, dur, (k) => {
-        gateObj.portcullis.position.y = Ease.inOut(k) * 3.7;
+        gateObj.portcullis.position.y = dir * Ease.inOut(k) * 3.7;
       });
       break;
+    }
     case 'gate_light':
       tl.span('light', t, 0.6, (k) => {
         gateObj.light.intensity = 2 + k * 12;
@@ -928,10 +1076,62 @@ export function buildFaceoff(ctx: CineCtx, views: [FighterView, FighterView], de
   if (banter[1]) shot(bAt, bEnd - bAt, closeOn(1));
   // 4. rising two-shot into FIGHT!
   const riseAt = banter[0] || banter[1] ? bEnd : aAt;
-  shot(riseAt, total - riseAt, (k) => {
-    const e = Ease.out(k);
-    return [p0.set(Math.sin(e * 0.5) * 2, 1.7 + e * 0.8, 6.4 + e * 0.6), l0.set(0, 1.1, 0), 50];
-  });
+  if (ctx.arena.kit?.art.cine?.faceoff === 'landmark') {
+    // A18 (ref-3): low over the west fighter's shoulder, the east fighter in front of the stair, the gate, the ring arch
+    // and the moon, slowly pushing in; the fight camera then blends in from here (Director handover: ots_0 on this side)
+    const aspect = ctx.rig.cam.aspect || 16 / 9;
+    // camera behind and beside the west fighter, tilted up so the ring arch and the moon are in (ref-3: pitch about 7 deg,
+    // the stair right of centre); candidates by side / offset / height, scored on the hanging hazards and on columns in
+    // the way of the east fighter or the stair
+    const L = ctx.arena.layout;
+    const pose = (c: { s: number; lat: number; h: number }, k: number): [THREE.Vector3, THREE.Vector3, number] => {
+      const me = start[0],
+        them = start[1];
+      const fwd = them.clone().sub(me).normalize();
+      const side = new THREE.Vector3(-fwd.z, 0, fwd.x).multiplyScalar(c.s);
+      const p = me.clone().addScaledVector(fwd, -3.4 + 0.6 * k).addScaledVector(side, c.lat);
+      p.y = c.h + 0.12 * k;
+      const l = them.clone().addScaledVector(fwd, 5.0).addScaledVector(side, -1.0 * c.lat).setY(4.3 - 0.2 * k);
+      return [p, l, 50 - 3 * k];
+    };
+    const through = (a: THREE.Vector3, b: THREE.Vector3) =>
+      L.obstacles.some((o) => {
+        const dx = b.x - a.x,
+          dz = b.z - a.z;
+        const u = Math.max(0, Math.min(1, ((o.x - a.x) * dx + (o.z - a.z) * dz) / (dx * dx + dz * dz || 1e-6)));
+        return Math.hypot(a.x + dx * u - o.x, a.z + dz * u - o.z) < o.r + 0.35;
+      });
+    const cands = [1, -1].flatMap((s) => [2.2, 3.2, 1.4].flatMap((lat) => [1.25, 0.9].map((h) => ({ s, lat, h }))));
+    let best = cands[0],
+      bp = Infinity;
+    for (const c of cands) {
+      let pen = (c.lat !== 2.2 ? 0.05 : 0) + (c.h !== 1.25 ? 0.05 : 0);
+      for (const k of [0, 1]) {
+        const [p, l, f] = pose(c, k);
+        pen += hazardPenalty(L, p, l, f, aspect);
+        if (through(p, start[1])) pen += 3;
+        if (through(p, new THREE.Vector3(L.rx + 4, 0, 0))) pen += 1.5;
+        for (const o of L.obstacles) if (Math.hypot(p.x - o.x, p.z - o.z) < o.r + 1.2) pen += 3;
+        for (const o of L.props) if (Math.hypot(p.x - o.x, p.z - o.z) < o.r + 0.8) pen += 2;
+      }
+      if (pen < bp - 1e-3) {
+        bp = pen;
+        best = c;
+      }
+    }
+    // a composed shot in the open arena: no collision orbit (beginFight turns collision back on)
+    tl.cue('camera', riseAt, () => (ctx.rig.collide = false));
+    // the over-the-shoulder framing is deliberate: no stale "fighters lined up" orbit from the last fight's subjects
+    tl.cue('camera', riseAt, () => (ctx.rig.subjects = []));
+    shot(riseAt, total - riseAt, (k) => {
+      const [p, l, f] = pose(best, Ease.inOut(k));
+      return [p0.copy(p), l0.copy(l), f];
+    });
+  } else
+    shot(riseAt, total - riseAt, (k) => {
+      const e = Ease.out(k);
+      return [p0.set(Math.sin(e * 0.5) * 2, 1.7 + e * 0.8, 6.4 + e * 0.6), l0.set(0, 1.1, 0), 50];
+    });
   if (banter[0]) tl.cue('audio', aAt, () => banter[0]!.play());
   if (banter[1]) tl.cue('audio', bAt, () => banter[1]!.play());
   tl.cue('audio', 0.8, () => ctx.audio.drum(1));

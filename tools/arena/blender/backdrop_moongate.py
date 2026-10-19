@@ -10,10 +10,10 @@ Content, by panorama layer (the renderer gives each layer its own view layer; ot
                     (r about 62 m, broken tops, missing bays, rubble), small fires on the tiers (emit AOV), a ground disc
   mid   (150-600 m) an outer ring of broken towers and spires with a few lit windows (emit AOV), low ruined walls, a
                     cliff with a WATERFALL behind the arena (azimuth 160: a test of the water AOV; the concept has none)
-  far   (> 600 m)   mountain silhouettes and STORM CLOUDS (Cycles volumes) lit from behind by the moon, a clear hole
-                    around the moon itself
+  far   (> 600 m)   mountain silhouettes (A8: rendered with --no-clouds; the A6 storm-cloud volumes stay available)
 The moon disc is NOT rendered: sky.ts draws it behind the far layer (the moon sun lamp here only lights the scene).
-It is a BLOCKOUT for A6's pipeline test. A8 builds the real scene from the kit (plan A8 row).
+A8 rescaled it for the ref-3 framing (see `build_arch`), added banners / swags / chains, two vista pillars, the
+storey detail of the arcade, and dropped the test waterfall and the cloud volumes (the authored sky draws the storm).
 
 AOV `aov` (COLOR): R = emission to animate (fires, windows: flicker), G = water (waterfall flow), B = cloud (drift).
 """
@@ -27,12 +27,12 @@ from mathutils import Euler, Vector
 import abake
 
 # ---------------------------------------------------------------------------- frame / colours (plan 3.1 Moon Gate)
-MOON_AZ, MOON_EL = -1.7, 27.0
+MOON_AZ, MOON_EL = 0.0, 26.0   # A8: centred in the ring arch as in ref-3 (A6: -1.7 / 27)
 MOON_RGB = (0.85, 0.83, 1.0)            # #d8d4ff
 STONE = (0.12, 0.12, 0.155)            # linear albedo, dark blue-grey (moonlit stone reads violet-grey)
 STONE_FAR = (0.07, 0.072, 0.09)
 FIRE_RGB = (1.0, 0.36, 0.09)
-ARCH_X = 74.0                           # arch distance (plan: 70 m, 60 m tall)
+ARCH_X = 74.0                           # arch distance (A8: 74 m, ring top 43 m; see the rescale note below)
 ARCADE_R = 62.0
 
 
@@ -331,90 +331,367 @@ def place(coll, mesh, loc, rz, name):
     return o
 
 
-# ---------------------------------------------------------------------------- scene parts
+# ---------------------------------------------------------------------------- cloth (banners / swags)
 
-def build_arch(coll, stone, metal):
-    """the ring arch at azimuth 0: pylons + ring + portal + crescent sigil (ref-3, plan 1.1)"""
+def mat_banner(name, rgb=(0.3, 0.012, 0.024), shred=1.0, seed=0.0):
+    """tattered crimson cloth (ref-3 #8a1a2a): UV u across, v down the hang (0 = top). Alpha cuts vertical shreds that
+    grow toward the bottom and ragged side edges; a thin dull-gold band near the top; no emission (AOV 0)"""
+    m = bpy.data.materials.new(name)
+    m.use_nodes = True
+    nt = m.node_tree
+    N, L = nt.nodes, nt.links
+    b = next(n for n in N if n.type == 'BSDF_PRINCIPLED')
+    uv = N.new('ShaderNodeUVMap')
+    sep = N.new('ShaderNodeSeparateXYZ')
+    L.new(uv.outputs['UV'], sep.inputs[0])
+    # shred noise: stretched along the hang (vertical strips)
+    mp = N.new('ShaderNodeMapping')
+    mp.inputs['Scale'].default_value = (18.0 * shred, 1.6, 1.0)
+    mp.inputs['Location'].default_value = (seed, seed * 0.37, 0)
+    L.new(uv.outputs['UV'], mp.inputs['Vector'])
+    nz = N.new('ShaderNodeTexNoise')
+    nz.inputs['Scale'].default_value = 1.0
+    nz.inputs['Detail'].default_value = 5
+    nz.inputs['Roughness'].default_value = 0.65
+    L.new(mp.outputs['Vector'], nz.inputs['Vector'])
+    # holes: blotchy noise (burns / tears)
+    mh = N.new('ShaderNodeMapping')
+    mh.inputs['Scale'].default_value = (5.0, 3.0, 1.0)
+    mh.inputs['Location'].default_value = (seed * 1.7, 0, 0)
+    L.new(uv.outputs['UV'], mh.inputs['Vector'])
+    nh = N.new('ShaderNodeTexNoise')
+    nh.inputs['Scale'].default_value = 1.0
+    nh.inputs['Detail'].default_value = 3
+    L.new(mh.outputs['Vector'], nh.inputs['Vector'])
+    # threshold rises with v: v^1.6 * 1.05
+    pw = N.new('ShaderNodeMath')
+    pw.operation = 'POWER'
+    L.new(sep.outputs['Y'], pw.inputs[0])
+    pw.inputs[1].default_value = 2.2
+    th = N.new('ShaderNodeMath')
+    th.operation = 'MULTIPLY_ADD'
+    L.new(pw.outputs[0], th.inputs[0])
+    th.inputs[1].default_value = 0.55 * shred
+    th.inputs[2].default_value = 0.12
+    # side edges: |u - 0.5| near 0.5 -> threshold up
+    su = N.new('ShaderNodeMath')
+    su.operation = 'SUBTRACT'
+    L.new(sep.outputs['X'], su.inputs[0])
+    su.inputs[1].default_value = 0.5
+    ab = N.new('ShaderNodeMath')
+    ab.operation = 'ABSOLUTE'
+    L.new(su.outputs[0], ab.inputs[0])
+    ed = N.new('ShaderNodeMapRange')
+    ed.inputs['From Min'].default_value = 0.38
+    ed.inputs['From Max'].default_value = 0.5
+    ed.inputs['To Min'].default_value = 0.0
+    ed.inputs['To Max'].default_value = 0.35
+    L.new(ab.outputs[0], ed.inputs['Value'])
+    t2 = N.new('ShaderNodeMath')
+    t2.operation = 'ADD'
+    L.new(th.outputs[0], t2.inputs[0])
+    L.new(ed.outputs['Result'], t2.inputs[1])
+    # holes add to the threshold where the blotch noise is high (below the top band)
+    hr = N.new('ShaderNodeMapRange')
+    hr.inputs['From Min'].default_value = 0.6
+    hr.inputs['From Max'].default_value = 0.72
+    hr.inputs['To Max'].default_value = 0.45
+    L.new(nh.outputs['Fac'], hr.inputs['Value'])
+    hv = N.new('ShaderNodeMath')
+    hv.operation = 'MULTIPLY'
+    L.new(hr.outputs['Result'], hv.inputs[0])
+    L.new(sep.outputs['Y'], hv.inputs[1])
+    t3 = N.new('ShaderNodeMath')
+    t3.operation = 'ADD'
+    L.new(t2.outputs[0], t3.inputs[0])
+    L.new(hv.outputs[0], t3.inputs[1])
+    gt = N.new('ShaderNodeMath')
+    gt.operation = 'GREATER_THAN'
+    L.new(nz.outputs['Fac'], gt.inputs[0])
+    L.new(t3.outputs[0], gt.inputs[1])
+    # colour: crimson with darker burnt edges near the cut threshold, a gold band at v 0.05..0.08
+    burn = N.new('ShaderNodeMath')
+    burn.operation = 'SUBTRACT'
+    L.new(nz.outputs['Fac'], burn.inputs[0])
+    L.new(t3.outputs[0], burn.inputs[1])
+    br = N.new('ShaderNodeMapRange')
+    br.inputs['From Min'].default_value = 0.0
+    br.inputs['From Max'].default_value = 0.08
+    br.inputs['To Min'].default_value = 0.35
+    br.inputs['To Max'].default_value = 1.0
+    L.new(burn.outputs[0], br.inputs['Value'])
+    col = N.new('ShaderNodeVectorMath')
+    col.operation = 'SCALE'
+    col.inputs[0].default_value = rgb
+    L.new(br.outputs['Result'], col.inputs['Scale'])
+    band = N.new('ShaderNodeMapRange')
+    band.interpolation_type = 'SMOOTHSTEP'
+    L.new(sep.outputs['Y'], band.inputs['Value'])
+    band.inputs['From Min'].default_value = 0.035
+    band.inputs['From Max'].default_value = 0.045
+    band2 = N.new('ShaderNodeMapRange')
+    band2.interpolation_type = 'SMOOTHSTEP'
+    L.new(sep.outputs['Y'], band2.inputs['Value'])
+    band2.inputs['From Min'].default_value = 0.075
+    band2.inputs['From Max'].default_value = 0.065
+    bm_ = N.new('ShaderNodeMath')
+    bm_.operation = 'MULTIPLY'
+    L.new(band.outputs['Result'], bm_.inputs[0])
+    L.new(band2.outputs['Result'], bm_.inputs[1])
+    mix = N.new('ShaderNodeMix')
+    mix.data_type = 'RGBA'
+    L.new(bm_.outputs[0], mix.inputs['Factor'])
+    L.new(col.outputs['Vector'], mix.inputs['A'])
+    mix.inputs['B'].default_value = (0.22, 0.13, 0.03, 1)
+    L.new(mix.outputs['Result'], b.inputs['Base Color'])
+    L.new(gt.outputs[0], b.inputs['Alpha'])
+    b.inputs['Roughness'].default_value = 0.85
+    try:
+        b.inputs['Sheen Weight'].default_value = 0.4
+        b.inputs['Sheen Tint'].default_value = (1.0, 0.6, 0.6, 1)
+    except Exception:
+        pass
+    _aov(nt, (0, 0, 0))
+    return m
+
+
+def cloth_strip(bm, uvl, pts_top, drop, segs_v=6, sway=0.0, mat=0, rnd=None):
+    """a hanging cloth: pts_top = [(Vector top point)] along its width; each column hangs `drop` metres (scalar or
+    per-point list) straight down with an optional sideways belly. UV u along the top line, v down (0 = top)."""
+    n = len(pts_top)
+    drops = drop if isinstance(drop, (list, tuple)) else [drop] * n
+    grid = []
+    for i, p in enumerate(pts_top):
+        col = []
+        for j in range(segs_v + 1):
+            t = j / segs_v
+            off = Vector((0, 0, -drops[i] * t))
+            if sway:
+                off += Vector((sway * math.sin(t * math.pi) * (rnd.uniform(0.6, 1.0) if rnd else 1.0), 0, 0))
+            col.append(bm.verts.new(p + off))
+        grid.append(col)
+    for i in range(n - 1):
+        for j in range(segs_v):
+            f = bm.faces.new((grid[i][j], grid[i + 1][j], grid[i + 1][j + 1], grid[i][j + 1]))
+            f.material_index = mat
+            for lp in f.loops:
+                ii = i if lp.vert in (grid[i][j], grid[i][j + 1]) else i + 1
+                jj = j if lp.vert in (grid[i][j], grid[i + 1][j]) else j + 1
+                lp[uvl].uv = (ii / (n - 1), jj / segs_v)
+    return grid
+
+
+def banner(coll, mat, top, facing, w, h, rnd, name='banner'):
+    """a long vertical banner hanging from `top` (Vector), its face toward `facing` (unit Vector, horizontal)"""
+    bm = bmesh.new()
+    uvl = bm.loops.layers.uv.new('UVMap')
+    side = Vector((-facing.y, facing.x, 0)).normalized()
+    pts = [top + side * (w * (k / 6 - 0.5)) + facing * 0.02 * math.sin(k * 1.3) for k in range(7)]
+    cloth_strip(bm, uvl, pts, h, segs_v=8, rnd=rnd)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.append(mat)
+    o = bpy.data.objects.new(name, me)
+    coll.objects.link(o)
+    return o
+
+
+def swag(coll, mat, p0, p1, sag, drop, rnd, name='swag'):
+    """a shredded cloth swag hanging between two points (catenary-like top line, rags below)"""
+    bm = bmesh.new()
+    uvl = bm.loops.layers.uv.new('UVMap')
+    n = 14
+    pts, drops = [], []
+    for k in range(n + 1):
+        t = k / n
+        p = p0.lerp(p1, t) + Vector((0, 0, -sag * 4 * t * (1 - t)))
+        pts.append(p)
+        drops.append(drop * (0.55 + 0.45 * math.sin(t * math.pi)) * rnd.uniform(0.8, 1.15))
+    cloth_strip(bm, uvl, pts, drops, segs_v=5, rnd=rnd)
+    me = bpy.data.meshes.new(name)
+    bm.to_mesh(me)
+    bm.free()
+    me.materials.append(mat)
+    o = bpy.data.objects.new(name, me)
+    coll.objects.link(o)
+    return o
+
+
+def chain_line(bm, p0, p1, sag, link=0.9, mat=0):
+    """a heavy chain as alternating flat boxes along a sagging line (silhouette only at backdrop distance)"""
+    L_ = (p1 - p0).length
+    n = max(2, int(L_ / link))
+    prev = None
+    for k in range(n + 1):
+        t = k / n
+        p = p0.lerp(p1, t) + Vector((0, 0, -sag * 4 * t * (1 - t)))
+        if prev is not None:
+            d = p - prev
+            mid = (p + prev) / 2
+            rz = math.atan2(d.y, d.x)
+            ln = d.length
+            ry = -math.atan2(d.z, math.hypot(d.x, d.y))
+            vs = []
+            sx, sy, sz = ln * 0.62, 0.12 if k % 2 else 0.42, 0.42 if k % 2 else 0.12
+            for zz in (-sz / 2, sz / 2):
+                for xx, yy in ((-sx / 2, -sy / 2), (sx / 2, -sy / 2), (sx / 2, sy / 2), (-sx / 2, sy / 2)):
+                    v = Vector((xx, yy, zz))
+                    v.rotate(Euler((0, ry, rz)))
+                    vs.append(bm.verts.new(mid + v))
+            for f in [(0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]:
+                bm.faces.new([vs[i] for i in f]).material_index = mat
+        prev = p
+
+
+# ---------------------------------------------------------------------------- scene parts
+# A8 RESCALE for the ref-3 framing (A6 README, A8 brief): from the ref-3 camera (game (-7.5, 1, -0.3), pitch 6.9,
+# vFOV 44.7) ref-3 puts the ring-arch top at about 28 deg elevation, the ring centre at about 22 deg, the lintel between
+# the pylons at about 17 deg, the arcade tops at 16-20 deg and the pylon feet at about 1.5 deg. At 81.5 m from that
+# camera (arch at x 74) this gives: ring centre 33.5 m, ring centreline radius 8.2 m (+ 2.8 m section: outer 9.6),
+# pylons at +-7.6 m (6.2 m wide), lintel top 26.5 m, portal crown 22.5 m; arcade storeys 7.4 m (3 storeys = 22 m at
+# r 62 m: about 17 deg; the A6 README's 8.5 m put the arcade above ref-3's by-eye skyline in the game frame).
+
+RC, RR, RT, RD = 33.5, 8.2, 2.8, 5.0          # ring centre height, centreline radius, radial section, depth (X)
+PY, PW0, PW1, PD = 7.6, 6.2, 5.2, 6.5        # pylon centre |Y|, width at the foot / at the ring, depth (X)
+
+
+def build_arch(coll, stone, metal, cloth, rnd):
+    """the ring arch at azimuth 0 (ref-3): stepped podium, two tall pylons, a horseshoe ring on top framing the moon, a
+    lintel bridge with a portal arch below, a hanging two-blade crescent sigil, crimson banners on the pylons"""
     X = ARCH_X
     bm = bmesh.new()
-    PY, PW, PD, PH = 12.0, 8.0, 7.0, 46.0     # pylon centre |Y|, width, depth, height
+    # podium (the stair in ref-3 climbs to it; hidden behind the near-field dais from the arena)
+    box(bm, X, 0, 1.4, PD + 10, 2 * (PY + PW0) + 8, 2.8, 0)
+    box(bm, X, 0, 3.4, PD + 5, 2 * (PY + PW0) + 3, 1.2, 0)
     for s in (-1, 1):
         y = s * PY
-        box(bm, X, y, 6, PD + 4, PW + 4, 12, 0)                # stepped plinth
-        box(bm, X, y, 13, PD + 2, PW + 2, 2.4, 0)
-        box(bm, X, y, PH / 2, PD, PW, PH, 0, taper=0.08)        # shaft
-        # recessed panel ribs
+        # stepped plinth + shaft (taper PW0 -> PW1), edge ribs, horizontal bands, a recessed panel on the front face
+        box(bm, X, y, 5.5, PD + 2.2, PW0 + 2.2, 3.0, 0)
+        box(bm, X, y, 7.6, PD + 1.2, PW0 + 1.2, 1.2, 0)
+        box(bm, X, y, 8.2 + (RC - 8.2) / 2, PD, (PW0 + PW1) / 2, RC - 8.2, 0, taper=1 - PW1 / PW0)
         for k in (-1, 1):
-            box(bm, X - PD / 2 - 0.4, y + k * (PW / 2 - 0.9), 30, 0.8, 1.2, 30, 0)
-        box(bm, X, y, PH + 1.2, PD + 1.6, PW + 1.6, 2.4, 0)     # capital
-    # ring: square-section torus in the X = const plane, centre height RC
-    RC, R, T = 43.0, 12.0, 5.0
-    n = 56
+            box(bm, X - PD / 2 - 0.35, y + k * ((PW0 + PW1) / 4 - 0.6), 8.2 + (RC - 8.2) / 2, 0.7, 1.0, RC - 8.2, 0)
+        for zb in (14.0, 20.5, 27.0):
+            w = PW0 + (PW1 - PW0) * (zb - 8.2) / (RC - 8.2)
+            box(bm, X, y, zb, PD + 0.9, w + 0.9, 0.9, 0)
+        # broken chunks knocked out of the outer edge (silhouette damage)
+        for k in range(3):
+            zc = rnd.uniform(11, 30)
+            box(bm, X - PD / 2 + rnd.uniform(0.2, 1.0), y + s * ((PW0 + PW1) / 4 + 0.2), zc, 1.6, 1.2, rnd.uniform(0.8, 2.0), 0, rz=rnd.uniform(-0.3, 0.3))
+    # the ring: upper half of a rectangular-section torus (theta 0..pi) + short legs down into the pylons
+    n = 44
     rings = []
-    for i in range(n):
-        th = 2 * math.pi * i / n
-        cy, cz = R * math.cos(th), RC + R * math.sin(th)
+    for i in range(n + 1):
+        th = math.pi * i / n
+        cy, cz = RR * math.cos(th), RC + RR * math.sin(th)
         ny, nz = math.cos(th), math.sin(th)
         ring = []
-        for dx, dr in ((-PD / 2, -T / 2), (PD / 2, -T / 2), (PD / 2, T / 2), (-PD / 2, T / 2)):
+        for dx, dr in ((-RD / 2, -RT / 2), (RD / 2, -RT / 2), (RD / 2, RT / 2), (-RD / 2, RT / 2)):
             ring.append(bm.verts.new((X + dx, cy + ny * dr, cz + nz * dr)))
         rings.append(ring)
     for i in range(n):
-        A, B = rings[i], rings[(i + 1) % n]
+        A, B = rings[i], rings[i + 1]
         for k in range(4):
             bm.faces.new((A[k], A[(k + 1) % 4], B[(k + 1) % 4], B[k]))
-    # crown spikes on the ring top
-    for i in range(-3, 4):
-        th = math.pi / 2 + i * 0.16
-        cy, cz = (R + T / 2) * math.cos(th), RC + (R + T / 2) * math.sin(th)
-        h = 4.5 - abs(i) * 0.9
-        box(bm, X, cy, cz + h / 2, 2.2, 1.6, h, 0, rz=0, taper=0.9)
-    # portal: lintel block between the pylons under the ring + arched opening sides
-    box(bm, X, 0, 27.5, PD - 1.0, 2 * PY - PW, 3.0, 0)
-    # portal arch under the lintel: a semicircular spandrel between the pylons (springing at 15 m), a moulded archivolt
-    a_ = PY - PW / 2
+    # outer moulding on the arena face of the ring, and a raised inner lip
+    for i in range(0, n, 1):
+        th0, th1 = math.pi * i / n, math.pi * (i + 1) / n
+        thm = (th0 + th1) / 2
+        for rad, sec, dz in ((RR + RT / 2 + 0.25, 0.6, 1.0), (RR - RT / 2 - 0.15, 0.4, 0.6)):
+            cy, cz = rad * math.cos(thm), RC + rad * math.sin(thm)
+            seg = rad * (th1 - th0) + 0.05
+            vs = []
+            t = Vector((0, -math.sin(thm), math.cos(thm)))
+            nr = Vector((0, math.cos(thm), math.sin(thm)))
+            c = Vector((X - RD / 2 - dz / 2 + 0.3, cy, cz))
+            # simple box oriented along the tangent
+            for xx in (-dz / 2, dz / 2):
+                for a_, b_ in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+                    vs.append(bm.verts.new(c + Vector((xx, 0, 0)) + t * (a_ * seg / 2) + nr * (b_ * sec / 2)))
+            for f in [(0, 3, 2, 1), (4, 5, 6, 7), (0, 1, 5, 4), (1, 2, 6, 5), (2, 3, 7, 6), (3, 0, 4, 7)]:
+                bm.faces.new([vs[q] for q in f])
+    # crown: a low keystone at the ring top
+    box(bm, X, 0, RC + RR + RT / 2 + 0.4, RD + 0.6, 2.6, 1.2, 0, taper=0.15)
+    # lintel bridge between the pylons + portal arch (springing 18 m, crown 22.5 m) + archivolt
+    inner = PY - (PW0 + PW1) / 4
+    box(bm, X, 0, 25.25, PD - 1.0, 2 * inner + 0.4, 2.5, 0)
+    box(bm, X - 0.3, 0, 26.75, PD - 0.2, 2 * inner + 1.4, 0.5, 0)   # cornice
+    a_ = inner
     hx = (PD - 1.6) / 2
-    segs = 20
-    pts = [(a_ * math.cos(math.pi - math.pi * k / segs), 15.0 + a_ * 0.92 * math.sin(math.pi - math.pi * k / segs)) for k in range(segs + 1)]
+    segs = 18
+    pts = [(a_ * math.cos(math.pi - math.pi * k / segs), 18.0 + a_ * 1.0 * math.sin(math.pi - math.pi * k / segs)) for k in range(segs + 1)]
     for (y0, z0), (y1, z1) in zip(pts, pts[1:]):
         for x in (-hx, hx):
-            v = [bm.verts.new((X + x, y0, z0)), bm.verts.new((X + x, y1, z1)), bm.verts.new((X + x, y1, 26.0)), bm.verts.new((X + x, y0, 26.0))]
+            v = [bm.verts.new((X + x, y0, z0)), bm.verts.new((X + x, y1, z1)), bm.verts.new((X + x, y1, 24.0)), bm.verts.new((X + x, y0, 24.0))]
             bm.faces.new(v if x > 0 else list(reversed(v)))
         bm.faces.new([bm.verts.new((X - hx, y0, z0)), bm.verts.new((X + hx, y0, z0)), bm.verts.new((X + hx, y1, z1)), bm.verts.new((X - hx, y1, z1))])
-        # archivolt ring (a raised band on the arena face)
         ym, zm = (y0 + y1) / 2, (z0 + z1) / 2
-        box(bm, X - hx - 0.35, ym * 1.06, zm + 0.5, 0.7, abs(y1 - y0) + 0.5, 1.4, 0)
+        box(bm, X - hx - 0.3, ym * 1.08, zm + 0.45 * (1 if abs(ym) < a_ * 0.9 else 0), 0.6, abs(y1 - y0) + 0.5, 1.0, 0)
     arch = new_obj('ARCH', bm, [stone], coll)
-    # crescent sigil: two curved blades hanging from the ring top
+    # crescent sigil: two curved blades hanging in front of the ring top, points down (ref-3)
     bm = bmesh.new()
+    xs = X - RD / 2 - 1.6
     for s in (-1, 1):
         prof = []
-        for k in range(14):
-            t = k / 13
-            z = 52.5 - t * 17.0
-            y = s * (1.2 + 2.6 * math.sin(t * math.pi * 0.9))
-            w = 0.9 * (1 - t) + 0.12
+        for k in range(18):
+            t = k / 17
+            z = RC + RR + RT / 2 + 2.6 - t * 15.0
+            y = s * (0.35 + 1.5 * math.sin(t * math.pi * 0.85)) + s * 0.4 * t
+            w = 0.75 * (1 - t) ** 0.7 + 0.08
             prof.append((y, z, w))
         verts = []
         for y, z, w in prof:
-            verts.append([bm.verts.new((X - 1.4, y - w, z)), bm.verts.new((X - 1.4, y + w, z)), bm.verts.new((X - 0.8, y + w, z)), bm.verts.new((X - 0.8, y - w, z))])
+            verts.append([bm.verts.new((xs - 0.3, y - w, z)), bm.verts.new((xs - 0.3, y + w, z)), bm.verts.new((xs + 0.3, y + w, z)), bm.verts.new((xs + 0.3, y - w, z))])
         for A, B in zip(verts, verts[1:]):
             for k in range(4):
                 bm.faces.new((A[k], A[(k + 1) % 4], B[(k + 1) % 4], B[k]))
         bm.faces.new(list(reversed(verts[0])))
         bm.faces.new(verts[-1])
-        # barbs
-        for k in (4, 8, 11):
+        for k in (3, 7, 11):
             y, z, w = prof[k]
-            box(bm, X - 1.1, y + s * (w + 0.8), z, 0.5, 1.8, 0.45, 0, rz=0)
-    box(bm, X - 1.1, 0, 53.5, 0.8, 4.0, 1.2, 0)
+            box(bm, xs, y + s * (w + 0.7), z - 0.4, 0.4, 1.6, 0.35, 0, rz=0)
     new_obj('SIGIL', bm, [metal], coll)
+    # crimson banners on the pylons' arena faces (ref-3: long red cloths on both pylons) + swags from the pylons
+    for s in (-1, 1):
+        top = bl(X - PD / 2 - 0.9, 30.5, -s * PY)
+        banner(coll, cloth, top, Vector((-1, 0, 0)), 3.4, 17.0, rnd, f'pylon_banner{s}')
     return arch
 
 
-def build_arcade(coll, stone, fire, rnd, lights):
-    """three-storey ruined colosseum arcade around the arena (r ARCADE_R), gap at the arch, broken tops, rubble"""
-    W, H, PIER, DEPTH, SPRING = 6.4, 12.0, 1.7, 3.2, 5.0
+def build_vista_pillars(coll, stone, iron, cloth, rnd):
+    """two tall square pillars flanking the vista at r 38 m, azimuth +-24 (ref-3: the pillar behind the creature and
+    the tall one at the right edge), long banners on their arena faces, heavy chains swagging to the arch pylons"""
+    bm = bmesh.new()
+    ch = bmesh.new()
+    for s, h in ((-1, 22.0), (1, 25.0)):
+        d = az_dir(24 * s)
+        c = d * 38.0
+        rz = math.atan2(d.y, d.x)
+        box(bm, c.x, c.y, 0.9, 4.4, 4.4, 1.8, 0, rz=rz)
+        box(bm, c.x, c.y, 2.2, 3.8, 3.8, 0.8, 0, rz=rz)
+        box(bm, c.x, c.y, 2.6 + (h - 4.2) / 2, 3.0, 3.0, h - 4.2, 0, rz=rz, taper=0.04)
+        box(bm, c.x, c.y, h - 1.0, 3.7, 3.7, 0.9, 0, rz=rz)
+        box(bm, c.x, c.y, h - 0.2, 3.3, 3.3, 0.8, 0, rz=rz, taper=0.1)
+        # broken blocks on the top
+        for k in range(3):
+            box(bm, c.x + rnd.uniform(-0.8, 0.8), c.y + rnd.uniform(-0.8, 0.8), h + 0.5 + rnd.uniform(0, 0.8), rnd.uniform(0.8, 1.6), rnd.uniform(0.8, 1.6), rnd.uniform(0.6, 1.4), 0, rz=rnd.uniform(0, 3))
+        f = Vector((-d.x, -d.y, 0)).normalized()
+        banner(coll, cloth, c + f * 1.65 + Vector((0, 0, h - 2.2)), f, 2.6, 13.0, rnd, f'vista_banner{s}')
+        # short heavy chains hanging from the capital (ref-3's pillars carry chains; no long span across the sky: it
+        # filled the skyline between the pillars and the arch)
+        for k in (-1, 1):
+            side = Vector((-f.y, f.x, 0)) * (1.3 * k)
+            q0 = c + f * 1.9 + side + Vector((0, 0, h - 1.3))
+            chain_line(ch, q0, q0 + Vector((0, 0, -5.5 - k * 1.2)) + f * 0.01, 0.0, link=1.0)
+    new_obj('VISTA_PILLARS', bm, [stone], coll)
+    new_obj('VISTA_CHAINS', ch, [iron], coll)
+
+
+def build_arcade(coll, stone, fire, cloth, rnd, lights):
+    """three-storey ruined colosseum arcade around the arena (r ARCADE_R, storeys 8.5 m), gap at the arch, broken tops,
+    pilasters + storey cornices, rubble, banners and shredded swags near the arch, small tier fires"""
+    W, H, PIER, DEPTH, SPRING = 5.2, 7.4, 1.35, 3.0, 3.0  # A8: 7.4 m storeys (22 m arcade: ref-3's skyline at about 18 deg)
     meshes = {}
     for variant in ('s3', 's3b', 's2', 's2b', 's1', 'stub'):
         bm = bmesh.new()
@@ -423,33 +700,36 @@ def build_arcade(coll, stone, fire, rnd, lights):
             last = s == st - 1
             keep = 1.0 if not last or not variant.endswith('b') else rnd.uniform(0.3, 0.7)
             if variant == 'stub':
-                box(bm, 0, -W / 2, 3.5, DEPTH, PIER, 7.0, 0)
+                box(bm, 0, -W / 2, 3.0, DEPTH, PIER, 6.0, 0)
                 continue
             arch_bay(bm, W, H, PIER, DEPTH, SPRING, z0=s * H, keep=keep, rnd=rnd)
+            # pilaster on the pier's arena face + impost block at the springing
+            box(bm, -DEPTH / 2 - 0.18, -W / 2, s * H + H / 2, 0.36, PIER * 0.62, H - 0.4, 0)
+            box(bm, -DEPTH / 2 - 0.1, -W / 2, s * H + SPRING, 0.5, PIER + 0.3, 0.35, 0)
         # back wall of the ground storey (dark corridor behind the openings)
-        box(bm, 4.5, 0, H / 2, 0.8, W, H, 0)
-        # broken pier stump on top of ruined bays
+        box(bm, 4.2, 0, H / 2, 0.8, W, H, 0)
+        # broken pier stumps / jagged blocks on top of ruined bays
         if variant in ('s2b', 's3b', 's1'):
-            box(bm, 0, -W / 2, st * H + 2.0, DEPTH * 0.9, PIER * 0.9, 4.0 * rnd.uniform(0.5, 1.0), 0, taper=0.3)
+            for k in range(rnd.randint(1, 3)):
+                box(bm, rnd.uniform(-0.6, 0.6), -W / 2 + rnd.uniform(-0.4, 1.4), st * H + rnd.uniform(0.6, 2.4), DEPTH * rnd.uniform(0.5, 0.9), PIER * rnd.uniform(0.6, 1.0), rnd.uniform(1.2, 3.6), 0, rz=rnd.uniform(-0.2, 0.2), taper=rnd.uniform(0.1, 0.5))
         meshes[variant] = new_obj(f'bay_{variant}', bm, [stone], coll)
         meshes[variant].hide_render = True  # template (instances below)
         meshes[variant].hide_viewport = True
     circ = 2 * math.pi * ARCADE_R
     n = int(circ / W)
     dth = 2 * math.pi / n
-    # a ruin profile around the ring: tall near the arch (the concept frames the arch with full storeys), lower and
-    # broken toward the back, with a few gaps
+    tops = {}
     for i in range(n):
         th = i * dth
         az = -math.degrees(th)  # Blender angle th (CCW from +X toward +Y) = game azimuth -th
         aza = abs(((az + 180) % 360) - 180)
-        if aza < 13:
+        if aza < 12.5:
             continue  # the arch's pylons stand here
         u = rnd.random()
-        if aza < 70:
-            v = 's3' if u < 0.45 else 's3b'
-        elif aza < 120:
-            v = 's3b' if u < 0.4 else ('s2' if u < 0.7 else 's2b')
+        if aza < 75:
+            v = 's3' if u < 0.4 else 's3b'
+        elif aza < 125:
+            v = 's3b' if u < 0.35 else ('s2' if u < 0.65 else 's2b')
         else:
             v = 's2b' if u < 0.4 else ('s1' if u < 0.7 else ('stub' if u < 0.9 else None))
         if v is None:
@@ -457,23 +737,52 @@ def build_arcade(coll, stone, fire, rnd, lights):
         r = ARCADE_R + rnd.uniform(-0.3, 0.3)
         o = place(coll, meshes[v].data, (r * math.cos(th), r * math.sin(th), 0), th, f'bay{i}')
         o.hide_render = False
+        st = 3 if v.startswith('s3') else (2 if v.startswith('s2') else 1)
+        tops[i] = (th, r, st * H if not v.endswith('b') else (st - 1) * H + H * 0.75, v)
         # rubble at the foot of broken bays
         if v.endswith('b') or v in ('s1', 'stub'):
             bm = bmesh.new()
-            for k in range(rnd.randint(3, 7)):
-                s = rnd.uniform(0.8, 2.6)
-                box(bm, rnd.uniform(-3, 1.5), rnd.uniform(-3, 3), s * 0.4, s, s * rnd.uniform(0.6, 1.4), s * 0.8, 0, rz=rnd.uniform(0, 3))
+            for k in range(rnd.randint(4, 9)):
+                s = rnd.uniform(0.6, 2.4)
+                box(bm, rnd.uniform(-3.5, 1.5), rnd.uniform(-3, 3), s * 0.35, s, s * rnd.uniform(0.6, 1.4), s * 0.7, 0, rz=rnd.uniform(0, 3), taper=rnd.uniform(0, 0.4))
             ob = new_obj(f'rubble{i}', bm, [stone], coll)
             ob.location = (r * math.cos(th), r * math.sin(th), 0)
             ob.rotation_euler = (0, 0, th)
-        # fires on the tiers (ref-3: small fires along the ruined tiers, mostly on the left of the hero view)
-        left = -110 < az < -20 or 20 < az < 60
-        if (left and rnd.random() < 0.28) or rnd.random() < 0.06:
-            st = 3 if v.startswith('s3') else (2 if v.startswith('s2') else 1)
+        # fires on the tiers (ref-3: many small fires along the ruined tiers, mostly on the left of the hero view)
+        left = -120 < az < -15 or 15 < az < 70
+        if (left and rnd.random() < 0.42) or rnd.random() < 0.08:
             lvl = rnd.randint(0, st - 1)
-            z = lvl * H + 0.7 + (H if lvl < st - 1 else 0) * 0
-            px, py = (r - 2.2) * math.cos(th), (r - 2.2) * math.sin(th)
-            add_fire(coll, fire, (px, py, lvl * H + 0.05 + (0.7 if lvl else 0)), rnd, lights, size=rnd.uniform(0.9, 1.6))
+            px, py = (r - 2.0) * math.cos(th), (r - 2.0) * math.sin(th)
+            add_fire(coll, fire, (px, py, lvl * H + 0.05 + (0.5 if lvl else 0)), rnd, lights, size=rnd.uniform(0.8, 1.5))
+        # long banners on some bays near the vista (ref-3: crimson cloths hanging down the arcade)
+        if aza < 85 and v in ('s3', 's3b') and rnd.random() < 0.3:
+            rr = r - DEPTH / 2 - 0.5
+            yb = -W / 2 + PIER / 2 + 0.2
+            p = Vector((rr * math.cos(th) - yb * math.sin(th), rr * math.sin(th) + yb * math.cos(th), 2 * H + H * 0.92))
+            banner(coll, cloth, p, Vector((-math.cos(th), -math.sin(th), 0)), 2.2, rnd.uniform(9, 14), rnd, f'arc_banner{i}')
+    # shredded swags between neighbouring tall bays near the vista, and from each pylon to the first arcade bay
+    keys = sorted(tops)
+    for a_i, b_i in zip(keys, keys[1:]):
+        tha, ra, za, va = tops[a_i]
+        thb, rb, zb, vb = tops[b_i]
+        azm = abs(((-math.degrees((tha + thb) / 2) + 180) % 360) - 180)
+        if b_i - a_i != 1 or a_i % 2 or azm > 70 or rnd.random() < 0.3:
+            continue
+        rr = ARCADE_R - DEPTH / 2 - 0.4
+        p0 = Vector((rr * math.cos(tha - dth / 2), rr * math.sin(tha - dth / 2), min(za, zb) - 0.4))
+        p1 = Vector((rr * math.cos(thb + dth / 2), rr * math.sin(thb + dth / 2), min(za, zb) - 0.4))
+        swag(coll, cloth, p0, p1, rnd.uniform(1.0, 2.2), rnd.uniform(2.0, 4.0), rnd, f'swag{a_i}')
+    for s in (-1, 1):
+        # nearest bay top beside the arch on this side
+        cand = [k for k in keys if abs(((-math.degrees(tops[k][0]) + 180) % 360) - 180) < 22 and (math.sin(tops[k][0]) * s) > 0]
+        if not cand:
+            continue
+        k = min(cand, key=lambda q: abs(math.sin(tops[q][0])))
+        th, r, z, _ = tops[k]
+        rr = ARCADE_R - DEPTH / 2 - 0.4
+        p0 = Vector((ARCH_X - PD / 2 - 0.5, s * (PY + PW1 / 2), 23.5))
+        p1 = Vector((rr * math.cos(th), rr * math.sin(th), z - 0.6))
+        swag(coll, cloth, p0, p1, 3.5, 3.5, rnd, f'pylon_swag{s}')
 
 
 def add_fire(coll, fire, loc, rnd, lights, size=1.2):
@@ -540,24 +849,8 @@ def build_mid(coll, stone, win, water, rnd):
         v = [bm.verts.new((r * math.cos(a), r * math.sin(a), -0.5)) for r, a in ((140, a0), (700, a0), (700, a1), (140, a1))]
         bm.faces.new(v)
     new_obj('MID_GROUND', bm, [stone], coll)
-    # cliff + waterfall behind the arena (azimuth 160, 300 m)
-    d = az_dir(160)
-    c = d * 300
-    bm = bmesh.new()
-    box(bm, c.x, c.y, 45, 50, 160, 90, 0, rz=math.atan2(d.y, d.x), taper=0.15)
-    for k in range(8):
-        box(bm, c.x + rnd.uniform(-30, 30), c.y + rnd.uniform(-70, 70), rnd.uniform(20, 70), 30, 30, rnd.uniform(30, 60), 0, rz=rnd.uniform(0, 3), taper=0.3)
-    new_obj('CLIFF', bm, [stone], coll)
-    bm = bmesh.new()
-    f = Vector((-d.x, -d.y, 0)).normalized()
-    side = Vector((-f.y, f.x, 0))
-    for k, (off, wdt) in enumerate(((-28, 9), (6, 14), (34, 6))):
-        base = c + f * 26.5 + side * off
-        v = [bm.verts.new(base + side * (-wdt / 2) + Vector((0, 0, z))) for z in (0,)]
-        v = [bm.verts.new(base + side * (-wdt / 2)), bm.verts.new(base + side * (wdt / 2)),
-             bm.verts.new(base + side * (wdt / 2) + Vector((0, 0, 84))), bm.verts.new(base + side * (-wdt / 2) + Vector((0, 0, 84)))]
-        bm.faces.new(v)
-    new_obj('WATERFALL', bm, [water], coll)
+    # A8: the A6 test cliff + waterfall (azimuth 160) is gone: ref-3 has none (A6 decision 8)
+    void_water = water  # noqa: F841 (kept for the AOV G path of other themes)
 
 
 def build_far(coll, dark, rnd, clouds=True, quick=False):
@@ -660,9 +953,11 @@ def build(opts):
     win = mat_emit('window', (1.0, 0.42, 0.14), 1.4)
     metal = mat_metal('sigil_iron', (0.05, 0.045, 0.05))
     water = mat_water('water')
+    cloth = mat_banner('banner_crimson')
     lights = []
-    build_arch(colls['near'], stone, metal)
-    build_arcade(colls['near'], stone, fire, rnd, lights)
+    build_arch(colls['near'], stone, metal, cloth, rnd)
+    build_arcade(colls['near'], stone, fire, cloth, rnd, lights)
+    build_vista_pillars(colls['near'], stone, metal, cloth, rnd)
     # near ground disc 34-140 m (under the arcade; the arena itself covers the inside)
     bm = bmesh.new()
     n = 96

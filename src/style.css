@@ -149,3 +149,13 @@ html, body { margin: 0; height: 100%; overflow: hidden; background: #000; color:
   -webkit-mask-image: radial-gradient(circle at 50% 50%, transparent 0 32%, #000 62%); mask-image: radial-gradient(circle at 50% 50%, transparent 0 32%, #000 62%); }
 .speedlines.show { animation: speedlines var(--dur, 0.45s) ease-out forwards; }
 @keyframes speedlines { 0% { opacity: 0.95; transform: scale(1.08); } 70% { opacity: 0.8; } 100% { opacity: 0; transform: scale(1); } }
+
+/* ---------------- A21: match loading screen */
+.loading { position: absolute; inset: 0; z-index: 6; display: flex; align-items: center; justify-content: center; background: radial-gradient(ellipse at 50% 38%, #1a1c2a 0%, #0a0a10 55%, #040406 100%); opacity: 0; pointer-events: none; transition: opacity .45s ease; }
+.loading.show { opacity: 1; pointer-events: auto; }
+.loading-box { width: min(560px, 82vw); text-align: center; }
+.loading-kicker { font-family: var(--display); font-size: 12px; letter-spacing: 0.55em; color: var(--gold); opacity: 0.75; margin-bottom: 14px; }
+.loading-title { font-family: var(--display); font-weight: 700; font-size: clamp(30px, 4.6vw, 58px); letter-spacing: 0.08em; color: #ece6da; text-shadow: 0 0 28px #6a72b0aa, 0 6px 22px #000; margin-bottom: 28px; }
+.loading-track { height: 2px; background: #ffffff1c; overflow: hidden; }
+.loading-bar { height: 100%; background: linear-gradient(90deg, #8a6a3a, var(--gold) 70%, #fff3d8); transform-origin: 0 50%; transform: scaleX(0); box-shadow: 0 0 10px #e8c27a88; }
+.loading-status { margin-top: 12px; font-family: var(--body); font-size: 15px; letter-spacing: 0.08em; color: #b8b2c8; min-height: 1.2em; }

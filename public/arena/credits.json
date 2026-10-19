@@ -49,9 +49,7 @@
     "large_grey_tiles_arm_2k.png"
    ],
    "fetched": "2026-10-17",
-   "usedBy": [
-    "floor/flagstone_bluegrey"
-   ]
+   "usedBy": []
   },
   "polyhaven/lichen_rock": {
    "name": "Lichen Rock",
@@ -70,6 +68,7 @@
    ],
    "fetched": "2026-10-18",
    "usedBy": [
+    "floor/slabs_moongate",
     "kit/banner_pole",
     "kit/brazier_pedestal",
     "kit/chunk",
@@ -119,6 +118,23 @@
     "kit/lantern_paper",
     "kit/spike_grate",
     "kit/vent_grate"
+   ]
+  },
+  "polyhaven/quarry_cloudy": {
+   "name": "Quarry Cloudy",
+   "authors": [
+    "Dimitrios Savva",
+    "Jarod Guest"
+   ],
+   "licence": "CC0-1.0",
+   "url": "https://polyhaven.com/a/quarry_cloudy",
+   "res": "8k",
+   "files": [
+    "quarry_cloudy_8k.hdr"
+   ],
+   "fetched": "2026-10-18",
+   "usedBy": [
+    "sky/moongate"
    ]
   },
   "polyhaven/rock_moss_set_02": {

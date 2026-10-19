@@ -297,7 +297,9 @@ varying vec2 vQ;
 varying vec4 vCol;
 varying vec2 vWorld;
 varying float vDist;
+varying float vMoon;
 void main() {
+  vMoon = aShape.x > 2.5 ? 1.0 : 0.0;
   vec2 toCam = cameraPosition.xz - aSrc.xz;
   float d = max(length(toCam), 0.05);
   vec2 dir = toCam / d;
@@ -324,6 +326,9 @@ uniform float uGain;
 uniform sampler2D uOrm;
 uniform float uTile;
 uniform float uWater;
+uniform float uDry;
+uniform float uMoonDry;
+varying float vMoon;
 varying vec2 vQ;
 varying vec4 vCol;
 varying vec2 vWorld;
@@ -333,7 +338,7 @@ void main() {
   float along = exp(-vQ.y * vQ.y * 2.2) * smoothstep(-1.0, -0.75, vQ.y);
   // the floor's water rank: streaks are bright on wet stone and puddles, broken on the dry tops
   float wr = uTile > 0.0 ? texture2D(uOrm, vWorld / uTile).b : 0.7;
-  float wet = mix(0.12, 1.0, smoothstep(1.0 - uWater - 0.3, 1.0 - uWater + 0.05, wr));
+  float wet = mix(uMoonDry >= 0.0 && vMoon > 0.5 ? uMoonDry : uDry, 1.0, smoothstep(1.0 - uWater - 0.3, 1.0 - uWater + 0.05, wr));
   float a = across * along * wet * uFlicker * uGain * vCol.a * exp(-vDist * 0.015);
   gl_FragColor = vec4(vCol.rgb * a, 1.0);
 }`;
@@ -348,6 +353,10 @@ export class StreakCards {
     uOrm: { value: null as THREE.Texture | null },
     uTile: { value: 0 },
     uWater: { value: 0.35 },
+    /** A8b: streak brightness left on the dry slab tops (FloorArt.streakDry) */
+    uDry: { value: 0.12 },
+    /** A8b: the moon path's own dry-stone brightness (-1 = uDry) */
+    uMoonDry: { value: -1 },
   };
   private src: THREE.InstancedBufferAttribute;
   private col: THREE.InstancedBufferAttribute;

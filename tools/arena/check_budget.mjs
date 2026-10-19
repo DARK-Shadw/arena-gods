@@ -349,6 +349,32 @@ async function main() {
       rows.push([`backdrop/${id}`, tier, '-', String(T.layers.length), '-', '-', texs.length + ' tex', (g / MB).toFixed(2), (dl / 1024).toFixed(0)]);
     }
   }
+  // A7c: authored skies (manifest `skies`, build_sky.mjs): files listed + present, sources in the ledger (CC0), GPU memory
+  // per quality tier (UASTC RGBA -> 1 B/px + mips) added to the kit's, download caps
+  const skyGpu = { low: 0, medium: 0, high: 0 };
+  const SKY_DOWNLOAD_MB = { q0: 1, q1: 3, q2: 8 };
+  for (const [id, S] of Object.entries(man.skies ?? {})) {
+    for (const file of S.files) {
+      listed.add(file.replace(/\//g, path.sep));
+      if (!fs.existsSync(path.join(PUB, file))) fails.push(`${file}: missing (sky ${id})`);
+    }
+    for (const s of S.sources ?? []) {
+      const row = ledger.assets?.[s];
+      if (!row) fails.push(`sky ${id}: source ${s} missing from credits.json`);
+      else if (!/^CC0/.test(row.licence)) fails.push(`sky ${id}: source ${s} licence ${row.licence} is not CC0`);
+    }
+    const J = JSON.parse(fs.readFileSync(path.join(PUB, S.json), 'utf8'));
+    for (const [tier, T] of Object.entries(J.tiers)) {
+      const buf = fs.readFileSync(path.join(PUB, T.tex.ktx2));
+      const w = buf.readUInt32LE(20), h = buf.readUInt32LE(24);
+      if (w % 4 || h % 4) fails.push(`${T.tex.ktx2}: ${w}x${h} not a multiple of 4 (block compression)`);
+      const g = w * h * (4 / 3);
+      if (buf.length > SKY_DOWNLOAD_MB[tier] * MB) fails.push(`sky ${id} ${tier}: download ${(buf.length / MB).toFixed(1)} MB > ${SKY_DOWNLOAD_MB[tier]} MB`);
+      skyGpu[TIER_OF[tier]] = Math.max(skyGpu[TIER_OF[tier]], g);
+      rows.push([`sky/${id}`, tier, '-', '1', '-', '-', `${w}x${h}`, (g / MB).toFixed(2), (buf.length / 1024).toFixed(0)]);
+    }
+  }
+  for (const t of Object.keys(bdGpu)) bdGpu[t] += skyGpu[t];
   // stray files in public/arena (everything shipped must be in the manifest, so the ledger covers it)
   const walk = (d) => fs.readdirSync(d, { withFileTypes: true }).flatMap((e) => (e.isDirectory() ? walk(path.join(d, e.name)) : [path.relative(PUB, path.join(d, e.name))]));
   for (const f of walk(PUB)) if (!listed.has(f)) fails.push(`${f}: in public/arena but not in the manifest`);
@@ -359,7 +385,7 @@ async function main() {
   const w = head.map((h, i) => Math.max(h.length, ...rows.map((r) => r[i].length)));
   console.log(head.map((h, i) => h.padEnd(w[i])).join('  '));
   for (const r of rows) console.log(r.map((c, i) => c.padEnd(w[i])).join('  '));
-  console.log(`arena texture GPU memory (KTX2, kit + backdrop): low ${(tiers.low / MB).toFixed(2)} MB / ${TIER_TEX_MB.low}, medium ${(tiers.medium / MB).toFixed(2)} MB / ${TIER_TEX_MB.medium}, high ${(tiers.high / MB).toFixed(2)} MB / ${TIER_TEX_MB.high} (backdrop low ${(bdGpu.low / MB).toFixed(2)}, medium ${(bdGpu.medium / MB).toFixed(2)}, high ${(bdGpu.high / MB).toFixed(2)}); WebP fallback: low ${(gpu.low.webp / MB).toFixed(2)}, full ${(gpu.full.webp / MB).toFixed(2)} MB`);
+  console.log(`arena texture GPU memory (KTX2, kit + backdrop): low ${(tiers.low / MB).toFixed(2)} MB / ${TIER_TEX_MB.low}, medium ${(tiers.medium / MB).toFixed(2)} MB / ${TIER_TEX_MB.medium}, high ${(tiers.high / MB).toFixed(2)} MB / ${TIER_TEX_MB.high} (backdrop + sky low ${(bdGpu.low / MB).toFixed(2)}, medium ${(bdGpu.medium / MB).toFixed(2)}, high ${(bdGpu.high / MB).toFixed(2)}; sky alone ${(skyGpu.low / MB).toFixed(2)} / ${(skyGpu.medium / MB).toFixed(2)} / ${(skyGpu.high / MB).toFixed(2)}); WebP fallback: low ${(gpu.low.webp / MB).toFixed(2)}, full ${(gpu.full.webp / MB).toFixed(2)} MB`);
   console.log(`sim contract: PROP_BASE r ${JSON.stringify(sim.base)}; TOP ${JSON.stringify(sim.top)}`);
   if (args.includes('--json')) console.log(JSON.stringify({ rows, tiers, fails }, null, 1));
   if (fails.length) {
