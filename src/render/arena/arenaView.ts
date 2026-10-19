@@ -336,6 +336,7 @@ export class Arena {
         if (F.streakDry !== undefined) U.uDry.value = F.streakDry;
         if (F.streakLen !== undefined) U.uStretch.value = F.streakLen;
         if (F.streakWater !== undefined) U.uWater.value = F.streakWater;
+        if (F.moonPath?.dry !== undefined) U.uMoonDry.value = F.moonPath.dry;
         this.group.add(this.streaks.mesh);
       }
       this.tagReflect();
@@ -1129,7 +1130,7 @@ export class Arena {
     if (this.streaks && S.moonSize > 0 && S.sunGlow === 0 && S.moonDir.y > 0.05) {
       const hz = Math.hypot(S.moonDir.x, S.moonDir.z) || 1;
       const cp = this.sky.position; // = the camera (update())
-      st.push({ x: cp.x + (S.moonDir.x / hz) * 40, y: 3, z: cp.z + (S.moonDir.z / hz) * 40, size: 4, color: this._moonCol.copy(S.moonColor).multiplyScalar(1 / Math.max(1e-3, S.moonColor.r)), power: MOON_PATH, len: 3, wid: 1 });
+      st.push({ x: cp.x + (S.moonDir.x / hz) * 40, y: 3, z: cp.z + (S.moonDir.z / hz) * 40, size: 4, color: this._moonCol.copy(S.moonColor).multiplyScalar(1 / Math.max(1e-3, S.moonColor.r)), power: this.wetFloor?.moonPath?.power ?? MOON_PATH, len: 3, wid: this.wetFloor?.moonPath?.wid ?? 1 });
     }
     for (const h of this.hazards) {
       if (h.def.kind !== 'lava') continue;

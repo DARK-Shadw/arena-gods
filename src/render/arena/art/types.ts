@@ -48,6 +48,8 @@ export interface FloorArt {
   streakLen?: number;
   /** A8b: water level the streak cards follow (default min(0.9, puddles x 1.6)); lower keeps them in the deepest water */
   streakWater?: number;
+  /** A8b: the moon-path streak (night themes): power (default 0.6), width multiplier (1), dry-stone brightness (streakDry) */
+  moonPath?: { power?: number; wid?: number; dry?: number };
   /** A8: gain of the fire-streak cards on medium / high (default STREAK_ACCENT 0.6; the planar reflection carries the rest) */
   streakGain?: number;
   /** A8: the same on the low tier (default 1: there the cards are the only fire reflections) */

@@ -214,6 +214,8 @@ export class WetFloor {
   readonly streakLen?: number;
   /** A8b: water level the streak cards follow (FloorArt.streakWater; default puddles x 1.6) */
   readonly streakWater?: number;
+  /** A8b: moon-path streak overrides (FloorArt.moonPath) */
+  readonly moonPath?: { power?: number; wid?: number; dry?: number };
 
   constructor(o: WetFloorOpts) {
     const L = o.layout;
@@ -262,6 +264,7 @@ export class WetFloor {
     this.streakDry = o.art.streakDry;
     this.streakLen = o.art.streakLen;
     this.streakWater = o.art.streakWater;
+    this.moonPath = o.art.moonPath;
     const inSize = inl ? Number(inl.extras.sizeM) || 16 : 16;
     const tint = o.art.tint ?? [1, 1, 1];
     this.uniforms = {
