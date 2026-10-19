@@ -335,6 +335,7 @@ export class Arena {
         U.uWater.value = Math.min(0.9, (F.uniforms.uFPuddle.value as number) * 1.6);
         if (F.streakDry !== undefined) U.uDry.value = F.streakDry;
         if (F.streakLen !== undefined) U.uStretch.value = F.streakLen;
+        if (F.streakWater !== undefined) U.uWater.value = F.streakWater;
         this.group.add(this.streaks.mesh);
       }
       this.tagReflect();

@@ -46,6 +46,8 @@ export interface FloorArt {
   streakDry?: number;
   /** A8b: streak-card length multiplier (default 1) */
   streakLen?: number;
+  /** A8b: water level the streak cards follow (default min(0.9, puddles x 1.6)); lower keeps them in the deepest water */
+  streakWater?: number;
   /** A8: gain of the fire-streak cards on medium / high (default STREAK_ACCENT 0.6; the planar reflection carries the rest) */
   streakGain?: number;
   /** A8: the same on the low tier (default 1: there the cards are the only fire reflections) */
@@ -194,7 +196,9 @@ export interface RuinsArt {
     /** long vertical banners on the pillars' arena faces (w x h m), every n-th pillar skipped by `skip` */
     banner?: { w: number; h: number; pin: number };
     /** heavy chains between neighbouring pillar tops (link scale, sag m) with swag cloths under them */
-    chains?: { scale: number; sag: number; swags: boolean };
+    /** A8b: `swagShred` tears the swag cloths into long shreds (deepest tear, share of the height); `swagSize` = [width
+     * share of the span, height m] (default [0.3, 1.5]) */
+    chains?: { scale: number; sag: number; swags: boolean; swagShred?: number; swagSize?: [number, number] };
   };
   /** sparse hooded watchers standing on the tiers (count per quality tier low / medium / high) */
   watchers?: { count: [number, number, number]; color: string };

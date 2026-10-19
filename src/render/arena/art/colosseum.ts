@@ -23,7 +23,7 @@ export const COLOSSEUM_ART: ThemeArt = {
   id: 'colosseum',
   // A8 (owner feedback): big thick broken slabs (procedural, 8 m tile), dull damp stone, wet glints in puddles / joints /
   // cracks; the ring carved deeper (inlay re-baked at 26 mm)
-  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.42, streakGainLow: 0.8, streakDry: 0.0, streakLen: 0.6, tint: [1.0, 1.0, 1.04], reflDry: 0.3 },
+  floor: { set: 'floor/slabs_moongate', inlay: 'floor/inlay_moongate', wetness: 0.9, puddles: 0.3, damp: [0.78, 0.1], streakGain: 0.42, streakGainLow: 0.8, streakDry: 0.0, streakLen: 0.6, streakWater: 0.22, tint: [1.0, 1.0, 1.04], reflDry: 0.3 },
   // A4: ref-3's big bowls on stone pedestals alternate with the tripods (the pedestal flame is bigger: SOCK_flame size)
   ringFlames: { asset: 'kit/brazier_tripod', assets: ['kit/brazier_pedestal', 'kit/brazier_tripod'], count: 10, offset: 0.55, size: 0.95 },
   // A3: the shared stone kit. Square masonry pillars (ref-3) for the sim's columns (every third one a fluted ruin column),
@@ -56,7 +56,8 @@ export const COLOSSEUM_ART: ThemeArt = {
         scale: 2.0,
         height: 14,
         banner: { w: 2.3, h: 8.6, pin: 12.2 },
-        chains: { scale: 2.6, sag: 2.4, swags: true },
+        // A8b: the swags torn into long rags (the baked zigzag hem read as bunting) and hung deeper
+        chains: { scale: 2.6, sag: 2.4, swags: true, swagShred: 0.6, swagSize: [0.36, 2.6] },
       },
       watchers: { count: [8, 14, 18], color: '#1b1722' },
       fires: { asset: 'kit/brazier_wall', count: 14, size: 0.8, vista: 6, ground: { asset: 'kit/rubble_scatter', count: 9, size: 0.55 } },

@@ -102,6 +102,8 @@ export class BannerKit {
   readonly cells: number;
   private cellUV: [number, number];
   private swagUV: [number, number];
+  private src: THREE.MeshStandardMaterial | null = null;
+  private amp = 0.05;
 
   constructor(
     readonly asset: KitAsset,
@@ -122,6 +124,8 @@ export class BannerKit {
     }
     const src = (v ?? s)?.mat as THREE.MeshStandardMaterial | undefined;
     if (src) this.mat = swayMaterial(src, amp);
+    this.src = src ?? null;
+    this.amp = amp;
   }
 
   /** the geometry of a shape with its UVs moved to atlas cell `cell` */
@@ -171,10 +175,47 @@ export class BannerKit {
   }
 
   /**
+   * A8b: a copy of the sway material that tears the swag row of the atlas (v > swag top) into long irregular shreds
+   * (`depth` = the deepest tear as a share of the cloth height): the baked swag cells end in a regular zigzag that reads
+   * as bunting. Only the swag row is touched; one extra material / draw for the arena that asks for it.
+   */
+  shredMaterial(depth: number): THREE.MeshStandardMaterial | null {
+    if (!this.src) return null;
+    // built from the source material (this.mat's onBeforeCompile may already carry the stage-light patch, which
+    // the stage pass then adds to this material too)
+    const m = swayMaterial(this.src, this.amp);
+    const sway = m.onBeforeCompile;
+    const v0 = 1 - this.swagUV[1];
+    m.name = `${this.src.name}_shred`;
+    m.onBeforeCompile = (sh, r) => {
+      sway.call(m, sh, r);
+      sh.fragmentShader = sh.fragmentShader.replace(
+        '#include <map_fragment>',
+        `#include <map_fragment>
+#ifdef USE_MAP
+if ( vMapUv.y > ${v0.toFixed(4)} ) {
+  float lv = ( vMapUv.y - ${v0.toFixed(4)} ) / ${(1 - v0).toFixed(4)};
+  float sx = vMapUv.x * 46.0;
+  float k = floor( sx + 0.5 * sin( vMapUv.x * 97.0 ) );
+  float h1 = fract( sin( k * 12.9898 ) * 43758.5453 );
+  float h2 = fract( sin( k * 78.233 + 1.7 ) * 24634.6345 );
+  float tear = ${depth.toFixed(3)} * ( 0.12 + 0.88 * h1 * h1 ) + 0.05 * sin( sx * 6.2831 ) * h2;
+  if ( lv > 1.0 - tear - 0.03 ) discard;
+  float hole = fract( sin( dot( floor( vMapUv * vec2( 70.0, 30.0 ) ), vec2( 12.9898, 78.233 ) ) ) * 43758.5453 );
+  if ( hole > 0.985 && lv > 0.3 ) discard;
+}
+#endif`,
+      );
+    };
+    m.customProgramCacheKey = () => `sway|shred|${depth}|${this.src!.uuid}`;
+    return m;
+  }
+
+  /**
    * many banners merged into ONE mesh (one draw call): each placement's geometry is transformed to the world, and its sway
    * axis (the banner's world +z), hang depth (metres, after scale) and phase (deterministic, from `phase`) go into aSway
    */
-  merged(list: { shape: BannerShape; cell: number; w: number; h: number; m: THREE.Matrix4; phase: number }[]): THREE.Mesh | null {
+  merged(list: { shape: BannerShape; cell: number; w: number; h: number; m: THREE.Matrix4; phase: number }[], mat?: THREE.Material): THREE.Mesh | null {
     if (!this.mat || !list.length) return null;
     const geos: THREE.BufferGeometry[] = [];
     const ext = this.asset.extras;
@@ -194,7 +235,7 @@ export class BannerKit {
     for (const g of geos) g.dispose();
     if (!merged) return null;
     merged.computeBoundingSphere();
-    const mesh = new THREE.Mesh(merged, this.mat);
+    const mesh = new THREE.Mesh(merged, mat ?? this.mat);
     mesh.castShadow = mesh.receiveShadow = true;
     mesh.userData.dyn = true;
     mesh.userData.banner = true;

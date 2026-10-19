@@ -212,6 +212,8 @@ export class WetFloor {
   readonly streakDry?: number;
   /** A8b: streak-card length multiplier (FloorArt.streakLen; default 1) */
   readonly streakLen?: number;
+  /** A8b: water level the streak cards follow (FloorArt.streakWater; default puddles x 1.6) */
+  readonly streakWater?: number;
 
   constructor(o: WetFloorOpts) {
     const L = o.layout;
@@ -259,6 +261,7 @@ export class WetFloor {
     this.streakGainLow = o.art.streakGainLow;
     this.streakDry = o.art.streakDry;
     this.streakLen = o.art.streakLen;
+    this.streakWater = o.art.streakWater;
     const inSize = inl ? Number(inl.extras.sizeM) || 16 : 16;
     const tint = o.art.tint ?? [1, 1, 1];
     this.uniforms = {

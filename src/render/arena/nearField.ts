@@ -37,6 +37,8 @@ export interface Placed {
 
 export interface BannerSpec {
   shape: BannerShape;
+  /** A8b: torn swag (deepest tear, share of the height; own material) */
+  shred?: number;
   cell: number;
   w: number;
   h: number;
@@ -305,7 +307,7 @@ export function buildNearField(a: Arena, pack: ArenaPack, N: RuinsArt, banners: 
             const fwd = new THREE.Vector3(Math.sin(yaw), 0, Math.cos(yaw));
             if (fwd.dot(new THREE.Vector3(-c.x, 0, -c.z)) < 0) yaw += Math.PI;
             const m = new THREE.Matrix4().compose(c, new THREE.Quaternion().setFromAxisAngle(UP, yaw), new THREE.Vector3(1, 1, 1));
-            out.banners.push({ shape: 'swag', cell: hash(L.seed, i, t * 10) % 2, w: span * 0.3, h: 1.5, m, phase: (hash(L.seed, i, 23, t * 10) % 628) / 100 });
+            out.banners.push({ shape: 'swag', cell: hash(L.seed, i, t * 10) % 2, w: span * (P.chains.swagSize?.[0] ?? 0.3), h: P.chains.swagSize?.[1] ?? 1.5, m, phase: (hash(L.seed, i, 23, t * 10) % 628) / 100, shred: P.chains.swagShred });
           }
       }
     }

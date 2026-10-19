@@ -536,8 +536,13 @@ function buildRing(a: Arena, pack: ArenaPack, D: Dressing, banners: BannerKit | 
   removeLegacy(a, D, toRemove);
   // banners (wall + pillar + swags): ONE merged swaying mesh; rods merged; chains instanced
   if (banners && bannerList.length) {
-    const mesh = banners.merged(bannerList);
+    // A8b: shredded swags (their own material) go in a second merged mesh
+    const torn = bannerList.filter((b) => b.shred);
+    const mesh = banners.merged(torn.length ? bannerList.filter((b) => !b.shred) : bannerList);
     if (mesh) a.group.add(mesh);
+    const sm = torn.length ? banners.shredMaterial(torn[0].shred!) : null;
+    const tm = sm ? banners.merged(torn, sm) : null;
+    if (tm) a.group.add(tm);
   }
   const rod = rodList.length && banners ? banners.rod() : null;
   if (rod) {
